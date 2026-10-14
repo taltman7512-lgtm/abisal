@@ -511,18 +511,21 @@ async function wpCheck(pi,raw){const key=pi+"|"+norm(raw);if(WP.cache.has(key))r
  catch(e){if(e instanceof TypeError&&!WP.ok)WP.on=false}
  return res}
 
-// ===================== IA (preguntas creativas) =====================
-// Las preguntas con "ia" (excusas, situaciones…) no tienen una fuente completa: si la respuesta no está en la lista,
-// se le pregunta a una IA gratuita a través de un Worker de Cloudflare (herramientas/ia-worker.js). Sin dirección no se usa.
+// ===================== IA (último recurso) =====================
+// Si la respuesta no está en la lista ni en Wikidata ni en Wikipedia, se le pregunta a una IA gratuita a través de un
+// Worker de Cloudflare (herramientas/ia-worker.js). Sin dirección no se usa.
+// En las preguntas creativas ("ia") la IA puede ser flexible; en las de datos se le pide que sea estricta
+// (si no, aceptaba "Bailando" como canción de Soda Stereo) y lo más que da es Hallazgo profundo.
 const AI={url:"https://abisalia.altmantomas05.workers.dev",on:true,cache:new Map()};
 const AI_RAREZA=["común","poco común","rara","rarísima"];
+const AI_DATOS=" [DATOS: sé muy estricto, muchas respuestas son trampas de otro artista, obra o categoría; aceptá solo si estás 100% seguro]";
 async function aiCheck(pi,raw){if(!AI.url)return null;const key=pi+"|"+norm(raw);if(AI.cache.has(key))return AI.cache.get(key);let res=null;
- try{const c=new AbortController(),t=setTimeout(()=>c.abort(),16000);
+ try{const c=new AbortController(),t=setTimeout(()=>c.abort(),16000),datos=!P[pi].ia;
   // ejemplos para que la IA calibre qué tan rara es (sin las "Muy vivo", que son trampas)
   const ej=P[pi].t.flatMap((s,tier)=>tier===1?[]:s.split(",").map(g=>g.split("/")[0].trim()).filter(Boolean)).slice(0,40);
-  const r=await fetch(AI.url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({q:P[pi].q,a:raw,ej}),signal:c.signal}).finally(()=>clearTimeout(t));AI.ok=true;
-  if(r.ok){const d=await r.json();if(d.valida)res={tier:1+d.rareza,label:d.etiqueta,key:norm(d.etiqueta),exact:false,ai:true}}
-  AI.cache.set(key,res)}
+  const r=await fetch(AI.url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({q:P[pi].q+(datos?AI_DATOS:""),a:raw,ej}),signal:c.signal}).finally(()=>clearTimeout(t));AI.ok=true;
+  // si la IA está saturada no se guarda la decisión, así se puede volver a probar
+  if(r.ok){const d=await r.json();if(d.valida)res={tier:Math.min(datos?4:5,1+d.rareza),label:d.etiqueta,key:norm(d.etiqueta),exact:false,ai:true};AI.cache.set(key,res)}}
  catch(e){if(e instanceof TypeError&&!AI.ok)AI.on=false}
  return res}
 
@@ -606,8 +609,8 @@ $("bar").addEventListener("submit",async e=>{e.preventDefault();if(phase!=="answ
  // y si tampoco está ahí, en Wikipedia
  if(!hit&&P[current].wp&&WP.on){const pi=current;phase="checking";toast(`Buscando “${esc(v)}” en Wikipedia…<small>EL RELOJ ESTÁ EN PAUSA</small>`);
   const r=await wpCheck(pi,v);if(phase!=="checking"||current!==pi)return;phase="answering";if(r)hit=r}
- // en las preguntas creativas, se le pregunta a la IA
- const useAI=!hit&&P[current].ia&&AI.url&&AI.on;
+ // y si nada la encontró, se le pregunta a la IA (en cualquier pregunta)
+ const useAI=!hit&&v.length>=2&&AI.url&&AI.on;
  if(useAI){const pi=current;phase="checking";toast(`Consultando a la IA por “${esc(v)}”…<small>EL RELOJ ESTÁ EN PAUSA</small>`);
   const r=await aiCheck(pi,v);if(phase!=="checking"||current!==pi)return;phase="answering";if(r)hit=r}
  if(!hit){const pen=mode==="run"?3:2,src=[P[current].wd&&WD.on&&"Wikidata",P[current].wp&&WP.on&&"Wikipedia"].filter(Boolean).join(" ni en ");timeLeft-=pen;sfx.wrong();toast(`“${esc(v)}” no está en la lista${src?" ni en "+src:""}${useAI&&AI.on?" y la IA no la aceptó":""}<small>−${pen} SEGUNDOS</small>`,true);const a=$("answer");a.classList.remove("shake");void a.offsetWidth;a.classList.add("shake");a.select();return}
@@ -639,7 +642,7 @@ function reveal(hit){UI.tag.hidden=true;tagState=null;phase="reveal";setDim(true
  if(hit){const t=TIERS[hit.tier],c=iconCanvas(hit.tier,6);ic.width=c.width;ic.height=c.height;ic.getContext("2d").drawImage(c,0,0);ic.style.filter=`drop-shadow(0 0 10px ${t.color})`;ic.hidden=false;
   $("revTier").textContent=t.name;$("revTier").style.color=t.color;$("revTier").style.textShadow=`0 0 16px ${t.color}88`;$("revAnswer").textContent="“"+hit.label.replace(/^./,c=>c.toUpperCase())+"”";
   $("revPts").innerHTML=`<span style="color:${t.color}">+${t.pts} PTS</span> · bajás ${t.pts*M_PER_PT}m`;
-  $("revNote").textContent=hit.ai?`Aceptada por la IA, que la consideró ${AI_RAREZA[hit.tier-2]}. No estaba en la lista.`:hit.wd||hit.wp?`Verificada en ${hit.wd?"Wikidata":"Wikipedia"}: tiene artículo en ${hit.links} ${hit.links===1?"Wikipedia":"Wikipedias"}. Cuantas menos, más rara.`:(factFor(pi,hit.label)||t.note);sfx.reveal(hit.tier)}
+  $("revNote").textContent=hit.ai?`Aceptada por la IA, que la consideró ${AI_RAREZA[hit.tier-2]}. No estaba en la lista${P[pi].wd||P[pi].wp?" ni en Wikipedia":""}.`:hit.wd||hit.wp?`Verificada en ${hit.wd?"Wikidata":"Wikipedia"}: tiene artículo en ${hit.links} ${hit.links===1?"Wikipedia":"Wikipedias"}. Cuantas menos, más rara.`:(factFor(pi,hit.label)||t.note);sfx.reveal(hit.tier)}
  else{ic.hidden=true;$("revTier").textContent="SIN OXÍGENO";$("revTier").style.color="#7d95aa";$("revTier").style.textShadow="none";$("revAnswer").textContent="Se terminó el tiempo";$("revPts").textContent="+0 PTS · no bajás";
   $("revNote").textContent="El krill se quedó quieto. En la próxima, cualquier respuesta válida suma.";sfx.timeout()}
  UI.reveal.hidden=false;UI.revBtn.hidden=false;UI.revBtn.textContent=R.results.length>=7?"SALIR A LA SUPERFICIE ▲":"DESCENDER ▼";UI.revBtn.focus()}
