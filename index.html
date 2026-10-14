@@ -473,6 +473,59 @@ async function wdCheck(pi,raw){const key=pi+"|"+norm(raw);if(WD.cache.has(key))r
  catch(e){if(e instanceof TypeError&&!WD.ok)WD.on=false}
  return res}
 
+// ===================== Wikipedia =====================
+// Si tampoco está en Wikidata, se busca el artículo en Wikipedia en español y se mira si alguna de sus categorías
+// es del tipo que pide la pregunta (P[i].wp: expresión regular sobre el nombre de la categoría, ej. "^(Canciones|Sencillos) de Soda Stereo").
+const WP={on:true,cache:new Map()};
+const WP_API="https://es.wikipedia.org/w/api.php?format=json&formatversion=2&origin=*&";
+const wpTitle=t=>t.replace(/\s*\([^)]*\)$/,"");
+async function wpFetch(q,ms=7000){const c=new AbortController(),t=setTimeout(()=>c.abort(),ms);
+ try{const r=await fetch(WP_API+q,{signal:c.signal});WP.ok=true;if(!r.ok)throw new Error("HTTP "+r.status);return await r.json()}finally{clearTimeout(t)}}
+async function wpCheck(pi,raw){const key=pi+"|"+norm(raw);if(WP.cache.has(key))return WP.cache.get(key);let res=null;
+ try{const want=norm(raw),re=new RegExp(P[pi].wp,"i"),sc=new Map();
+  // lo escrito es el principio o el final del título: "wimbledon" → "Campeonato de Wimbledon", "obelisco" → "Obelisco de Buenos Aires"
+  const edge=s=>{const t=wdRaw(wpTitle(s)).join("");return want.length>=4&&(t.startsWith(want)||t.endsWith(want))};
+  // 1) búsqueda por relevancia; si Wikipedia sugiere otra escritura ("¿quisiste decir…?") también se prueba
+  const look=async q=>{const d=await wpFetch("action=query&list=search&srlimit=12&srprop=redirecttitle&srinfo=suggestion&srsearch="+encodeURIComponent(q));
+   // si coincide por una redirección ("Carpincho" → "Hydrochoerus hydrochaeris"), se muestra ese nombre
+   for(const h of d.query.search){const vt=wdScore(want,wpTitle(h.title)),vr=h.redirecttitle?wdScore(want,wpTitle(h.redirecttitle)):0,v=Math.max(vt,vr),e=edge(h.title)||!!(h.redirecttitle&&edge(h.redirecttitle));
+    if(v&&!(sc.has(h.title)&&sc.get(h.title).v>=v))sc.set(h.title,{v,e,label:wpTitle(vr>vt?h.redirecttitle:h.title)})}
+   return d.query.searchinfo&&d.query.searchinfo.suggestion};
+  const sug=await look(raw);if(sug&&!sc.size)await look(sug);
+  // 2) de los que coinciden con lo escrito, cuáles tienen una categoría del tipo pedido; y en cuántos idiomas está cada uno
+  if(sc.size){const pages=new Map();let cont="";
+   for(let i=0;i<5;i++){const d=await wpFetch("action=query&prop=categories|langlinks&cllimit=max&clshow=!hidden&lllimit=max&titles="+encodeURIComponent([...sc.keys()].join("|"))+cont);
+    for(const p of d.query.pages){const o=pages.get(p.title)||{cats:[],langs:0};o.cats.push(...(p.categories||[]).map(c=>c.title.replace(/^Categoría:/,"")));o.langs+=(p.langlinks||[]).length;pages.set(p.title,o)}
+    if(!d.continue)break;cont="&"+new URLSearchParams(d.continue)}
+   // muchos artículos solo están en su propia categoría ("Club Atlético Huracán"); entonces se mira un nivel más arriba
+   const ok=o=>o.cats.some(c=>re.test(c)),up=[...new Set([...pages.values()].filter(o=>!ok(o)).flatMap(o=>o.cats))].slice(0,50);
+   if(up.length){const d=await wpFetch("action=query&prop=categories&cllimit=max&clshow=!hidden&titles="+encodeURIComponent(up.map(c=>"Categoría:"+c).join("|"))),good=new Set();
+    for(const p of d.query.pages)if((p.categories||[]).some(c=>re.test(c.title.replace(/^Categoría:/,""))))good.add(p.title.replace(/^Categoría:/,""));
+    for(const o of pages.values())if(o.cats.some(c=>good.has(c)))o.up=true}
+   // vale si coincide entero o con errores chicos; una palabra suelta ("Marge" → "Marge Simpson") solo en preguntas de nombres;
+   // y si lo escrito es el principio o el final del título, solo si el artículo es conocido (10 idiomas o más): así "Messi" no es la "Messi Cup"
+   let best=null;for(const [title,o] of pages){const m=sc.get(title),links=o.langs+1;if(!m)continue;const score=m.v;
+    if((score>=3||(P[pi].n&&score>=2)||(m.e&&links>=10))&&(o.up||ok(o))&&(!best||score>best.score||(score===best.score&&links>best.links)))best={label:m.label,score,links}}
+   if(best)res={tier:wdTier(best.links),label:best.label,key:norm(best.label),exact:false,wp:true,links:best.links}}
+  WP.cache.set(key,res)}
+ catch(e){if(e instanceof TypeError&&!WP.ok)WP.on=false}
+ return res}
+
+// ===================== IA (preguntas creativas) =====================
+// Las preguntas con "ia" (excusas, situaciones…) no tienen una fuente completa: si la respuesta no está en la lista,
+// se le pregunta a una IA gratuita a través de un Worker de Cloudflare (herramientas/ia-worker.js). Sin dirección no se usa.
+const AI={url:"https://abisalia.altmantomas05.workers.dev",on:true,cache:new Map()};
+const AI_RAREZA=["común","poco común","rara","rarísima"];
+async function aiCheck(pi,raw){if(!AI.url)return null;const key=pi+"|"+norm(raw);if(AI.cache.has(key))return AI.cache.get(key);let res=null;
+ try{const c=new AbortController(),t=setTimeout(()=>c.abort(),16000);
+  // ejemplos para que la IA calibre qué tan rara es (sin las "Muy vivo", que son trampas)
+  const ej=P[pi].t.flatMap((s,tier)=>tier===1?[]:s.split(",").map(g=>g.split("/")[0].trim()).filter(Boolean)).slice(0,40);
+  const r=await fetch(AI.url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({q:P[pi].q,a:raw,ej}),signal:c.signal}).finally(()=>clearTimeout(t));AI.ok=true;
+  if(r.ok){const d=await r.json();if(d.valida)res={tier:1+d.rareza,label:d.etiqueta,key:norm(d.etiqueta),exact:false,ai:true}}
+  AI.cache.set(key,res)}
+ catch(e){if(e instanceof TypeError&&!AI.ok)AI.on=false}
+ return res}
+
 // ===================== Sonido (sintetizado, sin archivos) =====================
 const sfx=(()=>{let ctx=null,master=null,ambF=null,ambG=null,on=store.get("abisal-sound")!==false;
  function init(){if(ctx)return ctx;const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;ctx=new C();master=ctx.createGain();master.gain.value=on?.9:0;master.connect(ctx.destination);
@@ -550,8 +603,16 @@ $("bar").addEventListener("submit",async e=>{e.preventDefault();if(phase!=="answ
  // si no está en la lista, se consulta Wikidata (el reloj se pausa mientras busca)
  if(!hit&&P[current].wd&&WD.on){const pi=current;phase="checking";toast(`Buscando “${esc(v)}” en Wikidata…<small>EL RELOJ ESTÁ EN PAUSA</small>`);
   const r=await wdCheck(pi,v);if(phase!=="checking"||current!==pi)return;phase="answering";if(r)hit=r}
- if(!hit){const pen=mode==="run"?3:2;timeLeft-=pen;sfx.wrong();toast(`“${esc(v)}” no está en la lista${P[current].wd&&WD.on?" ni en Wikidata":""}<small>−${pen} SEGUNDOS</small>`,true);const a=$("answer");a.classList.remove("shake");void a.offsetWidth;a.classList.add("shake");a.select();return}
- if(hit.wd)toast(`“${esc(v)}” → “${esc(hit.label)}”<small>VERIFICADA EN WIKIDATA</small>`);
+ // y si tampoco está ahí, en Wikipedia
+ if(!hit&&P[current].wp&&WP.on){const pi=current;phase="checking";toast(`Buscando “${esc(v)}” en Wikipedia…<small>EL RELOJ ESTÁ EN PAUSA</small>`);
+  const r=await wpCheck(pi,v);if(phase!=="checking"||current!==pi)return;phase="answering";if(r)hit=r}
+ // en las preguntas creativas, se le pregunta a la IA
+ const useAI=!hit&&P[current].ia&&AI.url&&AI.on;
+ if(useAI){const pi=current;phase="checking";toast(`Consultando a la IA por “${esc(v)}”…<small>EL RELOJ ESTÁ EN PAUSA</small>`);
+  const r=await aiCheck(pi,v);if(phase!=="checking"||current!==pi)return;phase="answering";if(r)hit=r}
+ if(!hit){const pen=mode==="run"?3:2,src=[P[current].wd&&WD.on&&"Wikidata",P[current].wp&&WP.on&&"Wikipedia"].filter(Boolean).join(" ni en ");timeLeft-=pen;sfx.wrong();toast(`“${esc(v)}” no está en la lista${src?" ni en "+src:""}${useAI&&AI.on?" y la IA no la aceptó":""}<small>−${pen} SEGUNDOS</small>`,true);const a=$("answer");a.classList.remove("shake");void a.offsetWidth;a.classList.add("shake");a.select();return}
+ if(hit.wd||hit.wp)toast(`“${esc(v)}” → “${esc(hit.label)}”<small>VERIFICADA EN ${hit.wd?"WIKIDATA":"WIKIPEDIA"}</small>`);
+ else if(hit.ai)toast(`“${esc(v)}” → “${esc(hit.label)}”<small>ACEPTADA POR LA IA</small>`);
  else if(!hit.exact)toast(`“${esc(v)}” → “${esc(hit.label)}”<small>${hit.desc?"ACEPTADA POR DESCRIPCIÓN":"SE ACEPTA CON ERRORES DE TIPEO"}</small>`);
  mode==="run"?runHit(hit):infHit(hit)});
 
@@ -578,7 +639,7 @@ function reveal(hit){UI.tag.hidden=true;tagState=null;phase="reveal";setDim(true
  if(hit){const t=TIERS[hit.tier],c=iconCanvas(hit.tier,6);ic.width=c.width;ic.height=c.height;ic.getContext("2d").drawImage(c,0,0);ic.style.filter=`drop-shadow(0 0 10px ${t.color})`;ic.hidden=false;
   $("revTier").textContent=t.name;$("revTier").style.color=t.color;$("revTier").style.textShadow=`0 0 16px ${t.color}88`;$("revAnswer").textContent="“"+hit.label.replace(/^./,c=>c.toUpperCase())+"”";
   $("revPts").innerHTML=`<span style="color:${t.color}">+${t.pts} PTS</span> · bajás ${t.pts*M_PER_PT}m`;
-  $("revNote").textContent=hit.wd?`Verificada en Wikidata: tiene artículo en ${hit.links} Wikipedias. Cuantas menos, más rara.`:(factFor(pi,hit.label)||t.note);sfx.reveal(hit.tier)}
+  $("revNote").textContent=hit.ai?`Aceptada por la IA, que la consideró ${AI_RAREZA[hit.tier-2]}. No estaba en la lista.`:hit.wd||hit.wp?`Verificada en ${hit.wd?"Wikidata":"Wikipedia"}: tiene artículo en ${hit.links} ${hit.links===1?"Wikipedia":"Wikipedias"}. Cuantas menos, más rara.`:(factFor(pi,hit.label)||t.note);sfx.reveal(hit.tier)}
  else{ic.hidden=true;$("revTier").textContent="SIN OXÍGENO";$("revTier").style.color="#7d95aa";$("revTier").style.textShadow="none";$("revAnswer").textContent="Se terminó el tiempo";$("revPts").textContent="+0 PTS · no bajás";
   $("revNote").textContent="El krill se quedó quieto. En la próxima, cualquier respuesta válida suma.";sfx.timeout()}
  UI.reveal.hidden=false;UI.revBtn.hidden=false;UI.revBtn.textContent=R.results.length>=7?"SALIR A LA SUPERFICIE ▲":"DESCENDER ▼";UI.revBtn.focus()}
@@ -667,6 +728,7 @@ else{$("eyebrow").textContent="FALTAN LAS PREGUNTAS";$("prompt").textContent="No
  $("startBtn").hidden=true;$("introMore").hidden=true;$("tierTable").hidden=true}
 requestAnimationFrame(loop);
 </script>
+
 
 </body>
 </html>
