@@ -1080,7 +1080,7 @@ function sink(text,tier,then){phase="sinking";UI.bar.hidden=true;$("answer").blu
  const start=cam+(H*(W<700?.48:.45)-surfY)/PPM,d=TIERS[tier].pts*M_PER_PT,plan=sinkPlan(tier,mode==="inf"),t=TIERS[tier];
  const tag=UI.tag;tag.textContent="“"+text.toUpperCase()+"” ▼";tag.style.borderColor=t.color;tag.style.boxShadow=`0 0 ${tier>=4?28:16}px rgba(${t.rgb},${tier>=4?.6:.3})`;tag.style.color=tier>=3?t.color:"#d7e6f0";
  tag.style.visibility="hidden";tag.hidden=false;const w=tag.offsetWidth;
- tagState={start,depth:start,d,tier,t:0,dur:reduce?.01:plan.dur,ev:plan.ev,cam0:cam,x:W/2,y:scrY(start),w,moving:true,then,wob:Math.random()*7};
+ tagState={start,depth:start,d,tier,t:0,dur:plan.dur,ev:plan.ev,cam0:cam,x:W/2,y:scrY(start),w,moving:true,then,wob:Math.random()*7};
  placeTag();tag.style.visibility="visible"}
 function placeTag(){const s=tagState;s.x=W/2+Math.sin(T*1.3+s.wob)*7;s.y=scrY(s.depth);
  const rot=s.tier===1?Math.sin(T*9)*12:Math.sin(T*1.1+s.wob)*2.5;UI.tag.style.transform=`translate(${s.x-s.w/2+FX.sx}px,${s.y-16+FX.sy}px) rotate(${rot}deg)`}
@@ -1106,7 +1106,7 @@ function reveal(hit){UI.tag.hidden=true;tagState=null;phase="reveal";setDim(true
  UI.reveal.hidden=false;UI.revBtn.hidden=false;UI.revBtn.textContent=R.results.length>=7?"SALIR A LA SUPERFICIE ▲":"DESCENDER ▼";UI.revBtn.focus()}
 UI.revBtn.onclick=()=>{if(mode!=="run")return;if(R.results.length>=7){hideAll();UI.card.hidden=true;
   // algo pica solo si terminaste con 500 puntos o más; si no, se sube como siempre
-  if(!reduce&&runPts()>=500)startBoss();else{camTarget=0;phase="surfacing";setTimeout(endRun,reduce?0:1600)}}else nextQ()};
+  if(runPts()>=500)startBoss();else{camTarget=0;phase="surfacing";setTimeout(endRun,1600)}}else nextQ()};
 // Final: "LLEGASTE AL FONDO...", se encienden dos ojos en la oscuridad, sube un pez gigante, muerde el krill
 // y sube con él (la cámara lo acompaña hasta la superficie)
 let EX_CR=null;   // modo explorador: la criatura elegida para "VER EL FINAL"
@@ -1472,7 +1472,7 @@ $("menuBtn").onclick=e=>{e.stopPropagation();const m=$("menu");m.hidden=!m.hidde
 const ARC=106.8;let last=performance.now();
 // rdt: el tiempo real que pasó (aunque la página haya estado escondida), para los relojes; dt: el de las animaciones
 function loop(now){const rdt=clamp((now-last)/1000,0,3600),dt=Math.min(rdt,.05);last=Math.max(last,now);T+=dt;
- if(phase==="sinking"&&tagState)stepSink(dt);else cam+=(camTarget-cam)*(reduce?1:1-Math.exp(-dt*2.2));
+ if(phase==="sinking"&&tagState)stepSink(dt);else cam+=(camTarget-cam)*(1-Math.exp(-dt*2.2));
  if(phase==="countdown"){const before=Math.ceil(cd);cd-=rdt;if(Math.ceil(cd)!==before&&cd>0)sfx.tick(false);UI.pill.innerHTML=`descendiendo · el reloj arranca en <b>${Math.max(1,Math.ceil(cd))}</b>`;if(cd<=0)beginAnswer()}
  const cave=mode==="run"&&R&&R.caveOn===R.results.length;
  if(phase==="answering"&&cave){$("ringArc").setAttribute("stroke-dashoffset",0);$("ringArc").setAttribute("stroke","#4fd8f0");$("ring").classList.remove("low");$("ringTxt").textContent="∞"}
