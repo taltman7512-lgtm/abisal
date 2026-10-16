@@ -1901,13 +1901,15 @@ const FIGHT_T=6;
 function crResult(b){const e=bestMark(b.cr,!b.esc,runPts()*M_PER_PT);R.catch={id:b.cr.id,esc:b.esc,nuevo:!b.esc&&e.n===1};const rz=RZ[b.cr.r],m=$("crMsg");m.style.setProperty("--c",rz.c);
  m.className="r"+b.cr.r;m.innerHTML=b.esc?`<b>¡SE SOLTÓ!</b><small>${esc(b.cr.n.toUpperCase())} · ${rz.n}</small>`:`<b>${esc(b.cr.n.toUpperCase())}</b><small>${rz.n}${R.catch.nuevo?" · ¡NUEVA EN TU BESTIARIO!":""}</small>`;m.hidden=false}
 function fightStart(b){b.fighting=true;b.fp=0;b.ft=FIGHT_T;b.need=6+2*b.cr.r;b.dec=.02*b.cr.r;
- const rz=RZ[b.cr.r],m=$("crMsg");m.style.setProperty("--c",rz.c);m.className="r"+b.cr.r;m.innerHTML=`<b>¡SE QUIERE ESCAPAR!</b><small>${esc(b.cr.n.toUpperCase())} · ${rz.n} · TOCÁ ¡TIRÁ! RÁPIDO</small>`;m.hidden=false;
+ const rz=RZ[b.cr.r],m=$("crMsg");m.style.setProperty("--c",rz.c);m.className="r"+b.cr.r;m.innerHTML=`<b>¡SE QUIERE ESCAPAR!</b><small>${esc(b.cr.n.toUpperCase())} · ${rz.n} · TOCÁ RÁPIDO, CON CUALQUIER DEDO O CLIC</small>`;m.hidden=false;
  $("fightFill").style.width="0%";$("fightBox").hidden=false;fightUI(b)}
 function fightUI(b){$("fightFill").style.width=Math.round(b.fp*100)+"%";$("fightTime").textContent=Math.max(0,b.ft).toFixed(1)+" s"}
 function fightStep(b,dt){b.ft-=dt;b.fp=Math.max(0,b.fp-b.dec*dt);FX.shake=Math.max(FX.shake,1.2);fightUI(b);if(b.fp>=1)fightEnd(b,true);else if(b.ft<=0)fightEnd(b,false)}
 function fightTap(){const b=FX.boss;if(!b||!b.fighting)return;b.fp=Math.min(1,b.fp+1/b.need);sfx.blub();FX.shake=Math.max(FX.shake,2.5);fightUI(b);if(b.fp>=1)fightEnd(b,true)}
 function fightEnd(b,won){if(!b.fighting)return;b.fighting=false;$("fightBox").hidden=true;b.esc=!won;if(won){flash(hexRgb(RZ[b.cr.r].c),.6);sfx.reveal(Math.min(5,b.cr.r))}else sfx.wrong();crResult(b)}
-$("fightBtn").addEventListener("pointerdown",e=>{e.preventDefault();fightTap()});
+// durante la pelea cuenta cualquier toque en cualquier parte: clic izquierdo o derecho, y cada dedo en el celular (se puede con los dos pulgares)
+document.addEventListener("pointerdown",e=>{if(FX.boss&&FX.boss.fighting){e.preventDefault();fightTap()}},{capture:true});
+document.addEventListener("contextmenu",e=>{if(FX.boss&&FX.boss.fighting)e.preventDefault()});
 document.addEventListener("keydown",e=>{if(FX.boss&&FX.boss.fighting&&(e.code==="Space"||e.key==="Enter")){e.preventDefault();if(!e.repeat)fightTap()}});
 // ===================== Bucle =====================
 const ARC=106.8;let last=performance.now();
