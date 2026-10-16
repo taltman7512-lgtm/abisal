@@ -993,9 +993,10 @@ async function wpCheck(pi,raw){const key=pi+"|"+norm(raw);if(WP.cache.has(key))r
 // Worker de Cloudflare (herramientas/ia-worker.js). Sin dirección no se usa.
 // En las preguntas creativas ("ia") la IA puede ser flexible; en las de datos se le pide que sea estricta
 // (si no, aceptaba "Bailando" como canción de Soda Stereo) y lo más que da es Hallazgo profundo.
-const AI={url:"https://abisalia.altmantomas05.workers.dev",on:true,cache:new Map()};
+// buscar: la segunda oportunidad buscando en Google (apagada: en la cuenta gratis de Google el cupo de búsquedas es 0; se prende con true si se activa la facturación)
+const AI={url:"https://abisalia.altmantomas05.workers.dev",on:true,cache:new Map(),buscar:false};
 const AI_RAREZA=["común","poco común","rara","rarísima"];
-const AI_DATOS=" [DATOS: sé muy estricto, muchas respuestas son trampas de otro artista, obra o categoría; aceptá solo si estás 100% seguro]";
+const AI_DATOS=" [DATOS: sé estricto con los hechos: rechazá si es de otro artista, otra obra, otra categoría o si no existe; si es correcta, aceptala aunque sea poco conocida]";
 // En el link de Claude (artifact) no se puede salir a internet, pero sí preguntarle a Claude mismo ("sample"):
 // ahí el juez es Claude en vez de Gemini. Fuera de Claude no existe window.claude y esto no hace nada.
 let CLAUDE_AI=null;
@@ -1009,22 +1010,23 @@ Decidí si la respuesta es válida y qué tan rara es.
 - rareza: 1 común · 2 poco común · 3 rara · 4 rarísima.
 - etiqueta: la respuesta escrita prolija y corta (máximo 6 palabras).
 Respondé solo con JSON: {"valida": true|false, "rareza": 1-4, "etiqueta": "..."}`;
-async function aiCheck(pi,raw){if(!AI.url&&!CLAUDE_AI)return null;const key=pi+"|"+norm(raw);if(AI.cache.has(key))return AI.cache.get(key);let res=null;
- const datos=!P[pi].ia,q=P[pi].q+(datos?AI_DATOS:"");
+async function aiCheck(pi,raw,opt={}){AI.err=false;if(!AI.url&&!CLAUDE_AI)return null;const key=pi+"|"+norm(raw)+(opt.extra?"|r":"");if(AI.cache.has(key))return AI.cache.get(key);let res=null;
+ const datos=opt.datos===false?false:!P[pi].ia,q=P[pi].q+(datos?AI_DATOS:"")+(opt.extra||"");
  // ejemplos para que la IA calibre qué tan rara es (sin las "Muy vivo", que son trampas)
  const ej=P[pi].t.flatMap((s,tier)=>tier===1?[]:s.split(",").map(g=>g.split("/")[0].trim()).filter(Boolean)).slice(0,40);
- const toHit=d=>d&&d.valida?{tier:Math.min(datos?4:5,1+Math.min(4,Math.max(1,+d.rareza||1))),label:String(d.etiqueta||raw).slice(0,60),key:norm(String(d.etiqueta||raw)),exact:false,ai:true}:null;
+ const toHit=d=>d&&d.valida?{tier:Math.min(datos?4:5,1+Math.min(4,Math.max(1,+d.rareza||1))),label:String(d.etiqueta||raw).slice(0,60),key:norm(String(d.etiqueta||raw)),exact:false,ai:true,g:!!d.google}:null;
  if(CLAUDE_AI){
   try{const d=await CLAUDE_AI.json(`${AI_REGLAS}\n\nPregunta: ${q}\nEjemplos de respuestas válidas (de comunes a raras): ${ej.join(" · ")}\nRespuesta del jugador: <<<${raw.slice(0,80)}>>>`,{modelTier:"quick",cache:{gcTime:864e5}});
    res=toHit(d);AI.cache.set(key,res)}
   // si el jugador no dio permiso (o Claude no está disponible) se deja de preguntar en esta partida
-  catch(e){if(["not_granted","sampling_disabled","not_declared","capability_disabled","capability_removed"].includes(e&&e.code))CLAUDE_AI=null}
+  catch(e){AI.err=true;if(["not_granted","sampling_disabled","not_declared","capability_disabled","capability_removed"].includes(e&&e.code))CLAUDE_AI=null}
   return res}
- try{const c=new AbortController(),t=setTimeout(()=>c.abort(),16000);
-  const r=await fetch(AI.url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({q,a:raw,ej}),signal:c.signal}).finally(()=>clearTimeout(t));AI.ok=true;
-  // si la IA está saturada no se guarda la decisión, así se puede volver a probar
-  if(r.ok){res=toHit(await r.json());AI.cache.set(key,res)}}
- catch(e){if(e instanceof TypeError&&!AI.ok)AI.on=false}
+ for(let k=0;k<2;k++){
+  try{const c=new AbortController(),t=setTimeout(()=>c.abort(),26000);
+   const r=await fetch(AI.url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({q,a:raw,ej,buscar:AI.buscar}),signal:c.signal}).finally(()=>clearTimeout(t));AI.ok=true;
+   // si la IA está saturada no se guarda la decisión, así se puede volver a probar
+   if(r.ok){res=toHit(await r.json());AI.cache.set(key,res);AI.err=false;break}AI.err=true}
+  catch(e){AI.err=true;if(e instanceof TypeError&&!AI.ok){AI.on=false;break}if(e&&e.name==="AbortError")break}}
  return res}
 
 // ===================== Sonido (sintetizado, sin archivos) =====================
@@ -1115,6 +1117,7 @@ function countdown(sec){phase="countdown";cd=sec;UI.bar.hidden=true;UI.pill.hidd
 function beginAnswer(){phase="answering";UI.pill.hidden=true;UI.bar.hidden=false;$("skip").hidden=mode!=="inf";const a=$("answer");a.value="";a.focus()}
 
 $("bar").addEventListener("submit",async e=>{e.preventDefault();if(phase!=="answering")return;const v=$("answer").value.trim();if(!v)return;let hit=judge(current,v);
+ const rl=!hit&&RULES[P[current].q];if(rl&&!rl[0](ruleWord(v))){const pen=mode==="run"?3:2;timeLeft-=pen;sfx.wrong();toast(`“${esc(v)}” no cumple: ${rl[1]}<small>−${pen} SEGUNDOS</small>`,true);const a=$("answer");a.classList.remove("shake");void a.offsetWidth;a.classList.add("shake");a.select();return}
  // si no está en la lista, se consulta Wikidata (el reloj se pausa mientras busca)
  if(!hit&&P[current].wd&&WD.on){const pi=current;phase="checking";toast(`Buscando “${esc(v)}” en Wikidata…<small>EL RELOJ ESTÁ EN PAUSA</small>`);
   const r=await wdCheck(pi,v);if(phase!=="checking"||current!==pi)return;phase="answering";if(r)hit=r}
@@ -1124,10 +1127,14 @@ $("bar").addEventListener("submit",async e=>{e.preventDefault();if(phase!=="answ
  // y si nada la encontró, se le pregunta a la IA (en cualquier pregunta)
  const useAI=!hit&&v.length>=2&&(CLAUDE_AI||(AI.url&&AI.on));
  if(useAI){const pi=current;phase="checking";toast(`Consultando a ${CLAUDE_AI?"Claude":"la IA"} por “${esc(v)}”…<small>EL RELOJ ESTÁ EN PAUSA</small>`);
-  const r=await aiCheck(pi,v);if(phase!=="checking"||current!==pi)return;phase="answering";if(r)hit=r}
+  let r=await aiCheck(pi,v,rl?{datos:false,extra:RULE_NOTE}:{});if(!r&&AI.err&&rl&&rl[2]&&WP.on)r=await wikcCheck(v);
+  if(phase!=="checking"||current!==pi)return;phase="answering";if(r)hit=r;
+  // si la IA no contestó (está saturada), no se cuenta como error: se puede volver a probar
+  else if(AI.err){toast(`La IA está saturada y no pudo revisar “${esc(v)}”<small>NO PERDÉS TIEMPO · PROBÁ DE NUEVO</small>`,true);$("answer").select();return}}
  if(!hit){const pen=mode==="run"?3:2,src=[P[current].wd&&WD.on&&"Wikidata",P[current].wp&&WP.on&&"Wikipedia"].filter(Boolean).join(" ni en ");timeLeft-=pen;sfx.wrong();toast(`“${esc(v)}” no está en la lista${src?" ni en "+src:""}${useAI&&AI.on?" y la IA no la aceptó":""}<small>−${pen} SEGUNDOS</small>`,true);const a=$("answer");a.classList.remove("shake");void a.offsetWidth;a.classList.add("shake");a.select();return}
- if(hit.wd||hit.wp)toast(`“${esc(v)}” → “${esc(hit.label)}”<small>VERIFICADA EN ${hit.wd?"WIKIDATA":"WIKIPEDIA"}</small>`);
- else if(hit.ai)toast(`“${esc(v)}” → “${esc(hit.label)}”<small>ACEPTADA POR LA IA</small>`);
+ if(hit.wk)toast(`“${esc(v)}” → “${esc(hit.label)}”<small>ESTÁ EN EL DICCIONARIO (WIKCIONARIO)</small>`);
+ else if(hit.wd||hit.wp)toast(`“${esc(v)}” → “${esc(hit.label)}”<small>VERIFICADA EN ${hit.wd?"WIKIDATA":"WIKIPEDIA"}</small>`);
+ else if(hit.ai)toast(`“${esc(v)}” → “${esc(hit.label)}”<small>${hit.g?"ACEPTADA POR LA IA · LA BUSCÓ EN GOOGLE":"ACEPTADA POR LA IA"}</small>`);
  else if(!hit.exact)toast(`“${esc(v)}” → “${esc(hit.label)}”<small>${hit.desc?"ACEPTADA POR DESCRIPCIÓN":"SE ACEPTA CON ERRORES DE TIPEO"}</small>`);
  mode==="run"?runHit(hit):infHit(hit)});
 
@@ -1854,6 +1861,28 @@ LOGROS.push(["perla1","Perlita","Encontrá una perla en la pared",s=>[g0(s,"perl
 
 // los cuadraditos de arriba a la izquierda (bestiario, logros, amigos y, si está activado, explorar)
 function topBtns(on){for(const id of ["bestBtn","lgBtn","frBtn"])$(id).hidden=!on;$("exBtn").hidden=!on||$("exploreBtn").hidden}
+// reglas de letras: [prueba sobre la palabra en minúsculas y sin tildes (la ñ se mantiene), qué tiene que cumplir, ¿es una palabra del diccionario?]
+const ruleWord=s=>String(s).toLowerCase().trim().replace(/ñ/g,"\u0001").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\u0001/g,"ñ").replace(/\s+/g," ");
+const letras=w=>w.replace(/[^a-zñ]/g,""),unaPal=w=>!/\s/.test(w);
+const RULES={
+ "Nombrá una palabra con todas las vocales":[w=>unaPal(w)&&[..."aeiou"].every(v=>w.includes(v)),"tiene que tener las cinco vocales (a, e, i, o, u)",1],
+ "Nombrá una palabra que se escriba igual al revés (palíndromo)":[w=>{const l=letras(w);return unaPal(w)&&l.length>=3&&l===[...l].reverse().join("")},"tiene que leerse igual al derecho y al revés",1],
+ "Nombrá una palabra de tres letras":[w=>unaPal(w)&&letras(w).length===3,"tiene que tener exactamente tres letras",1],
+ "Nombrá una palabra con \"ñ\"":[w=>unaPal(w)&&w.includes("ñ"),"tiene que tener una ñ",1],
+ "Nombrá una palabra con \"x\"":[w=>unaPal(w)&&w.includes("x"),"tiene que tener una x",1],
+ "Nombrá una palabra que empiece con \"Z\"":[w=>unaPal(w)&&/^z/.test(w),"tiene que empezar con z",1],
+ "Nombrá algo que empiece con \"super\"":[w=>/^super/.test(w),"tiene que empezar con «super»",0],
+ "Nombrá una palabra que rime con \"corazón\"":[w=>/on$/.test(w)&&w!=="corazon","tiene que terminar en «-ón»",1],
+ "Nombrá una palabra que rime con \"amor\"":[w=>/or$/.test(w)&&w!=="amor","tiene que terminar en «-or»",1],
+ "Nombrá un nombre de mujer que empiece con \"M\"":[w=>/^m/.test(w),"tiene que empezar con M",0],
+ "Nombrá un nombre de varón que empiece con \"J\"":[w=>/^j/.test(w),"tiene que empezar con J",0],
+ "Nombrá un nombre de mujer que empiece con \"A\"":[w=>/^a/.test(w),"tiene que empezar con A",0],
+ "Nombrá un nombre de varón que empiece con \"M\"":[w=>/^m/.test(w),"tiene que empezar con M",0]};
+const RULE_NOTE=" [El juego ya comprobó que cumple la regla de letras: solo decidí si es una palabra, nombre o cosa real del castellano (vale cualquier forma: plural, femenino, verbo conjugado)]";
+// si la IA está saturada, para las reglas de palabras se busca la palabra en el Wikcionario en español
+async function wikcCheck(v){const w=ruleWord(v).replace(/[^a-zñ]/g,"");if(w.length<2)return null;
+ try{const d=await fetch("https://es.wiktionary.org/w/api.php?action=query&format=json&origin=*&titles="+encodeURIComponent(w)).then(r=>r.json());
+  const pg=Object.values((d.query||{}).pages||{})[0];if(!pg||"missing" in pg)return null;return{tier:3,label:w,key:norm(w),exact:false,wk:true}}catch(e){return null}}
 // ===================== Bucle =====================
 const ARC=106.8;let last=performance.now();
 // rdt: el tiempo real que pasó (aunque la página haya estado escondida), para los relojes; dt: el de las animaciones
