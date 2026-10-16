@@ -269,6 +269,11 @@ pre.share{background:rgba(10,22,38,.9);border:1px solid var(--line);padding:12px
 #thinking i{width:6px;height:6px;background:var(--cyan);box-shadow:0 0 6px rgba(79,216,240,.6);animation:tk 1.1s infinite ease-in-out}
 #thinking i:nth-child(2){animation-delay:.18s}#thinking i:nth-child(3){animation-delay:.36s}
 @keyframes tk{0%,55%,100%{transform:translateY(0);opacity:.45}25%{transform:translateY(-5px);opacity:1}}
+#fightBox{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 70px);transform:translateX(-50%);z-index:15;display:flex;flex-direction:column;align-items:center;gap:8px;width:min(86vw,340px)}#fightBox[hidden]{display:none}
+#fightBox .fbar{width:100%;height:14px;border:2px solid #ffd23d;background:rgba(8,18,32,.85);position:relative;overflow:hidden}
+#fightFill{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,#ff4f8b,#ffd23d);transition:width .08s linear}
+#fightBtn{width:100%;padding:18px 0;font:400 1.1rem var(--f-pix);letter-spacing:.14em;color:#1a0610;background:#ffd23d;border:0;cursor:pointer;box-shadow:0 0 26px rgba(255,210,61,.55);touch-action:manipulation;user-select:none}
+#fightBtn:active{transform:scale(.96);filter:brightness(1.15)}#fightTime{font:400 .62rem var(--f-pix);letter-spacing:.14em;color:#ffd23d;text-shadow:0 1px 0 #000}
 #pearlBtn,#bottleBtn{position:fixed;width:70px;height:60px;transform:translate(-50%,-50%);background:transparent;border:0;padding:0;cursor:pointer;z-index:13}#pearlBtn[hidden],#bottleBtn[hidden]{display:none}
 #bottleMsg{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 120px);transform:translateX(-50%);z-index:14;background:#f1e3c0;color:#3a2a14;border:2px solid #a0703a;padding:10px 16px;width:max-content;max-width:min(92vw,520px);font-size:.85rem;line-height:1.45;box-shadow:0 6px 24px rgba(0,0,0,.5);animation:bossIn .5s ease-out;cursor:pointer}
 #bottleMsg b{display:block;font:400 .62rem var(--f-pix);letter-spacing:.12em;color:#7a4a1a;margin-bottom:4px}
@@ -360,6 +365,7 @@ pre.share{background:rgba(10,22,38,.9);border:1px solid var(--line);padding:12px
 <button id="pearlBtn" hidden aria-label="Una perla en la pared: tocala para guardarla"></button>
 <button id="bottleBtn" hidden aria-label="Una botella con un mensaje: tocala para leerlo"></button>
 <div id="bottleMsg" hidden></div>
+<div id="fightBox" hidden><div class="fbar"><i id="fightFill"></i></div><button id="fightBtn" type="button">¡TIRÁ!</button><small id="fightTime"></small></div>
 <button id="caveBtn" hidden aria-label="Cueva de aire: tocala para tener todo el tiempo que quieras en esta pregunta"></button>
 <div id="explorer" class="notch" hidden>
   <div class="exTop"><b>EXPLORAR</b><span id="exDepth">0 m</span></div>
@@ -833,15 +839,14 @@ function scene(dt){
 // el gigante del fondo: 0–1.6 s solo el cartel; 1.6–3.4 dos ojos que se encienden abajo; 3.4–4.4 sube con la boca abierta;
 // 4.4 muerde el cebo (destello, temblor); 4.4–6.4 se lo lleva para arriba y se va
 const BOSS_PAL={X:"#5f7f92",D:"#3c566a",O:"#1c2a36",B:"#8fb0c0",S:"#bff3ff",F:"#4a6a7e",E:"#ff2a2a",W:"#e8eef0",M:"#07030a",G:"#4a0c14"};   // estilo "Bloop": pálido, boca enorme, ojos rojos
-function drawBoss(dt){const b=FX.boss;b.t+=dt;const t=b.t,S_=Math.max(3,Math.floor(Math.min(pw*.56,ph*1.05)/30)),cx=W/2/PX,ky=H*.42/PX,left=cx-15*S_;
+function drawBoss(dt){const b=FX.boss;if(b.fighting)fightStep(b,dt);else b.t+=dt;const t=b.t,S_=Math.max(3,Math.floor(Math.min(pw*.56,ph*1.05)/30)),cx=W/2/PX,ky=H*.42/PX,left=cx-15*S_;
  const ease3=u=>1-Math.pow(1-clamp(u,0,1),3);
  if(t>=1.6&&b.ev<1){b.ev=1;sfx.sonar(.8)}
  if(t>=3.4&&b.ev<2){b.ev=2;sfx.deep();$("bossMsg").hidden=true}   // primero el cartel solo; cuando sube el pez, se va
  if(t>=4.4&&b.ev<3){b.ev=3;b.eaten=true;b.cam0=cam;const rr=b.cr&&b.cr.id!==1?b.cr.r:0,[fa,sh]=BITE[rr];
   flash(rr===7?"255,255,255":rr>=3?hexRgb(RZ[rr].c):"255,209,102",fa);FX.shake=sh;sfx.boom();if(rr>=6)setTimeout(()=>sfx.boom(),180);
   if(rr>=5)for(let k=0;k<RINGS[rr];k++)FX.rings.push({x:cx*PX,y:ky*PX,r:10+k*22,a:.9-k*.04,col:rr===7?hslRgb(k*36):hexRgb(RZ[rr].c)});
-  if(b.cr){const e=bestMark(b.cr,!b.esc,runPts()*M_PER_PT);R.catch={id:b.cr.id,esc:b.esc,nuevo:!b.esc&&e.n===1};const rz=RZ[b.cr.r],m=$("crMsg");m.style.setProperty("--c",rz.c);
-   m.className="r"+b.cr.r;m.innerHTML=b.esc?`<b>¡SE SOLTÓ!</b><small>${esc(b.cr.n.toUpperCase())} · ${rz.n}</small>`:`<b>${esc(b.cr.n.toUpperCase())}</b><small>${rz.n}${R.catch.nuevo?" · ¡NUEVA EN TU BESTIARIO!":""}</small>`;m.hidden=false}}
+  if(b.cr){if(b.fight)fightStart(b);else crResult(b)}}
  // con el krill en la boca, el pez sube y la cámara lo acompaña hasta la superficie (4 s)
  if(b.eaten){const u=clamp((t-5)/4,0,1);cam=camTarget=b.cam0*(1-u*u*(3-2*u));if(u>=1){bossEnd();return}}
  if(b.cr&&b.cr.id!==1){entradaFX(b,t,dt,cx,ky);return drawCrBoss(b,t,cx,ky,ease3)}
@@ -1180,7 +1185,7 @@ UI.revBtn.onclick=()=>{if(mode!=="run"||R.kind==="duel")return;if(R.results.leng
 // y sube con él (la cámara lo acompaña hasta la superficie)
 let EX_CR=null;   // modo explorador: la criatura elegida para "VER EL FINAL"
 function startBoss(cr){phase="boss";cr=cr||EX_CR||elegirCriatura(runPts());EX_CR=null;const r=cr&&cr.id!==1?cr.r:0;
- FX.boss={t:-PRE[r],ev:0,cr,esc:!!cr&&R.kind!=="daily"&&Math.random()<ESCAPA[cr.r]};const m=$("bossMsg");m.textContent=BOSS_TXT[r];m.hidden=false;sfx.deep()}
+ FX.boss={t:-PRE[r],ev:0,cr,esc:false,fight:!!cr&&cr.id!==1&&R.kind!=="daily"&&ESCAPA[cr.r]>0};const m=$("bossMsg");m.textContent=BOSS_TXT[r];m.hidden=false;sfx.deep()}
 // ===================== Entradas por rareza =====================
 // Espuma: casi nada. Marea: corriente de burbujas y un temblor. Coral: aura de su color y anillos. Perla: destellos que giran.
 // Leyenda: se oscurece todo, rayos de luz dorada desde abajo. Mito: relámpagos rojos y el fondo que tiembla.
@@ -1273,8 +1278,8 @@ function drawCrBoss(b,t,cx,ky,ease3){const c=b.cr,col=crSprite(c),sil=crSprite(c
   if(t>=1.6&&u<1){const ea=Math.min(1,(t-1.6)/.8)*(.75+.25*Math.sin(T*5))*(1-u);pcx.globalCompositeOperation="lighter";for(const [ex,ey] of crEyes(c))glowPx(ox+(ex+.5)*k,oy+(ey+.5)*k,Math.min(3*k,12),eyeC,.55*ea);pcx.globalCompositeOperation="source-over"}
   b.my=ky;return}
  // pescada: el hilo atado a la cabeza; el resto del cuerpo cuelga hacia abajo y se sacude
- const k=Math.max(2,Math.min(ph*.8,pw*.8)/hd.far),my=ky+(ph*.05-ky)*ease3((t-4.4)/1.2),sway=Math.sin(T*1.6)*2;b.my=my;
- pcx.save();pcx.translate(cx+sway,my);pcx.rotate(hd.ang+Math.sin(T*3.1)*.09);pcx.drawImage(col,-hd.x*k,-hd.y*k,w*k,h*k);pcx.restore();
+ const k=Math.max(2,Math.min(ph*.8,pw*.8)/hd.far),my=ky+(ph*.05-ky)*ease3((t-4.4)/1.2),sway=Math.sin(T*1.6)*2+(b.fighting?Math.sin(T*23)*3:0);b.my=my;
+ pcx.save();pcx.translate(cx+sway,my);pcx.rotate(hd.ang+Math.sin(T*3.1)*.09+(b.fighting?Math.sin(T*17)*.12:0));pcx.drawImage(col,-hd.x*k,-hd.y*k,w*k,h*k);pcx.restore();
  if(Math.random()<.5)bubbles.push({x:cx+sway+(Math.random()-.5)*hd.far*k*.5,y:my+Math.random()*hd.far*k*.8,v:4+Math.random()*8,life:1.5})}
 
 
@@ -1412,7 +1417,7 @@ function archiveSheet(){const days=[];for(let n=dayNum-1;n>=Math.max(1,dayNum-60
  $("endIn").querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>{const n=+b.dataset.n,s=store.get("abisal-"+dateOf(n)),done=s&&s.results&&s.results.length>=7;startRun(makeRun("archive",{n,replay:done}),true)});$("back").onclick=()=>go("lobby")}
 function go(where){duelQuit();$("menu").hidden=true;$("menuBtn").setAttribute("aria-expanded","false");
  if(["answering","sinking","countdown"].includes(phase)&&mode==="run"&&R&&R.key){/* lo jugado queda guardado */}
- demoOn=false;$("explorer").hidden=true;
+ demoOn=false;$("explorer").hidden=true;if(FX.boss){FX.boss=null;$("fightBox").hidden=true;$("crMsg").hidden=true}
  if(where==="lobby"){const r=makeRun("daily");r.lobby=1;startRun(r)}else if(where==="daily")startRun(makeRun("daily"));else if(where==="free")startRun(makeRun("free"),true);else if(where==="packs")packsSheet();else if(where==="archive")archiveSheet();else if(where==="inf")infIntro();else if(where==="explore")explore();else if(where==="bestiario")bestiarioSheet();else if(where==="amigos")friendsSheet();else if(where==="logros")logrosSheet()}
 
 // --- Modo explorador: escondido. Se activa tocando 5 veces el título ABISAL (o entrando con #explorar);
@@ -1888,6 +1893,22 @@ const RULE_NOTE=" [El juego ya comprobó que cumple la regla de letras: solo dec
 async function wikcCheck(v){const w=ruleWord(v).replace(/[^a-zñ]/g,"");if(w.length<2)return null;
  try{const d=await fetch("https://es.wiktionary.org/w/api.php?action=query&format=json&origin=*&titles="+encodeURIComponent(w)).then(r=>r.json());
   const pg=Object.values((d.query||{}).pages||{})[0];if(!pg||"missing" in pg)return null;return{tier:3,label:w,key:norm(w),exact:false,wk:true}}catch(e){return null}}
+// ===================== La pelea con el pez =====================
+// Cuando muerde una criatura que se puede escapar (Marea a Mito, no en la primera pesca diaria), el final se frena con el pez
+// enganchado y hay que tocar ¡TIRÁ! (o la barra espaciadora) para llenar la barra antes de que pasen 6 s; el pez la va vaciando.
+// Cuanto más rara, más toques hacen falta y más fuerte tira: Marea 10 toques (tira 4%/s) … Mito 18 toques (tira 12%/s).
+const FIGHT_T=6;
+function crResult(b){const e=bestMark(b.cr,!b.esc,runPts()*M_PER_PT);R.catch={id:b.cr.id,esc:b.esc,nuevo:!b.esc&&e.n===1};const rz=RZ[b.cr.r],m=$("crMsg");m.style.setProperty("--c",rz.c);
+ m.className="r"+b.cr.r;m.innerHTML=b.esc?`<b>¡SE SOLTÓ!</b><small>${esc(b.cr.n.toUpperCase())} · ${rz.n}</small>`:`<b>${esc(b.cr.n.toUpperCase())}</b><small>${rz.n}${R.catch.nuevo?" · ¡NUEVA EN TU BESTIARIO!":""}</small>`;m.hidden=false}
+function fightStart(b){b.fighting=true;b.fp=0;b.ft=FIGHT_T;b.need=6+2*b.cr.r;b.dec=.02*b.cr.r;
+ const rz=RZ[b.cr.r],m=$("crMsg");m.style.setProperty("--c",rz.c);m.className="r"+b.cr.r;m.innerHTML=`<b>¡SE QUIERE ESCAPAR!</b><small>${esc(b.cr.n.toUpperCase())} · ${rz.n} · TOCÁ ¡TIRÁ! RÁPIDO</small>`;m.hidden=false;
+ $("fightFill").style.width="0%";$("fightBox").hidden=false;fightUI(b)}
+function fightUI(b){$("fightFill").style.width=Math.round(b.fp*100)+"%";$("fightTime").textContent=Math.max(0,b.ft).toFixed(1)+" s"}
+function fightStep(b,dt){b.ft-=dt;b.fp=Math.max(0,b.fp-b.dec*dt);FX.shake=Math.max(FX.shake,1.2);fightUI(b);if(b.fp>=1)fightEnd(b,true);else if(b.ft<=0)fightEnd(b,false)}
+function fightTap(){const b=FX.boss;if(!b||!b.fighting)return;b.fp=Math.min(1,b.fp+1/b.need);sfx.blub();FX.shake=Math.max(FX.shake,2.5);fightUI(b);if(b.fp>=1)fightEnd(b,true)}
+function fightEnd(b,won){if(!b.fighting)return;b.fighting=false;$("fightBox").hidden=true;b.esc=!won;if(won){flash(hexRgb(RZ[b.cr.r].c),.6);sfx.reveal(Math.min(5,b.cr.r))}else sfx.wrong();crResult(b)}
+$("fightBtn").addEventListener("pointerdown",e=>{e.preventDefault();fightTap()});
+document.addEventListener("keydown",e=>{if(FX.boss&&FX.boss.fighting&&(e.code==="Space"||e.key==="Enter")){e.preventDefault();if(!e.repeat)fightTap()}});
 // ===================== Bucle =====================
 const ARC=106.8;let last=performance.now();
 // rdt: el tiempo real que pasó (aunque la página haya estado escondida), para los relojes; dt: el de las animaciones
