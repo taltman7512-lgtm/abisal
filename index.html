@@ -50,7 +50,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--cyan);outline-o
 .topBtn{position:fixed;top:calc(env(safe-area-inset-top,0px) + 14px);z-index:11;background:var(--card);border:1px solid var(--line);color:var(--ink);width:36px;height:32px;font-size:.95rem;line-height:1;display:grid;place-items:center;padding:0;cursor:pointer}
 #bestBtn{left:142px}#lgBtn{left:184px}#frBtn{left:226px}#exBtn{left:268px}
 .topBtn[hidden]{display:none}.topBtn svg{width:16px;height:16px;fill:#f4f9fc}.topBtn .badge{position:absolute;top:-7px;right:-9px;margin:0}
-@media (min-width:601px) and (max-width:1100px){#hud{top:calc(env(safe-area-inset-top,0px) + 54px)}#card:not(.lobby){top:calc(env(safe-area-inset-top,0px) + 118px)}#rivalBox{top:calc(env(safe-area-inset-top,0px) + 106px)}}
+@media (min-width:601px) and (max-width:1100px){#hud{top:calc(env(safe-area-inset-top,0px) + 54px)}#card:not(.lobby){top:calc(env(safe-area-inset-top,0px) + 118px)}#rivalBox{top:calc(env(safe-area-inset-top,0px) + 106px)}body #card.lobby{top:calc(env(safe-area-inset-top,0px) + 58px);transform:translateX(-50%);max-height:calc(100% - 70px)}}
 @media (max-width:600px){#homeBtn,#acctBtn,.topBtn{display:none!important}#menu .narrow{display:block}#menu .narrow[hidden]{display:none}}
 #sndBtn{position:fixed;top:calc(env(safe-area-inset-top,0px) + 14px);right:16px;z-index:11;background:var(--card);border:1px solid var(--line);color:var(--ink);height:32px;padding:0 10px;font-size:.62rem;letter-spacing:.1em}
 #sndBtn[aria-pressed="false"]{color:var(--dim)}
@@ -246,7 +246,12 @@ pre.share{background:rgba(10,22,38,.9);border:1px solid var(--line);padding:12px
 #duelInv b{font:400 .72rem var(--f-pix);letter-spacing:.08em}
 #rivalBox{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 62px);transform:translateX(-50%);z-index:6;background:rgba(8,18,32,.85);border:1px solid #7fb8ff;padding:4px 12px;font:400 .62rem var(--f-pix);letter-spacing:.1em;color:#cfe4ff;white-space:nowrap}
 #rivalTag{position:fixed;z-index:5;font:400 .55rem var(--f-pix);letter-spacing:.08em;color:#cfe4ff;text-shadow:0 0 6px #000;pointer-events:none;transform:translate(-50%,-100%);white-space:nowrap}
-.racha{margin:6px 0 0;font-size:.8rem;color:#ffb347}
+.rachaBox{display:flex;align-items:center;gap:12px;border:1px solid rgba(255,179,71,.35);background:rgba(255,179,71,.06);padding:8px 12px;margin-top:4px}
+.rachaBox.off{border-color:var(--line);background:none}.rachaBox.off b,.rachaBox.off span{color:var(--dim)}
+.rachaBox b{font:400 1.35rem var(--f-pix);color:#ffb347;min-width:1.3em;text-align:center}
+.rachaBox span{display:block;font:400 .6rem var(--f-pix);letter-spacing:.16em;color:#ffb347}
+.rachaBox small{display:block;margin-top:2px;font-size:.72rem;line-height:1.35;color:var(--dim)}
+.rachaBox .rd{margin-left:auto;display:flex;gap:3px}.rachaBox .rd i{width:7px;height:7px;border:1px solid rgba(255,179,71,.6)}.rachaBox .rd i.on{background:#ffb347;border-color:#ffb347}
 .lgList{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
 .lg{display:flex;gap:10px;align-items:center;background:rgba(10,22,38,.75);border:1px solid var(--line);padding:8px 10px;opacity:.6}
 .lg.ok{opacity:1;border-color:#ffd23d}.lg i{font-style:normal;font-size:1.3rem}
@@ -307,7 +312,7 @@ pre.share{background:rgba(10,22,38,.9);border:1px solid var(--line);padding:12px
   <p id="bottleHint" hidden></p>
   <div id="introBody">
     <p id="introText"></p>
-    <p class="racha" id="rachaTxt" hidden></p>
+    <div id="rachaTxt" hidden></div>
     <div class="tiers" id="tierTable"></div>
     <div class="row"><button class="btn" id="startBtn">TIRAR LA LÍNEA ▼</button></div>
     <div class="modes" id="introMore">
@@ -1097,12 +1102,12 @@ function startRun(run,autostart){mode="run";G=null;R=run;const saved=run.key?sto
  R.air=Math.random()<.6?3+Math.floor(Math.random()*4):-1;R.airUsed=false;FX.air=null;   // solo en las preguntas 4 a 7
  // cueva de aire: en 3 de cada 4 partidas, en una pregunta al azar (no la misma que las burbujas); solo a partir de los 3.000 m; adentro el reloj se detiene
  R.cave=-1;if(Math.random()<.75){do R.cave=Math.floor(Math.random()*7);while(R.cave===R.air)}FX.cave=null;R.airUsed=false;FX.air=null;camTarget=runPts()*M_PER_PT;$("menu").hidden=true;
- if(R.results.length>=7){cam=camTarget;return endRun()}
+ if(R.results.length>=7&&!run.lobby){cam=camTarget;return endRun()}if(run.lobby&&R.results.length>=7)camTarget=0;
  if(autostart)return nextQ();
  hideAll();UI.card.hidden=false;phase="intro";$("introBody").hidden=false;$("hint").hidden=true;$("eyebrow").textContent=R.label;
  $("prompt").textContent="Cuanto más rara tu respuesta, más hondo se hunde.";
  $("introText").textContent="7 preguntas, las mismas para todos hoy. Tenés 25 segundos para cada una. Escribí cualquier respuesta válida: las obvias se quedan cerca de la superficie y las rebuscadas se van al fondo. Si le errás, solo perdés 3 segundos.";
- $("startBtn").textContent=R.results.length?"SEGUIR · PREGUNTA "+(R.results.length+1)+" ▼":"TIRAR LA LÍNEA ▼";$("introMore").hidden=false;rachaUI(R.kind==="daily");hud();lobby(true)}
+ $("startBtn").textContent=R.results.length>=7?"VER TU PESCA DE HOY ▼":R.results.length?"SEGUIR · PREGUNTA "+(R.results.length+1)+" ▼":"TIRAR LA LÍNEA ▼";$("introMore").hidden=false;rachaUI(R.kind==="daily");hud();lobby(true)}
 $("startBtn").onclick=()=>mode==="run"?nextQ():startInf();
 
 function askPrompt(pi,eyebrow){current=pi;markSeen(pi);lobby(false);UI.card.hidden=false;$("introBody").hidden=true;$("hint").hidden=false;$("eyebrow").textContent=eyebrow;$("prompt").textContent=P[pi].q;bottleHintUI()}
@@ -1286,7 +1291,7 @@ function paintMinis(root){root.querySelectorAll("canvas[data-mini]").forEach(cv=
 const crName=id=>(CR.find(x=>x.id===id)||{}).n||"?";
 async function friendsSheet(msg){const F=fbx();
  if(!F){showSheet(`<div class="endHead"><b>AMIGOS</b><span>VER Y CAMBIAR CRIATURAS</span></div><div class="acctBox"><p>${window.claude?"Los amigos funcionan en la página del juego (la de GitHub), no adentro de Claude.":"Para tener amigos e intercambiar criaturas necesitás una cuenta."}</p>${window.claude?"":'<button class="btn" id="goAcct">ENTRAR O CREAR CUENTA</button>'}</div><div class="row"><button class="btn sm" id="back">VOLVER</button></div>`);
-  if($("goAcct"))$("goAcct").onclick=()=>acctSheet();$("back").onclick=()=>go("daily");return}
+  if($("goAcct"))$("goAcct").onclick=()=>acctSheet();$("back").onclick=()=>go("lobby");return}
  if(!PROF)await profEnsure();
  showSheet(`<div class="endHead"><b>AMIGOS</b><span>CARGANDO…</span></div>`);
  const me=ACCT.user.uid;let friends=[],inc=[],out=[];
@@ -1305,7 +1310,7 @@ async function friendsSheet(msg){const F=fbx();
  <div class="frBox"><h3>TUS AMIGOS</h3>${friends.length?friends.map(fr=>{const n=Object.values(fr.bes||{}).filter(v=>v>0).length;return `<div class="frRow"><canvas data-kl='${esc(JSON.stringify(fr.kl||{}))}'></canvas><b>${esc(fr.name||"Sin nombre")}</b><span>${n} / ${CR.length} criaturas</span><div class="row"><button class="btn sm" data-duel="${fr.id}">DUELO ⚔</button><button class="btn sm" data-ver="${fr.id}">VER PERFIL</button><button class="btn sm" data-tr="${fr.id}">INTERCAMBIAR</button></div></div>`}).join(""):'<p class="frMsg" style="color:var(--dim)">Todavía no agregaste a nadie. Pedile su código a un amigo.</p>'}</div>
  <p class="foot">Solo se intercambian las repetidas (siempre te queda al menos una). Un intercambio se hace cuando los dos están de acuerdo.</p>
  <div class="row"><button class="btn sm" id="back">VOLVER</button></div>`);
- paintMinis($("endIn"));paintKls($("endIn"));$("back").onclick=()=>go("daily");
+ paintMinis($("endIn"));paintKls($("endIn"));$("back").onclick=()=>go("lobby");
  $("endIn").querySelectorAll("[data-duel]").forEach(b=>b.onclick=()=>duelInvite(friends.find(x=>x.id===b.dataset.duel)));
  if($("dAcc2")){$("dAcc2").onclick=()=>duelAccept(DUEL.inv);$("dNo2").onclick=()=>duelDecline(DUEL.inv)}
  $("frCopy").onclick=()=>copy(PROF.code||"",$("frCopy"));
@@ -1358,7 +1363,7 @@ function bestiarioSheet(page=0,sel,other){const b=other?Object.fromEntries(CR.ma
  const info=id=>{const c=CR.find(x=>x.id===id),e=b[id]||{};if(!c||!(e.n>0))return;const rz=RZ[c.r];$("bestInfo").innerHTML=`<div class="bestInfo" style="--c:${rz.c}"><b>${esc(c.n)}</b><span>${rz.n} · ${"★".repeat(c.d)}${"☆".repeat(3-c.d)} · ${esc(c.o.toUpperCase())}</span><p>${esc(c.h)}</p><span>${other?"TIENE":"PESCADA"} ${e.n} ${other?"":e.n===1?"VEZ":"VECES"}${other?"":" · LA MÁS HONDA A -"+fmtM(e.m||0)}</span></div>`;
   $("endIn").querySelectorAll(".slot").forEach(s=>s.classList.toggle("sel",+s.dataset.id===id))};
  $("endIn").querySelectorAll(".slot.ok").forEach(s=>s.onclick=()=>info(+s.dataset.id));if(sel)info(sel);
- $("bPrev").onclick=()=>bestiarioSheet(page-1,0,other);$("bNext").onclick=()=>bestiarioSheet(page+1,0,other);$("back").onclick=()=>other?friendsSheet():go("daily")}
+ $("bPrev").onclick=()=>bestiarioSheet(page-1,0,other);$("bNext").onclick=()=>bestiarioSheet(page+1,0,other);$("back").onclick=()=>other?friendsSheet():go("lobby")}
 function endRun(){sfx.end();logrosRun();const pts=runPts(),m=pts*M_PER_PT;let best=0;if(R.kind==="daily"){best=store.get("abisal-dbest")||0;if(pts>best)store.set("abisal-dbest",pts)}
  const bear=BEARING.find(b=>pts>=b[0]&&pts<=b[1])||BEARING[0];
  const cols=R.results.map((r,i)=>{const t=r.tier>=0?TIERS[r.tier]:null,h=t?t.pts:2;return `<div class="logcol" style="--c:${t?t.color:"#3a4654"};--c0:${t?t.color+"22":"#3a465422"}"><div class="ln" style="height:${h*1.5}px"></div><span data-i="${i}"></span><span class="num">${i+1}</span></div>`}).join("");
@@ -1372,8 +1377,8 @@ function endRun(){sfx.end();logrosRun();const pts=runPts(),m=pts*M_PER_PT;let be
  <div class="sec">TU RUMBO</div><div class="bear">${BEARING.map(b=>`<div class="${b===bear?"me":""}"><span data-t="${b[2]}"></span><b style="color:${TIERS[b[2]].color}">${b[0]}–${b[1]}</b><span>${b[3]}</span></div>`).join("")}</div>
  <pre class="share">${esc(share)}</pre>
  <div class="row"><button class="btn" id="copyBtn">COPIAR RESULTADO</button>${again}</div>
- <div class="row"><button class="btn sm" data-go="packs">PACKS</button><button class="btn sm" data-go="archive">ARCHIVO</button><button class="btn sm" data-go="inf">INFINITO ∞</button>${R.kind!=="daily"?'<button class="btn sm" data-go="daily">PESCA DIARIA</button>':""}</div>
- ${R.kind==="daily"&&rachaNow()?`<p class="racha" style="text-align:center">🔥 Racha: ${rachaNow()} ${rachaNow()===1?"día":"días seguidos"} · récord ${(store.get("abisal-racha")||{}).best||1}</p>`:""}
+ <div class="row"><button class="btn sm" data-go="lobby">INICIO</button><button class="btn sm" data-go="packs">PACKS</button><button class="btn sm" data-go="archive">ARCHIVO</button><button class="btn sm" data-go="inf">INFINITO ∞</button>${R.kind!=="daily"?'<button class="btn sm" data-go="daily">PESCA DIARIA</button>':""}</div>
+ ${R.kind==="daily"?rachaHTML(true):""}
  <p class="foot">${R.kind==="daily"?"Tu mejor pesca diaria: "+Math.max(best,pts)+" pts. Mañana hay preguntas nuevas (a la medianoche), y mientras tanto podés seguir jugando partidas libres.":"Las partidas libres y los packs eligen primero preguntas que no viste hace poco."}</p>`);
  $("endIn").querySelectorAll(".logcol span[data-i]").forEach(s=>{const r=R.results[+s.dataset.i];if(r.tier>=0){const c=iconCanvas(r.tier,2);c.style.filter=`drop-shadow(0 0 4px ${TIERS[r.tier].color})`;s.append(c)}});
  $("endIn").querySelectorAll(".bear span[data-t]").forEach(s=>{const c=iconCanvas(+s.dataset.t,2);c.style.height="16px";s.append(c)});
@@ -1385,25 +1390,25 @@ function packsSheet(){showSheet(`<div class="endHead"><b>PACKS</b><span>7 PREGUN
  <div class="packs">${PACKS.map((p,i)=>`<button class="pack" data-pack="${p.id}"><span data-t="${i%6}"></span><b>${esc(p.name.toUpperCase())}</b><span>${esc(p.desc)}</span><span>${ALL.filter(j=>(" "+P[j].c+" ").includes(" "+p.id+" ")).length} preguntas</span></button>`).join("")}</div>
  <div class="row"><button class="btn sm" id="back">VOLVER</button></div>`);
  $("endIn").querySelectorAll("[data-t]").forEach(s=>{const c=iconCanvas(+s.dataset.t,2);c.style.height="18px";s.append(c)});
- $("endIn").querySelectorAll("[data-pack]").forEach(b=>b.onclick=()=>startRun(makeRun("pack",b.dataset.pack),true));$("back").onclick=()=>go("daily")}
+ $("endIn").querySelectorAll("[data-pack]").forEach(b=>b.onclick=()=>startRun(makeRun("pack",b.dataset.pack),true));$("back").onclick=()=>go("lobby")}
 function archiveSheet(){const days=[];for(let n=dayNum-1;n>=Math.max(1,dayNum-60);n--)days.push(n);
  showSheet(`<div class="endHead"><b>ARCHIVO</b><span>PESCAS DE DÍAS ANTERIORES</span></div>
  <p class="foot">Cada día tiene sus 7 preguntas fijas. Si ya jugaste uno, podés repetirlo sin perder tu resultado guardado.</p>
  ${days.length?`<div class="days">${days.map(n=>{const s=store.get("abisal-"+dateOf(n)),done=s&&s.results&&s.results.length>=7,pts=done?s.results.reduce((a,r)=>a+(r.tier>=0?TIERS[r.tier].pts:0),0):0;const d=dateOf(n).split("-");
   return `<button class="day ${done?"done":""}" data-n="${n}">#${n}<small>${d[2]}/${d[1]}</small><small>${done?pts+" pts":s&&s.results&&s.results.length?"a medias":"sin jugar"}</small></button>`}).join("")}</div>`:`<p class="foot">Todavía no hay días anteriores.</p>`}
  <div class="row"><button class="btn sm" id="back">VOLVER</button></div>`);
- $("endIn").querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>{const n=+b.dataset.n,s=store.get("abisal-"+dateOf(n)),done=s&&s.results&&s.results.length>=7;startRun(makeRun("archive",{n,replay:done}),true)});$("back").onclick=()=>go("daily")}
+ $("endIn").querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>{const n=+b.dataset.n,s=store.get("abisal-"+dateOf(n)),done=s&&s.results&&s.results.length>=7;startRun(makeRun("archive",{n,replay:done}),true)});$("back").onclick=()=>go("lobby")}
 function go(where){duelQuit();$("menu").hidden=true;$("menuBtn").setAttribute("aria-expanded","false");
  if(["answering","sinking","countdown"].includes(phase)&&mode==="run"&&R&&R.key){/* lo jugado queda guardado */}
  demoOn=false;$("explorer").hidden=true;
- if(where==="daily")startRun(makeRun("daily"));else if(where==="free")startRun(makeRun("free"),true);else if(where==="packs")packsSheet();else if(where==="archive")archiveSheet();else if(where==="inf")infIntro();else if(where==="explore")explore();else if(where==="bestiario")bestiarioSheet();else if(where==="amigos")friendsSheet();else if(where==="logros")logrosSheet()}
+ if(where==="lobby"){const r=makeRun("daily");r.lobby=1;startRun(r)}else if(where==="daily")startRun(makeRun("daily"));else if(where==="free")startRun(makeRun("free"),true);else if(where==="packs")packsSheet();else if(where==="archive")archiveSheet();else if(where==="inf")infIntro();else if(where==="explore")explore();else if(where==="bestiario")bestiarioSheet();else if(where==="amigos")friendsSheet();else if(where==="logros")logrosSheet()}
 
 // --- Modo explorador: escondido. Se activa tocando 5 veces el título ABISAL (o entrando con #explorar);
 // queda guardado solo en este navegador y aparece "Explorar" en el menú. Sirve para ver el juego sin jugarlo.
 let demoOn=false;
 const exUnlock=()=>{store.set("abisal-explorar",true);$("exploreBtn").hidden=false;topBtns(!$("menuBtn").hidden)};
 if(store.get("abisal-explorar")||/explorar/.test(location.hash))exUnlock();
-const exLock=()=>{store.set("abisal-explorar",false);$("exploreBtn").hidden=true;$("exBtn").hidden=true;if(phase==="explore")go("daily")};
+const exLock=()=>{store.set("abisal-explorar",false);$("exploreBtn").hidden=true;$("exBtn").hidden=true;if(phase==="explore")go("lobby")};
 // 5 toques seguidos en el título: activa el modo explorador; otros 5, lo desactiva
 {let taps=0,tt;$("logo").addEventListener("click",()=>{taps++;clearTimeout(tt);tt=setTimeout(()=>taps=0,2500);if(taps>=5){taps=0;
  if($("exploreBtn").hidden){exUnlock();toast("Modo explorador activado<small>ESTÁ EN EL MENÚ ☰</small>")}else{exLock();toast("Modo explorador desactivado")}}})}
@@ -1456,7 +1461,7 @@ const ACCT_ERR={"auth/invalid-credential":"Mail o contraseña incorrectos.","aut
 const acctErr=e=>e&&(e.code==="auth/popup-closed-by-user"||e.code==="auth/cancelled-popup-request")?"":(ACCT_ERR[e&&e.code]||"No se pudo ("+((e&&e.code)||e)+").");
 function acctSheet(){const u=ACCT.user,F=ACCT.fb;
  const head=`<div class="endHead"><b>TU CUENTA</b><span>${u?esc(u.email||""):"GUARDÁ TU PROGRESO"}</span></div>`,back=`<div class="row"><button class="btn sm" id="back">VOLVER</button></div>`;
- if(!F){showSheet(head+`<div class="acctBox" id="acctBox"><p>${window.claude?"Las cuentas funcionan en la página del juego (la de GitHub), no adentro de Claude.":"Las cuentas todavía no están activadas. ¡Muy pronto!"}</p></div>`+back);$("back").onclick=()=>go("daily");return}
+ if(!F){showSheet(head+`<div class="acctBox" id="acctBox"><p>${window.claude?"Las cuentas funcionan en la página del juego (la de GitHub), no adentro de Claude.":"Las cuentas todavía no están activadas. ¡Muy pronto!"}</p></div>`+back);$("back").onclick=()=>go("lobby");return}
  if(!u){showSheet(head+`<div class="acctBox" id="acctBox">
   <p>Con una cuenta, el juego recuerda qué preguntas ya viste y tus récords en cualquier celular o compu, y no te repite preguntas.</p>
   <button class="btn" id="aGoogle">ENTRAR CON GOOGLE</button>
@@ -1471,7 +1476,7 @@ function acctSheet(){const u=ACCT.user,F=ACCT.fb;
   $("aForm").onsubmit=async ev=>{ev.preventDefault();msg("Entrando…",true);try{await F.signInWithEmailAndPassword(F.auth,mail(),pass())}catch(e){msg(acctErr(e))}};
   $("aNew").onclick=async()=>{if(!$("aForm").reportValidity())return;msg("Creando la cuenta…",true);try{await F.createUserWithEmailAndPassword(F.auth,mail(),pass())}catch(e){msg(acctErr(e))}};
   $("aForgot").onclick=async()=>{if(!mail())return msg("Escribí tu mail arriba y tocá de nuevo.");try{await F.sendPasswordResetEmail(F.auth,mail());msg("Te mandamos un mail para cambiar la contraseña.",true)}catch(e){msg(acctErr(e))}};
-  $("back").onclick=()=>go("daily");return}
+  $("back").onclick=()=>go("lobby");return}
  const google=u.providerData.some(p=>p.providerId==="google.com"),seen=Object.keys(store.get("abisal-seen")||{}).length;
  showSheet(head+`<div class="acctBox" id="acctBox">
   <div class="acctStats"><div><b>${seen}</b>PREGUNTAS VISTAS</div><div><b>${store.get("abisal-dbest")||0}</b>MEJOR PESCA</div><div><b>${fmtM(store.get("abisal-best")||0)}</b>RÉCORD ∞</div></div>
@@ -1488,14 +1493,14 @@ function acctSheet(){const u=ACCT.user,F=ACCT.fb;
    msg("¡Guardado!",true)}catch(e){msg(acctErr(e))}};
  $("aFriends").onclick=()=>friendsSheet();
  $("aOut").onclick=async()=>{acctPush(true);await new Promise(r=>setTimeout(r,300));await F.signOut(F.auth);ACCT.name=""};
- $("back").onclick=()=>go("daily")}
+ $("back").onclick=()=>go("lobby")}
 $("acctBtn").onclick=$("menuAcct").onclick=()=>acctSheet();$("acctLobby").onclick=e=>{e.stopPropagation();acctSheet()};   // (no cuenta como toque del logo)
 // volver al inicio (arriba a la izquierda); si estás en medio de una pregunta, pregunta antes
-$("homeBtn").onclick=$("menuHome").onclick=()=>{const mid=["answering","countdown","checking"].includes(phase)||(mode==="inf"&&G);if(mid&&!confirm("¿Volver al inicio? Vas a dejar esta partida."))return;go("daily")};
+$("homeBtn").onclick=$("menuHome").onclick=()=>{const mid=["answering","countdown","checking","sinking","reveal","timeout"].includes(phase)&&(mode==="inf"?!!G:!!(R&&R.results.length<(R.n||7)||phase==="sinking"));if(mid&&!confirm("¿Volver al inicio? Vas a dejar esta partida."))return;go("lobby")};
 acctInit();
 bestCountUI();
 $("exCr").insertAdjacentHTML("beforeend",CR.map(c=>`<option value="${c.id}">${c.id}. ${esc(c.n)} (${RZ[c.r].n.toLowerCase()})</option>`).join(""));
-$("exOut").onclick=()=>go("daily");
+$("exOut").onclick=()=>go("lobby");
 $("caveBtn").onclick=()=>{const a=FX.cave;if(!a||a.in||phase!=="answering")return;a.in=true;R.caveOn=R.results.length;if(!R.explorer)statAdd(s=>s.cave=(s.cave||0)+1);sfx.air();flash("150,225,255",.35);toast("¡Cueva de aire!<small>EN ESTA PREGUNTA TENÉS TODO EL TIEMPO QUE QUIERAS</small>");$("answer").focus()};
 $("airBtn").onclick=()=>{const a=FX.air;if(!a||a.pop!=null||phase!=="answering")return;a.pop=0;R.airUsed=true;if(!R.explorer)statAdd(s=>s.air=(s.air||0)+1);timeLeft+=10;timeTotal=Math.max(timeTotal,timeLeft);sfx.air();toast("¡Bolsa de aire!<small>+10 SEGUNDOS</small>");$("answer").focus()};
 $("exBoss").onclick=()=>{$("explorer").hidden=true;EX_CR=CR.find(c=>c.id===+$("exCr").value)||null;const run=makeRun("free");run.explorer=true;startRun(run);R.results=[3,4,5,4,5,5,4].map(t=>({tier:t,answer:""}));
@@ -1527,7 +1532,7 @@ function endInf(){const m=G.pts*M_PER_PT,best=store.get("abisal-best")||0;if(m>b
  <p class="foot">${G.count} aciertos. ${m>best?"¡Nuevo récord!":"Récord: "+fmtM(best)+"."}</p>
  <pre class="share">${esc(share)}</pre>
  <div class="row"><button class="btn" id="copyBtn">COPIAR RESULTADO</button><button class="btn out" id="again">BUCEAR DE NUEVO</button></div>
- <div class="row"><button class="btn sm" data-go="daily">PESCA DIARIA</button><button class="btn sm" data-go="free">PARTIDA LIBRE</button><button class="btn sm" data-go="packs">PACKS</button></div>`);
+ <div class="row"><button class="btn sm" data-go="lobby">INICIO</button><button class="btn sm" data-go="daily">PESCA DIARIA</button><button class="btn sm" data-go="free">PARTIDA LIBRE</button><button class="btn sm" data-go="packs">PACKS</button></div>`);
  $("copyBtn").onclick=()=>copy(share,$("copyBtn"));$("again").onclick=startInf;phase="end";rollSheet(G.pts,m)}
 
 async function copy(txt,btn){try{await navigator.clipboard.writeText(txt);btn.textContent="¡COPIADO!"}catch(e){const pre=UI.end.querySelector("pre");const r=document.createRange();r.selectNodeContents(pre);const s=getSelection();s.removeAllRanges();s.addRange(r);btn.textContent="COPIALO CON CTRL+C"}setTimeout(()=>btn.textContent="COPIAR RESULTADO",2500)}
@@ -1567,8 +1572,11 @@ function krillSet(ch){KRL={...KRL,...ch};if(!KRL.h)delete KRL.h;store.set("abisa
 // Premio: con racha, es menos probable que pique algo de la zona de arriba (los raros pican más)
 function rachaNow(){const r=store.get("abisal-racha");return r&&r.last>=dayNum-1?r.n||0:0}
 function rachaMark(){const r=store.get("abisal-racha")||{last:0,n:0,best:0};if(r.last===dayNum)return;r.n=r.last===dayNum-1?(r.n||0)+1:1;r.last=dayNum;r.best=Math.max(r.best||0,r.n);store.set("abisal-racha",r)}
-function rachaUI(on){const el=$("rachaTxt");if(!on){el.hidden=true;return}const n=rachaNow(),done=(store.get("abisal-racha")||{}).last===dayNum;el.hidden=false;
- el.textContent=n?`🔥 Racha de ${n} ${n===1?"día":"días seguidos"}${done?" · hoy ya la sumaste":" · terminá la de hoy para seguirla"}${n>=2?" · los peces raros pican más":""}`:"🔥 Terminá la pesca diaria todos los días para armar una racha: cuanto más larga, más pican los peces raros."}
+// la cajita de la racha: el número, qué falta y siete cuadraditos (uno por día de la última semana de racha)
+function rachaHTML(withBest){const n=rachaNow(),r=store.get("abisal-racha")||{},done=r.last===dayNum;
+ if(!n)return '<div class="rachaBox off"><b>0</b><div><span>SIN RACHA</span><small>Terminá la pesca diaria todos los días: cuanto más larga la racha, más pican los peces raros.</small></div></div>';
+ return `<div class="rachaBox"><b>${n}</b><div><span>${n===1?"DÍA":"DÍAS SEGUIDOS"} DE RACHA</span><small>${done?"Hoy ya la sumaste.":"Terminá la de hoy para seguirla."}${n>=2?" Los peces raros pican más.":""}${withBest?" Récord: "+Math.max(r.best||0,n)+".":""}</small></div><div class="rd">${[...Array(7)].map((_,i)=>`<i class="${i<Math.min(7,n)?"on":""}"></i>`).join("")}</div></div>`}
+function rachaUI(on){const el=$("rachaTxt");if(!on){el.hidden=true;return}el.hidden=false;el.innerHTML=rachaHTML(false)}
 
 // ===================== Logros =====================
 // abisal-stats: lo que fuiste haciendo (partidas, respuestas por nivel, la más honda, burbujas, cuevas...). abisal-logros: {id: cuándo}
@@ -1622,13 +1630,13 @@ function logrosSheet(){const have=store.get("abisal-logros")||{},s=store.get("ab
   <h3>COLOR</h3><div class="kPick">${Object.keys(SKINS).map(c=>{const ok=oc.includes(c);return `<button data-kc="${c}" class="${(KRL.c||"rosa")===c?"on":""}" ${ok?"":"disabled"} title="${ok?"":esc("Se gana con el logro: "+by("c:"+c))}"><i style="background:${c==="arcoiris"?"linear-gradient(90deg,#f33,#fd3,#3f6,#3cf,#a5f)":SKINS[c][1]}"></i>${esc(SKINS[c][0])}${ok?"":" 🔒"}</button>`}).join("")}</div>
   <h3>GORRO</h3><div class="kPick"><button data-kh="" class="${KRL.h?"":"on"}">Ninguno</button>${Object.keys(HATS).map(h=>{const ok=oh.includes(h);return `<button data-kh="${h}" class="${KRL.h===h?"on":""}" ${ok?"":"disabled"} title="${ok?"":esc("Se gana con el logro: "+by("h:"+h))}"><canvas data-hp="${h}"></canvas>${esc(hatName(h))}${ok?"":" 🔒"}</button>`}).join("")}</div>
   <p class="frMsg" style="color:var(--dim)">Tus amigos ven tu krill en el ranking.</p></div>
- <div class="frBox"><h3>RACHA 🔥</h3><p class="frMsg" style="color:var(--ink)">${rachaNow()?`${rachaNow()} ${rachaNow()===1?"día":"días seguidos"} jugando la pesca diaria. Tu récord: ${r.best||rachaNow()}.`:"Todavía no tenés racha. Terminá la pesca diaria hoy para empezar una."} Con racha, los peces raros pican más.</p></div>
+ <div class="frBox"><h3>RACHA</h3>${rachaHTML(true)}</div>
  <div class="lgList">${LOGROS.map(lg=>{const ok=have[lg[0]],[c,g]=lg[3](s,x);return `<div class="lg${ok?" ok":""}"><i>${ok?"🏅":"🔒"}</i><div><b>${esc(lg[1])}</b><span>${esc(lg[2])}</span><em>${ok?"✓ ganaste "+esc(prizeName(lg[4])):Math.min(c,g)+" / "+g+" · premio: "+esc(prizeName(lg[4]))}</em></div></div>`}).join("")}</div>
  <div class="row"><button class="btn sm" id="back">VOLVER</button></div>`);
  krillCanvas($("kPrev"),KRL,7);$("endIn").querySelectorAll("canvas[data-hp]").forEach(cv=>krillCanvas(cv,{c:KRL.c,h:cv.dataset.hp},2));
  $("endIn").querySelectorAll("[data-kc]").forEach(b=>b.onclick=()=>{krillSet({c:b.dataset.kc});logrosSheet()});
  $("endIn").querySelectorAll("[data-kh]").forEach(b=>b.onclick=()=>{krillSet({h:b.dataset.kh});logrosSheet()});
- $("back").onclick=()=>go("daily")}
+ $("back").onclick=()=>go("lobby")}
 
 // ===================== Ranking de amigos =====================
 // cada perfil guarda st: {day, dp: puntos de la pesca diaria de ese día, rn: racha, mp: la más honda, sp: especies} y kl: su krill
@@ -1638,7 +1646,7 @@ function profStats(dp){const F=fbx();if(!F||!PROF)return;const st={...(PROF.st||
  F.updateDoc(F.doc(F.db,"profiles",ACCT.user.uid),{st,kl:{c:KRL.c||"rosa",h:KRL.h||""}}).catch(()=>{})}
 function rankHTML(friends){const cnt=b=>Object.values(b||{}).filter(v=>v>0).length;
  const rows=[{n:"Vos",me:1,st:PROF.st||{},kl:KRL,sp:cnt(PROF.bes)},...friends.map(f=>({n:f.name||"Sin nombre",st:f.st||{},kl:f.kl||{},sp:cnt(f.bes)}))];
- const rn=r=>r.st.day>=dayNum-1&&r.st.rn?` · 🔥${r.st.rn}`:"";
+ const rn=r=>r.st.day>=dayNum-1&&r.st.rn?` · racha ${r.st.rn}`:"";
  const row=(r,i,val)=>`<span>${i}</span><canvas data-kl='${esc(JSON.stringify(r.kl||{}))}'></canvas><b class="${r.me?"me":""}">${esc(r.n)}</b><span>${val}</span>`;
  const hoy=rows.filter(r=>r.st.day===dayNum).sort((a,b)=>(b.st.dp||0)-(a.st.dp||0)),no=rows.filter(r=>r.st.day!==dayNum);
  return `<div class="frBox"><h3>RANKING DE HOY · PESCA DIARIA #${dayNum}</h3><div class="rank">${hoy.map((r,i)=>row(r,i+1,`${r.st.dp||0} pts${rn(r)}`)).join("")}${no.map(r=>row(r,"–",`<small>todavía no jugó${rn(r)}</small>`)).join("")}</div>
@@ -1673,7 +1681,7 @@ function duelWaitSheet(){const nm=esc(DUEL.fr.name||"tu amigo");
  $("dCancel").onclick=async()=>{const F=fbx(),id=DUEL.id;duelQuit();try{await F.updateDoc(F.doc(F.db,"duels",id),{st:"cancel"})}catch(e){}friendsSheet()}}
 function duelSnap(d){DUEL.d=d;
  if(d.st==="no"||d.st==="cancel"){if(!DUEL.run){const who=DUEL.fr.name||"Tu amigo",no=d.st==="no";duelQuit();
-  showSheet(`<div class="endHead"><b>DUELO ⚔</b><span>${no?"NO ACEPTÓ":"CANCELADO"}</span></div><div class="acctBox"><p>${no?esc(who)+" no aceptó el duelo esta vez.":"El duelo se canceló."}</p></div><div class="row"><button class="btn sm" data-go="amigos">AMIGOS</button><button class="btn sm" data-go="daily">INICIO</button></div>`)}return}
+  showSheet(`<div class="endHead"><b>DUELO ⚔</b><span>${no?"NO ACEPTÓ":"CANCELADO"}</span></div><div class="acctBox"><p>${no?esc(who)+" no aceptó el duelo esta vez.":"El duelo se canceló."}</p></div><div class="row"><button class="btn sm" data-go="amigos">AMIGOS</button><button class="btn sm" data-go="lobby">INICIO</button></div>`)}return}
  if(d.st!=="invite"&&!DUEL.run&&!DUEL.done){DUEL.run=true;DUEL.t0=Date.now()+6000;duelRun(d)}
  if(R&&R.kind==="duel"&&DUEL.run){R.rival=(DUEL.side==="a"?d.rb:d.ra)||[];rivalUI();if(R.results.length>=R.n&&phase==="duelwait")duelFinishCheck()}}
 function duelRun(d){const picks=d.qs.map(q=>P.findIndex(p=>p.q===q)).filter(i=>i>=0);for(let k=0;picks.length<DUEL_N;k++)picks.push(ALL[hashQ(d.qs.join("|")+k)%ALL.length]);
@@ -1701,7 +1709,7 @@ function duelFinish(){if(DUEL.done)return;DUEL.done=true;const F=fbx(),me=runPts
  const sq=a=>[...Array(R.n)].map((_,i)=>a[i]==null?"▫️":a[i]>=0?TIERS[a[i]].emo:"⬛").join(""),mine=R.results.map(r=>r.tier);duelQuit();camTarget=0;
  showSheet(`<div class="endHead"><b>DUELO ⚔</b><span>${win?"¡GANASTE!":tie?"EMPATE":"GANÓ "+esc(name.toUpperCase())}</span></div>
  <div class="duelRes"><div><span>VOS</span><b style="color:${win?"#ffd23d":"var(--ink)"}">${me}</b><span>-${fmtM(me*M_PER_PT)}</span><p>${sq(mine)}</p></div><div>VS</div><div><span>${esc(name.toUpperCase())}</span><b style="color:${!win&&!tie?"#ffd23d":"var(--ink)"}">${them}</b><span>-${fmtM(them*M_PER_PT)}</span><p>${sq(rv)}</p></div></div>
- <div class="row"><button class="btn" id="dAgain">REVANCHA</button><button class="btn sm" data-go="amigos">AMIGOS</button><button class="btn sm" data-go="daily">INICIO</button></div>`);
+ <div class="row"><button class="btn" id="dAgain">REVANCHA</button><button class="btn sm" data-go="amigos">AMIGOS</button><button class="btn sm" data-go="lobby">INICIO</button></div>`);
  $("dAgain").onclick=()=>duelInvite({id:fr.id,name:fr.name});phase="end";if(win)sfx.reveal(5)}
 function duelQuit(){if(DUEL.unsub){DUEL.unsub();DUEL.unsub=null}if(DUEL.timer){clearInterval(DUEL.timer);DUEL.timer=null}DUEL.id=null;DUEL.run=false;$("rivalBox").hidden=true;$("rivalTag").hidden=true;duelInvUI()}
 paintLogoKrill();lgCountUI();
@@ -1865,7 +1873,7 @@ function loop(now){const rdt=clamp((now-last)/1000,0,3600),dt=Math.min(rdt,.05);
  scene(dt);overlay(dt);$("depthTxt").textContent=fmtM(Math.max(0,cam));if((T*10|0)%5===0)sfx.depth(Math.max(0,cam));
  requestAnimationFrame(loop)}
 krill.x=krill.wx=W*.5;krill.y=krill.wy=H*.6;
-if(P.length)startRun(makeRun("daily"));
+if(P.length)go("lobby");
 else{$("eyebrow").textContent="FALTAN LAS PREGUNTAS";$("prompt").textContent="No se encontró el archivo preguntas.js";
  $("introText").textContent="Tiene que estar en la misma carpeta que esta página y llamarse exactamente preguntas.js (sin espacios ni números). Subilo de nuevo y recargá la página.";
  $("startBtn").hidden=true;$("introMore").hidden=true;$("tierTable").hidden=true}
