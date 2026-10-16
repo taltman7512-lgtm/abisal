@@ -48,9 +48,9 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--cyan);outline-o
 /* en pantallas angostas no entran al lado del marcador: quedan adentro del menú ≡ */
 #menu .narrow{display:none}
 .topBtn{position:fixed;top:calc(env(safe-area-inset-top,0px) + 14px);z-index:11;background:var(--card);border:1px solid var(--line);color:var(--ink);width:36px;height:32px;font-size:.95rem;line-height:1;display:grid;place-items:center;padding:0;cursor:pointer}
-#bestBtn{left:142px}#lgBtn{left:184px}#frBtn{left:226px}#exBtn{left:268px}
+#bestBtn{left:142px}#lgBtn{left:184px}#frBtn{left:226px}#cofreBtn{left:268px}#exBtn{left:310px}
 .topBtn[hidden]{display:none}.topBtn svg{width:16px;height:16px;fill:#f4f9fc}.topBtn .badge{position:absolute;top:-7px;right:-9px;margin:0}
-@media (min-width:601px) and (max-width:1100px){#hud{top:calc(env(safe-area-inset-top,0px) + 54px)}#card:not(.lobby){top:calc(env(safe-area-inset-top,0px) + 118px)}#rivalBox{top:calc(env(safe-area-inset-top,0px) + 106px)}body #card.lobby{top:calc(env(safe-area-inset-top,0px) + 58px);transform:translateX(-50%);max-height:calc(100% - 70px)}}
+@media (min-width:601px) and (max-width:1200px){#hud{top:calc(env(safe-area-inset-top,0px) + 54px)}#card:not(.lobby){top:calc(env(safe-area-inset-top,0px) + 118px)}#rivalBox{top:calc(env(safe-area-inset-top,0px) + 106px)}body #card.lobby{top:calc(env(safe-area-inset-top,0px) + 58px);transform:translateX(-50%);max-height:calc(100% - 70px)}}
 @media (max-width:600px){#homeBtn,#acctBtn,.topBtn{display:none!important}#menu .narrow{display:block}#menu .narrow[hidden]{display:none}}
 #sndBtn{position:fixed;top:calc(env(safe-area-inset-top,0px) + 14px);right:16px;z-index:11;background:var(--card);border:1px solid var(--line);color:var(--ink);height:32px;padding:0 10px;font-size:.62rem;letter-spacing:.1em}
 #sndBtn[aria-pressed="false"]{color:var(--dim)}
@@ -274,6 +274,20 @@ pre.share{background:rgba(10,22,38,.9);border:1px solid var(--line);padding:12px
 #fightFill{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,#ff4f8b,#ffd23d);transition:width .08s linear}
 #fightBtn{width:100%;padding:18px 0;font:400 1.1rem var(--f-pix);letter-spacing:.14em;color:#1a0610;background:#ffd23d;border:0;cursor:pointer;box-shadow:0 0 26px rgba(255,210,61,.55);touch-action:manipulation;user-select:none}
 #fightBtn:active{transform:scale(.96);filter:brightness(1.15)}#fightTime{font:400 .62rem var(--f-pix);letter-spacing:.14em;color:#ffd23d;text-shadow:0 1px 0 #000}
+.reel{position:relative;overflow:hidden;background:rgba(4,10,20,.9);border:1px solid var(--line);padding:10px 0;margin:4px 0}
+.reel .mark{position:absolute;left:50%;top:0;bottom:0;width:2px;margin-left:-1px;background:#ffd23d;box-shadow:0 0 10px #ffd23d;z-index:2}
+.strip{display:flex;gap:6px;padding-left:6px;will-change:transform}
+.it{flex:0 0 92px;height:92px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:linear-gradient(180deg,rgba(255,255,255,.04),color-mix(in srgb,var(--rc) 22%,transparent));border-bottom:4px solid var(--rc);position:relative}
+.it canvas{position:static;width:72px;height:44px;image-rendering:pixelated}.it span{font-size:.62rem;text-align:center;line-height:1.15;color:#d7e6f0;padding:0 3px}
+.it em{position:absolute;top:3px;right:5px;font-style:normal;font:400 .5rem var(--f-pix);color:#7ef0c4}
+.itGrid{display:flex;flex-wrap:wrap;gap:6px}.rarRow{display:flex;flex-wrap:wrap;gap:8px}.rarRow span{font-size:.72rem;color:var(--dim);border-left:4px solid var(--rc);padding-left:6px}.rarRow b{display:block;font:400 .58rem var(--f-pix);color:var(--rc)}
+.itB{background:none;border:0;padding:0;cursor:pointer}.itB.on .it{outline:2px solid #7ef0c4}
+.cofreWin{display:flex;align-items:center;gap:14px;border:2px solid var(--rc);box-shadow:0 0 24px color-mix(in srgb,var(--rc) 50%,transparent);padding:10px 14px;margin:6px 0;animation:bossIn .5s ease-out}
+.cofreWin b{display:block;font:400 .85rem var(--f-pix);color:var(--rc)}.cofreWin span{display:block;font-size:.75rem;color:#bcd0de;margin-top:3px}.cofreWin .btn{margin-top:8px}
+.escGain{text-align:center;font:400 .66rem var(--f-pix);letter-spacing:.12em;color:#7ef0c4;margin:6px 0 0}
+#tag.fr-oro{border-color:#ffd23d!important;box-shadow:0 0 20px rgba(255,210,61,.55)!important}
+#tag.fr-neon{border-color:#ff4fd8!important;box-shadow:0 0 18px rgba(255,79,216,.75),inset 0 0 8px rgba(255,79,216,.45)!important;animation:neonF 1.2s infinite}@keyframes neonF{50%{box-shadow:0 0 6px rgba(255,79,216,.35)}}
+#tag.fr-perg{background:#f1e3c0!important;color:#3a2a14!important;border-color:#a0703a!important}
 #pearlBtn,#bottleBtn{position:fixed;width:70px;height:60px;transform:translate(-50%,-50%);background:transparent;border:0;padding:0;cursor:pointer;z-index:13}#pearlBtn[hidden],#bottleBtn[hidden]{display:none}
 #bottleMsg{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 120px);transform:translateX(-50%);z-index:14;background:#f1e3c0;color:#3a2a14;border:2px solid #a0703a;padding:10px 16px;width:max-content;max-width:min(92vw,520px);font-size:.85rem;line-height:1.45;box-shadow:0 6px 24px rgba(0,0,0,.5);animation:bossIn .5s ease-out;cursor:pointer}
 #bottleMsg b{display:block;font:400 .62rem var(--f-pix);letter-spacing:.12em;color:#7a4a1a;margin-bottom:4px}
@@ -292,6 +306,7 @@ pre.share{background:rgba(10,22,38,.9);border:1px solid var(--line);padding:12px
 <button id="bestBtn" class="topBtn" data-go="bestiario" aria-label="Bestiario" title="Bestiario: las criaturas que pescaste"><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1 3h6v1h2V3h6v10H9v1H7v-1H1zM2 4v8h5V4zM9 4v8h5V4z"/></svg></button>
 <button id="lgBtn" class="topBtn" data-go="logros" aria-label="Logros y tu krill" title="Logros y tu krill"><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 1h2v4H4zM10 1h2v4h-2zM5 6h6v1h1v5h-1v1H5v-1H4V7h1zM6 8v3h4V8z"/></svg></button>
 <button id="frBtn" class="topBtn" data-go="amigos" aria-label="Amigos" title="Amigos: ranking, duelos e intercambios"><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M3 2h3v3H3zM2 6h5v6H2zM10 2h3v3h-3zM9 6h5v6H9z"/></svg></button>
+<button id="cofreBtn" class="topBtn" data-go="cofre" aria-label="Cofre" title="Cofre"><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M3 2h10v2h1v10H2V4h1zM3 7v6h10V7zM7 8h2v3H7z"/></svg></button>
 <button id="exBtn" class="topBtn" data-go="explore" aria-label="Explorar" title="Explorar (modo explorador)" hidden><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1 9l10-6 2 3-10 6zM7 11h2v4H7zM4 15l3-4h1l-3 4zM12 15l-3-4H8l3 4z"/></svg></button>
 <button id="sndBtn" aria-label="Sonido" aria-pressed="true">♪ ON</button>
 <div id="menu" hidden>
@@ -304,6 +319,7 @@ pre.share{background:rgba(10,22,38,.9);border:1px solid var(--line);padding:12px
   <button data-go="inf">Modo infinito ∞<small>Un tanque de aire, sin límite de preguntas</small></button>
   <button class="narrow" data-go="bestiario">Bestiario 📖<small>Las criaturas que pescaste en el fondo</small></button>
   <button class="narrow" data-go="logros">Logros y tu krill 🏅<small>Medallas, tu racha y gorros para tu krill</small></button>
+  <button class="narrow" data-go="cofre">Cofre<small>Tirá la ruleta con tus escamas y elegí qué usar</small></button>
   <button class="narrow" data-go="amigos" id="menuAmigos">Amigos 👥<small>Ver el bestiario de tus amigos e intercambiar criaturas</small></button>
   <button data-go="explore" id="exploreBtn" hidden>Explorar 🔭<small>Recorrer el océano y ver el juego sin jugar</small></button>
 </div>
@@ -332,6 +348,7 @@ pre.share{background:rgba(10,22,38,.9);border:1px solid var(--line);padding:12px
       <button class="mode" data-go="inf"><b>INFINITO ∞</b><small>un tanque de aire</small></button>
       <button class="mode" data-go="bestiario"><b>BESTIARIO 📖</b><small id="bestCount">las criaturas del fondo</small></button>
       <button class="mode" data-go="logros"><b>LOGROS 🏅</b><small id="lgCount">medallas y tu krill</small></button>
+      <button class="mode" data-go="cofre" style="grid-column:1/-1"><b>COFRE</b><small id="escCount">tirá la ruleta con tus escamas</small></button>
     </div>
   </div>
   <span class="hint" id="hint" hidden>▼ LAS RESPUESTAS RARAS SE HUNDEN MÁS ▼</span>
@@ -693,6 +710,7 @@ function scene(dt){
  // arrecife: algas y corales
  const kTop=pyOf(270);if(kTop>-40&&kTop<ph+10){for(const [fx,len,col] of KELP){pcx.fillStyle=col;const x0=fx*pw;for(let k=0;k<len;k++){const xx=Math.round(x0+Math.sin(T*1.1+k*.25+fx*9)*(k/len)*2.5);const sh=shelfTop(x0);pcx.fillRect(xx,Math.round(kTop-sh-k),1,1);if(k%4===2)pcx.fillRect(xx+(k%8<4?1:-1),Math.round(kTop-sh-k),1,1)}}
   for(const [n,fx,pal] of REEF){const s=sprite(n,pal);drawSpr(s,fx*pw,kTop-s.height/2+1-shelfTop(fx*pw))}}
+ decoFX(pyOf);
  // paredes: rocas, corales y esponjas en el borde (cada 14 m se sortea siempre igual si hay adorno y cuál)
  const mTop=cam-surfY/PPM,mBot=cam+(H-surfY)/PPM;
  for(let m=Math.max(42,Math.ceil(mTop/14)*14);m<=mBot+14;m+=14)for(const side of [0,1]){if(hash(m/14,side?11:5)>.3||under(m))continue;const w=side?wallR(m):wallL(m);if(w<3)continue;
@@ -735,11 +753,12 @@ function scene(dt){
   if(c.type==="squid"){L();glowPx(px,py+bob,12,"255,77,94",.12);S()}}
  // bote
  const by=pyOf(0)+Math.sin(T*1.4)*.6,bx=Math.round(pw*.4);
- if(by>-30&&by<ph+10){pcx.fillStyle="#13233a";const B=Math.round(by);
+ if(by>-30&&by<ph+10&&!drawBoatSkin(bx,Math.round(by))){pcx.fillStyle="#13233a";const B=Math.round(by);
   pcx.fillRect(bx-17,B-3,36,3);pcx.fillRect(bx-14,B,30,2);pcx.fillRect(bx+17,B-5,6,2);pcx.fillRect(bx-19,B-5,4,2);
   pcx.fillRect(bx-6,B-9,12,6);pcx.fillRect(bx-1,B-21,1,12);pcx.fillStyle="#5aa0bf";pcx.fillRect(bx-3,B-7,2,2);pcx.fillRect(bx+2,B-7,2,2);
   pcx.fillStyle="#ff6f91";pcx.fillRect(bx-6,B-21,5,3);pcx.fillRect(bx-7,B-20+(Math.sin(T*4)>0?1:0),1,1);
   pcx.fillStyle="#3b2a1e";for(let i=0;i<12;i++)pcx.fillRect(bx+12+i,B-4-i,1,1)}
+ if(by>-30&&by<ph+10)boatExtra(bx,Math.round(by));
  krill.tipX=(bx+24)*PX;krill.tipY=(Math.round(by)-16)*PX;
  // krill: arriba de la respuesta mientras baja (la lleva colgada de un hilito); si no, nada solo
  const cv=FX.cave&&FX.cave.in&&FX.cave.g?FX.cave:null;
@@ -753,6 +772,7 @@ function scene(dt){
   const vx=(krill.wx-krill.x)*Math.min(1,dt*.9);krill.x+=vx;krill.y+=(krill.wy-krill.y)*Math.min(1,dt*.9);if(Math.abs(vx)>.05)krill.dir=vx>0?1:-1}
  if(!(FX.boss&&FX.boss.eaten)){
   drawKrill(krill.x/PX,krill.y/PX+Math.sin(T*3)*.5,krill.dir)}
+ trailFX(dt);petFX();
  if(R&&R.kind==="duel"&&!FX.boss)drawRival();
  if(FX.boss)drawBoss(dt);
  // peces que acompañan la respuesta
@@ -767,7 +787,7 @@ function scene(dt){
  if(tagState&&tagState.moving&&Math.random()<(tagState.tier>=4?1:.6))bubbles.push({x:tagState.x/PX+(Math.random()-.5)*14,y:tagState.y/PX,v:6+Math.random()*10,life:2.2});
  pcx.fillStyle="rgba(190,225,240,.7)";for(let i=bubbles.length-1;i>=0;i--){const b=bubbles[i];b.y-=b.v*dt+dCam;b.x+=Math.sin(T*5+i)*.08;b.life-=dt;if(b.life<=0||b.y<pyOf(0)){bubbles.splice(i,1);continue}pcx.fillRect(Math.round(b.x),Math.round(b.y),1,1);if(i%3===0)pcx.fillRect(Math.round(b.x)+1,Math.round(b.y)-1,1,1)}
  pcx.fillStyle="rgba(170,205,225,.35)";for(const s of snow){s.y-=(s.v*dt+dCam*s.par)/ph;if(s.y<-.02)s.y+=1.04;if(s.y>1.02)s.y-=1.04;const py=s.y*ph;if(py<pyOf(0)+3||(FLOOR&&py>=FY[Math.min(pw-1,Math.floor(s.x*pw))]))continue;pcx.fillRect(Math.round(s.x*pw),Math.round(py),1,1)}
- plankGlow(dt);worldFront(dt);
+ plankGlow(dt);worldFront(dt);celebFX(dt);
  // bolsa de aire: un grupito de burbujas transparentes que sube despacio por el agua hacia la superficie; si la tocás, +10 s
  // y las burbujas suben y se desvanecen en unos 2,5 s
  {const a=FX.air,btn=$("airBtn");let show=false;
@@ -881,7 +901,7 @@ function overlay(dt){hcx.clearRect(0,0,W,H);
  // hilo de pesca: curva suave hecha de bloques de 4 px alternados (textura de cuadrícula, como en pixel art)
  {const x0=krill.tipX,y0=krill.tipY,x1=krill.x,y1=krill.y-6,cx0=(x0+x1)/2+20,cy0=(y0+y1)/2;const n=Math.max(12,Math.round(Math.hypot(x1-x0,y1-y0)/4));
   for(let i=0;i<=n;i++){const t=i/n,px=(1-t)*(1-t)*x0+2*(1-t)*t*cx0+t*t*x1,py=(1-t)*(1-t)*y0+2*(1-t)*t*cy0+t*t*y1;
-   const sx=Math.round(px/4)*4,sy=Math.round(py/4)*4;hcx.fillStyle=i%2?"rgba(220,235,245,.55)":"rgba(160,200,220,.3)";hcx.fillRect(sx-1,sy-1,3,3)}
+   const sx=Math.round(px/4)*4,sy=Math.round(py/4)*4;hcx.fillStyle=lineCol(i);hcx.fillRect(sx-1,sy-1,3,3)}
   hcx.strokeStyle="rgba(220,235,245,.18)";hcx.lineWidth=1;hcx.beginPath();hcx.moveTo(x0,y0);hcx.quadraticCurveTo(cx0,cy0,x1,y1);hcx.stroke();
   // hilito del krill a la respuesta que lleva colgada
   if(tagState){const top=tagState.y-16+FX.sy;for(let y=krill.y+9;y<top;y+=4){hcx.fillStyle="rgba(220,235,245,.6)";hcx.fillRect(Math.round(krill.x)-1,y,2,Math.min(3,top-y))}}}
@@ -1091,7 +1111,7 @@ TIERS.forEach((t,i)=>{const c=iconCanvas(i,2),k=Math.min(22/c.width,18/c.height)
 // krill del logo
 
 // la tarjeta se vuelve "pantalla de inicio" (más grande, centrada, con logo y sin el marcador de arriba)
-function lobby(on){UI.card.classList.toggle("lobby",on);$("logo").hidden=!on;$("homeBtn").hidden=on;if(on)$("hud").hidden=true}
+function lobby(on){if(on&&$("escCount"))$("escCount").textContent=escBal()+" escamas · tirá la ruleta";UI.card.classList.toggle("lobby",on);$("logo").hidden=!on;$("homeBtn").hidden=on;if(on)$("hud").hidden=true}
 
 const runPts=()=>R?R.results.reduce((s,r)=>s+(r.tier>=0?TIERS[r.tier].pts:0),0):0;
 function hud(){const pts=mode==="run"?runPts():G?G.pts:0;roll($("scoreTxt"),pts);
@@ -1151,7 +1171,7 @@ $("bar").addEventListener("submit",async e=>{e.preventDefault();if(phase!=="answ
 // --- La respuesta se hunde
 function sink(text,tier,then){phase="sinking";UI.bar.hidden=true;$("answer").blur();
  const start=cam+(H*(W<700?.48:.45)-surfY)/PPM,d=TIERS[tier].pts*M_PER_PT,plan=sinkPlan(tier,mode==="inf"),t=TIERS[tier];
- const tag=UI.tag;tag.textContent="“"+text.toUpperCase()+"” ▼";tag.style.borderColor=t.color;tag.style.boxShadow=`0 0 ${tier>=4?28:16}px rgba(${t.rgb},${tier>=4?.6:.3})`;tag.style.color=tier>=3?t.color:"#d7e6f0";
+ const tag=UI.tag;tag.className=KRL.fr?"fr-"+KRL.fr:"";tag.textContent="“"+text.toUpperCase()+"” ▼";tag.style.borderColor=t.color;tag.style.boxShadow=`0 0 ${tier>=4?28:16}px rgba(${t.rgb},${tier>=4?.6:.3})`;tag.style.color=tier>=3?t.color:"#d7e6f0";
  tag.style.visibility="hidden";tag.hidden=false;const w=tag.offsetWidth;
  tagState={start,depth:start,d,tier,t:0,dur:plan.dur,ev:plan.ev,cam0:cam,x:W/2,y:scrY(start),w,moving:true,then,wob:Math.random()*7};
  placeTag();tag.style.visibility="visible"}
@@ -1169,7 +1189,7 @@ function nextQ(){if(R.kind==="duel")return duelNext();hideAll();if(R.results.len
 function record(r){R.results.push(r);R.live=true;if(R.key)store.set(R.key,{results:R.results});statAns(r);if(R.kind==="duel")duelPush()}
 function runHit(hit){record({tier:hit.tier,answer:hit.label});hud();UI.card.hidden=true;sink(hit.label,hit.tier,()=>{camTarget=runPts()*M_PER_PT;reveal(hit)})}
 function timeout(){if(mode==="inf")return endInf();record({tier:-1,answer:""});hud();UI.card.hidden=true;UI.bar.hidden=true;FX.shake=3;reveal(null)}
-function reveal(hit){UI.tag.hidden=true;tagState=null;phase="reveal";setDim(true);if(hit&&hit.tier>=4)FX.darkT=.6;const pi=current,ic=$("revIcon");
+function reveal(hit){if(hit&&hit.tier===5)celebrate();UI.tag.hidden=true;tagState=null;phase="reveal";setDim(true);if(hit&&hit.tier>=4)FX.darkT=.6;const pi=current,ic=$("revIcon");
  if(hit){const t=TIERS[hit.tier],c=iconCanvas(hit.tier,6);ic.width=c.width;ic.height=c.height;ic.getContext("2d").drawImage(c,0,0);ic.style.filter=`drop-shadow(0 0 10px ${t.color})`;ic.hidden=false;
   $("revTier").textContent=t.name;$("revTier").style.color=t.color;$("revTier").style.textShadow=`0 0 16px ${t.color}88`;$("revAnswer").textContent="“"+hit.label.replace(/^./,c=>c.toUpperCase())+"”";
   $("revPts").innerHTML=`<span style="color:${t.color}">+${t.pts} PTS</span> · bajás ${t.pts*M_PER_PT}m`;
@@ -1395,6 +1415,7 @@ function endRun(){sfx.end();logrosRun();const pts=runPts(),m=pts*M_PER_PT;let be
  <pre class="share">${esc(share)}</pre>
  <div class="row"><button class="btn" id="copyBtn">COPIAR RESULTADO</button>${again}</div>
  <div class="row"><button class="btn sm" data-go="lobby">INICIO</button><button class="btn sm" data-go="packs">PACKS</button><button class="btn sm" data-go="archive">ARCHIVO</button><button class="btn sm" data-go="inf">INFINITO ∞</button>${R.kind!=="daily"?'<button class="btn sm" data-go="daily">PESCA DIARIA</button>':""}</div>
+ ${R.escGain?`<p class="escGain">+${R.escGain} ESCAMAS · TENÉS ${escBal()} · <a href="#" data-go="cofre" style="color:inherit">ABRIR EL COFRE</a></p>`:""}
  ${R.kind==="daily"?rachaHTML(true):""}
  <p class="foot">${R.kind==="daily"?"Tu mejor pesca diaria: "+Math.max(best,pts)+" pts. Mañana hay preguntas nuevas (a la medianoche), y mientras tanto podés seguir jugando partidas libres.":"Las partidas libres y los packs eligen primero preguntas que no viste hace poco."}</p>`);
  $("endIn").querySelectorAll(".logcol span[data-i]").forEach(s=>{const r=R.results[+s.dataset.i];if(r.tier>=0){const c=iconCanvas(r.tier,2);c.style.filter=`drop-shadow(0 0 4px ${TIERS[r.tier].color})`;s.append(c)}});
@@ -1418,7 +1439,7 @@ function archiveSheet(){const days=[];for(let n=dayNum-1;n>=Math.max(1,dayNum-60
 function go(where){duelQuit();$("menu").hidden=true;$("menuBtn").setAttribute("aria-expanded","false");
  if(["answering","sinking","countdown"].includes(phase)&&mode==="run"&&R&&R.key){/* lo jugado queda guardado */}
  demoOn=false;$("explorer").hidden=true;if(FX.boss){FX.boss=null;$("fightBox").hidden=true;$("crMsg").hidden=true}
- if(where==="lobby"){const r=makeRun("daily");r.lobby=1;startRun(r)}else if(where==="daily")startRun(makeRun("daily"));else if(where==="free")startRun(makeRun("free"),true);else if(where==="packs")packsSheet();else if(where==="archive")archiveSheet();else if(where==="inf")infIntro();else if(where==="explore")explore();else if(where==="bestiario")bestiarioSheet();else if(where==="amigos")friendsSheet();else if(where==="logros")logrosSheet()}
+ if(where==="lobby"){const r=makeRun("daily");r.lobby=1;startRun(r)}else if(where==="daily")startRun(makeRun("daily"));else if(where==="free")startRun(makeRun("free"),true);else if(where==="packs")packsSheet();else if(where==="archive")archiveSheet();else if(where==="inf")infIntro();else if(where==="explore")explore();else if(where==="bestiario")bestiarioSheet();else if(where==="amigos")friendsSheet();else if(where==="logros")logrosSheet();else if(where==="cofre")cofreSheet()}
 
 // --- Modo explorador: escondido. Se activa tocando 5 veces el título ABISAL (o entrando con #explorar);
 // queda guardado solo en este navegador y aparece "Explorar" en el menú. Sirve para ver el juego sin jugarlo.
@@ -1457,6 +1478,8 @@ async function acctPull(){const F=ACCT.fb,u=ACCT.user;let r={};
   let L,Rv;try{L=JSON.parse(lv);Rv=JSON.parse(rv)}catch(e){continue}
   let m=L;
   if(k==="abisal-seen"&&L&&Rv){m={...L};for(const q in Rv)m[q]=Math.max(m[q]||0,Rv[q])}
+  else if(k==="abisal-escamas"&&L&&Rv)m={g:Math.max(L.g||0,Rv.g||0),s:Math.max(L.s||0,Rv.s||0)};
+  else if(k==="abisal-cofre"&&L&&Rv)m={o:{...(Rv.o||{}),...(L.o||{})}};
   else if(k==="abisal-racha"&&L&&Rv)m=(Rv.last>L.last||(Rv.last===L.last&&Rv.n>L.n))?{...Rv,best:Math.max(L.best||0,Rv.best||0)}:{...L,best:Math.max(L.best||0,Rv.best||0)};
   else if(k==="abisal-logros"&&L&&Rv)m={...Rv,...L};
   else if(k==="abisal-stats"&&L&&Rv){m={...L};for(const q in Rv)if(typeof Rv[q]==="number")m[q]=Math.max(L[q]||0,Rv[q]);m.ans=[0,1,2,3,4,5].map(i=>Math.max((L.ans||[])[i]||0,(Rv.ans||[])[i]||0))}
@@ -1542,10 +1565,11 @@ function nextInf(first){hideAll();if(!G.bag.length)G.bag=fresh(ALL,ALL.length).r
 function infHit(hit){const t=TIERS[hit.tier];G.pts+=t.pts;G.count++;G.log.push(t.emo);timeLeft=Math.min(timeLeft+AIR[hit.tier],90);timeTotal=Math.max(45,timeLeft);hud();UI.card.hidden=true;
  sink(hit.label,hit.tier,()=>{camTarget=G.pts*M_PER_PT;UI.tag.hidden=true;tagState=null;FX.darkT=0;sfx.reveal(hit.tier);toast(`<b style="color:${t.color}">${t.name}</b> · +${t.pts} pts · +${AIR[hit.tier]} s de aire`);nextInf(false)})}
 $("skip").onclick=()=>{if(phase!=="answering"||mode!=="inf")return;timeLeft-=5;toast("Pregunta salteada<small>−5 SEGUNDOS</small>",true);nextInf(false)};
-function endInf(){const m=G.pts*M_PER_PT,best=store.get("abisal-best")||0;if(m>best)store.set("abisal-best",m);statAdd(s=>s.infBest=Math.max(s.infBest||0,G.count));
+function endInf(){const m=G.pts*M_PER_PT,best=store.get("abisal-best")||0;if(m>best)store.set("abisal-best",m);statAdd(s=>s.infBest=Math.max(s.infBest||0,G.count));const egI=Math.floor(G.pts/10);escAdd(egI);
  const share=`Abisal ∞ · -${fmtM(m)} · ${G.count} aciertos\n${G.log.join("")||"⬛"}`;
  showSheet(`<div class="endHead"><b>ABISAL</b><span>∞ INMERSIÓN TERMINADA</span></div>
  <div class="bigScore"><b>${G.pts}</b><span>pts</span><em>-${fmtM(m)}</em></div>
+ <p class="escGain">+${egI} ESCAMAS · TENÉS ${escBal()}</p>
  <p class="foot">${G.count} aciertos. ${m>best?"¡Nuevo récord!":"Récord: "+fmtM(best)+"."}</p>
  <pre class="share">${esc(share)}</pre>
  <div class="row"><button class="btn" id="copyBtn">COPIAR RESULTADO</button><button class="btn out" id="again">BUCEAR DE NUEVO</button></div>
@@ -1569,9 +1593,9 @@ const HATS={lana:["el gorro de lana",["..W..",".RRR.","RRRRR","WWWWW"],5],capita
  snorkel:["el snorkel",["O.....","O.....","OCCCCC"],4],minero:["el casco de minero",["..YYY..",".YYYYYL","YYYYYYY"],4],vincha:["la vincha ninja",["R......",".RRRRRR"],3,1]};
 const HPAL={W:"#f4f8fb",R:"#e8323c",K:"#1a1a22",G:"#ffd23d",Y:"#ffcc33",C:"#9be8ff",B:"#3a7bd5",O:"#ff8a2a",L:"#fffbe0"};
 function skinPal(c){if(c==="arcoiris"){const h=(Math.floor(T*2)%12)*30;return{X:`hsl(${h},90%,60%)`,A:`hsl(${(h+60)%360},90%,82%)`,O:"#1a0010",g:"255,255,255"}}
- const s=SKINS[c]||SKINS.rosa;return{X:s[1],A:s[2],O:s[3],g:hexRgb(s[1])}}
+ const s=SKINS[c]||SKINS.rosa;if(s[4]){const [X,A,O]=s[4](T);return{X,A,O,g:hexRgb(s[1])}}return{X:s[1],A:s[2],O:s[3],g:hexRgb(s[1])}}
 // dibuja el krill (11×6) con su gorro, con la esquina de arriba a la izquierda en x0,y0 y cada píxel de k×k
-function paintKrill(ctx,x0,y0,dir,look,k,anim){const p=skinPal(look.c),a0=ctx.globalAlpha;ctx.imageSmoothingEnabled=false;if(look.c==="fantasma")ctx.globalAlpha=a0*.55;
+function paintKrill(ctx,x0,y0,dir,look,k,anim){const p=skinPal(look.c),a0=ctx.globalAlpha;ctx.imageSmoothingEnabled=false;if(look.c==="fantasma"||look.c==="transp")ctx.globalAlpha=a0*.55;
  ctx.drawImage(sprite(anim?frameOf("krill",0):"krill",{X:p.X,A:p.A,O:p.O},dir<0),x0,y0,11*k,6*k);
  const h=HATS[look.h];if(h){const rows=h[1],w=rows[0].length,hh=rows.length,dx=dir<0?11-h[2]-w:h[2],top=(h[3]||0)-(hh-1);
   for(let r=0;r<hh;r++)for(let c=0;c<w;c++){const ch=rows[r][dir<0?w-1-c:c];if(ch===".")continue;ctx.fillStyle=HPAL[ch];ctx.fillRect(x0+(dx+c)*k,y0+(top+r)*k,k,k)}}
@@ -1636,16 +1660,17 @@ function logroShow(){if(logroBusy||!logroQ.length)return;logroBusy=true;const lg
 function lgCountUI(){const n=Object.keys(store.get("abisal-logros")||{}).length;if($("lgCount"))$("lgCount").textContent=n?`${n} / ${LOGROS.length} logros`:"medallas y tu krill"}
 // al terminar una partida de 7 (no la del explorador ni una ya terminada que se vuelve a abrir)
 function logrosRun(){if(!R||R.explorer||!R.live||R.counted)return;R.counted=true;const pts=runPts();
+ R.escGain=escGanadas(pts,R.kind==="daily"&&R.results.length>=7&&(store.get("abisal-racha")||{}).last!==dayNum);escAdd(R.escGain);
  if(R.kind==="daily"&&R.results.length>=7)rachaMark();
  statAdd(s=>{s.runs=(s.runs||0)+1;s.maxPts=Math.max(s.maxPts||0,pts);if(R.results.length>=7&&R.results.every(r=>r.tier>=2))s.perfect=(s.perfect||0)+1});
  profStats(R.kind==="daily"?pts:null)}
 function logrosSheet(){const have=store.get("abisal-logros")||{},s=store.get("abisal-stats")||{},x=logrosCtx(),n=Object.keys(have).length;
- const own=k=>LOGROS.filter(l=>have[l[0]]&&l[4].startsWith(k+":")).map(l=>l[4].slice(2)),oc=["rosa",...own("c")],oh=own("h"),by=p=>(LOGROS.find(l=>l[4]===p)||[])[1]||"";
+ const own=k=>LOGROS.filter(l=>have[l[0]]&&l[4].startsWith(k+":")).map(l=>l[4].slice(2)),oc=["rosa",...own("c"),...ITEMS.filter(i=>i[1]==="skin"&&has(i[0])).map(i=>i[2])],oh=[...own("h"),...ITEMS.filter(i=>i[1]==="hat"&&has(i[0])).map(i=>i[2])],by=p=>(LOGROS.find(l=>l[4]===p)||[])[1]||"";
  const r=store.get("abisal-racha")||{};
  showSheet(`<div class="endHead"><b>LOGROS</b><span>${n} / ${LOGROS.length} · CADA UNO TE DA UN COLOR O UN GORRO</span></div>
  <div class="frBox"><h3>TU KRILL</h3><canvas id="kPrev"></canvas>
-  <h3>COLOR</h3><div class="kPick">${Object.keys(SKINS).map(c=>{const ok=oc.includes(c);return `<button data-kc="${c}" class="${(KRL.c||"rosa")===c?"on":""}" ${ok?"":"disabled"} title="${ok?"":esc("Se gana con el logro: "+by("c:"+c))}"><i style="background:${c==="arcoiris"?"linear-gradient(90deg,#f33,#fd3,#3f6,#3cf,#a5f)":SKINS[c][1]}"></i>${esc(SKINS[c][0])}${ok?"":" 🔒"}</button>`}).join("")}</div>
-  <h3>GORRO</h3><div class="kPick"><button data-kh="" class="${KRL.h?"":"on"}">Ninguno</button>${Object.keys(HATS).map(h=>{const ok=oh.includes(h);return `<button data-kh="${h}" class="${KRL.h===h?"on":""}" ${ok?"":"disabled"} title="${ok?"":esc("Se gana con el logro: "+by("h:"+h))}"><canvas data-hp="${h}"></canvas>${esc(hatName(h))}${ok?"":" 🔒"}</button>`}).join("")}</div>
+  <h3>COLOR</h3><div class="kPick">${Object.keys(SKINS).map(c=>{const ok=oc.includes(c);return `<button data-kc="${c}" class="${(KRL.c||"rosa")===c?"on":""}" ${ok?"":"disabled"} title="${ok?"":esc(by("c:"+c)?"Se gana con el logro: "+by("c:"+c):"Sale en el cofre")}"><i style="background:${c==="arcoiris"?"linear-gradient(90deg,#f33,#fd3,#3f6,#3cf,#a5f)":SKINS[c][1]}"></i>${esc(SKINS[c][0])}${ok?"":" 🔒"}</button>`}).join("")}</div>
+  <h3>GORRO</h3><div class="kPick"><button data-kh="" class="${KRL.h?"":"on"}">Ninguno</button>${Object.keys(HATS).map(h=>{const ok=oh.includes(h);return `<button data-kh="${h}" class="${KRL.h===h?"on":""}" ${ok?"":"disabled"} title="${ok?"":esc(by("h:"+h)?"Se gana con el logro: "+by("h:"+h):"Sale en el cofre")}"><canvas data-hp="${h}"></canvas>${esc(hatName(h))}${ok?"":" 🔒"}</button>`}).join("")}</div>
   <p class="frMsg" style="color:var(--dim)">Tus amigos ven tu krill en el ranking.</p></div>
  <div class="frBox"><h3>RACHA</h3>${rachaHTML(true)}</div>
  <div class="lgList">${LOGROS.map(lg=>{const ok=have[lg[0]],[c,g]=lg[3](s,x);return `<div class="lg${ok?" ok":""}"><i>${ok?"🏅":"🔒"}</i><div><b>${esc(lg[1])}</b><span>${esc(lg[2])}</span><em>${ok?"✓ ganaste "+esc(prizeName(lg[4])):Math.min(c,g)+" / "+g+" · premio: "+esc(prizeName(lg[4]))}</em></div></div>`}).join("")}</div>
@@ -1721,7 +1746,7 @@ function drawRival(){const tg=$("rivalTag");if(!DUEL.id||!DUEL.run){tg.hidden=tr
 function duelFinishCheck(){if(DUEL.done||!DUEL.id)return;const rv=R.rival||[];if(rv.length>=R.n||Date.now()>DUEL.t0+R.n*DUEL_SLOT*1e3+8e3)return duelFinish();
  if(phase!=="duelwait"){showSheet(`<div class="endHead"><b>DUELO ⚔</b><span>ESPERANDO A ${esc(((DUEL.fr&&DUEL.fr.name)||"tu amigo").toUpperCase())}</span></div><div class="acctBox"><p>¡Terminaste! Falta que ${esc((DUEL.fr&&DUEL.fr.name)||"tu amigo")} responda la última…</p></div>`);phase="duelwait"}}
 function duelFinish(){if(DUEL.done)return;DUEL.done=true;const F=fbx(),me=runPts(),rv=R.rival||[],them=tiersPts(rv),fr=DUEL.fr||{},name=fr.name||"Tu amigo",win=me>them,tie=me===them,id=DUEL.id;
- if(win)statAdd(s=>s.duelWins=(s.duelWins||0)+1);
+ if(win)statAdd(s=>s.duelWins=(s.duelWins||0)+1);escAdd(Math.floor(me/10)+(win?15:0));
  if(F&&id)F.updateDoc(F.doc(F.db,"duels",id),{st:"end"}).catch(()=>{});
  const sq=a=>[...Array(R.n)].map((_,i)=>a[i]==null?"▫️":a[i]>=0?TIERS[a[i]].emo:"⬛").join(""),mine=R.results.map(r=>r.tier);duelQuit();camTarget=0;
  showSheet(`<div class="endHead"><b>DUELO ⚔</b><span>${win?"¡GANASTE!":tie?"EMPATE":"GANÓ "+esc(name.toUpperCase())}</span></div>
@@ -1870,7 +1895,7 @@ SKINS.nacar=["Nácar","#efe2ef","#ffffff","#5a3a5a"];HATS.tiara=["la tiara de pe
 LOGROS.push(["perla1","Perlita","Encontrá una perla en la pared",s=>[g0(s,"perlas"),1],"c:nacar"],["perla10","Collar de perlas","Encontrá 10 perlas",s=>[g0(s,"perlas"),10],"h:tiara"],["botella5","Náufrago","Abrí 5 botellas con mensaje",s=>[g0(s,"botellas"),5],"h:panuelo"]);
 
 // los cuadraditos de arriba a la izquierda (bestiario, logros, amigos y, si está activado, explorar)
-function topBtns(on){for(const id of ["bestBtn","lgBtn","frBtn"])$(id).hidden=!on;$("exBtn").hidden=!on||$("exploreBtn").hidden}
+function topBtns(on){for(const id of ["bestBtn","lgBtn","frBtn","cofreBtn"])$(id).hidden=!on;$("exBtn").hidden=!on||$("exploreBtn").hidden}
 // reglas de letras: [prueba sobre la palabra en minúsculas y sin tildes (la ñ se mantiene), qué tiene que cumplir, ¿es una palabra del diccionario?]
 const ruleWord=s=>String(s).toLowerCase().trim().replace(/ñ/g,"\u0001").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\u0001/g,"ñ").replace(/\s+/g," ");
 const letras=w=>w.replace(/[^a-zñ]/g,""),unaPal=w=>!/\s/.test(w);
@@ -1911,6 +1936,177 @@ function fightEnd(b,won){if(!b.fighting)return;b.fighting=false;$("fightBox").hi
 document.addEventListener("pointerdown",e=>{if(FX.boss&&FX.boss.fighting){e.preventDefault();fightTap()}},{capture:true});
 document.addEventListener("contextmenu",e=>{if(FX.boss&&FX.boss.fighting)e.preventDefault()});
 document.addEventListener("keydown",e=>{if(FX.boss&&FX.boss.fighting&&(e.code==="Space"||e.key==="Enter")){e.preventDefault();if(!e.repeat)fightTap()}});
+// ===================== Cofre: escamas, ruleta (como las cajas del Counter) y armario =====================
+// abisal-escamas {g: ganadas, s: gastadas} (las dos solo suben, así al juntar con la nube se toma el mayor de cada una)
+// abisal-cofre {o: {id: 1}} lo que ya salió. Lo que tenés puesto va en KRL (abisal-krill): c color, h gorro, tr estela,
+// bt bote, ln hilo, fx festejo, fr marco del cartel, pet mascota, dc [adornos del mapa]
+const COFRE_COSTO=100,RAR=[null,["COMÚN","#4b8bff",60,20],["RARO","#8847ff",25,35],["ÉPICO","#d32ce6",10,60],["LEGENDARIO","#eb4b4b",4,100],["MÍTICO","#ffd23d",1,200]];   // nombre, color, chance %, escamas que devuelve si sale repetido
+const CAT_N={skin:"Color del krill",hat:"Accesorio",tr:"Estela",bt:"Bote",ln:"Hilo de pesca",dc:"Adorno del mapa",fx:"Festejo",fr:"Marco del cartel",pet:"Mascota"};
+// colores nuevos (los animados tienen una función que devuelve [cuerpo, antenas, ojo] según el tiempo)
+Object.assign(SKINS,{menta:["Menta","#7ef0c4","#d4fff0","#0a3324"],lila:["Lila","#c9a2ff","#ecdcff","#2a1440"],coral:["Coral","#ff7f6a","#ffc6bb","#3a0e08"],piedra:["Piedra","#8a96a0","#c4ccd2","#1a2028"],
+ cebra:["Cebra","#f2f2f2","#202020","#000000"],camu:["Camuflaje","#5d7a3a","#8a6a3a","#1a2010"],choco:["Chocolate","#7a4a2a","#c08a5a","#1a0a04"],transp:["Transparente","#cfefff","#ffffff","#3a6a8a"],
+ neon:["Neón","#39ff8e","#c4ffe0","#00301a",t=>Math.floor(t*6)%2?["#39ff8e","#c4ffe0","#00301a"]:["#1fae5e","#7fe0aa","#00301a"]],
+ lava:["Lava","#ff4a1a","#ffd23d","#2a0800",t=>{const h=8+(Math.floor(t*5)%6)*5;return[`hsl(${h},95%,52%)`,`hsl(${h+30},100%,62%)`,"#2a0800"]}],
+ hielo:["Hielo","#bfeeff","#ffffff","#2a5a7a"],
+ galaxia:["Galaxia","#2a1a5a","#ff9ad5","#ffffff",t=>Math.floor(t*3)%2?["#2a1a5a","#ffffff","#ff9ad5"]:["#321e6a","#b48cff","#ffffff"]],
+ oro:["Oro brillante","#ffc23d","#fff3b0","#3a2400",t=>Math.floor(t*2)%3===0?["#ffe07a","#ffffff","#3a2400"]:["#ffc23d","#fff3b0","#3a2400"]],
+ dragon:["Krill dragón","#2fd3a0","#ffd23d","#ff2a4a",t=>{const h=140+(Math.floor(t*6)%8)*12;return[`hsl(${h},80%,50%)`,`hsl(${(h+180)%360},95%,60%)`,"#ff2a4a"]}]});
+Object.assign(HPAL,{N:"#8a5a2b",P:"#ff7ab8",V:"#4fd36b"});
+Object.assign(HATS,{lentes:["los anteojos de sol",["KKKK"],7,3],bigote:["el bigote",["KKK"],8,4],chef:["el gorro de chef",["WWWWW","WWWWW",".WWW."],5],flores:["la corona de flores",["P.Y.P","VVVVV"],5],
+ auris:["los auriculares",[".KKKK.","K....K","R....R"],5,2],diablo:["los cuernitos de diablo",["R...R","RR.RR"],5],cowboy:["el sombrero de cowboy",["..NNN..",".NNNNN.","NNNNNNN"],4],
+ vikingo:["el casco vikingo",["W...W","WYYYW",".YYY."],5],llamas:["la aureola de fuego",[".O.O.O.",".ORORO.","..RRR.."],4,-1]});
+Object.assign(SPR,{
+ bPirata:["..........KKKKK...........","..........KWKWK...........","..........KKWKK...........","..........KKKKK...........","..........N...............","..........N...............","..........N...............","N.........N..............N","NNNNNNNNNNNNNNNNNNNNNNNNNN",".NNYNNNNYNNNNYNNNNYNNNNNN.","..NNNNNNNNNNNNNNNNNNNNNN.."],
+ bSub:["..........Y...............","..........Y...............",".........YYYY.............","........YYYYYY............","...YYYYYYYYYYYYYYYYYYY....","..YYYCYYYCYYYCYYYYYYYYY...",".YYYYYYYYYYYYYYYYYYYYYYYK.","..YYYYYYYYYYYYYYYYYYYYY.KK","...YYYYYYYYYYYYYYYYYYY...."],
+ bLancha:["...........CC.............","..........CCCW............","WWWWWWWWWWWWWWWWWWWWWWWW..",".WRRRRRRRRRRRRRRRRRRRRRRW.","..WWWWWWWWWWWWWWWWWWWWWWWW","...BBBBBBBBBBBBBBBBBBBBBB."],
+ bBalsa:["...........N............","...........N.WWW........","...........N.WWWW.......","...........N.WWW........","...........N............","NNNNNNNNNNNNNNNNNNNNNNNN","SSSSSSSSSSSSSSSSSSSSSSSS","NNNNNNNNNNNNNNNNNNNNNNNN"],
+ dCastillo:["S.S.S.S.S","SSSSSSSSS",".SSSSSSS.",".SSKKKSS.",".SSKKKSS.","SSSSSSSSS"],
+ dSombrilla:["..RWRWR..",".RWRWRWR.","RWRWRWRWR","....N....","....N....","....N...."],
+ dFlamenco:["...PP..","...P...","...P...",".PPPPP.","PP...PP",".PPPPP."],
+ dFaro:["..Y..",".KKK.",".WWW.",".RRR.",".WWW.",".RRR.",".WWW.","GGGGG"],
+ dIsla:["..VVV..",".VVNVV.","V..N..V","...N...","...N...",".SSSSS.","SSSSSSS"],
+ dPato:[".YY..","YKYO.",".YY..","YYYYY",".YYY."],
+ dMonedas:["..Y..",".YYY.","YYYYY"],
+ dTrono:["Y.....Y","YGGGGGY","YGRRRGY","YGGGGGY","YYYYYYY","Y.....Y","Y.....Y"]});
+const DPAL={S:"#e2c98f",K:"#5a4426",R:"#e8323c",W:"#f4f8fb",N:"#7a5230",P:"#ff7ab8",Y:"#ffd23d",G:"#55606a",V:"#3fbf6a",O:"#ff8a2a",C:"#9be8ff",B:"#3a7bd5"};
+// el catálogo: [id, categoría, valor, nombre, rareza]
+const ITEMS=[
+ ["s-menta","skin","menta","Menta",1],["s-lila","skin","lila","Lila",1],["s-coral","skin","coral","Coral",1],["s-piedra","skin","piedra","Piedra",1],
+ ["s-cebra","skin","cebra","Cebra",2],["s-camu","skin","camu","Camuflaje",2],["s-choco","skin","choco","Chocolate",2],["s-transp","skin","transp","Transparente",2],
+ ["s-neon","skin","neon","Neón",3],["s-lava","skin","lava","Lava",3],["s-hielo","skin","hielo","Hielo",3],["s-galaxia","skin","galaxia","Galaxia",4],["s-oro","skin","oro","Oro brillante",4],["s-dragon","skin","dragon","Krill dragón",5],
+ ["h-lentes","hat","lentes","Anteojos de sol",1],["h-bigote","hat","bigote","Bigote",1],["h-chef","hat","chef","Gorro de chef",1],["h-flores","hat","flores","Corona de flores",2],["h-auris","hat","auris","Auriculares",2],
+ ["h-diablo","hat","diablo","Cuernitos de diablo",2],["h-cowboy","hat","cowboy","Sombrero de cowboy",3],["h-vikingo","hat","vikingo","Casco vikingo",3],["h-llamas","hat","llamas","Aureola de fuego",4],
+ ["t-burbujas","tr","burbujas","Burbujas de colores",1],["t-corazones","tr","corazones","Corazones",2],["t-notas","tr","notas","Notas musicales",2],["t-chispas","tr","chispas","Chispas",3],
+ ["t-estrellas","tr","estrellas","Estrellitas",3],["t-arcoiris","tr","arcoiris","Arcoíris",4],["t-fuego","tr","fuego","Fuego azul",5],
+ ["b-balsa","bt","bBalsa","Balsa de troncos",1],["b-lancha","bt","bLancha","Lancha",2],["b-luces","bt","luces","Bote con luces",2],["b-pirata","bt","bPirata","Barco pirata",3],["b-sub","bt","bSub","Submarino amarillo",4],
+ ["l-brillo","ln","brillo","Hilo que brilla",1],["l-oro","ln","oro","Hilo dorado",2],["l-arcoiris","ln","arcoiris","Hilo arcoíris",3],
+ ["d-sombrilla","dc","dSombrilla","Sombrilla en el arrecife",1],["d-castillo","dc","dCastillo","Castillo de arena",1],["d-pato","dc","dPato","Patito de goma gigante",1],["d-flamenco","dc","dFlamenco","Flamenco inflable",2],
+ ["d-banderines","dc","banderines","Banderines en el cielo",2],["d-monedas","dc","dMonedas","Monedas de oro en el arrecife",2],["d-isla","dc","dIsla","Isla con palmera",3],["d-guirnaldas","dc","guirnaldas","Guirnaldas de luces en el cañón",3],
+ ["d-faro","dc","dFaro","Faro",3],["d-estatua","dc","estatua","Estatua de tu krill",4],["d-cristales","dc","cristales","Cristales en las paredes",4],["d-trono","dc","dTrono","Trono en el fondo del mar",5],
+ ["f-confeti","fx","confeti","Confeti",2],["f-fuegos","fx","fuegos","Fuegos artificiales",3],["f-rayos","fx","rayos","Rayos",4],
+ ["m-perg","fr","perg","Marco de pergamino",1],["m-neon","fr","neon","Marco de neón",2],["m-oro","fr","oro","Marco dorado",3],
+ ["p-payaso","pet","payaso","Pececito payaso",2],["p-medusa","pet","medusa","Medusita",3],["p-caballito","pet","caballito","Caballito de mar",3],["p-pulpo","pet","pulpo","Pulpito",4]];
+const ITEM=Object.fromEntries(ITEMS.map(i=>[i[0],i]));
+const PETS={payaso:["fishStripe",{X:"#ff8a3d",W:"#fff4e6",O:"#1a0e08"}],medusa:["jelly",{X:"#ff8fc8"},"255,143,200"],caballito:["seahorse",{X:"#ffb347",O:"#2a1500"}],pulpo:["dumbo",{X:"#ff9e8a",O:"#2a0b08"},"255,158,138"]};
+const escGet=()=>store.get("abisal-escamas")||{g:0,s:0},escBal=()=>{const e=escGet();return Math.max(0,(e.g||0)-(e.s||0))};
+function escAdd(n){if(!(n>0))return;const e=escGet();e.g=(e.g||0)+Math.round(n);store.set("abisal-escamas",e)}
+const cofreGet=()=>store.get("abisal-cofre")||{o:{}},has=id=>!!cofreGet().o[id];
+// cuánto se gana al terminar: 1 escama cada 10 puntos; la primera pesca diaria del día da 20 más y 5 por cada día de racha
+function escGanadas(pts,primera){return Math.floor(pts/10)+(primera?20+5*rachaNow():0)}
+// la tirada: primero la rareza según las chances, después cualquier objeto de esa rareza
+function cofreSortear(){let x=Math.random()*100,r=1;for(let k=5;k>=1;k--){if(x<RAR[k][2]){r=k;break}x-=RAR[k][2]}const l=ITEMS.filter(i=>i[4]===r);return l[Math.floor(Math.random()*l.length)]}
+function cofreAzar(){let x=Math.random()*100;for(let k=5;k>=1;k--){if(x<RAR[k][2]){const l=ITEMS.filter(i=>i[4]===k);return l[Math.floor(Math.random()*l.length)]}x-=RAR[k][2]}return ITEMS[0]}
+// dibujito de cada objeto (para la ruleta y el armario)
+function itemPreview(cv,it){const [id,cat,v]=it,W_=cv.width=72,H_=cv.height=44,x=cv.getContext("2d");x.imageSmoothingEnabled=false;x.clearRect(0,0,W_,H_);
+ const spr=(s,k)=>{k=k||Math.max(1,Math.floor(Math.min((W_-8)/s.width,(H_-6)/s.height)));x.drawImage(s,Math.round((W_-s.width*k)/2),Math.round((H_-s.height*k)/2),s.width*k,s.height*k)};
+ const dots=(cols,f)=>{for(let i=0;i<14;i++){const px=8+i*4,py=H_/2+Math.sin(i*.9)*8;x.fillStyle=cols[i%cols.length];f?f(px,py,i):x.fillRect(px,py,3,3)}};
+ if(cat==="skin"){const c=document.createElement("canvas");krillCanvas(c,{c:v},3);spr(c,1);return}
+ if(cat==="hat"){const c=document.createElement("canvas");krillCanvas(c,{c:KRL.c,h:v},3);spr(c,1);return}
+ if(cat==="pet"){const p=PETS[v];spr(sprite(p[0],p[1]));return}
+ if(cat==="bt"){spr(v==="luces"?sprite("bLancha",{W:"#13233a",R:"#ff4f8b",B:"#13233a",C:"#ffd23d"}):sprite(v,DPAL));return}
+ if(cat==="dc"){if(SPR[v])return spr(sprite(v,DPAL));
+  if(v==="estatua"){const c=document.createElement("canvas");krillCanvas(c,{c:"piedra"},3);spr(c,1);return}
+  if(v==="banderines"){x.strokeStyle="#9fb4c7";x.beginPath();x.moveTo(4,10);x.quadraticCurveTo(36,22,68,10);x.stroke();["#ff4f8b","#ffd23d","#4fd8f0","#7ef0c4"].forEach((c,i)=>{x.fillStyle=c;const px=10+i*15,py=12+Math.sin(i)*2;x.beginPath();x.moveTo(px,py);x.lineTo(px+8,py);x.lineTo(px+4,py+9);x.fill()});return}
+  if(v==="guirnaldas")return dots(["#ff4f8b","#ffd23d","#4fd8f0","#7ef0c4"],(px,py)=>{x.fillRect(px,py,3,3)});
+  if(v==="cristales"){x.fillStyle="#7ff6ff";for(const [px,h] of [[18,18],[30,26],[42,14],[54,22]]){x.beginPath();x.moveTo(px,H_-6);x.lineTo(px+4,H_-6-h);x.lineTo(px+8,H_-6);x.fill()}return}}
+ if(cat==="tr"){const C={burbujas:["#ff7ab8","#7ef0c4","#ffd23d","#4fd8f0"],corazones:["#ff4f8b"],notas:["#ffffff"],chispas:["#ffd23d","#ff8a2a"],estrellas:["#ffffff","#ffd23d"],arcoiris:["#ff3d3d","#ffa53d","#ffe03d","#4fd36b","#3da5ff","#a35bff"],fuego:["#4fd8f0","#bff3ff"]}[v];return dots(C)}
+ if(cat==="ln"){const c={brillo:"#7ff6ff",oro:"#ffd23d",arcoiris:null}[v];for(let i=0;i<16;i++){x.fillStyle=c||`hsl(${i*24},90%,60%)`;x.fillRect(6+i*4,6+i*2,3,3)}return}
+ if(cat==="fx"){const C={confeti:["#ff4f8b","#ffd23d","#4fd8f0","#7ef0c4"],fuegos:["#ffd23d","#ff4f8b","#ffffff"],rayos:["#fff6c4"]}[v];
+  if(v==="rayos"){x.strokeStyle="#fff6c4";x.lineWidth=2;x.beginPath();x.moveTo(36,2);x.lineTo(30,18);x.lineTo(40,20);x.lineTo(32,42);x.stroke();return}
+  for(let i=0;i<22;i++){const a=i/22*6.28,r=v==="fuegos"?14:8+Math.random()*16;x.fillStyle=C[i%C.length];x.fillRect(36+Math.cos(a)*r,22+Math.sin(a)*r*.8,3,v==="confeti"?2:3)}return}
+ if(cat==="fr"){const c={perg:"#a0703a",neon:"#ff4fd8",oro:"#ffd23d"}[v];x.fillStyle=v==="perg"?"#f1e3c0":"#0b1626";x.fillRect(8,12,56,20);x.strokeStyle=c;x.lineWidth=3;x.strokeRect(8,12,56,20);x.fillStyle=v==="perg"?"#3a2a14":"#d7e6f0";x.font="9px monospace";x.fillText("“RESPUESTA”",12,26)}}
+const itemHTML=(it,extra="")=>`<div class="it" style="--rc:${RAR[it[4]][1]}" title="${esc(it[3]+" · "+RAR[it[4]][0])}"><canvas data-it="${it[0]}"></canvas><span>${esc(it[3])}</span>${extra}</div>`;
+function paintItems(root){root.querySelectorAll("canvas[data-it]").forEach(cv=>itemPreview(cv,ITEM[cv.dataset.it]))}
+// pantalla del cofre
+let cofreGirando=false;
+function cofreSheet(){const bal=escBal(),own=Object.keys(cofreGet().o).length;
+ showSheet(`<div class="endHead"><b>COFRE</b><span>${bal} ESCAMAS · ${own} / ${ITEMS.length} OBJETOS</span></div>
+ <div class="reel"><div class="mark"></div><div class="strip" id="strip">${[...Array(9)].map(()=>itemHTML(cofreAzar())).join("")}</div></div>
+ <div id="cofreRes"></div>
+ <div class="row"><button class="btn" id="cofreOpen" ${bal<COFRE_COSTO?"disabled":""}>ABRIR · ${COFRE_COSTO} ESCAMAS</button><button class="btn sm" id="armBtn">ARMARIO</button><button class="btn sm" id="back">VOLVER</button></div>
+ <p class="foot">${bal<COFRE_COSTO?`Te faltan ${COFRE_COSTO-bal} escamas. `:""}Ganás 1 escama cada 10 puntos que hacés en cualquier partida; la primera pesca diaria del día da 20 más, y 5 más por cada día de racha. Si sale algo que ya tenés, te devuelve escamas.</p>
+ <div class="frBox"><h3>CHANCES</h3><div class="rarRow">${RAR.slice(1).map(r=>`<span style="--rc:${r[1]}"><b>${r[0]}</b>${r[2]}% · repetido +${r[3]}</span>`).join("")}</div>
+  <h3>QUÉ PUEDE SALIR</h3><div class="itGrid">${[5,4,3,2,1].flatMap(r=>ITEMS.filter(i=>i[4]===r)).map(it=>itemHTML(it,has(it[0])?'<em>✓</em>':"")).join("")}</div></div>`);
+ paintItems($("endIn"));$("back").onclick=()=>go("lobby");$("armBtn").onclick=()=>armarioSheet();$("cofreOpen").onclick=cofreAbrir}
+function cofreAbrir(){if(cofreGirando||escBal()<COFRE_COSTO)return;cofreGirando=true;const e=escGet();e.s=(e.s||0)+COFRE_COSTO;store.set("abisal-escamas",e);
+ const win=cofreSortear(),N=56,WIN=48,list=[...Array(N)].map((_,i)=>i===WIN?win:cofreAzar()),st=$("strip");
+ st.style.transition="none";st.style.transform="translateX(0)";st.innerHTML=list.map(it=>itemHTML(it)).join("");paintItems(st);
+ $("cofreOpen").disabled=true;$("cofreRes").innerHTML="";$("endIn").querySelector(".endHead span").textContent=escBal()+" ESCAMAS · ABRIENDO…";
+ const cell=st.children[0].offsetWidth+6,reelW=st.parentNode.offsetWidth,dx=-(WIN*cell+cell/2-reelW/2+(Math.random()-.5)*cell*.6),D=5.6;
+ void st.offsetWidth;st.style.transition=`transform ${D}s cubic-bezier(.08,.72,.16,1)`;st.style.transform=`translateX(${dx}px)`;
+ // tic-tic a medida que pasan los objetos (cada vez más despacio)
+ let last=0;const t0=performance.now(),tick=()=>{const u=Math.min(1,(performance.now()-t0)/(D*1000)),pos=Math.abs(new DOMMatrix(getComputedStyle(st).transform).m41),k=Math.floor(pos/cell);if(k!==last){last=k;sfx.tick(false)}if(u<1)requestAnimationFrame(tick)};requestAnimationFrame(tick);
+ setTimeout(()=>{cofreGirando=false;const c=cofreGet(),nuevo=!c.o[win[0]],r=RAR[win[4]];if(nuevo){c.o[win[0]]=1;store.set("abisal-cofre",c)}else escAdd(r[3]);
+  sfx.reveal(Math.min(5,win[4]));if(win[4]>=4)flash(hexRgb(r[1]),.5);
+  $("cofreRes").innerHTML=`<div class="cofreWin" style="--rc:${r[1]}">${itemHTML(win)}<div><b>${esc(win[3])}</b><span>${r[0]} · ${CAT_N[win[1]]}</span><span>${nuevo?"¡NUEVO!":"Ya lo tenías: te devolvemos "+r[3]+" escamas."}</span>${nuevo?`<button class="btn sm" id="cofreEq">USARLO</button>`:""}</div></div>`;
+  paintItems($("cofreRes"));if($("cofreEq"))$("cofreEq").onclick=()=>{equipar(win);$("cofreEq").textContent="¡PUESTO!";$("cofreEq").disabled=true};
+  $("endIn").querySelector(".endHead span").textContent=escBal()+" ESCAMAS · "+Object.keys(cofreGet().o).length+" / "+ITEMS.length+" OBJETOS";$("cofreOpen").disabled=escBal()<COFRE_COSTO},D*1000+250)}
+// poner o sacar un objeto
+function equipar(it,quitar){const [id,cat,v]=it,ch={};
+ if(cat==="skin")ch.c=quitar?"rosa":v;else if(cat==="hat")ch.h=quitar?"":v;
+ else if(cat==="dc"){const d=new Set(KRL.dc||[]);quitar?d.delete(v):d.add(v);ch.dc=[...d]}
+ else ch[cat]=quitar?"":v;
+ krillSet(ch)}
+const puesto=it=>{const [id,cat,v]=it;return cat==="skin"?(KRL.c||"rosa")===v:cat==="hat"?KRL.h===v:cat==="dc"?(KRL.dc||[]).includes(v):KRL[cat]===v};
+function armarioSheet(){const c=cofreGet().o,mine=ITEMS.filter(i=>c[i[0]]);
+ showSheet(`<div class="endHead"><b>ARMARIO</b><span>${mine.length} / ${ITEMS.length} OBJETOS · TOCÁ PARA PONER O SACAR</span></div>
+ <div class="frBox"><canvas id="kPrev"></canvas></div>
+ ${Object.keys(CAT_N).map(cat=>{const l=mine.filter(i=>i[1]===cat);return l.length?`<div class="frBox"><h3>${CAT_N[cat].toUpperCase()}${cat==="dc"?" (PODÉS PONER VARIOS)":""}</h3><div class="itGrid">${l.map(it=>`<button class="itB${puesto(it)?" on":""}" data-eq="${it[0]}">${itemHTML(it,puesto(it)?"<em>PUESTO</em>":"")}</button>`).join("")}</div></div>`:""}).join("")||'<p class="foot">Todavía no sacaste nada del cofre.</p>'}
+ <p class="foot">Los colores y gorros que ganás con logros se eligen en Logros.</p>
+ <div class="row"><button class="btn sm" id="toCofre">COFRE</button><button class="btn sm" id="back">VOLVER</button></div>`);
+ krillCanvas($("kPrev"),KRL,7);paintItems($("endIn"));
+ $("endIn").querySelectorAll("[data-eq]").forEach(b=>b.onclick=()=>{const it=ITEM[b.dataset.eq];equipar(it,puesto(it));armarioSheet()});
+ $("toCofre").onclick=()=>cofreSheet();$("back").onclick=()=>go("lobby")}
+
+// ----- lo que se ve en el juego -----
+// estela detrás del krill (sobre todo mientras baja con la respuesta)
+const TRAIL=[];
+function trailFX(dt){const tr=KRL.tr;if(tr&&!(FX.boss&&FX.boss.eaten)){const kx=krill.x/PX-(krill.dir||1)*4,ky=krill.y/PX,mov=tagState&&tagState.moving;
+  if(Math.random()<(mov?.9:.12)){const C={burbujas:["#ff7ab8","#7ef0c4","#ffd23d","#4fd8f0"],corazones:["#ff4f8b","#ff9ad5"],notas:["#ffffff","#d7e6f0"],chispas:["#ffd23d","#ff8a2a"],estrellas:["#ffffff","#ffd23d"],arcoiris:null,fuego:["#4fd8f0","#bff3ff","#7f9cff"]}[tr];
+   TRAIL.push({x:kx+(Math.random()-.5)*4,y:ky+(Math.random()-.5)*3,vx:(Math.random()-.5)*6,vy:tr==="fuego"||tr==="burbujas"?-8-Math.random()*6:-2+Math.random()*4,l:1,k:tr,c:C?C[Math.floor(Math.random()*C.length)]:`hsl(${(T*240)%360},95%,62%)`})}}
+ for(let i=TRAIL.length-1;i>=0;i--){const p=TRAIL[i];p.l-=dt*(p.k==="arcoiris"?1.4:.9);if(p.l<=0){TRAIL.splice(i,1);continue}p.x+=p.vx*dt;p.y+=p.vy*dt;const x=Math.round(p.x),y=Math.round(p.y);pcx.globalAlpha=Math.min(1,p.l*1.5);pcx.fillStyle=p.c;
+  if(p.k==="corazones"){pcx.fillRect(x-1,y,1,1);pcx.fillRect(x+1,y,1,1);pcx.fillRect(x-1,y+1,3,1);pcx.fillRect(x,y+2,1,1)}
+  else if(p.k==="notas"){pcx.fillRect(x,y,2,2);pcx.fillRect(x+1,y-3,1,3)}
+  else if(p.k==="estrellas"){pcx.fillRect(x,y-1,1,3);pcx.fillRect(x-1,y,3,1)}
+  else if(p.k==="arcoiris")pcx.fillRect(x,y,2,2);
+  else{pcx.fillRect(x,y,1,1);if(p.k==="chispas"||p.k==="fuego"){pcx.globalCompositeOperation="lighter";glowPx(x,y,3,p.k==="fuego"?"79,216,240":"255,210,61",.4*p.l);pcx.globalCompositeOperation="source-over"}}}
+ pcx.globalAlpha=1}
+// mascota: nada al lado del krill, un poco atrás
+const PET={x:0,y:0};
+function petFX(){const p=PETS[KRL.pet];if(!p||(FX.boss&&FX.boss.eaten))return;const tx=krill.x/PX-(krill.dir||1)*15,ty=krill.y/PX-5+Math.sin(T*2.3)*2;
+ if(!PET.x){PET.x=tx;PET.y=ty}PET.x+=(tx-PET.x)*.08;PET.y+=(ty-PET.y)*.08;const dir=krill.x/PX>PET.x?1:-1;
+ if(p[2]){pcx.globalCompositeOperation="lighter";glowPx(PET.x,PET.y,7,p[2],.3);pcx.globalCompositeOperation="source-over"}drawSpr(sprite(frameOf(p[0],1),p[1],dir<0),PET.x,PET.y)}
+// adornos del mapa
+function decoFX(pyOf){const d=KRL.dc;if(!d||!d.length)return;const on=v=>d.includes(v),sea=pyOf(0),kTop=pyOf(270),put=(n,fx,y)=>{const s=sprite(n,DPAL);drawSpr(s,Math.round(fx*pw),Math.round(y-s.height/2))};
+ if(kTop>-30&&kTop<ph+30){if(on("dSombrilla"))put("dSombrilla",.135,kTop-shelfTop(.135*pw)+1);if(on("dCastillo"))put("dCastillo",.163,kTop-shelfTop(.163*pw)+1);if(on("dMonedas"))put("dMonedas",.176,kTop-shelfTop(.176*pw)+1);
+  if(on("estatua")){const x=Math.round(.098*pw),y=Math.round(kTop-shelfTop(x));pcx.fillStyle="#5a646c";pcx.fillRect(x-6,y-4,13,4);paintKrill(pcx,x-11,y-16,1,{c:"piedra",h:KRL.h},2)}}
+ if(sea>-20&&sea<ph+20){const bob=Math.sin(T*1.6)*.7;
+  if(on("dPato"))put("dPato",.62,sea+bob);if(on("dFlamenco"))put("dFlamenco",.7,sea+bob);if(on("dIsla"))put("dIsla",.9,sea+2);
+  if(on("dFaro")){put("dFaro",.83,sea+1);if(Math.sin(T*1.5)>0){pcx.globalCompositeOperation="lighter";glowPx(.83*pw,sea-7,16,"255,240,170",.35);pcx.globalCompositeOperation="source-over"}}
+  if(on("banderines")){const cols=["#ff4f8b","#ffd23d","#4fd8f0","#7ef0c4"];for(let i=0;i<12;i++){const u=i/11,x=Math.round(pw*(.52+.3*u)),y=Math.round(sea-26+Math.sin(u*Math.PI)*6);pcx.fillStyle="#9fb4c7";pcx.fillRect(x,y,2,1);pcx.fillStyle=cols[i%4];pcx.fillRect(x,y+1,2,2);pcx.fillRect(x,y+3,1,1)}}}
+ const mTop=cam-surfY/PPM,mBot=cam+(H-surfY)/PPM;
+ if(on("guirnaldas"))for(let m=Math.max(300,Math.ceil(mTop/12)*12);m<=Math.min(1300,mBot);m+=12)for(const side of [0,1]){const w=side?wallR(m):wallL(m);if(w<3)continue;const x=side?pw-w:w-1,c=["#ff4f8b","#ffd23d","#4fd8f0","#7ef0c4"][(m/12+side)%4|0];pcx.fillStyle=Math.sin(T*3+m)>-.3?c:"#223";pcx.fillRect(x,Math.round(pyOf(m)),1,1)}
+ if(on("cristales"))for(let m=Math.max(2400,Math.ceil(mTop/60)*60);m<=Math.min(5600,mBot+60);m+=60)for(const side of [0,1]){if(hash(m/60,side+70)>.5)continue;const w=side?wallR(m):wallL(m);if(w<4)continue;const x=side?pw-w-1:w,y=Math.round(pyOf(m)),s=side?-1:1;
+  pcx.globalCompositeOperation="lighter";glowPx(x+s*2,y-2,6,"127,246,255",.25+.1*Math.sin(T*2+m));pcx.globalCompositeOperation="source-over";pcx.fillStyle="#7ff6ff";for(let k=0;k<5;k++){pcx.fillRect(x+s*1,y-k,1,1);if(k<3)pcx.fillRect(x+s*3,y-k-1,1,1)}}
+ if(on("dTrono")&&FLOOR&&FY&&pyOf(FLOOR)<ph+40){const x=Math.round(pw*.5),s=sprite("dTrono",DPAL);drawSpr(s,x,FY[x]-s.height/2)}}
+// botes
+function drawBoatSkin(bx,B){const v=KRL.bt;if(!v||v==="luces"||!SPR[v])return false;const s=sprite(v,DPAL);drawSpr(s,bx+2,B+1-s.height/2);
+ pcx.fillStyle="#3b2a1e";for(let i=0;i<12;i++)pcx.fillRect(bx+12+i,B-4-i,1,1);return true}
+function boatExtra(bx,B){if(KRL.bt!=="luces")return;const cols=["#ff4f8b","#ffd23d","#4fd8f0","#7ef0c4"];for(let i=0;i<9;i++){const x=bx-16+i*4,c=cols[(i+Math.floor(T*3))%4];pcx.fillStyle=c;pcx.fillRect(x,B-4,1,1);pcx.globalCompositeOperation="lighter";glowPx(x,B-4,3,hexRgb(c),.35);pcx.globalCompositeOperation="source-over"}}
+// hilo de pesca
+function lineCol(i){const v=KRL.ln;if(v==="oro")return i%2?"rgba(255,215,90,.85)":"rgba(255,180,60,.5)";if(v==="brillo")return i%2?"rgba(127,246,255,.9)":"rgba(127,246,255,.45)";if(v==="arcoiris")return `hsla(${(i*24+T*140)%360},90%,65%,.8)`;return i%2?"rgba(220,235,245,.55)":"rgba(160,200,220,.3)"}
+// festejo cuando sale un "Uno en un abismo"
+const CELEB=[];
+function celebrate(){const v=KRL.fx;if(!v)return;
+ if(v==="confeti")for(let i=0;i<90;i++)CELEB.push({k:"c",x:Math.random()*pw,y:-Math.random()*ph*.4,vx:(Math.random()-.5)*12,vy:20+Math.random()*25,l:3.5,c:["#ff4f8b","#ffd23d","#4fd8f0","#7ef0c4","#b07cff"][i%5]});
+ if(v==="fuegos")for(let b=0;b<4;b++){const cx=pw*(.2+Math.random()*.6),cy=ph*(.15+Math.random()*.3),c=["#ffd23d","#ff4f8b","#4fd8f0","#ffffff"][b];setTimeout(()=>{for(let i=0;i<34;i++){const a=i/34*6.283,s=28+Math.random()*14;CELEB.push({k:"f",x:cx,y:cy,vx:Math.cos(a)*s,vy:Math.sin(a)*s,l:1.4,c})}sfx.thud(.5)},b*350)}
+ if(v==="rayos")for(let b=0;b<3;b++)setTimeout(()=>{CELEB.push({k:"r",x:pw*(.2+Math.random()*.6),seed:Math.random()*99,l:.35});flash("255,246,196",.5);sfx.thud(.8)},b*300)}
+function celebFX(dt){for(let i=CELEB.length-1;i>=0;i--){const p=CELEB[i];p.l-=dt;if(p.l<=0){CELEB.splice(i,1);continue}
+ if(p.k==="r"){pcx.fillStyle="rgba(255,246,196,.95)";let x=p.x;for(let y=0;y<ph*.7;y++){if(y%3===0)x+=Math.round((hash(y,p.seed)-.5)*5);pcx.fillRect(Math.round(x),y,2,1)}continue}
+ p.x+=p.vx*dt;p.y+=p.vy*dt;if(p.k==="f")p.vy+=18*dt;else p.vx+=Math.sin(T*3+i)*.4;pcx.globalAlpha=Math.min(1,p.l*1.6);pcx.fillStyle=p.c;pcx.fillRect(Math.round(p.x),Math.round(p.y),p.k==="c"?2:1,p.k==="c"?1:1);
+ if(p.k==="f"){pcx.globalCompositeOperation="lighter";glowPx(p.x,p.y,2,hexRgb(p.c),.4*p.l);pcx.globalCompositeOperation="source-over"}}pcx.globalAlpha=1}
+function topCofreUI(){const b=$("cofreBtn");if(b)b.title=`Cofre: ${escBal()} escamas`}
+
 // ===================== Bucle =====================
 const ARC=106.8;let last=performance.now();
 // rdt: el tiempo real que pasó (aunque la página haya estado escondida), para los relojes; dt: el de las animaciones
