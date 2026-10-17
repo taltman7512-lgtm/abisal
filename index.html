@@ -1310,22 +1310,33 @@ function drawCrBoss(b,t,cx,ky,ease3){const c=b.cr,col=crSprite(c),sil=crSprite(c
 let PROF=null;const NO_TRADE=0;   // (0: todas las rarezas se pueden intercambiar, también las de Abismo)
 const fbx=()=>ACCT.fb&&ACCT.user?ACCT.fb:null;
 const besLocal=()=>{const b=bestGet(),o={};for(const k in b)if(b[k].n>0)o["c"+k]=b[k].n;return o};
-function besToLocal(bes){const b=bestGet();for(const c of CR){const n=bes["c"+c.id]||0,e=b[c.id]||{n:0};e.n=n;if(n>0)e.v=1;if(n>0||e.v)b[c.id]=e}store.set("abisal-bestiario",b);bestCountUI()}
+function besToLocal(bes){{const co=cofreGet(),p=pendGet();for(const k in bes)if(k.startsWith("ci-")&&ITEM[k.slice(3)])co.o[k.slice(3)]=(bes[k]||0)+p.filter(x=>x===k).length;store.set("abisal-cofre",co)}const b=bestGet();for(const c of CR){const n=bes["c"+c.id]||0,e=b[c.id]||{n:0};e.n=n;if(n>0)e.v=1;if(n>0||e.v)b[c.id]=e}store.set("abisal-bestiario",b);bestCountUI()}
 async function profEnsure(){const F=fbx();if(!F)return;const u=ACCT.user,ref=F.doc(F.db,"profiles",u.uid);
  try{const s=await F.getDoc(ref);if(s.exists()){PROF=s.data();besToLocal(PROF.bes||{});return}
   // primera vez: se elige un código libre y se crea el perfil vacío (las reglas no dejan crearlo con criaturas; lo que se pesca desde ahora queda en la cuenta)
   let code=null;for(let k=0;k<6&&!code;k++){const c="KRILL-"+String(1000+Math.floor(Math.random()*9000));try{await F.setDoc(F.doc(F.db,"codes",c),{uid:u.uid});code=c}catch(e){}}
   PROF={name:ACCT.name||"",code:code||"",bes:{},friends:[],lastCatch:F.serverTimestamp()};await F.setDoc(ref,PROF);PROF=(await F.getDoc(ref)).data()}catch(e){ACCT.err=String(e)}}
-async function profCatch(id){const F=fbx();if(!F||!PROF)return;const k="c"+id;try{await F.updateDoc(F.doc(F.db,"profiles",ACCT.user.uid),{["bes."+k]:(PROF.bes[k]||0)+1,lastCatch:F.serverTimestamp()});PROF.bes[k]=(PROF.bes[k]||0)+1}catch(e){ACCT.err=String(e)}}
+// cada pesca (c12) o cada objeto del cofre (ci-s-neon) suma 1 en el perfil; las reglas dejan una suma por minuto,
+// así que se hace con una fila de espera (abisal-pend, solo en este aparato) y se van mandando de a una
+let profT=null,profLast=0;const pendGet=()=>store.get("abisal-pend")||[];
+function profAdd(k){const p=pendGet();p.push(k);store.set("abisal-pend",p);profFlush()}
+async function profFlush(){const F=fbx();clearTimeout(profT);if(!F||!PROF)return;const p=pendGet();if(!p.length)return;
+ const wait=61000-(Date.now()-profLast);if(wait>0){profT=setTimeout(profFlush,wait);return}const k=p[0];
+ try{await F.updateDoc(F.doc(F.db,"profiles",ACCT.user.uid),{["bes."+k]:(PROF.bes[k]||0)+1,lastCatch:F.serverTimestamp()});PROF.bes[k]=(PROF.bes[k]||0)+1;const q=pendGet();q.shift();store.set("abisal-pend",q)}
+ catch(e){ACCT.err=String(e)}profLast=Date.now();if(pendGet().length)profT=setTimeout(profFlush,61000)}
+function profCatch(id){profAdd("c"+id)}
+// al entrar: los objetos del cofre que tenés en este aparato y todavía no están en el perfil se ponen en la fila
+function profReconcile(){if(!PROF)return;const o=cofreGet().o,p=pendGet(),add=[];for(const id in o){const k="ci-"+id,need=(o[id]||0)-(PROF.bes[k]||0)-p.filter(x=>x===k).length;for(let i=0;i<need;i++)add.push(k)}
+ if(add.length){store.set("abisal-pend",p.concat(add))}profFlush()}
 // el que propuso un intercambio aplica su parte cuando el amigo lo acepta
 async function tradesSettle(){const F=fbx();if(!F||!PROF)return;const me=ACCT.user.uid;
  try{const q=await F.getDocs(F.query(F.collection(F.db,"trades"),F.where("from","==",me),F.where("status","==","accepted"),F.where("appliedFrom","==",false)));
   for(const d of q.docs){const tr=d.data(),out="c"+tr.give.id,inn="c"+tr.get.id,bes={...PROF.bes};bes[out]=(bes[out]||0)-tr.give.n;bes[inn]=(bes[inn]||0)+tr.get.n;
    const bt=F.writeBatch(F.db);bt.update(F.doc(F.db,"profiles",me),{bes,lastTrade:d.id});bt.update(d.ref,{appliedFrom:true});await bt.commit();PROF.bes=bes}
   besToLocal(PROF.bes)}catch(e){ACCT.err=String(e)}}
-const crMini=(id,sil)=>{const c=CR.find(x=>x.id===id);return c?`<canvas data-mini="${id}${sil?"s":""}"></canvas>`:""};
+const crMini=(id,sil)=>{if(typeof id==="string"&&id.startsWith("i-"))return `<canvas data-it="${id.slice(2)}"></canvas>`;const c=CR.find(x=>x.id===id);return c?`<canvas data-mini="${id}${sil?"s":""}"></canvas>`:""};
 function paintMinis(root){root.querySelectorAll("canvas[data-mini]").forEach(cv=>{const v=cv.dataset.mini,id=parseInt(v),c=CR.find(x=>x.id===id),s=crSprite(c,v.endsWith("s")),k=Math.max(1,Math.floor(Math.min(64/s.width,32/s.height)));cv.width=s.width*k;cv.height=s.height*k;const x=cv.getContext("2d");x.imageSmoothingEnabled=false;x.drawImage(s,0,0,cv.width,cv.height)})}
-const crName=id=>(CR.find(x=>x.id===id)||{}).n||"?";
+const crName=id=>typeof id==="string"&&id.startsWith("i-")?((ITEM[id.slice(2)]||[])[3]||"?"):(CR.find(x=>x.id===id)||{}).n||"?";
 async function friendsSheet(msg){const F=fbx();
  if(!F){showSheet(`<div class="endHead"><b>AMIGOS</b><span>VER Y CAMBIAR CRIATURAS</span></div><div class="acctBox"><p>${window.claude?"Los amigos funcionan en la página del juego (la de GitHub), no adentro de Claude.":"Para tener amigos e intercambiar criaturas necesitás una cuenta."}</p>${window.claude?"":'<button class="btn" id="goAcct">ENTRAR O CREAR CUENTA</button>'}</div><div class="row"><button class="btn sm" id="back">VOLVER</button></div>`);
   if($("goAcct"))$("goAcct").onclick=()=>acctSheet();$("back").onclick=()=>go("lobby");return}
@@ -1344,10 +1355,10 @@ async function friendsSheet(msg){const F=fbx();
  ${out.length?`<div class="frBox"><h3>ESPERANDO RESPUESTA</h3>${out.map(tr=>`<div class="frRow"><div class="trOffer"><b>${esc(tr.toName||"Tu amigo")}</b>${offer(tr,true)}</div><div class="row"><button class="btn sm" data-can="${tr.id}">CANCELAR</button></div></div>`).join("")}</div>`:""}
  ${DUEL.inv?`<div class="frBox"><h3>TE DESAFÍAN</h3><div class="frRow"><b>⚔ ${esc(DUEL.inv.an||"Un amigo")}</b><span>te desafía a un duelo</span><div class="row"><button class="btn sm" id="dAcc2">ACEPTAR</button><button class="btn sm" id="dNo2">NO</button></div></div></div>`:""}
  ${friends.length?rankHTML(friends):""}
- <div class="frBox"><h3>TUS AMIGOS</h3>${friends.length?friends.map(fr=>{const n=Object.values(fr.bes||{}).filter(v=>v>0).length;return `<div class="frRow"><canvas data-kl='${esc(JSON.stringify(fr.kl||{}))}'></canvas><b>${esc(fr.name||"Sin nombre")}</b><span>${n} / ${CR.length} criaturas</span><div class="row"><button class="btn sm" data-duel="${fr.id}">DUELO ⚔</button><button class="btn sm" data-ver="${fr.id}">VER PERFIL</button><button class="btn sm" data-tr="${fr.id}">INTERCAMBIAR</button></div></div>`}).join(""):'<p class="frMsg" style="color:var(--dim)">Todavía no agregaste a nadie. Pedile su código a un amigo.</p>'}</div>
- <p class="foot">Solo se intercambian las repetidas (siempre te queda al menos una). Un intercambio se hace cuando los dos están de acuerdo.</p>
+ <div class="frBox"><h3>TUS AMIGOS</h3>${friends.length?friends.map(fr=>{const n=Object.keys(fr.bes||{}).filter(k=>/^c\d+$/.test(k)&&fr.bes[k]>0).length;return `<div class="frRow"><canvas data-kl='${esc(JSON.stringify(fr.kl||{}))}'></canvas><b>${esc(fr.name||"Sin nombre")}</b><span>${n} / ${CR.length} criaturas</span><div class="row"><button class="btn sm" data-duel="${fr.id}">DUELO ⚔</button><button class="btn sm" data-ver="${fr.id}">VER PERFIL</button><button class="btn sm" data-tr="${fr.id}">INTERCAMBIAR</button></div></div>`}).join(""):'<p class="frMsg" style="color:var(--dim)">Todavía no agregaste a nadie. Pedile su código a un amigo.</p>'}</div>
+ <p class="foot">Se intercambian criaturas y objetos del cofre, solo los repetidos (siempre te queda al menos uno). Un intercambio se hace cuando los dos están de acuerdo.</p>
  <div class="row"><button class="btn sm" id="back">VOLVER</button></div>`);
- paintMinis($("endIn"));paintKls($("endIn"));$("back").onclick=()=>go("lobby");
+ paintMinis($("endIn"));paintItems($("endIn"));paintKls($("endIn"));$("back").onclick=()=>go("lobby");
  $("endIn").querySelectorAll("[data-duel]").forEach(b=>b.onclick=()=>duelInvite(friends.find(x=>x.id===b.dataset.duel)));
  if($("dAcc2")){$("dAcc2").onclick=()=>duelAccept(DUEL.inv);$("dNo2").onclick=()=>duelDecline(DUEL.inv)}
  $("frCopy").onclick=()=>copy(PROF.code||"",$("frCopy"));
@@ -1366,14 +1377,15 @@ async function friendsSheet(msg){const F=fbx();
 // armar una propuesta: elegís qué das (de tus repetidas) y qué pedís (de las repetidas de tu amigo)
 function tradeSheet(fr){const F=fbx();if(!F||!fr)return;const mine=PROF.bes||{},his=fr.bes||{};let give=null,get=null,gn=1,tn=1;
  const can=(bes,c)=>c.r!==NO_TRADE&&(bes["c"+c.id]||0)>=2;
- const list=(bes,side)=>{const l=CR.filter(c=>can(bes,c));return l.length?l.map(c=>`<button class="trPick" data-${side}="${c.id}" style="--c:${RZ[c.r].c}">${crMini(c.id)}${esc(c.n)}<small>×${bes["c"+c.id]}</small></button>`).join(""):'<p class="frMsg" style="color:var(--dim)">No hay repetidas.</p>'};
+ const list=(bes,side)=>{const l=CR.filter(c=>can(bes,c)),li=Object.keys(bes).filter(k=>k.startsWith("ci-")&&bes[k]>=2&&ITEM[k.slice(3)]).map(k=>ITEM[k.slice(3)]);
+  return l.length||li.length?l.map(c=>`<button class="trPick" data-${side}="${c.id}" style="--c:${RZ[c.r].c}">${crMini(c.id)}${esc(c.n)}<small>×${bes["c"+c.id]}</small></button>`).join("")+li.map(it=>`<button class="trPick" data-${side}="i-${it[0]}" style="--c:${RAR[it[4]][1]}">${crMini("i-"+it[0])}${esc(it[3])}<small>×${bes["ci-"+it[0]]}</small></button>`).join(""):'<p class="frMsg" style="color:var(--dim)">No hay repetidas.</p>'};
  showSheet(`<div class="endHead"><b>INTERCAMBIAR</b><span>CON ${esc((fr.name||"tu amigo").toUpperCase())}</span></div>
  <div class="trCols"><div class="frBox"><h3>DAS (TUS REPETIDAS)</h3><div class="trList">${list(mine,"g")}</div><label class="frRow"><span>Cantidad</span><input class="frIn" id="gn" type="number" min="1" value="1" style="width:5em"></label></div>
  <div class="frBox"><h3>PEDÍS (REPETIDAS DE ${esc((fr.name||"tu amigo").toUpperCase())})</h3><div class="trList">${list(his,"t")}</div><label class="frRow"><span>Cantidad</span><input class="frIn" id="tn" type="number" min="1" value="1" style="width:5em"></label></div></div>
  <p class="frMsg" id="trMsg"></p>
  <div class="row"><button class="btn" id="trSend">PROPONER INTERCAMBIO</button><button class="btn sm" id="back">VOLVER</button></div>`);
- paintMinis($("endIn"));$("back").onclick=()=>friendsSheet();
- const pick=(attr,set)=>$("endIn").querySelectorAll("[data-"+attr+"]").forEach(b=>b.onclick=()=>{$("endIn").querySelectorAll("[data-"+attr+"]").forEach(x=>x.classList.toggle("on",x===b));set(+b.dataset[attr])});
+ paintMinis($("endIn"));paintItems($("endIn"));$("back").onclick=()=>friendsSheet();
+ const pick=(attr,set)=>$("endIn").querySelectorAll("[data-"+attr+"]").forEach(b=>b.onclick=()=>{$("endIn").querySelectorAll("[data-"+attr+"]").forEach(x=>x.classList.toggle("on",x===b));const v=b.dataset[attr];set(/^\d+$/.test(v)?+v:v)});
  pick("g",v=>give=v);pick("t",v=>get=v);
  $("trSend").onclick=async()=>{const m=$("trMsg");m.className="frMsg";gn=Math.floor(+$("gn").value||1);tn=Math.floor(+$("tn").value||1);
   if(!give||!get)return m.textContent="Elegí qué das y qué pedís.";if(give===get)return m.textContent="Elegí dos criaturas distintas.";
@@ -1457,14 +1469,14 @@ $("exRange").oninput=e=>{camTarget=+e.target.value;$("exDepth").textContent=fmtM
 // así no se repiten preguntas aunque juegues en otro celular o compu. Para activarlas hay que crear el proyecto
 // en Firebase y pegar acá su configuración (ver activar-cuentas.md). Mientras config sea null, no se usan.
 const ACCT={config:{apiKey:"AIzaSyD5HIfTcj9f-nNYKk2NF0-SW1x_RxEnZKQ",authDomain:"abisal-49b12.firebaseapp.com",projectId:"abisal-49b12",storageBucket:"abisal-49b12.firebasestorage.app",messagingSenderId:"42614435640",appId:"1:42614435640:web:e16b0e21d252a55f8f5bcd"},user:null,fb:null,name:"",err:""};
-const ACCT_SKIP=new Set(["abisal-sound","abisal-explorar"]),FBV="10.12.2";
+const ACCT_SKIP=new Set(["abisal-sound","abisal-explorar","abisal-pend"]),FBV="10.12.2";
 const ICON_USER='<svg viewBox="0 0 16 16"><path d="M5 2h6v1h1v5h-1v1H5V8H4V3h1zM3 10h10v1h1v4H2v-4h1z"/></svg>';
 async function acctInit(){if(!ACCT.config||window.claude)return acctUI();
  try{const base=`https://www.gstatic.com/firebasejs/${FBV}/`;
   const [app,auth,fs]=await Promise.all(["firebase-app.js","firebase-auth.js","firebase-firestore.js"].map(f=>import(base+f)));
   const a=app.initializeApp(ACCT.config);ACCT.fb={...auth,...fs,auth:auth.getAuth(a),db:fs.getFirestore(a)};
   auth.getRedirectResult(ACCT.fb.auth).catch(()=>{});
-  auth.onAuthStateChanged(ACCT.fb.auth,async u=>{ACCT.user=u;PROF=null;if(u){await acctPull();await profEnsure();tradesSettle();tradesBadge();duelListen();profStats();logrosCheck()}else duelListen();acctUI(true)});
+  auth.onAuthStateChanged(ACCT.fb.auth,async u=>{ACCT.user=u;PROF=null;if(u){await acctPull();await profEnsure();tradesSettle();tradesBadge();duelListen();profStats();logrosCheck();profReconcile()}else duelListen();acctUI(true)});
  }catch(e){ACCT.err=String(e)}acctUI()}
 // todo lo del juego que está en el navegador (menos el sonido y el modo explorador)
 function acctLocal(){const d={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith("abisal-")&&!ACCT_SKIP.has(k))d[k]=localStorage.getItem(k)}return d}
@@ -1479,7 +1491,7 @@ async function acctPull(){const F=ACCT.fb,u=ACCT.user;let r={};
   let m=L;
   if(k==="abisal-seen"&&L&&Rv){m={...L};for(const q in Rv)m[q]=Math.max(m[q]||0,Rv[q])}
   else if(k==="abisal-escamas"&&L&&Rv)m={g:Math.max(L.g||0,Rv.g||0),s:Math.max(L.s||0,Rv.s||0)};
-  else if(k==="abisal-cofre"&&L&&Rv)m={o:{...(Rv.o||{}),...(L.o||{})}};
+  else if(k==="abisal-cofre"&&L&&Rv){m={o:{...(Rv.o||{})}};for(const i in L.o||{})m.o[i]=Math.max(+m.o[i]||0,+L.o[i]||0)}
   else if(k==="abisal-racha"&&L&&Rv)m=(Rv.last>L.last||(Rv.last===L.last&&Rv.n>L.n))?{...Rv,best:Math.max(L.best||0,Rv.best||0)}:{...L,best:Math.max(L.best||0,Rv.best||0)};
   else if(k==="abisal-logros"&&L&&Rv)m={...Rv,...L};
   else if(k==="abisal-stats"&&L&&Rv){m={...L};for(const q in Rv)if(typeof Rv[q]==="number")m[q]=Math.max(L[q]||0,Rv[q]);m.ans=[0,1,2,3,4,5].map(i=>Math.max((L.ans||[])[i]||0,(Rv.ans||[])[i]||0))}
@@ -1684,9 +1696,9 @@ function logrosSheet(){const have=store.get("abisal-logros")||{},s=store.get("ab
 // cada perfil guarda st: {day, dp: puntos de la pesca diaria de ese día, rn: racha, mp: la más honda, sp: especies} y kl: su krill
 function profStats(dp){const F=fbx();if(!F||!PROF)return;const st={...(PROF.st||{})};
  if(dp!=null){if(st.day!==dayNum){st.day=dayNum;st.dp=dp}else st.dp=Math.max(st.dp||0,dp)}
- st.rn=rachaNow();st.mp=Math.max(st.mp||0,(store.get("abisal-stats")||{}).maxPts||0);st.sp=Object.values(PROF.bes||{}).filter(v=>v>0).length;PROF.st=st;
+ st.rn=rachaNow();st.mp=Math.max(st.mp||0,(store.get("abisal-stats")||{}).maxPts||0);st.sp=Object.keys(PROF.bes||{}).filter(k=>/^c\d+$/.test(k)&&PROF.bes[k]>0).length;PROF.st=st;
  F.updateDoc(F.doc(F.db,"profiles",ACCT.user.uid),{st,kl:{c:KRL.c||"rosa",h:KRL.h||""}}).catch(()=>{})}
-function rankHTML(friends){const cnt=b=>Object.values(b||{}).filter(v=>v>0).length;
+function rankHTML(friends){const cnt=b=>Object.keys(b||{}).filter(k=>/^c\d+$/.test(k)&&b[k]>0).length;
  const rows=[{n:"Vos",me:1,st:PROF.st||{},kl:KRL,sp:cnt(PROF.bes)},...friends.map(f=>({n:f.name||"Sin nombre",st:f.st||{},kl:f.kl||{},sp:cnt(f.bes)}))];
  const rn=r=>r.st.day>=dayNum-1&&r.st.rn?` · racha ${r.st.rn}`:"";
  const row=(r,i,val)=>`<span>${i}</span><canvas data-kl='${esc(JSON.stringify(r.kl||{}))}'></canvas><b class="${r.me?"me":""}">${esc(r.n)}</b><span>${val}</span>`;
@@ -1938,9 +1950,9 @@ document.addEventListener("contextmenu",e=>{if(FX.boss&&FX.boss.fighting)e.preve
 document.addEventListener("keydown",e=>{if(FX.boss&&FX.boss.fighting&&(e.code==="Space"||e.key==="Enter")){e.preventDefault();if(!e.repeat)fightTap()}});
 // ===================== Cofre: escamas, ruleta (como las cajas del Counter) y armario =====================
 // abisal-escamas {g: ganadas, s: gastadas} (las dos solo suben, así al juntar con la nube se toma el mayor de cada una)
-// abisal-cofre {o: {id: 1}} lo que ya salió. Lo que tenés puesto va en KRL (abisal-krill): c color, h gorro, tr estela,
+// abisal-cofre {o: {id: cuántos}} lo que ya salió (los repetidos se juntan y se pueden intercambiar con amigos). Lo que tenés puesto va en KRL (abisal-krill): c color, h gorro, tr estela,
 // bt bote, ln hilo, fx festejo, fr marco del cartel, pet mascota, dc [adornos del mapa]
-const COFRE_COSTO=100,RAR=[null,["COMÚN","#4b8bff",60,20],["RARO","#8847ff",25,35],["ÉPICO","#d32ce6",10,60],["LEGENDARIO","#eb4b4b",4,100],["MÍTICO","#ffd23d",1,200]];   // nombre, color, chance %, escamas que devuelve si sale repetido
+const COFRE_COSTO=100,RAR=[null,["COMÚN","#4b8bff",60],["RARO","#8847ff",25],["ÉPICO","#d32ce6",10],["LEGENDARIO","#eb4b4b",4],["MÍTICO","#ffd23d",1]];   // nombre, color, chance %
 const CAT_N={skin:"Color del krill",hat:"Accesorio",tr:"Estela",bt:"Bote",ln:"Hilo de pesca",dc:"Adorno del mapa",fx:"Festejo",fr:"Marco del cartel",pet:"Mascota"};
 // colores nuevos (los animados tienen una función que devuelve [cuerpo, antenas, ojo] según el tiempo)
 Object.assign(SKINS,{menta:["Menta","#7ef0c4","#d4fff0","#0a3324"],lila:["Lila","#c9a2ff","#ecdcff","#2a1440"],coral:["Coral","#ff7f6a","#ffc6bb","#3a0e08"],piedra:["Piedra","#8a96a0","#c4ccd2","#1a2028"],
@@ -2024,8 +2036,8 @@ function cofreSheet(){const bal=escBal(),own=Object.keys(cofreGet().o).length;
  <div class="reel"><div class="mark"></div><div class="strip" id="strip">${[...Array(9)].map(()=>itemHTML(cofreAzar())).join("")}</div></div>
  <div id="cofreRes"></div>
  <div class="row"><button class="btn" id="cofreOpen" ${bal<COFRE_COSTO?"disabled":""}>ABRIR · ${COFRE_COSTO} ESCAMAS</button><button class="btn sm" id="armBtn">ARMARIO</button><button class="btn sm" id="back">VOLVER</button></div>
- <p class="foot">${bal<COFRE_COSTO?`Te faltan ${COFRE_COSTO-bal} escamas. `:""}Ganás 1 escama cada 10 puntos que hacés en cualquier partida; la primera pesca diaria del día da 20 más, y 5 más por cada día de racha. Si sale algo que ya tenés, te devuelve escamas.</p>
- <div class="frBox"><h3>CHANCES</h3><div class="rarRow">${RAR.slice(1).map(r=>`<span style="--rc:${r[1]}"><b>${r[0]}</b>${r[2]}% · repetido +${r[3]}</span>`).join("")}</div>
+ <p class="foot">${bal<COFRE_COSTO?`Te faltan ${COFRE_COSTO-bal} escamas. `:""}Ganás 1 escama cada 10 puntos que hacés en cualquier partida; la primera pesca diaria del día da 20 más, y 5 más por cada día de racha. Si sale algo que ya tenés, se te junta repetido: los repetidos se pueden intercambiar con tus amigos.</p>
+ <div class="frBox"><h3>CHANCES</h3><div class="rarRow">${RAR.slice(1).map(r=>`<span style="--rc:${r[1]}"><b>${r[0]}</b>${r[2]}%</span>`).join("")}</div>
   <h3>QUÉ PUEDE SALIR</h3><div class="itGrid">${[5,4,3,2,1].flatMap(r=>ITEMS.filter(i=>i[4]===r)).map(it=>itemHTML(it,has(it[0])?'<em>✓</em>':"")).join("")}</div></div>`);
  paintItems($("endIn"));$("back").onclick=()=>go("lobby");$("armBtn").onclick=()=>armarioSheet();$("cofreOpen").onclick=cofreAbrir}
 function cofreAbrir(){if(cofreGirando||escBal()<COFRE_COSTO)return;cofreGirando=true;const e=escGet();e.s=(e.s||0)+COFRE_COSTO;store.set("abisal-escamas",e);
@@ -2036,9 +2048,9 @@ function cofreAbrir(){if(cofreGirando||escBal()<COFRE_COSTO)return;cofreGirando=
  void st.offsetWidth;st.style.transition=`transform ${D}s cubic-bezier(.08,.72,.16,1)`;st.style.transform=`translateX(${dx}px)`;
  // tic-tic a medida que pasan los objetos (cada vez más despacio)
  let last=0;const t0=performance.now(),tick=()=>{const u=Math.min(1,(performance.now()-t0)/(D*1000)),pos=Math.abs(new DOMMatrix(getComputedStyle(st).transform).m41),k=Math.floor(pos/cell);if(k!==last){last=k;sfx.tick(false)}if(u<1)requestAnimationFrame(tick)};requestAnimationFrame(tick);
- setTimeout(()=>{cofreGirando=false;const c=cofreGet(),nuevo=!c.o[win[0]],r=RAR[win[4]];if(nuevo){c.o[win[0]]=1;store.set("abisal-cofre",c)}else escAdd(r[3]);
+ setTimeout(()=>{cofreGirando=false;const c=cofreGet(),nuevo=!c.o[win[0]],r=RAR[win[4]];c.o[win[0]]=(c.o[win[0]]||0)+1;store.set("abisal-cofre",c);profAdd("ci-"+win[0]);
   sfx.reveal(Math.min(5,win[4]));if(win[4]>=4)flash(hexRgb(r[1]),.5);
-  $("cofreRes").innerHTML=`<div class="cofreWin" style="--rc:${r[1]}">${itemHTML(win)}<div><b>${esc(win[3])}</b><span>${r[0]} · ${CAT_N[win[1]]}</span><span>${nuevo?"¡NUEVO!":"Ya lo tenías: te devolvemos "+r[3]+" escamas."}</span>${nuevo?`<button class="btn sm" id="cofreEq">USARLO</button>`:""}</div></div>`;
+  $("cofreRes").innerHTML=`<div class="cofreWin" style="--rc:${r[1]}">${itemHTML(win)}<div><b>${esc(win[3])}</b><span>${r[0]} · ${CAT_N[win[1]]}</span><span>${nuevo?"¡NUEVO!":"Repetido: ahora tenés ×"+c.o[win[0]]+" (lo podés intercambiar)"}</span>${nuevo?`<button class="btn sm" id="cofreEq">USARLO</button>`:""}</div></div>`;
   paintItems($("cofreRes"));if($("cofreEq"))$("cofreEq").onclick=()=>{equipar(win);$("cofreEq").textContent="¡PUESTO!";$("cofreEq").disabled=true};
   $("endIn").querySelector(".endHead span").textContent=escBal()+" ESCAMAS · "+Object.keys(cofreGet().o).length+" / "+ITEMS.length+" OBJETOS";$("cofreOpen").disabled=escBal()<COFRE_COSTO},D*1000+250)}
 // poner o sacar un objeto
@@ -2051,8 +2063,8 @@ const puesto=it=>{const [id,cat,v]=it;return cat==="skin"?(KRL.c||"rosa")===v:ca
 function armarioSheet(){const c=cofreGet().o,mine=ITEMS.filter(i=>c[i[0]]);
  showSheet(`<div class="endHead"><b>ARMARIO</b><span>${mine.length} / ${ITEMS.length} OBJETOS · TOCÁ PARA PONER O SACAR</span></div>
  <div class="frBox"><canvas id="kPrev"></canvas></div>
- ${Object.keys(CAT_N).map(cat=>{const l=mine.filter(i=>i[1]===cat);return l.length?`<div class="frBox"><h3>${CAT_N[cat].toUpperCase()}${cat==="dc"?" (PODÉS PONER VARIOS)":""}</h3><div class="itGrid">${l.map(it=>`<button class="itB${puesto(it)?" on":""}" data-eq="${it[0]}">${itemHTML(it,puesto(it)?"<em>PUESTO</em>":"")}</button>`).join("")}</div></div>`:""}).join("")||'<p class="foot">Todavía no sacaste nada del cofre.</p>'}
- <p class="foot">Los colores y gorros que ganás con logros se eligen en Logros.</p>
+ ${Object.keys(CAT_N).map(cat=>{const l=mine.filter(i=>i[1]===cat);return l.length?`<div class="frBox"><h3>${CAT_N[cat].toUpperCase()}${cat==="dc"?" (PODÉS PONER VARIOS)":""}</h3><div class="itGrid">${l.map(it=>`<button class="itB${puesto(it)?" on":""}" data-eq="${it[0]}">${itemHTML(it,(puesto(it)?"<em>PUESTO</em>":"")+(c[it[0]]>1?`<em style="left:5px;right:auto;color:#ffd23d">×${c[it[0]]}</em>`:""))}</button>`).join("")}</div></div>`:""}).join("")||'<p class="foot">Todavía no sacaste nada del cofre.</p>'}
+ <p class="foot">Los colores y gorros que ganás con logros se eligen en Logros. Los repetidos (×2 o más) se pueden intercambiar en Amigos.</p>
  <div class="row"><button class="btn sm" id="toCofre">COFRE</button><button class="btn sm" id="back">VOLVER</button></div>`);
  krillCanvas($("kPrev"),KRL,7);paintItems($("endIn"));
  $("endIn").querySelectorAll("[data-eq]").forEach(b=>b.onclick=()=>{const it=ITEM[b.dataset.eq];equipar(it,puesto(it));armarioSheet()});
