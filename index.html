@@ -225,6 +225,8 @@ pre.share{background:rgba(10,22,38,.9);border:1px solid var(--line);padding:12px
 .acctBox input:focus{border-color:var(--cyan)}.acctBox input:disabled{opacity:.6}
 .acctOr{text-align:center;font:400 .6rem var(--f-pix);color:var(--dim);letter-spacing:.2em}
 .acctMsg{min-height:1.2em;color:var(--pink)!important;font-size:.8rem!important}.acctMsg.ok{color:var(--cyan)!important}
+.histBox{border:1px solid var(--line);padding:10px 12px}.histBox h3{margin:0 0 6px;font:400 .62rem var(--f-pix);letter-spacing:.16em;color:var(--dim)}
+#histCv{display:block;width:100%;height:190px;position:static}.histBox p{margin:6px 0 0!important;font-size:.78rem!important}
 .acctStats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
 .acctStats div{border:1px solid var(--line);padding:8px;text-align:center;font:400 .55rem var(--f-pix);letter-spacing:.12em;color:var(--dim)}
 .acctStats b{display:block;font:400 1.1rem var(--f-pix);color:var(--ink);margin-bottom:4px}
@@ -1490,6 +1492,7 @@ async function acctPull(){const F=ACCT.fb,u=ACCT.user;let r={};
   let L,Rv;try{L=JSON.parse(lv);Rv=JSON.parse(rv)}catch(e){continue}
   let m=L;
   if(k==="abisal-seen"&&L&&Rv){m={...L};for(const q in Rv)m[q]=Math.max(m[q]||0,Rv[q])}
+  else if(k==="abisal-hist"&&Array.isArray(L)&&Array.isArray(Rv)){const s=new Map();for(const x of [...Rv,...L])s.set(x.t,x);m=[...s.values()].sort((a,b)=>a.t-b.t).slice(-400)}
   else if(k==="abisal-escamas"&&L&&Rv)m={g:Math.max(L.g||0,Rv.g||0),s:Math.max(L.s||0,Rv.s||0)};
   else if(k==="abisal-cofre"&&L&&Rv){m={o:{...(Rv.o||{})}};for(const i in L.o||{})m.o[i]=Math.max(+m.o[i]||0,+L.o[i]||0)}
   else if(k==="abisal-racha"&&L&&Rv)m=(Rv.last>L.last||(Rv.last===L.last&&Rv.n>L.n))?{...Rv,best:Math.max(L.best||0,Rv.best||0)}:{...L,best:Math.max(L.best||0,Rv.best||0)};
@@ -1531,13 +1534,15 @@ function acctSheet(){const u=ACCT.user,F=ACCT.fb;
   $("back").onclick=()=>go("lobby");return}
  const google=u.providerData.some(p=>p.providerId==="google.com"),seen=Object.keys(store.get("abisal-seen")||{}).length;
  showSheet(head+`<div class="acctBox" id="acctBox">
-  <div class="acctStats"><div><b>-${fmtM(recPts()*M_PER_PT)}</b>LO MÁS HONDO EN UNA PARTIDA</div><div><b>${store.get("abisal-dbest")||0}</b>MEJOR PESCA DIARIA</div><div><b>${fmtM(store.get("abisal-best")||0)}</b>RÉCORD ∞</div><div><b>${seen}</b>PREGUNTAS VISTAS</div></div>
+  <div class="acctStats"><div><b>${recPts()?"-"+fmtM(recPts()*M_PER_PT):"—"}</b>LO MÁS HONDO EN UNA PARTIDA</div><div><b>${store.get("abisal-dbest")||0} pts</b>MEJOR PESCA DIARIA</div><div><b>${store.get("abisal-best")?"-"+fmtM(store.get("abisal-best")):"—"}</b>RÉCORD EN EL INFINITO${store.get("abisal-best")?"":"<br>(todavía no jugaste)"}</div><div><b>${seen}</b>PREGUNTAS VISTAS</div></div>
+  <div class="histBox"><h3>TUS PARTIDAS</h3><canvas id="histCv"></canvas><p id="histTxt"></p></div>
   <label>NOMBRE<input id="aName" maxlength="24" value="${esc(ACCT.name||"")}" autocomplete="nickname"></label>
   <label>MAIL<input id="aMail" type="email" value="${esc(u.email||"")}" ${google?"disabled":""} autocomplete="email"></label>
   ${google?`<p style="font-size:.75rem;color:var(--dim)">Entraste con Google: el mail es el de tu cuenta de Google.</p>`:""}
   <div class="row"><button class="btn" id="aSave">GUARDAR</button><button class="btn sm" id="aFriends">AMIGOS 👥</button><button class="btn sm" id="aOut">CERRAR SESIÓN</button></div>
   ${PROF&&PROF.code?`<p style="font-size:.8rem">Tu código de amigo: <b style="color:var(--cyan);font-family:var(--f-pix)">${esc(PROF.code)}</b></p>`:""}
   <p class="acctMsg" id="aMsg"></p></div>`+back);
+ histChart($("histCv"),$("histTxt"));
  const msg=(t,ok)=>{$("aMsg").textContent=t;$("aMsg").className="acctMsg"+(ok?" ok":"")};
  $("aSave").onclick=async()=>{const n=$("aName").value.trim().slice(0,24),m=$("aMail").value.trim();if(!n)return msg("Poné un nombre.");
   try{ACCT.name=n;await F.updateProfile(u,{displayName:n});acctPush(true);acctUI();if(PROF){await F.updateDoc(F.doc(F.db,"profiles",u.uid),{name:n});PROF.name=n}
@@ -1674,6 +1679,7 @@ function logroShow(){if(logroBusy||!logroQ.length)return;logroBusy=true;const lg
 function lgCountUI(){const n=Object.keys(store.get("abisal-logros")||{}).length;if($("lgCount"))$("lgCount").textContent=n?`${n} / ${LOGROS.length} logros`:"medallas y tu krill"}
 // al terminar una partida de 7 (no la del explorador ni una ya terminada que se vuelve a abrir)
 function logrosRun(){if(!R||R.explorer||!R.live||R.counted)return;R.counted=true;const pts=runPts();
+ if(R.results.length>=7){const h=store.get("abisal-hist")||[];h.push({t:Date.now(),p:pts,k:R.kind});store.set("abisal-hist",h.slice(-400))}
  R.escGain=escGanadas(pts,R.kind==="daily"&&R.results.length>=7&&(store.get("abisal-racha")||{}).last!==dayNum);escAdd(R.escGain);
  if(R.kind==="daily"&&R.results.length>=7)rachaMark();
  statAdd(s=>{s.runs=(s.runs||0)+1;s.maxPts=Math.max(s.maxPts||0,pts);if(R.results.length>=7&&R.results.every(r=>r.tier>=2))s.perfect=(s.perfect||0)+1});
@@ -2124,7 +2130,21 @@ function celebFX(dt){for(let i=CELEB.length-1;i>=0;i--){const p=CELEB[i];p.l-=dt
 function topCofreUI(){const b=$("cofreBtn");if(b)b.title=`Cofre: ${escBal()} escamas`}
 
 // el récord de profundidad en una partida de 7 (los puntos de la mejor, en metros ×10); cuenta también la mejor pesca diaria de antes de los logros
-function recPts(){return Math.max((store.get("abisal-stats")||{}).maxPts||0,store.get("abisal-dbest")||0)}
+function recPts(){return Math.max((store.get("abisal-stats")||{}).maxPts||0,store.get("abisal-dbest")||0,...(store.get("abisal-hist")||[]).map(g=>g.p||0))}
+// gráfico de tus partidas: cada punto es una partida de 7 (cuanto más arriba, más hondo bajaste); a la izquierda, las franjas
+// de "TU RUMBO" con el dibujito de cada nivel; la línea clara es el promedio de las últimas 5, para ver si vas mejor o peor
+function histChart(cv,txt){if(!cv)return;const h=store.get("abisal-hist")||[],dpr=Math.min(2,devicePixelRatio||1),w=cv.clientWidth||400,ht=cv.clientHeight||190;cv.width=w*dpr;cv.height=ht*dpr;
+ const x=cv.getContext("2d");x.setTransform(dpr,0,0,dpr,0,0);x.imageSmoothingEnabled=false;const L=34,Rr=40,T_=6,B=8,Y=p=>T_+(1-Math.min(700,p)/700)*(ht-T_-B),gw=w-L-Rr;
+ for(const [a,b,tier] of BEARING){const c=TIERS[tier];x.fillStyle=c.color+"22";x.fillRect(L,Y(b),gw,Y(a)-Y(b));x.fillStyle=c.color+"66";x.fillRect(L,Y(b),gw,1);
+  const ic=iconCanvas(tier,1),k=Math.min(22/ic.width,(Y(a)-Y(b)-2)/ic.height,2);x.drawImage(ic,Math.round(L/2-ic.width*k/2),Math.round((Y(a)+Y(b))/2-ic.height*k/2),ic.width*k,ic.height*k)}
+ x.fillStyle="#7d95aa";x.font="9px monospace";x.textAlign="left";for(const p of [0,150,250,350,450,700])x.fillText("-"+fmtM(p*M_PER_PT),w-Rr+4,Y(p)+3);
+ if(h.length<2){txt.textContent=h.length?"Ya tenés 1 partida guardada: con la próxima aparece el gráfico.":"Todavía no hay partidas guardadas: cada partida de 7 preguntas que termines va a aparecer acá.";return}
+ const X=i=>L+6+(gw-12)*(h.length===1?.5:i/(h.length-1)),avg=i=>{const s=h.slice(Math.max(0,i-4),i+1);return s.reduce((a,b)=>a+b.p,0)/s.length};
+ x.strokeStyle="rgba(215,230,240,.35)";x.lineWidth=1;x.beginPath();h.forEach((g,i)=>i?x.lineTo(X(i),Y(g.p)):x.moveTo(X(i),Y(g.p)));x.stroke();
+ x.strokeStyle="#4fd8f0";x.lineWidth=2.5;x.beginPath();h.forEach((g,i)=>i?x.lineTo(X(i),Y(avg(i))):x.moveTo(X(i),Y(avg(i))));x.stroke();
+ h.forEach((g,i)=>{const b=BEARING.find(b=>g.p>=b[0]&&g.p<=b[1])||BEARING[0];x.fillStyle=TIERS[b[2]].color;x.fillRect(X(i)-2,Y(g.p)-2,4,4)});
+ const n=h.length,now=avg(n-1),antes=n>=10?avg(n-6):h.slice(0,Math.max(1,n-5)).reduce((a,b)=>a+b.p,0)/Math.max(1,n-5),best=Math.max(...h.map(g=>g.p)),dif=now-antes;
+ txt.textContent=`${n} partidas · promedio de las últimas 5: -${fmtM(Math.round(now)*M_PER_PT)} · la mejor: -${fmtM(best*M_PER_PT)}${n>=6?(Math.abs(dif)<10?" · vas igual que antes":dif>0?" · ¡vas mejor que antes!":" · vas un poco peor que antes"):""}`}
 // ===================== Bucle =====================
 const ARC=106.8;let last=performance.now();
 // rdt: el tiempo real que pasó (aunque la página haya estado escondida), para los relojes; dt: el de las animaciones
