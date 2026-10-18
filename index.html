@@ -225,7 +225,7 @@ pre.share{background:rgba(10,22,38,.9);border:1px solid var(--line);padding:12px
 .acctBox input:focus{border-color:var(--cyan)}.acctBox input:disabled{opacity:.6}
 .acctOr{text-align:center;font:400 .6rem var(--f-pix);color:var(--dim);letter-spacing:.2em}
 .acctMsg{min-height:1.2em;color:var(--pink)!important;font-size:.8rem!important}.acctMsg.ok{color:var(--cyan)!important}
-.acctStats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.acctStats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
 .acctStats div{border:1px solid var(--line);padding:8px;text-align:center;font:400 .55rem var(--f-pix);letter-spacing:.12em;color:var(--dim)}
 .acctStats b{display:block;font:400 1.1rem var(--f-pix);color:var(--ink);margin-bottom:4px}
 .foot{font-size:.75rem;color:var(--dim);line-height:1.6;margin:0}
@@ -1355,7 +1355,7 @@ async function friendsSheet(msg){const F=fbx();
  ${out.length?`<div class="frBox"><h3>ESPERANDO RESPUESTA</h3>${out.map(tr=>`<div class="frRow"><div class="trOffer"><b>${esc(tr.toName||"Tu amigo")}</b>${offer(tr,true)}</div><div class="row"><button class="btn sm" data-can="${tr.id}">CANCELAR</button></div></div>`).join("")}</div>`:""}
  ${DUEL.inv?`<div class="frBox"><h3>TE DESAFÍAN</h3><div class="frRow"><b>⚔ ${esc(DUEL.inv.an||"Un amigo")}</b><span>te desafía a un duelo</span><div class="row"><button class="btn sm" id="dAcc2">ACEPTAR</button><button class="btn sm" id="dNo2">NO</button></div></div></div>`:""}
  ${friends.length?rankHTML(friends):""}
- <div class="frBox"><h3>TUS AMIGOS</h3>${friends.length?friends.map(fr=>{const n=Object.keys(fr.bes||{}).filter(k=>/^c\d+$/.test(k)&&fr.bes[k]>0).length;return `<div class="frRow"><canvas data-kl='${esc(JSON.stringify(fr.kl||{}))}'></canvas><b>${esc(fr.name||"Sin nombre")}</b><span>${n} / ${CR.length} criaturas</span><div class="row"><button class="btn sm" data-duel="${fr.id}">DUELO ⚔</button><button class="btn sm" data-ver="${fr.id}">VER PERFIL</button><button class="btn sm" data-tr="${fr.id}">INTERCAMBIAR</button></div></div>`}).join(""):'<p class="frMsg" style="color:var(--dim)">Todavía no agregaste a nadie. Pedile su código a un amigo.</p>'}</div>
+ <div class="frBox"><h3>TUS AMIGOS</h3>${friends.length?friends.map(fr=>{const n=Object.keys(fr.bes||{}).filter(k=>/^c\d+$/.test(k)&&fr.bes[k]>0).length;return `<div class="frRow"><canvas data-kl='${esc(JSON.stringify(fr.kl||{}))}'></canvas><b>${esc(fr.name||"Sin nombre")}</b><span>${n} / ${CR.length} criaturas${fr.st&&fr.st.mp?` · lo más hondo -${fmtM(fr.st.mp*M_PER_PT)}`:""}</span><div class="row"><button class="btn sm" data-duel="${fr.id}">DUELO ⚔</button><button class="btn sm" data-ver="${fr.id}">VER PERFIL</button><button class="btn sm" data-tr="${fr.id}">INTERCAMBIAR</button></div></div>`}).join(""):'<p class="frMsg" style="color:var(--dim)">Todavía no agregaste a nadie. Pedile su código a un amigo.</p>'}</div>
  <p class="foot">Se intercambian criaturas y objetos del cofre, solo los repetidos (siempre te queda al menos uno). Un intercambio se hace cuando los dos están de acuerdo.</p>
  <div class="row"><button class="btn sm" id="back">VOLVER</button></div>`);
  paintMinis($("endIn"));paintItems($("endIn"));paintKls($("endIn"));$("back").onclick=()=>go("lobby");
@@ -1531,7 +1531,7 @@ function acctSheet(){const u=ACCT.user,F=ACCT.fb;
   $("back").onclick=()=>go("lobby");return}
  const google=u.providerData.some(p=>p.providerId==="google.com"),seen=Object.keys(store.get("abisal-seen")||{}).length;
  showSheet(head+`<div class="acctBox" id="acctBox">
-  <div class="acctStats"><div><b>${seen}</b>PREGUNTAS VISTAS</div><div><b>${store.get("abisal-dbest")||0}</b>MEJOR PESCA</div><div><b>${fmtM(store.get("abisal-best")||0)}</b>RÉCORD ∞</div></div>
+  <div class="acctStats"><div><b>-${fmtM(recPts()*M_PER_PT)}</b>LO MÁS HONDO EN UNA PARTIDA</div><div><b>${store.get("abisal-dbest")||0}</b>MEJOR PESCA DIARIA</div><div><b>${fmtM(store.get("abisal-best")||0)}</b>RÉCORD ∞</div><div><b>${seen}</b>PREGUNTAS VISTAS</div></div>
   <label>NOMBRE<input id="aName" maxlength="24" value="${esc(ACCT.name||"")}" autocomplete="nickname"></label>
   <label>MAIL<input id="aMail" type="email" value="${esc(u.email||"")}" ${google?"disabled":""} autocomplete="email"></label>
   ${google?`<p style="font-size:.75rem;color:var(--dim)">Entraste con Google: el mail es el de tu cuenta de Google.</p>`:""}
@@ -1698,7 +1698,7 @@ function logrosSheet(){const have=store.get("abisal-logros")||{},s=store.get("ab
 // cada perfil guarda st: {day, dp: puntos de la pesca diaria de ese día, rn: racha, mp: la más honda, sp: especies} y kl: su krill
 function profStats(dp){const F=fbx();if(!F||!PROF)return;const st={...(PROF.st||{})};
  if(dp!=null){if(st.day!==dayNum){st.day=dayNum;st.dp=dp}else st.dp=Math.max(st.dp||0,dp)}
- st.rn=rachaNow();st.mp=Math.max(st.mp||0,(store.get("abisal-stats")||{}).maxPts||0);st.sp=Object.keys(PROF.bes||{}).filter(k=>/^c\d+$/.test(k)&&PROF.bes[k]>0).length;PROF.st=st;
+ st.rn=rachaNow();st.mp=Math.max(st.mp||0,recPts());st.sp=Object.keys(PROF.bes||{}).filter(k=>/^c\d+$/.test(k)&&PROF.bes[k]>0).length;PROF.st=st;
  F.updateDoc(F.doc(F.db,"profiles",ACCT.user.uid),{st,kl:{c:KRL.c||"rosa",h:KRL.h||""}}).catch(()=>{})}
 function rankHTML(friends){const cnt=b=>Object.keys(b||{}).filter(k=>/^c\d+$/.test(k)&&b[k]>0).length;
  const rows=[{n:"Vos",me:1,st:PROF.st||{},kl:KRL,sp:cnt(PROF.bes)},...friends.map(f=>({n:f.name||"Sin nombre",st:f.st||{},kl:f.kl||{},sp:cnt(f.bes)}))];
@@ -1706,7 +1706,8 @@ function rankHTML(friends){const cnt=b=>Object.keys(b||{}).filter(k=>/^c\d+$/.te
  const row=(r,i,val)=>`<span>${i}</span><canvas data-kl='${esc(JSON.stringify(r.kl||{}))}'></canvas><b class="${r.me?"me":""}">${esc(r.n)}</b><span>${val}</span>`;
  const hoy=rows.filter(r=>r.st.day===dayNum).sort((a,b)=>(b.st.dp||0)-(a.st.dp||0)),no=rows.filter(r=>r.st.day!==dayNum);
  return `<div class="frBox"><h3>RANKING DE HOY · PESCA DIARIA #${dayNum}</h3><div class="rank">${hoy.map((r,i)=>row(r,i+1,`${r.st.dp||0} pts${rn(r)}`)).join("")}${no.map(r=>row(r,"–",`<small>todavía no jugó${rn(r)}</small>`)).join("")}</div>
- <h3>MÁS CRIATURAS</h3><div class="rank">${[...rows].sort((a,b)=>b.sp-a.sp).map((r,i)=>row(r,i+1,`${r.sp} / ${CR.length}`)).join("")}</div></div>`}
+ <h3>MÁS CRIATURAS</h3><div class="rank">${[...rows].sort((a,b)=>b.sp-a.sp).map((r,i)=>row(r,i+1,`${r.sp} / ${CR.length}`)).join("")}</div>
+ <h3>LO MÁS HONDO EN UNA PARTIDA</h3><div class="rank">${[...rows].map(r=>({...r,mp:r.me?Math.max(r.st.mp||0,recPts()):r.st.mp||0})).sort((a,b)=>b.mp-a.mp).map((r,i)=>row(r,r.mp?i+1:"–",r.mp?`-${fmtM(r.mp*M_PER_PT)}`:"<small>todavía nada</small>")).join("")}</div></div>`}
 
 // ===================== Duelo en vivo =====================
 // duels/{id}: a (el que desafía), b (el desafiado), an/bn (nombres), qs (los enunciados de las 5 preguntas), st (invite/on/end/no/cancel),
@@ -2122,6 +2123,8 @@ function celebFX(dt){for(let i=CELEB.length-1;i>=0;i--){const p=CELEB[i];p.l-=dt
  if(p.k==="f"){pcx.globalCompositeOperation="lighter";glowPx(p.x,p.y,2,hexRgb(p.c),.4*p.l);pcx.globalCompositeOperation="source-over"}}pcx.globalAlpha=1}
 function topCofreUI(){const b=$("cofreBtn");if(b)b.title=`Cofre: ${escBal()} escamas`}
 
+// el récord de profundidad en una partida de 7 (los puntos de la mejor, en metros ×10); cuenta también la mejor pesca diaria de antes de los logros
+function recPts(){return Math.max((store.get("abisal-stats")||{}).maxPts||0,store.get("abisal-dbest")||0)}
 // ===================== Bucle =====================
 const ARC=106.8;let last=performance.now();
 // rdt: el tiempo real que pasó (aunque la página haya estado escondida), para los relojes; dt: el de las animaciones
