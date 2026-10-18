@@ -48,7 +48,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--cyan);outline-o
 /* en pantallas angostas no entran al lado del marcador: quedan adentro del menú ≡ */
 #menu .narrow{display:none}
 .topBtn{position:fixed;top:calc(env(safe-area-inset-top,0px) + 14px);z-index:11;background:var(--card);border:1px solid var(--line);color:var(--ink);width:36px;height:32px;font-size:.95rem;line-height:1;display:grid;place-items:center;padding:0;cursor:pointer}
-#bestBtn{left:142px}#lgBtn{left:184px}#frBtn{left:226px}#cofreBtn{left:268px}#exBtn{left:310px}
+#bestBtn{left:142px}#lgBtn{left:184px}#frBtn{left:226px}#cofreBtn{left:268px}#armTop{left:310px}#exBtn{left:352px}
 .topBtn[hidden]{display:none}.topBtn svg{width:16px;height:16px;fill:#f4f9fc}.topBtn .badge{position:absolute;top:-7px;right:-9px;margin:0}
 @media (min-width:601px) and (max-width:1200px){#hud{top:calc(env(safe-area-inset-top,0px) + 54px)}#card:not(.lobby){top:calc(env(safe-area-inset-top,0px) + 118px)}#rivalBox{top:calc(env(safe-area-inset-top,0px) + 106px)}body #card.lobby{top:calc(env(safe-area-inset-top,0px) + 58px);transform:translateX(-50%);max-height:calc(100% - 70px)}}
 @media (max-width:600px){#homeBtn,#acctBtn,.topBtn{display:none!important}#menu .narrow{display:block}#menu .narrow[hidden]{display:none}}
@@ -267,8 +267,9 @@ pre.share{background:rgba(10,22,38,.9);border:1px solid var(--line);padding:12px
 .rank .me{color:var(--cyan)}.rank small{color:var(--dim)}
 .duelRes{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;text-align:center}
 .duelRes b{display:block;font:400 1.6rem var(--f-pix)}.duelRes span{font-size:.75rem;color:var(--dim)}
-#thinking{position:absolute;top:7px;left:50%;transform:translateX(-50%);display:flex;gap:6px;pointer-events:none}#thinking[hidden]{display:none}
-#thinking i{width:6px;height:6px;background:var(--cyan);box-shadow:0 0 6px rgba(79,216,240,.6);animation:tk 1.1s infinite ease-in-out}
+.tdots{display:inline-flex;gap:3px;margin-left:6px;vertical-align:middle}.tdots i{width:4px;height:4px;background:var(--cyan);animation:tk 1.1s infinite ease-in-out}.tdots i:nth-child(2){animation-delay:.18s}.tdots i:nth-child(3){animation-delay:.36s}
+#thinking{position:absolute;top:6px;left:50%;transform:translateX(-50%);display:flex;gap:6px;pointer-events:none}#thinking[hidden]{display:none}
+#thinking i{width:8px;height:8px;background:var(--cyan);box-shadow:0 0 6px rgba(79,216,240,.6);animation:tk 1.1s infinite ease-in-out}
 #thinking i:nth-child(2){animation-delay:.18s}#thinking i:nth-child(3){animation-delay:.36s}
 @keyframes tk{0%,55%,100%{transform:translateY(0);opacity:.45}25%{transform:translateY(-5px);opacity:1}}
 #fightBox{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 70px);transform:translateX(-50%);z-index:15;display:flex;flex-direction:column;align-items:center;gap:8px;width:min(86vw,340px)}#fightBox[hidden]{display:none}
@@ -309,6 +310,7 @@ pre.share{background:rgba(10,22,38,.9);border:1px solid var(--line);padding:12px
 <button id="lgBtn" class="topBtn" data-go="logros" aria-label="Logros y tu krill" title="Logros y tu krill"><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 1h2v4H4zM10 1h2v4h-2zM5 6h6v1h1v5h-1v1H5v-1H4V7h1zM6 8v3h4V8z"/></svg></button>
 <button id="frBtn" class="topBtn" data-go="amigos" aria-label="Amigos" title="Amigos: ranking, duelos e intercambios"><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M3 2h3v3H3zM2 6h5v6H2zM10 2h3v3h-3zM9 6h5v6H9z"/></svg></button>
 <button id="cofreBtn" class="topBtn" data-go="cofre" aria-label="Cofre" title="Cofre"><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M3 2h10v2h1v10H2V4h1zM3 7v6h10V7zM7 8h2v3H7z"/></svg></button>
+<button id="armTop" class="topBtn" data-go="armario" aria-label="Armario" title="Armario: tus colores, accesorios y objetos"><svg viewBox="0 0 16 16"><path d="M5 2h2l1 1 1-1h2l4 3-2 3-1-1v7H4V7L3 8 1 5z"/></svg></button>
 <button id="exBtn" class="topBtn" data-go="explore" aria-label="Explorar" title="Explorar (modo explorador)" hidden><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1 9l10-6 2 3-10 6zM7 11h2v4H7zM4 15l3-4h1l-3 4zM12 15l-3-4H8l3 4z"/></svg></button>
 <button id="sndBtn" aria-label="Sonido" aria-pressed="true">♪ ON</button>
 <div id="menu" hidden>
@@ -321,6 +323,7 @@ pre.share{background:rgba(10,22,38,.9);border:1px solid var(--line);padding:12px
   <button data-go="inf">Modo infinito ∞<small>Un tanque de aire, sin límite de preguntas</small></button>
   <button class="narrow" data-go="bestiario">Bestiario 📖<small>Las criaturas que pescaste en el fondo</small></button>
   <button class="narrow" data-go="logros">Logros y tu krill 🏅<small>Medallas, tu racha y gorros para tu krill</small></button>
+  <button class="narrow" data-go="armario">Armario<small>Tus colores, accesorios y objetos del cofre</small></button>
   <button class="narrow" data-go="cofre">Cofre<small>Tirá la ruleta con tus escamas y elegí qué usar</small></button>
   <button class="narrow" data-go="amigos" id="menuAmigos">Amigos 👥<small>Ver el bestiario de tus amigos e intercambiar criaturas</small></button>
   <button data-go="explore" id="exploreBtn" hidden>Explorar 🔭<small>Recorrer el océano y ver el juego sin jugar</small></button>
@@ -458,6 +461,14 @@ const factFor=(pi,label)=>(P[pi].f||{})[label];
 // ===================== Utilidades =====================
 const $=id=>document.getElementById(id);
 const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}if(store.hook)store.hook(k)}};
+// respaldo: cada 2 minutos (y al cerrar) se copia todo tu progreso en abisal-respaldo; al abrir, si falta alguna de las cosas
+// importantes (bestiario, cofre, logros, récords…) pero está en el respaldo, se recupera. No se sube a la nube.
+(()=>{const K="abisal-respaldo",IMP=["abisal-bestiario","abisal-cofre","abisal-logros","abisal-stats","abisal-krill","abisal-escamas","abisal-racha","abisal-hist","abisal-dbest","abisal-best","abisal-seen","abisal-pend"];
+ try{const b=JSON.parse(localStorage.getItem(K)||"null");if(b&&b.d)for(const k of IMP)if(localStorage.getItem(k)==null&&b.d[k]!=null)localStorage.setItem(k,b.d[k])}catch(e){}
+ const save=()=>{try{const d={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith("abisal-")&&k!==K&&k!=="abisal-sound"&&!/^abisal-\d{4}-/.test(k))d[k]=localStorage.getItem(k)}
+  const prev=JSON.parse(localStorage.getItem(K)||"null");if(prev&&prev.d)for(const k of IMP)if(d[k]==null&&prev.d[k]!=null)d[k]=prev.d[k];   // si algo importante falta, se conserva la copia vieja
+  localStorage.setItem(K,JSON.stringify({t:Date.now(),d}))}catch(e){}};
+ setTimeout(save,5000);setInterval(save,120000);addEventListener("pagehide",save)})();
 function mulberry(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 const DAY0=Date.UTC(2026,0,1);const now0=new Date();
 // la pesca diaria cambia a la medianoche de la hora local de cada jugador (antes era 00:00 UTC = 21:00 en Argentina)
@@ -1104,7 +1115,8 @@ addEventListener("pointerdown",()=>sfx.init(),{once:true});addEventListener("key
 let mode="run",R=null,G=null,phase="intro",timeLeft=0,timeTotal=ROUND_SEC,cd=0,current=-1;
 const UI={card:$("card"),bar:$("bar"),pill:$("pill"),toast:$("toast"),tag:$("tag"),reveal:$("reveal"),revBtn:$("revBtn"),end:$("end"),dim:$("dim")};
 const setDim=on=>UI.dim.style.opacity=on?1:0;
-let toastT;function toast(html,bad){UI.toast.innerHTML=html;UI.toast.className=bad?"bad":"";UI.toast.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>UI.toast.hidden=true,2600)}
+let toastT;function toast(html,bad,ms){UI.toast.innerHTML=html;UI.toast.className=bad?"bad":"";UI.toast.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>UI.toast.hidden=true,ms||2600)}
+const TDOTS='<span class="tdots"><i></i><i></i><i></i></span>';
 // tabla de niveles: ícono, nombre, una barra que muestra qué tan hondo baja y los puntos
 // cada ícono entra en una caja de 22×18 sin deformarse (los anchos, como el pez de Cardumen, ya no pisan el nombre)
 TIERS.forEach((t,i)=>{const c=iconCanvas(i,2),k=Math.min(22/c.width,18/c.height);c.style.width=Math.round(c.width*k)+"px";c.style.height=Math.round(c.height*k)+"px";c.style.justifySelf="center";const a=document.createElement("span");a.textContent=t.name.charAt(0)+t.name.slice(1).toLowerCase();
@@ -1151,14 +1163,14 @@ function beginAnswer(){phase="answering";UI.pill.hidden=true;UI.bar.hidden=false
 $("bar").addEventListener("submit",async e=>{e.preventDefault();if(phase!=="answering")return;const v=$("answer").value.trim();if(!v)return;let hit=judge(current,v);
  const rl=!hit&&RULES[P[current].q];if(rl&&!rl[0](ruleWord(v))){const pen=mode==="run"?3:2;timeLeft-=pen;sfx.wrong();toast(`“${esc(v)}” no cumple: ${rl[1]}<small>−${pen} SEGUNDOS</small>`,true);const a=$("answer");a.classList.remove("shake");void a.offsetWidth;a.classList.add("shake");a.select();return}
  // si no está en la lista, se consulta Wikidata (el reloj se pausa mientras busca)
- if(!hit&&P[current].wd&&WD.on){const pi=current;phase="checking";toast(`Buscando “${esc(v)}” en Wikidata…<small>EL RELOJ ESTÁ EN PAUSA</small>`);
+ if(!hit&&P[current].wd&&WD.on){const pi=current;phase="checking";toast(`Buscando “${esc(v)}” en Wikidata${TDOTS}<small>EL RELOJ ESTÁ EN PAUSA</small>`,false,30000);
   const r=await wdCheck(pi,v);if(phase!=="checking"||current!==pi)return;phase="answering";if(r)hit=r}
  // y si tampoco está ahí, en Wikipedia
- if(!hit&&P[current].wp&&WP.on){const pi=current;phase="checking";toast(`Buscando “${esc(v)}” en Wikipedia…<small>EL RELOJ ESTÁ EN PAUSA</small>`);
+ if(!hit&&P[current].wp&&WP.on){const pi=current;phase="checking";toast(`Buscando “${esc(v)}” en Wikipedia${TDOTS}<small>EL RELOJ ESTÁ EN PAUSA</small>`,false,30000);
   const r=await wpCheck(pi,v);if(phase!=="checking"||current!==pi)return;phase="answering";if(r)hit=r}
  // y si nada la encontró, se le pregunta a la IA (en cualquier pregunta)
  const useAI=!hit&&v.length>=2&&(CLAUDE_AI||(AI.url&&AI.on));
- if(useAI){const pi=current;phase="checking";toast(`Consultando a ${CLAUDE_AI?"Claude":"la IA"} por “${esc(v)}”…<small>EL RELOJ ESTÁ EN PAUSA</small>`);
+ if(useAI){const pi=current;phase="checking";toast(`Consultando a ${CLAUDE_AI?"Claude":"la IA"} por “${esc(v)}”${TDOTS}<small>EL RELOJ ESTÁ EN PAUSA</small>`,false,30000);
   let r=await aiCheck(pi,v,rl?{datos:false,extra:RULE_NOTE}:{});if(!r&&AI.err&&rl&&rl[2]&&WP.on)r=await wikcCheck(v);
   if(phase!=="checking"||current!==pi)return;phase="answering";if(r)hit=r;
   // si la IA no contestó (está saturada), no se cuenta como error: se puede volver a probar
@@ -1453,7 +1465,7 @@ function archiveSheet(){const days=[];for(let n=dayNum-1;n>=Math.max(1,dayNum-60
 function go(where){duelQuit();$("menu").hidden=true;$("menuBtn").setAttribute("aria-expanded","false");
  if(["answering","sinking","countdown"].includes(phase)&&mode==="run"&&R&&R.key){/* lo jugado queda guardado */}
  demoOn=false;$("explorer").hidden=true;if(FX.boss){FX.boss=null;$("fightBox").hidden=true;$("crMsg").hidden=true}
- if(where==="lobby"){const r=makeRun("daily");r.lobby=1;startRun(r)}else if(where==="daily")startRun(makeRun("daily"));else if(where==="free")startRun(makeRun("free"),true);else if(where==="packs")packsSheet();else if(where==="archive")archiveSheet();else if(where==="inf")infIntro();else if(where==="explore")explore();else if(where==="bestiario")bestiarioSheet();else if(where==="amigos")friendsSheet();else if(where==="logros")logrosSheet();else if(where==="cofre")cofreSheet()}
+ if(where==="lobby"){const r=makeRun("daily");r.lobby=1;startRun(r)}else if(where==="daily")startRun(makeRun("daily"));else if(where==="free")startRun(makeRun("free"),true);else if(where==="packs")packsSheet();else if(where==="archive")archiveSheet();else if(where==="inf")infIntro();else if(where==="explore")explore();else if(where==="bestiario")bestiarioSheet();else if(where==="amigos")friendsSheet();else if(where==="logros")logrosSheet();else if(where==="cofre")cofreSheet();else if(where==="armario")armarioSheet()}
 
 // --- Modo explorador: escondido. Se activa tocando 5 veces el título ABISAL (o entrando con #explorar);
 // queda guardado solo en este navegador y aparece "Explorar" en el menú. Sirve para ver el juego sin jugarlo.
@@ -1471,7 +1483,7 @@ $("exRange").oninput=e=>{camTarget=+e.target.value;$("exDepth").textContent=fmtM
 // así no se repiten preguntas aunque juegues en otro celular o compu. Para activarlas hay que crear el proyecto
 // en Firebase y pegar acá su configuración (ver activar-cuentas.md). Mientras config sea null, no se usan.
 const ACCT={config:{apiKey:"AIzaSyD5HIfTcj9f-nNYKk2NF0-SW1x_RxEnZKQ",authDomain:"abisal-49b12.firebaseapp.com",projectId:"abisal-49b12",storageBucket:"abisal-49b12.firebasestorage.app",messagingSenderId:"42614435640",appId:"1:42614435640:web:e16b0e21d252a55f8f5bcd"},user:null,fb:null,name:"",err:""};
-const ACCT_SKIP=new Set(["abisal-sound","abisal-explorar","abisal-pend"]),FBV="10.12.2";
+const ACCT_SKIP=new Set(["abisal-sound","abisal-explorar","abisal-pend","abisal-respaldo"]),FBV="10.12.2";
 const ICON_USER='<svg viewBox="0 0 16 16"><path d="M5 2h6v1h1v5h-1v1H5V8H4V3h1zM3 10h10v1h1v4H2v-4h1z"/></svg>';
 async function acctInit(){if(!ACCT.config||window.claude)return acctUI();
  try{const base=`https://www.gstatic.com/firebasejs/${FBV}/`;
@@ -1916,7 +1928,7 @@ SKINS.nacar=["Nácar","#efe2ef","#ffffff","#5a3a5a"];HATS.tiara=["la tiara de pe
 LOGROS.push(["perla1","Perlita","Encontrá una perla en la pared",s=>[g0(s,"perlas"),1],"c:nacar"],["perla10","Collar de perlas","Encontrá 10 perlas",s=>[g0(s,"perlas"),10],"h:tiara"],["botella5","Náufrago","Abrí 5 botellas con mensaje",s=>[g0(s,"botellas"),5],"h:panuelo"]);
 
 // los cuadraditos de arriba a la izquierda (bestiario, logros, amigos y, si está activado, explorar)
-function topBtns(on){for(const id of ["bestBtn","lgBtn","frBtn","cofreBtn"])$(id).hidden=!on;$("exBtn").hidden=!on||$("exploreBtn").hidden}
+function topBtns(on){for(const id of ["bestBtn","lgBtn","frBtn","cofreBtn","armTop"])$(id).hidden=!on;$("exBtn").hidden=!on||$("exploreBtn").hidden}
 // reglas de letras: [prueba sobre la palabra en minúsculas y sin tildes (la ñ se mantiene), qué tiene que cumplir, ¿es una palabra del diccionario?]
 const ruleWord=s=>String(s).toLowerCase().trim().replace(/ñ/g,"\u0001").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\u0001/g,"ñ").replace(/\s+/g," ");
 const letras=w=>w.replace(/[^a-zñ]/g,""),unaPal=w=>!/\s/.test(w);
@@ -1961,7 +1973,7 @@ document.addEventListener("keydown",e=>{if(FX.boss&&FX.boss.fighting&&(e.code===
 // abisal-escamas {g: ganadas, s: gastadas} (las dos solo suben, así al juntar con la nube se toma el mayor de cada una)
 // abisal-cofre {o: {id: cuántos}} lo que ya salió (los repetidos se juntan y se pueden intercambiar con amigos). Lo que tenés puesto va en KRL (abisal-krill): c color, h gorro, tr estela,
 // bt bote, ln hilo, fx festejo, fr marco del cartel, pet mascota, dc [adornos del mapa]
-const COFRE_COSTO=100,RAR=[null,["COMÚN","#4b8bff",60],["RARO","#8847ff",25],["ÉPICO","#d32ce6",10],["LEGENDARIO","#eb4b4b",4],["MÍTICO","#ffd23d",1]];   // nombre, color, chance %
+const COFRE_COSTO=100,RAR=[["LOGRO","#7ef0c4",0],["COMÚN","#4b8bff",60],["RARO","#8847ff",25],["ÉPICO","#d32ce6",10],["LEGENDARIO","#eb4b4b",4],["MÍTICO","#ffd23d",1]];   // nombre, color, chance %
 const CAT_N={skin:"Color del krill",hat:"Accesorio",tr:"Estela",bt:"Bote",ln:"Hilo de pesca",dc:"Adorno del mapa",fx:"Festejo",fr:"Marco del cartel",pet:"Mascota"};
 // colores nuevos (los animados tienen una función que devuelve [cuerpo, antenas, ojo] según el tiempo)
 Object.assign(SKINS,{menta:["Menta","#7ef0c4","#d4fff0","#0a3324"],lila:["Lila","#c9a2ff","#ecdcff","#2a1440"],coral:["Coral","#ff7f6a","#ffc6bb","#3a0e08"],piedra:["Piedra","#8a96a0","#c4ccd2","#1a2028"],
@@ -2037,7 +2049,8 @@ function itemPreview(cv,it){const [id,cat,v]=it,W_=cv.width=72,H_=cv.height=44,x
   for(let i=0;i<22;i++){const a=i/22*6.28,r=v==="fuegos"?14:8+Math.random()*16;x.fillStyle=C[i%C.length];x.fillRect(36+Math.cos(a)*r,22+Math.sin(a)*r*.8,3,v==="confeti"?2:3)}return}
  if(cat==="fr"){const c={perg:"#a0703a",neon:"#ff4fd8",oro:"#ffd23d"}[v];x.fillStyle=v==="perg"?"#f1e3c0":"#0b1626";x.fillRect(8,12,56,20);x.strokeStyle=c;x.lineWidth=3;x.strokeRect(8,12,56,20);x.fillStyle=v==="perg"?"#3a2a14":"#d7e6f0";x.font="9px monospace";x.fillText("“RESPUESTA”",12,26)}}
 const itemHTML=(it,extra="")=>`<div class="it" style="--rc:${RAR[it[4]][1]}" title="${esc(it[3]+" · "+RAR[it[4]][0])}"><canvas data-it="${it[0]}"></canvas><span>${esc(it[3])}</span>${extra}</div>`;
-function paintItems(root){root.querySelectorAll("canvas[data-it]").forEach(cv=>itemPreview(cv,ITEM[cv.dataset.it]))}
+const XITEM={};   // lo de los logros que se muestra en el armario
+function paintItems(root){root.querySelectorAll("canvas[data-it]").forEach(cv=>{const it=ITEM[cv.dataset.it]||XITEM[cv.dataset.it];if(it)itemPreview(cv,it)})}
 // pantalla del cofre
 let cofreGirando=false;
 function cofreSheet(){const bal=escBal(),own=Object.keys(cofreGet().o).length;
@@ -2070,14 +2083,20 @@ function equipar(it,quitar){const [id,cat,v]=it,ch={};
  else ch[cat]=quitar?"":v;
  krillSet(ch)}
 const puesto=it=>{const [id,cat,v]=it;return cat==="skin"?(KRL.c||"rosa")===v:cat==="hat"?KRL.h===v:cat==="dc"?(KRL.dc||[]).includes(v):KRL[cat]===v};
-function armarioSheet(){const c=cofreGet().o,mine=ITEMS.filter(i=>c[i[0]]);
- showSheet(`<div class="endHead"><b>ARMARIO</b><span>${mine.length} / ${ITEMS.length} OBJETOS · TOCÁ PARA PONER O SACAR</span></div>
+function armarioSheet(){const c=cofreGet().o,have=store.get("abisal-logros")||{},cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+ // lo que ganaste con logros también aparece acá (marcado "LOGRO")
+ const lg=pre=>LOGROS.filter(l=>have[l[0]]&&l[4].startsWith(pre+":")).map(l=>l[4].slice(2));
+ const extra=[["L-c-rosa","skin","rosa","Rosa (el de siempre)",0],...lg("c").map(v=>["L-c-"+v,"skin",v,SKINS[v][0],0]),...lg("h").map(v=>["L-h-"+v,"hat",v,cap(hatName(v)),0])];
+ extra.forEach(i=>XITEM[i[0]]=i);const fromCofre=ITEMS.filter(i=>c[i[0]]),mine=[...extra,...fromCofre],MAP=Object.fromEntries(mine.map(i=>[i[0],i]));
+ const badge=it=>(puesto(it)?"<em>PUESTO</em>":"")+(c[it[0]]>1?`<em style="left:5px;right:auto;color:#ffd23d">×${c[it[0]]}</em>`:"")+(it[4]===0&&it[2]!=="rosa"?'<em style="left:5px;right:auto">LOGRO</em>':"");
+ showSheet(`<div class="endHead"><b>ARMARIO</b><span>${fromCofre.length} / ${ITEMS.length} DEL COFRE · ${extra.length-1} DE LOGROS · TOCÁ PARA PONER O SACAR</span></div>
  <div class="frBox"><canvas id="kPrev"></canvas></div>
- ${Object.keys(CAT_N).map(cat=>{const l=mine.filter(i=>i[1]===cat);return l.length?`<div class="frBox"><h3>${CAT_N[cat].toUpperCase()}${cat==="dc"?" (PODÉS PONER VARIOS)":""}</h3><div class="itGrid">${l.map(it=>`<button class="itB${puesto(it)?" on":""}" data-eq="${it[0]}">${itemHTML(it,(puesto(it)?"<em>PUESTO</em>":"")+(c[it[0]]>1?`<em style="left:5px;right:auto;color:#ffd23d">×${c[it[0]]}</em>`:""))}</button>`).join("")}</div></div>`:""}).join("")||'<p class="foot">Todavía no sacaste nada del cofre.</p>'}
- <p class="foot">Los colores y gorros que ganás con logros se eligen en Logros. Los repetidos (×2 o más) se pueden intercambiar en Amigos.</p>
+ ${Object.keys(CAT_N).map(cat=>{const l=mine.filter(i=>i[1]===cat);return l.length?`<div class="frBox"><h3>${CAT_N[cat].toUpperCase()}${cat==="dc"?" (PODÉS PONER VARIOS)":""}</h3><div class="itGrid">${l.map(it=>`<button class="itB${puesto(it)?" on":""}" data-eq="${it[0]}">${itemHTML(it,badge(it))}</button>`).join("")}</div></div>`:""}).join("")}
+ ${fromCofre.length?"":'<p class="foot">Todavía no sacaste nada del cofre: con 100 escamas podés tirar la ruleta.</p>'}
+ <p class="foot">Acá está todo lo tuyo: lo del cofre y los colores y accesorios de los logros. Los repetidos del cofre (×2 o más) se pueden intercambiar en Amigos.</p>
  <div class="row"><button class="btn sm" id="toCofre">COFRE</button><button class="btn sm" id="back">VOLVER</button></div>`);
  krillCanvas($("kPrev"),KRL,7);paintItems($("endIn"));
- $("endIn").querySelectorAll("[data-eq]").forEach(b=>b.onclick=()=>{const it=ITEM[b.dataset.eq];equipar(it,puesto(it));armarioSheet()});
+ $("endIn").querySelectorAll("[data-eq]").forEach(b=>b.onclick=()=>{const it=MAP[b.dataset.eq];equipar(it,puesto(it)&&!(it[1]==="skin"&&it[2]==="rosa"));armarioSheet()});
  $("toCofre").onclick=()=>cofreSheet();$("back").onclick=()=>go("lobby")}
 
 // ----- lo que se ve en el juego -----
@@ -2145,6 +2164,14 @@ function histChart(cv,txt){if(!cv)return;const h=store.get("abisal-hist")||[],dp
  h.forEach((g,i)=>{const b=BEARING.find(b=>g.p>=b[0]&&g.p<=b[1])||BEARING[0];x.fillStyle=TIERS[b[2]].color;x.fillRect(X(i)-2,Y(g.p)-2,4,4)});
  const n=h.length,now=avg(n-1),antes=n>=10?avg(n-6):h.slice(0,Math.max(1,n-5)).reduce((a,b)=>a+b.p,0)/Math.max(1,n-5),best=Math.max(...h.map(g=>g.p)),dif=now-antes;
  txt.textContent=`${n} partidas · promedio de las últimas 5: -${fmtM(Math.round(now)*M_PER_PT)} · la mejor: -${fmtM(best*M_PER_PT)}${n>=6?(Math.abs(dif)<10?" · vas igual que antes":dif>0?" · ¡vas mejor que antes!":" · vas un poco peor que antes"):""}`}
+// ESC: cierra el menú o el mensaje de la botella; en una pantalla (bestiario, cofre, amigos…) vuelve atrás; en medio de una partida
+// hace lo mismo que la casita (pregunta si querés dejarla). Durante la pelea con el pez no hace nada.
+document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;if(FX.boss&&FX.boss.fighting)return;
+ if(!$("menu").hidden){$("menu").hidden=true;$("menuBtn").setAttribute("aria-expanded","false");return}
+ if(!$("bottleMsg").hidden){$("bottleMsg").hidden=true;return}
+ if(["sheet","end","duelwait"].includes(phase)){const b=$("back");if(b&&b.offsetParent)b.click();else go("lobby");return}
+ if(phase==="explore"){go("lobby");return}
+ if(!UI.card.classList.contains("lobby")&&["intro","countdown","answering","checking","sinking","reveal","timeout","surfacing"].includes(phase))$("homeBtn").onclick()});
 // ===================== Bucle =====================
 const ARC=106.8;let last=performance.now();
 // rdt: el tiempo real que pasó (aunque la página haya estado escondida), para los relojes; dt: el de las animaciones
@@ -2161,7 +2188,7 @@ function loop(now){const rdt=clamp((now-last)/1000,0,3600),dt=Math.min(rdt,.05);
  const tr=`translate(${FX.sx}px,${FX.sy}px)`;pc.style.transform=tr;hc.style.transform=tr;
  const dk=$("dark");dk.style.opacity=FX.dark.toFixed(3);const fx=tagState?tagState.x:W/2,fy=tagState?tagState.y:H*.4;dk.style.setProperty("--x",fx+"px");dk.style.setProperty("--y",fy+"px");
  const fl=$("flash");fl.style.opacity=FX.flash.toFixed(3);fl.style.setProperty("--fc",FX.flashCol);
- $("thinking").hidden=phase!=="checking";
+ {const ck=phase==="checking";if(!ck&&!$("thinking").hidden&&UI.toast.innerHTML.includes("tdots"))UI.toast.hidden=true;$("thinking").hidden=!ck}
  scene(dt);overlay(dt);$("depthTxt").textContent=fmtM(Math.max(0,cam));if((T*10|0)%5===0)sfx.depth(Math.max(0,cam));
  requestAnimationFrame(loop)}
 krill.x=krill.wx=W*.5;krill.y=krill.wy=H*.6;
