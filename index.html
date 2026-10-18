@@ -1310,7 +1310,7 @@ function drawCrBoss(b,t,cx,ky,ease3){const c=b.cr,col=crSprite(c),sil=crSprite(c
 let PROF=null;const NO_TRADE=0;   // (0: todas las rarezas se pueden intercambiar, también las de Abismo)
 const fbx=()=>ACCT.fb&&ACCT.user?ACCT.fb:null;
 const besLocal=()=>{const b=bestGet(),o={};for(const k in b)if(b[k].n>0)o["c"+k]=b[k].n;return o};
-function besToLocal(bes){{const co=cofreGet(),p=pendGet();for(const k in bes)if(k.startsWith("ci-")&&ITEM[k.slice(3)])co.o[k.slice(3)]=(bes[k]||0)+p.filter(x=>x===k).length;store.set("abisal-cofre",co)}const b=bestGet();for(const c of CR){const n=bes["c"+c.id]||0,e=b[c.id]||{n:0};e.n=n;if(n>0)e.v=1;if(n>0||e.v)b[c.id]=e}store.set("abisal-bestiario",b);bestCountUI()}
+function besToLocal(bes){{const co=cofreGet(),p=pendGet();for(const k in bes)if(k.startsWith("ci-")&&ITEM[k.slice(3)])co.o[k.slice(3)]=(bes[k]||0)+p.filter(x=>x===k).length;store.set("abisal-cofre",co)}const b=bestGet(),pp=pendGet();for(const c of CR){const n=(bes["c"+c.id]||0)+pp.filter(x=>x==="c"+c.id).length,e=b[c.id]||{n:0};e.n=n;if(n>0)e.v=1;if(n>0||e.v)b[c.id]=e}store.set("abisal-bestiario",b);bestCountUI()}
 async function profEnsure(){const F=fbx();if(!F)return;const u=ACCT.user,ref=F.doc(F.db,"profiles",u.uid);
  try{const s=await F.getDoc(ref);if(s.exists()){PROF=s.data();besToLocal(PROF.bes||{});return}
   // primera vez: se elige un código libre y se crea el perfil vacío (las reglas no dejan crearlo con criaturas; lo que se pesca desde ahora queda en la cuenta)
@@ -1318,12 +1318,12 @@ async function profEnsure(){const F=fbx();if(!F)return;const u=ACCT.user,ref=F.d
   PROF={name:ACCT.name||"",code:code||"",bes:{},friends:[],lastCatch:F.serverTimestamp()};await F.setDoc(ref,PROF);PROF=(await F.getDoc(ref)).data()}catch(e){ACCT.err=String(e)}}
 // cada pesca (c12) o cada objeto del cofre (ci-s-neon) suma 1 en el perfil; las reglas dejan una suma por minuto,
 // así que se hace con una fila de espera (abisal-pend, solo en este aparato) y se van mandando de a una
-let profT=null,profLast=0;const pendGet=()=>store.get("abisal-pend")||[];
+let profT=null,profLast=0,profBusy=false;const pendGet=()=>store.get("abisal-pend")||[];
 function profAdd(k){const p=pendGet();p.push(k);store.set("abisal-pend",p);profFlush()}
-async function profFlush(){const F=fbx();clearTimeout(profT);if(!F||!PROF)return;const p=pendGet();if(!p.length)return;
- const wait=61000-(Date.now()-profLast);if(wait>0){profT=setTimeout(profFlush,wait);return}const k=p[0];
- try{await F.updateDoc(F.doc(F.db,"profiles",ACCT.user.uid),{["bes."+k]:(PROF.bes[k]||0)+1,lastCatch:F.serverTimestamp()});PROF.bes[k]=(PROF.bes[k]||0)+1;const q=pendGet();q.shift();store.set("abisal-pend",q)}
- catch(e){ACCT.err=String(e)}profLast=Date.now();if(pendGet().length)profT=setTimeout(profFlush,61000)}
+async function profFlush(){const F=fbx();clearTimeout(profT);if(!F||!PROF||profBusy)return;const p=pendGet();if(!p.length)return;
+ const wait=61000-(Date.now()-profLast);if(wait>0){profT=setTimeout(profFlush,wait);return}const k=p[0];profBusy=true;
+ try{await F.updateDoc(F.doc(F.db,"profiles",ACCT.user.uid),{["bes."+k]:(PROF.bes[k]||0)+1,lastCatch:F.serverTimestamp()});PROF.bes[k]=(PROF.bes[k]||0)+1;const q=pendGet();q.shift();store.set("abisal-pend",q);besToLocal(PROF.bes)}
+ catch(e){ACCT.err=String(e)}profBusy=false;profLast=Date.now();if(pendGet().length)profT=setTimeout(profFlush,61000)}
 function profCatch(id){profAdd("c"+id)}
 // al entrar: los objetos del cofre que tenés en este aparato y todavía no están en el perfil se ponen en la fila
 function profReconcile(){if(!PROF)return;const o=cofreGet().o,p=pendGet(),add=[];for(const id in o){const k="ci-"+id,need=(o[id]||0)-(PROF.bes[k]||0)-p.filter(x=>x===k).length;for(let i=0;i<need;i++)add.push(k)}
@@ -1558,7 +1558,9 @@ $("airBtn").onclick=()=>{const a=FX.air;if(!a||a.pop!=null||phase!=="answering")
 $("exBoss").onclick=()=>{$("explorer").hidden=true;EX_CR=CR.find(c=>c.id===+$("exCr").value)||null;const run=makeRun("free");run.explorer=true;startRun(run);R.results=[3,4,5,4,5,5,4].map(t=>({tier:t,answer:""}));
  cam=camTarget=Math.max(cam,runPts()*M_PER_PT);hideAll();UI.card.hidden=true;UI.revBtn.onclick()};
 // una partida que se juega sola: 7 preguntas con respuestas de la lista que suman más de 600, y el final
-$("exDemo").onclick=async()=>{$("explorer").hidden=true;demoOn=true;const sleep=ms=>new Promise(r=>setTimeout(r,ms)),until=async f=>{while(demoOn&&!f())await sleep(100)};
+$("exDemo").onclick=async()=>{$("explorer").hidden=true;const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+ // si ya había una partida automática andando, primero se corta (si no, quedan dos escribiendo a la vez)
+ demoOn=false;await sleep(350);demoOn=true;const until=async f=>{while(demoOn&&!f())await sleep(100)};
  const want=[3,4,5,4,5,5,4],picks=[];for(const pi of shuffle(ALL)){if(picks.length>=7)break;const e=INDEX[pi].find(x=>x.tier===want[picks.length]&&x.src===x.label&&x.label.length<=20);if(e)picks.push({pi,ans:e.label})}
  const run=makeRun("free");run.picks=picks.map(p=>p.pi);run.explorer=true;startRun(run,true);
  for(let i=0;i<7&&demoOn;i++){await until(()=>phase==="answering");const a=picks[i].ans;await sleep(600);
@@ -2041,14 +2043,15 @@ function cofreSheet(){const bal=escBal(),own=Object.keys(cofreGet().o).length;
   <h3>QUÉ PUEDE SALIR</h3><div class="itGrid">${[5,4,3,2,1].flatMap(r=>ITEMS.filter(i=>i[4]===r)).map(it=>itemHTML(it,has(it[0])?'<em>✓</em>':"")).join("")}</div></div>`);
  paintItems($("endIn"));$("back").onclick=()=>go("lobby");$("armBtn").onclick=()=>armarioSheet();$("cofreOpen").onclick=cofreAbrir}
 function cofreAbrir(){if(cofreGirando||escBal()<COFRE_COSTO)return;cofreGirando=true;const e=escGet();e.s=(e.s||0)+COFRE_COSTO;store.set("abisal-escamas",e);
- const win=cofreSortear(),N=56,WIN=48,list=[...Array(N)].map((_,i)=>i===WIN?win:cofreAzar()),st=$("strip");
+ const win=cofreSortear(),N=96,WIN=86,list=[...Array(N)].map((_,i)=>i===WIN?win:cofreAzar()),st=$("strip");
+ const c0=cofreGet(),nuevo=!c0.o[win[0]];c0.o[win[0]]=(c0.o[win[0]]||0)+1;store.set("abisal-cofre",c0);profAdd("ci-"+win[0]);
  st.style.transition="none";st.style.transform="translateX(0)";st.innerHTML=list.map(it=>itemHTML(it)).join("");paintItems(st);
  $("cofreOpen").disabled=true;$("cofreRes").innerHTML="";$("endIn").querySelector(".endHead span").textContent=escBal()+" ESCAMAS · ABRIENDO…";
- const cell=st.children[0].offsetWidth+6,reelW=st.parentNode.offsetWidth,dx=-(WIN*cell+cell/2-reelW/2+(Math.random()-.5)*cell*.6),D=5.6;
+ const cell=st.children[0].offsetWidth+6,reelW=st.parentNode.offsetWidth,dx=-(WIN*cell+cell/2-reelW/2+(Math.random()-.5)*cell*.6),D=8.5;
  void st.offsetWidth;st.style.transition=`transform ${D}s cubic-bezier(.08,.72,.16,1)`;st.style.transform=`translateX(${dx}px)`;
  // tic-tic a medida que pasan los objetos (cada vez más despacio)
  let last=0;const t0=performance.now(),tick=()=>{const u=Math.min(1,(performance.now()-t0)/(D*1000)),pos=Math.abs(new DOMMatrix(getComputedStyle(st).transform).m41),k=Math.floor(pos/cell);if(k!==last){last=k;sfx.tick(false)}if(u<1)requestAnimationFrame(tick)};requestAnimationFrame(tick);
- setTimeout(()=>{cofreGirando=false;const c=cofreGet(),nuevo=!c.o[win[0]],r=RAR[win[4]];c.o[win[0]]=(c.o[win[0]]||0)+1;store.set("abisal-cofre",c);profAdd("ci-"+win[0]);
+ setTimeout(()=>{cofreGirando=false;const c=cofreGet(),r=RAR[win[4]];if(!$("cofreRes"))return;
   sfx.reveal(Math.min(5,win[4]));if(win[4]>=4)flash(hexRgb(r[1]),.5);
   $("cofreRes").innerHTML=`<div class="cofreWin" style="--rc:${r[1]}">${itemHTML(win)}<div><b>${esc(win[3])}</b><span>${r[0]} · ${CAT_N[win[1]]}</span><span>${nuevo?"¡NUEVO!":"Repetido: ahora tenés ×"+c.o[win[0]]+" (lo podés intercambiar)"}</span>${nuevo?`<button class="btn sm" id="cofreEq">USARLO</button>`:""}</div></div>`;
   paintItems($("cofreRes"));if($("cofreEq"))$("cofreEq").onclick=()=>{equipar(win);$("cofreEq").textContent="¡PUESTO!";$("cofreEq").disabled=true};
