@@ -1619,13 +1619,14 @@ async function acctInit(){if(!ACCT.config||window.claude)return acctUI();
   const [app,auth,fs]=await Promise.all(["firebase-app.js","firebase-auth.js","firebase-firestore.js"].map(f=>import(base+f)));
   const a=app.initializeApp(ACCT.config);ACCT.fb={...auth,...fs,auth:auth.getAuth(a),db:fs.getFirestore(a)};
   auth.getRedirectResult(ACCT.fb.auth).catch(()=>{});
-  auth.onAuthStateChanged(ACCT.fb.auth,async u=>{pqStop();ACCT.user=u;PROF=null;if(u){await acctPull();await profEnsure();besToLocal((PROF&&PROF.bes)||{});pqListen();tradesSettle();tradesBadge();duelListen();profStats();logrosCheck();profReconcile()}else duelListen();acctUI(true)});
+  auth.onAuthStateChanged(ACCT.fb.auth,async u=>{pqStop();ACCT.user=u;PROF=null;ACCT.pulled=false;if(u){if(!await acctPull()){acctUI(true);return}await profEnsure();besToLocal((PROF&&PROF.bes)||{});pqListen();tradesSettle();tradesBadge();duelListen();profStats();logrosCheck();profReconcile()}else duelListen();acctUI(true)});
  }catch(e){ACCT.err=String(e)}acctUI()}
 // todo lo del juego que está en el navegador (menos el sonido y el modo explorador)
 function acctLocal(){const d={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith("abisal-")&&!ACCT_SKIP.has(k))d[k]=localStorage.getItem(k)}return d}
 // al entrar: junta lo de la nube con lo de este navegador (preguntas vistas: la fecha más nueva; récords: el mayor)
-async function acctPull(){const F=ACCT.fb,u=ACCT.user;let r={};
- try{const s=await F.getDoc(F.doc(F.db,"users",u.uid));if(s.exists())r=s.data()}catch(e){ACCT.err=String(e)}
+async function acctPull(){const F=ACCT.fb,u=ACCT.user;let r={};ACCT.pulled=false;
+ // si no se pudo leer la nube, no se sube nada (una compu nueva pisaba los récords guardados): se prueba tres veces
+ for(let i=0;;i++){try{const s=await F.getDoc(F.doc(F.db,"users",u.uid));if(s.exists())r=s.data();break}catch(e){ACCT.err=String(e);if(i>=2||ACCT.user!==u)return false;await new Promise(z=>setTimeout(z,3000))}}
  ACCT.name=r.name||u.displayName||(u.email||"").split("@")[0];
  const rd=r.data||{};PQ=Array.isArray(rd.pq)?rd.pq:[];   // la fila de pescas compartida (ver profFlush)
  for(const k in rd){if(!k.startsWith("abisal-"))continue;const lv=localStorage.getItem(k),rv=rd[k];
@@ -1644,10 +1645,15 @@ async function acctPull(){const F=ACCT.fb,u=ACCT.user;let r={};
   else if(typeof L==="number"&&typeof Rv==="number")m=Math.max(L,Rv);
   else if(L&&Rv&&L.results&&Rv.results&&Rv.results.length>L.results.length)m=Rv;      // pesca del día: la más avanzada
   try{localStorage.setItem(k,JSON.stringify(m))}catch(e){}}
- acctPush(true)}
-let acctT;function acctPush(now){if(!ACCT.user||!ACCT.fb)return;clearTimeout(acctT);acctT=setTimeout(async()=>{const F=ACCT.fb,u=ACCT.user;if(!u)return;
- try{await F.setDoc(F.doc(F.db,"users",u.uid),{name:ACCT.name||"",email:u.email||"",data:acctLocal(),updated:Date.now()},{merge:true})}catch(e){ACCT.err=String(e)}},now?0:2500)}
-store.hook=k=>{if(k.startsWith("abisal-")&&!ACCT_SKIP.has(k))acctPush()};
+ ACCT.pulled=true;acctPush(true);acctRefreshUI();return true}
+// después de traer lo de la nube se actualiza lo que ya estaba en pantalla
+function acctRefreshUI(){try{bestCountUI();lgCountUI();paintLogoKrill();if(UI.card.classList.contains("lobby")){rachaUI(true);lobby(true)}}catch(e){}}
+// no sube nada hasta haber traído lo de la nube; con now sube en el momento (al cerrar o cambiar de pestaña)
+let acctT;function acctPush(now){if(!ACCT.user||!ACCT.fb||!ACCT.pulled)return;clearTimeout(acctT);const go=async()=>{const F=ACCT.fb,u=ACCT.user;if(!u)return;
+ try{acctDirty=false;await F.setDoc(F.doc(F.db,"users",u.uid),{name:ACCT.name||"",email:u.email||"",data:acctLocal(),updated:Date.now()},{merge:true})}catch(e){acctDirty=true;ACCT.err=String(e)}};if(now)go();else acctT=setTimeout(go,2500)}
+let acctDirty=false;store.hook=k=>{if(k.startsWith("abisal-")&&!ACCT_SKIP.has(k)){acctDirty=true;acctPush()}};
+// si cerrás o cambiás de pestaña justo después de una partida, se sube en el momento (antes esperaba 2,5 s y se perdía el récord)
+addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"){pqShare();if(acctDirty)acctPush(true)}});addEventListener("pagehide",()=>{pqShare();if(acctDirty)acctPush(true)});
 function acctUI(changed){const u=ACCT.user;
  $("acctLobby").innerHTML=ICON_USER+`<span>${u?"HOLA, "+esc((ACCT.name||"").toUpperCase()):"ENTRAR"}</span>`;$("acctLobby").title=u?"Tu cuenta":"Crear cuenta o entrar (con Google o con tu mail)";
  $("acctBtn").classList.toggle("on",!!u);
