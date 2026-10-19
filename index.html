@@ -1424,24 +1424,53 @@ function drawCrBoss(b,t,cx,ky,ease3){const c=b.cr,col=crSprite(c),sil=crSprite(c
 let PROF=null;const NO_TRADE=0;   // (0: todas las rarezas se pueden intercambiar, también las de Abismo)
 const fbx=()=>ACCT.fb&&ACCT.user?ACCT.fb:null;
 const besLocal=()=>{const b=bestGet(),o={};for(const k in b)if(b[k].n>0)o["c"+k]=b[k].n;return o};
-function besToLocal(bes){{const co=cofreGet(),p=pendGet();for(const k in bes)if(k.startsWith("ci-")&&ITEM[k.slice(3)])co.o[k.slice(3)]=(bes[k]||0)+p.filter(x=>x===k).length;store.set("abisal-cofre",co);for(const it of ITEMS)if(!co.o[it[0]]&&puesto(it)&&!(it[1]==="skin"&&it[2]==="rosa"))equipar(it,true)}const b=bestGet(),pp=pendGet();for(const c of CR){const n=(bes["c"+c.id]||0)+pp.filter(x=>x==="c"+c.id).length,e=b[c.id]||{n:0};e.n=n;if(n>0)e.v=1;if(n>0||e.v)b[c.id]=e}store.set("abisal-bestiario",b);bestCountUI()}
+function besToLocal(bes){{const co=cofreGet(),p=pendAll();for(const k in bes)if(k.startsWith("ci-")&&ITEM[k.slice(3)])co.o[k.slice(3)]=(bes[k]||0)+p.filter(x=>x===k).length;store.set("abisal-cofre",co);for(const it of ITEMS)if(!co.o[it[0]]&&puesto(it)&&!(it[1]==="skin"&&it[2]==="rosa"))equipar(it,true)}const b=bestGet(),pp=pendAll();for(const c of CR){const n=(bes["c"+c.id]||0)+pp.filter(x=>x==="c"+c.id).length,e=b[c.id]||{n:0};e.n=n;if(n>0)e.v=1;if(n>0||e.v)b[c.id]=e}store.set("abisal-bestiario",b);bestCountUI()}
 async function profEnsure(){const F=fbx();if(!F)return;const u=ACCT.user,ref=F.doc(F.db,"profiles",u.uid);
  try{const s=await F.getDoc(ref);if(s.exists()){PROF=s.data();besToLocal(PROF.bes||{});return}
   // primera vez: se elige un código libre y se crea el perfil vacío (las reglas no dejan crearlo con criaturas; lo que se pesca desde ahora queda en la cuenta)
   let code=null;for(let k=0;k<6&&!code;k++){const c="KRILL-"+String(1000+Math.floor(Math.random()*9000));try{await F.setDoc(F.doc(F.db,"codes",c),{uid:u.uid});code=c}catch(e){}}
   PROF={name:ACCT.name||"",code:code||"",bes:{},friends:[],lastCatch:F.serverTimestamp()};await F.setDoc(ref,PROF);PROF=(await F.getDoc(ref)).data()}catch(e){ACCT.err=String(e)}}
 // cada pesca (c12) o cada objeto del cofre (ci-s-neon) suma 1 en el perfil; las reglas dejan una suma por minuto,
-// así que se hace con una fila de espera (abisal-pend, solo en este aparato) y se van mandando de a una
-let profT=null,profLast=0,profBusy=false;const pendGet=()=>store.get("abisal-pend")||[];
-function profAdd(k){const p=pendGet();p.push(k);store.set("abisal-pend",p);profFlush()}
-async function profFlush(){const F=fbx();clearTimeout(profT);if(!F||!PROF||profBusy)return;const p=pendGet();if(!p.length)return;
- const wait=61000-(Date.now()-profLast);if(wait>0){profT=setTimeout(profFlush,wait);return}const k=p[0];profBusy=true;
- try{await F.updateDoc(F.doc(F.db,"profiles",ACCT.user.uid),{["bes."+k]:(PROF.bes[k]||0)+1,lastCatch:F.serverTimestamp()});PROF.bes[k]=(PROF.bes[k]||0)+1;const q=pendGet();q.shift();store.set("abisal-pend",q);besToLocal(PROF.bes)}
- catch(e){ACCT.err=String(e)}profBusy=false;profLast=Date.now();if(pendGet().length)profT=setTimeout(profFlush,61000)}
+// así que se hace con una fila de espera. La fila está en la nube (users/{uid} → data.pq, cada entrada "c12|id-único"),
+// compartida por todos tus aparatos: lo que pescaste en el celular aparece enseguida en la compu aunque todavía no haya
+// subido al perfil, y cualquier aparato que tenga el juego abierto la va vaciando (antes la fila vivía solo en el aparato
+// donde pescaste: si lo cerrabas antes de que subiera todo, en los otros aparatos esas criaturas figuraban como no pescadas).
+// abisal-pend queda solo para lo pescado sin cuenta o sin conexión, hasta que se pueda pasar a la fila de la nube.
+let profT=null,profLast=0,profBusy=false,PQ=[],pqSkip=0,pqBroken=false,pqP=null,pqUnsub=null,profUnsub=null;
+const pendGet=()=>store.get("abisal-pend")||[];
+const pqKey=e=>String(e).split("|")[0];
+const pendAll=()=>pendGet().concat(PQ.map(pqKey));
+const pqRef=F=>F.doc(F.db,"users",ACCT.user.uid);
+const pqId=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+// pasa a la fila de la nube lo que está solo en este aparato (de a una tanda, nunca dos a la vez)
+function pqShare(){if(pqP)return pqP;let more=false;
+ return pqP=(async()=>{const F=fbx();if(!F||!PROF||pqBroken)return;const p=pendGet();if(!p.length)return;const add=p.map(k=>k+"|"+pqId());
+  try{await F.setDoc(pqRef(F),{data:{pq:F.arrayUnion(...add)}},{merge:true});PQ=PQ.concat(add.filter(e=>!PQ.includes(e)));store.set("abisal-pend",pendGet().slice(p.length));more=pendGet().length>0;besToLocal(PROF.bes||{})}
+  catch(e){ACCT.err=String(e);if(e&&e.code==="permission-denied")pqBroken=true}})().finally(()=>{pqP=null;if(more)pqShare()})}
+function profAdd(k){const p=pendGet();p.push(k);store.set("abisal-pend",p);pqShare().then(profFlush)}
+async function profFlush(){const F=fbx();clearTimeout(profT);if(!F||!PROF||profBusy)return;profBusy=true;let again=61000;
+ try{if(pendGet().length&&!pqBroken)await pqShare();
+  const local=pqBroken,list=local?pendGet():PQ;if(!list.length)return;
+  const wait=61000-(Date.now()-profLast);if(wait>0){again=wait;return}
+  // si una entrada falla, la próxima vez se prueba la siguiente: una que no pasa no traba a las demás
+  const ent=list[pqSkip%list.length],k=pqKey(ent),pref=F.doc(F.db,"profiles",ACCT.user.uid);profLast=Date.now();
+  try{if(local){await F.updateDoc(pref,{["bes."+k]:(PROF.bes[k]||0)+1,lastCatch:F.serverTimestamp()});PROF.bes[k]=(PROF.bes[k]||0)+1;const q=pendGet(),i=q.indexOf(ent);if(i>=0){q.splice(i,1);store.set("abisal-pend",q)}}
+   else{// en una sola operación: suma en el perfil y sale de la fila (si otro aparato ya la subió, no se suma dos veces)
+    const n=await F.runTransaction(F.db,async tx=>{const us=await tx.get(pqRef(F)),ps=await tx.get(pref);const q=((us.exists()&&us.data().data)||{}).pq||[];if(!q.includes(ent))return null;
+     const v=(((ps.exists()&&ps.data().bes)||{})[k])||0;tx.update(pref,{["bes."+k]:v+1,lastCatch:F.serverTimestamp()});tx.update(pqRef(F),{"data.pq":F.arrayRemove(ent)});return v+1});
+    if(n!=null)PROF.bes[k]=n;PQ=PQ.filter(e=>e!==ent)}
+   besToLocal(PROF.bes)}
+  catch(e){ACCT.err=String(e);pqSkip++}}
+ finally{profBusy=false;if(fbx()&&(PQ.length||pendGet().length))profT=setTimeout(profFlush,again)}}
+// escucha la fila y el perfil: cuando otro aparato pesca o sube algo, se ve acá sin recargar
+function pqListen(){if(pqUnsub){pqUnsub();pqUnsub=null}if(profUnsub){profUnsub();profUnsub=null}const F=fbx();if(!F)return;
+ pqUnsub=F.onSnapshot(pqRef(F),s=>{const d=(s.exists()&&s.data().data)||{},n=Array.isArray(d.pq)?d.pq:[];if(n.join()!==PQ.join()){PQ=n;if(PROF)besToLocal(PROF.bes||{});profFlush()}},()=>{});
+ if(PROF)profUnsub=F.onSnapshot(F.doc(F.db,"profiles",ACCT.user.uid),s=>{if(!s.exists()||!PROF)return;const b=s.data().bes||{};if(JSON.stringify(b)!==JSON.stringify(PROF.bes||{})){PROF.bes=b;besToLocal(b)}},()=>{})}
+function pqStop(){if(pqUnsub){pqUnsub();pqUnsub=null}if(profUnsub){profUnsub();profUnsub=null}PQ=[];pqBroken=false;clearTimeout(profT)}
 function profCatch(id){profAdd("c"+id)}
 // al entrar: los objetos del cofre que tenés en este aparato y todavía no están en el perfil se ponen en la fila
-function profReconcile(){if(!PROF)return;const o=cofreGet().o,p=pendGet(),add=[];for(const id in o){const k="ci-"+id,need=(o[id]||0)-(PROF.bes[k]||0)-p.filter(x=>x===k).length;for(let i=0;i<need;i++)add.push(k)}
- if(add.length){store.set("abisal-pend",p.concat(add))}profFlush()}
+function profReconcile(){if(!PROF)return;const o=cofreGet().o,p=pendAll(),add=[];for(const id in o){const k="ci-"+id,need=(o[id]||0)-(PROF.bes[k]||0)-p.filter(x=>x===k).length;for(let i=0;i<need;i++)add.push(k)}
+ if(add.length){store.set("abisal-pend",pendGet().concat(add))}pqShare().then(profFlush)}
 // el que propuso un intercambio aplica su parte cuando el amigo lo acepta
 async function tradesSettle(){const F=fbx();if(!F||!PROF)return;const me=ACCT.user.uid;
  try{const q=await F.getDocs(F.query(F.collection(F.db,"trades"),F.where("from","==",me),F.where("status","==","accepted"),F.where("appliedFrom","==",false)));
@@ -1590,7 +1619,7 @@ async function acctInit(){if(!ACCT.config||window.claude)return acctUI();
   const [app,auth,fs]=await Promise.all(["firebase-app.js","firebase-auth.js","firebase-firestore.js"].map(f=>import(base+f)));
   const a=app.initializeApp(ACCT.config);ACCT.fb={...auth,...fs,auth:auth.getAuth(a),db:fs.getFirestore(a)};
   auth.getRedirectResult(ACCT.fb.auth).catch(()=>{});
-  auth.onAuthStateChanged(ACCT.fb.auth,async u=>{ACCT.user=u;PROF=null;if(u){await acctPull();await profEnsure();tradesSettle();tradesBadge();duelListen();profStats();logrosCheck();profReconcile()}else duelListen();acctUI(true)});
+  auth.onAuthStateChanged(ACCT.fb.auth,async u=>{pqStop();ACCT.user=u;PROF=null;if(u){await acctPull();await profEnsure();besToLocal((PROF&&PROF.bes)||{});pqListen();tradesSettle();tradesBadge();duelListen();profStats();logrosCheck();profReconcile()}else duelListen();acctUI(true)});
  }catch(e){ACCT.err=String(e)}acctUI()}
 // todo lo del juego que está en el navegador (menos el sonido y el modo explorador)
 function acctLocal(){const d={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith("abisal-")&&!ACCT_SKIP.has(k))d[k]=localStorage.getItem(k)}return d}
@@ -1598,8 +1627,8 @@ function acctLocal(){const d={};for(let i=0;i<localStorage.length;i++){const k=l
 async function acctPull(){const F=ACCT.fb,u=ACCT.user;let r={};
  try{const s=await F.getDoc(F.doc(F.db,"users",u.uid));if(s.exists())r=s.data()}catch(e){ACCT.err=String(e)}
  ACCT.name=r.name||u.displayName||(u.email||"").split("@")[0];
- const rd=r.data||{};
- for(const k in rd){const lv=localStorage.getItem(k),rv=rd[k];
+ const rd=r.data||{};PQ=Array.isArray(rd.pq)?rd.pq:[];   // la fila de pescas compartida (ver profFlush)
+ for(const k in rd){if(!k.startsWith("abisal-"))continue;const lv=localStorage.getItem(k),rv=rd[k];
   if(lv==null){try{localStorage.setItem(k,rv)}catch(e){}continue}
   let L,Rv;try{L=JSON.parse(lv);Rv=JSON.parse(rv)}catch(e){continue}
   let m=L;
@@ -1608,6 +1637,8 @@ async function acctPull(){const F=ACCT.fb,u=ACCT.user;let r={};
   else if(k==="abisal-escamas"&&L&&Rv)m={g:Math.max(L.g||0,Rv.g||0),s:Math.max(L.s||0,Rv.s||0)};
   else if(k==="abisal-cofre"&&L&&Rv){m={o:{...(Rv.o||{})}};for(const i in L.o||{})m.o[i]=Math.max(+m.o[i]||0,+L.o[i]||0)}
   else if(k==="abisal-racha"&&L&&Rv)m=(Rv.last>L.last||(Rv.last===L.last&&Rv.n>L.n))?{...Rv,best:Math.max(L.best||0,Rv.best||0)}:{...L,best:Math.max(L.best||0,Rv.best||0)};
+  // bestiario: lo visto en cualquier aparato queda visto (las cantidades las pone después el perfil)
+  else if(k==="abisal-bestiario"&&L&&Rv){m={...Rv};for(const i in L){const a=L[i]||{},b=Rv[i]||{};m[i]={...b,...a,n:Math.max(a.n||0,b.n||0),m:Math.max(a.m||0,b.m||0)};if(a.v||b.v)m[i].v=1;if(a.t||b.t)m[i].t=Math.min(a.t||Infinity,b.t||Infinity)}}
   else if(k==="abisal-logros"&&L&&Rv)m={...Rv,...L};
   else if(k==="abisal-stats"&&L&&Rv){m={...L};for(const q in Rv)if(typeof Rv[q]==="number")m[q]=Math.max(L[q]||0,Rv[q]);m.ans=[0,1,2,3,4,5].map(i=>Math.max((L.ans||[])[i]||0,(Rv.ans||[])[i]||0))}
   else if(typeof L==="number"&&typeof Rv==="number")m=Math.max(L,Rv);
