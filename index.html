@@ -1054,8 +1054,8 @@ async function wpCheck(pi,raw){const key=pi+"|"+norm(raw);if(WP.cache.has(key))r
 // Worker de Cloudflare (herramientas/ia-worker.js). Sin dirección no se usa.
 // En las preguntas creativas ("ia") la IA puede ser flexible; en las de datos se le pide que sea estricta
 // (si no, aceptaba "Bailando" como canción de Soda Stereo) y lo más que da es Hallazgo profundo.
-// buscar: la segunda oportunidad buscando en Google (apagada: en la cuenta gratis de Google el cupo de búsquedas es 0; se prende con true si se activa la facturación)
-const AI={url:"https://abisalia.altmantomas05.workers.dev",on:true,cache:new Map(),buscar:false};
+// buscar: la segunda oportunidad buscando en Google. El juego siempre la pide; la prende o la apaga el Worker con la variable GOOGLE_POR_DIA de Cloudflare (tope por día; necesita la facturación de Google activada)
+const AI={url:"https://abisalia.altmantomas05.workers.dev",on:true,cache:new Map(),buscar:true};
 const AI_RAREZA=["común","poco común","rara","rarísima"];
 const AI_DATOS=" [DATOS: sé estricto con los hechos: rechazá si es de otro artista, otra obra, otra categoría o si no existe; si es correcta, aceptala aunque sea poco conocida]";
 // En el link de Claude (artifact) no se puede salir a internet, pero sí preguntarle a Claude mismo ("sample"):
