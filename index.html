@@ -1324,7 +1324,7 @@ function drawCrBoss(b,t,cx,ky,ease3){const c=b.cr,col=crSprite(c),sil=crSprite(c
 let PROF=null;const NO_TRADE=0;   // (0: todas las rarezas se pueden intercambiar, también las de Abismo)
 const fbx=()=>ACCT.fb&&ACCT.user?ACCT.fb:null;
 const besLocal=()=>{const b=bestGet(),o={};for(const k in b)if(b[k].n>0)o["c"+k]=b[k].n;return o};
-function besToLocal(bes){{const co=cofreGet(),p=pendGet();for(const k in bes)if(k.startsWith("ci-")&&ITEM[k.slice(3)])co.o[k.slice(3)]=(bes[k]||0)+p.filter(x=>x===k).length;store.set("abisal-cofre",co)}const b=bestGet(),pp=pendGet();for(const c of CR){const n=(bes["c"+c.id]||0)+pp.filter(x=>x==="c"+c.id).length,e=b[c.id]||{n:0};e.n=n;if(n>0)e.v=1;if(n>0||e.v)b[c.id]=e}store.set("abisal-bestiario",b);bestCountUI()}
+function besToLocal(bes){{const co=cofreGet(),p=pendGet();for(const k in bes)if(k.startsWith("ci-")&&ITEM[k.slice(3)])co.o[k.slice(3)]=(bes[k]||0)+p.filter(x=>x===k).length;store.set("abisal-cofre",co);for(const it of ITEMS)if(!co.o[it[0]]&&puesto(it)&&!(it[1]==="skin"&&it[2]==="rosa"))equipar(it,true)}const b=bestGet(),pp=pendGet();for(const c of CR){const n=(bes["c"+c.id]||0)+pp.filter(x=>x==="c"+c.id).length,e=b[c.id]||{n:0};e.n=n;if(n>0)e.v=1;if(n>0||e.v)b[c.id]=e}store.set("abisal-bestiario",b);bestCountUI()}
 async function profEnsure(){const F=fbx();if(!F)return;const u=ACCT.user,ref=F.doc(F.db,"profiles",u.uid);
  try{const s=await F.getDoc(ref);if(s.exists()){PROF=s.data();besToLocal(PROF.bes||{});return}
   // primera vez: se elige un código libre y se crea el perfil vacío (las reglas no dejan crearlo con criaturas; lo que se pesca desde ahora queda en la cuenta)
@@ -1370,7 +1370,7 @@ async function friendsSheet(msg){const F=fbx();
  ${DUEL.inv?`<div class="frBox"><h3>TE DESAFÍAN</h3><div class="frRow"><b>⚔ ${esc(DUEL.inv.an||"Un amigo")}</b><span>te desafía a un duelo</span><div class="row"><button class="btn sm" id="dAcc2">ACEPTAR</button><button class="btn sm" id="dNo2">NO</button></div></div></div>`:""}
  ${friends.length?rankHTML(friends):""}
  <div class="frBox"><h3>TUS AMIGOS</h3>${friends.length?friends.map(fr=>{const n=Object.keys(fr.bes||{}).filter(k=>/^c\d+$/.test(k)&&fr.bes[k]>0).length;return `<div class="frRow"><canvas data-kl='${esc(JSON.stringify(fr.kl||{}))}'></canvas><b>${esc(fr.name||"Sin nombre")}</b><span>${n} / ${CR.length} criaturas${fr.st&&fr.st.mp?` · lo más hondo -${fmtM(fr.st.mp*M_PER_PT)}`:""}</span><div class="row"><button class="btn sm" data-duel="${fr.id}">DUELO ⚔</button><button class="btn sm" data-ver="${fr.id}">VER PERFIL</button><button class="btn sm" data-tr="${fr.id}">INTERCAMBIAR</button></div></div>`}).join(""):'<p class="frMsg" style="color:var(--dim)">Todavía no agregaste a nadie. Pedile su código a un amigo.</p>'}</div>
- <p class="foot">Se intercambian criaturas y objetos del cofre, solo los repetidos (siempre te queda al menos uno). Un intercambio se hace cuando los dos están de acuerdo.</p>
+ <p class="foot">Se intercambian criaturas y objetos del cofre, cualquiera, aunque sea el único que tenés. Un intercambio se hace cuando los dos están de acuerdo.</p>
  <div class="row"><button class="btn sm" id="back">VOLVER</button></div>`);
  paintMinis($("endIn"));paintItems($("endIn"));paintKls($("endIn"));$("back").onclick=()=>go("lobby");
  $("endIn").querySelectorAll("[data-duel]").forEach(b=>b.onclick=()=>duelInvite(friends.find(x=>x.id===b.dataset.duel)));
@@ -1383,19 +1383,19 @@ async function friendsSheet(msg){const F=fbx();
  $("endIn").querySelectorAll("[data-ver]").forEach(b=>b.onclick=()=>{const fr=friends.find(x=>x.id===b.dataset.ver);bestiarioSheet(0,0,{name:fr.name,bes:fr.bes||{}})});
  $("endIn").querySelectorAll("[data-tr]").forEach(b=>b.onclick=()=>tradeSheet(friends.find(x=>x.id===b.dataset.tr)));
  $("endIn").querySelectorAll("[data-acc]").forEach(b=>b.onclick=async()=>{const tr=inc.find(x=>x.id===b.dataset.acc);b.disabled=true;
-  try{const fresh=(await F.getDoc(F.doc(F.db,"profiles",me))).data(),bes={...fresh.bes},o="c"+tr.get.id,i="c"+tr.give.id;if((bes[o]||0)-tr.get.n<1)return friendsSheet("Ya no tenés suficientes "+crName(tr.get.id)+" para este intercambio.");
+  try{const fresh=(await F.getDoc(F.doc(F.db,"profiles",me))).data(),bes={...fresh.bes},o="c"+tr.get.id,i="c"+tr.give.id;if((bes[o]||0)-tr.get.n<0)return friendsSheet("Ya no tenés suficientes "+crName(tr.get.id)+" para este intercambio.");
    bes[o]=(bes[o]||0)-tr.get.n;bes[i]=(bes[i]||0)+tr.give.n;const bt=F.writeBatch(F.db);bt.update(F.doc(F.db,"profiles",me),{bes,lastTrade:tr.id});bt.update(F.doc(F.db,"trades",tr.id),{status:"accepted",appliedTo:true});await bt.commit();
    PROF.bes=bes;besToLocal(bes);sfx.air();friendsSheet("✓ ¡Intercambio hecho! Recibiste "+tr.give.n+"× "+crName(tr.give.id)+".")}catch(e){friendsSheet("No se pudo aceptar ("+(e.code||e)+").")}});
  $("endIn").querySelectorAll("[data-rej]").forEach(b=>b.onclick=async()=>{try{await F.updateDoc(F.doc(F.db,"trades",b.dataset.rej),{status:"rejected"})}catch(e){}friendsSheet("Propuesta rechazada.")});
  $("endIn").querySelectorAll("[data-can]").forEach(b=>b.onclick=async()=>{try{await F.updateDoc(F.doc(F.db,"trades",b.dataset.can),{status:"canceled"})}catch(e){}friendsSheet("Propuesta cancelada.")})}
 // armar una propuesta: elegís qué das (de tus repetidas) y qué pedís (de las repetidas de tu amigo)
 function tradeSheet(fr){const F=fbx();if(!F||!fr)return;const mine=PROF.bes||{},his=fr.bes||{};let give=null,get=null,gn=1,tn=1;
- const can=(bes,c)=>c.r!==NO_TRADE&&(bes["c"+c.id]||0)>=2;
- const list=(bes,side)=>{const l=CR.filter(c=>can(bes,c)),li=Object.keys(bes).filter(k=>k.startsWith("ci-")&&bes[k]>=2&&ITEM[k.slice(3)]).map(k=>ITEM[k.slice(3)]);
-  return l.length||li.length?l.map(c=>`<button class="trPick" data-${side}="${c.id}" style="--c:${RZ[c.r].c}">${crMini(c.id)}${esc(c.n)}<small>×${bes["c"+c.id]}</small></button>`).join("")+li.map(it=>`<button class="trPick" data-${side}="i-${it[0]}" style="--c:${RAR[it[4]][1]}">${crMini("i-"+it[0])}${esc(it[3])}<small>×${bes["ci-"+it[0]]}</small></button>`).join(""):'<p class="frMsg" style="color:var(--dim)">No hay repetidas.</p>'};
+ const can=(bes,c)=>c.r!==NO_TRADE&&(bes["c"+c.id]||0)>=1;
+ const list=(bes,side)=>{const l=CR.filter(c=>can(bes,c)),li=Object.keys(bes).filter(k=>k.startsWith("ci-")&&bes[k]>=1&&ITEM[k.slice(3)]).map(k=>ITEM[k.slice(3)]);
+  return l.length||li.length?l.map(c=>`<button class="trPick" data-${side}="${c.id}" style="--c:${RZ[c.r].c}">${crMini(c.id)}${esc(c.n)}<small>×${bes["c"+c.id]}</small></button>`).join("")+li.map(it=>`<button class="trPick" data-${side}="i-${it[0]}" style="--c:${RAR[it[4]][1]}">${crMini("i-"+it[0])}${esc(it[3])}<small>×${bes["ci-"+it[0]]}</small></button>`).join(""):'<p class="frMsg" style="color:var(--dim)">No hay nada para intercambiar.</p>'};
  showSheet(`<div class="endHead"><b>INTERCAMBIAR</b><span>CON ${esc((fr.name||"tu amigo").toUpperCase())}</span></div>
- <div class="trCols"><div class="frBox"><h3>DAS (TUS REPETIDAS)</h3><div class="trList">${list(mine,"g")}</div><label class="frRow"><span>Cantidad</span><input class="frIn" id="gn" type="number" min="1" value="1" style="width:5em"></label></div>
- <div class="frBox"><h3>PEDÍS (REPETIDAS DE ${esc((fr.name||"tu amigo").toUpperCase())})</h3><div class="trList">${list(his,"t")}</div><label class="frRow"><span>Cantidad</span><input class="frIn" id="tn" type="number" min="1" value="1" style="width:5em"></label></div></div>
+ <div class="trCols"><div class="frBox"><h3>DAS</h3><div class="trList">${list(mine,"g")}</div><label class="frRow"><span>Cantidad</span><input class="frIn" id="gn" type="number" min="1" value="1" style="width:5em"></label></div>
+ <div class="frBox"><h3>PEDÍS (DE ${esc((fr.name||"tu amigo").toUpperCase())})</h3><div class="trList">${list(his,"t")}</div><label class="frRow"><span>Cantidad</span><input class="frIn" id="tn" type="number" min="1" value="1" style="width:5em"></label></div></div>
  <p class="frMsg" id="trMsg"></p>
  <div class="row"><button class="btn" id="trSend">PROPONER INTERCAMBIO</button><button class="btn sm" id="back">VOLVER</button></div>`);
  paintMinis($("endIn"));paintItems($("endIn"));$("back").onclick=()=>friendsSheet();
@@ -1404,7 +1404,7 @@ function tradeSheet(fr){const F=fbx();if(!F||!fr)return;const mine=PROF.bes||{},
  $("trSend").onclick=async()=>{const m=$("trMsg");m.className="frMsg";gn=Math.floor(+$("gn").value||1);tn=Math.floor(+$("tn").value||1);
   if(!give||!get)return m.textContent="Elegí qué das y qué pedís.";if(give===get)return m.textContent="Elegí dos criaturas distintas.";
   if(gn<1||gn>5||tn<1||tn>5)return m.textContent="La cantidad va de 1 a 5.";
-  if((mine["c"+give]||0)-gn<1)return m.textContent="No tenés tantas "+crName(give)+" repetidas.";if((his["c"+get]||0)-tn<1)return m.textContent="Tu amigo no tiene tantas "+crName(get)+" repetidas.";
+  if((mine["c"+give]||0)-gn<0)return m.textContent="No tenés tantas "+crName(give)+".";if((his["c"+get]||0)-tn<0)return m.textContent="Tu amigo no tiene tantas "+crName(get)+".";
   try{await F.addDoc(F.collection(F.db,"trades"),{from:ACCT.user.uid,to:fr.id,fromName:ACCT.name||"",toName:fr.name||"",give:{id:give,n:gn},get:{id:get,n:tn},status:"pending",appliedFrom:false,appliedTo:false,created:F.serverTimestamp()});
    friendsSheet("✓ Propuesta enviada a "+(fr.name||"tu amigo")+".")}catch(e){m.textContent="No se pudo enviar ("+(e.code||e)+")."}}}
 // aviso en el menú si alguien te propuso algo
@@ -2058,7 +2058,7 @@ function cofreSheet(){const bal=escBal(),own=Object.keys(cofreGet().o).length;
  <div class="reel"><div class="mark"></div><div class="strip" id="strip">${[...Array(9)].map(()=>itemHTML(cofreAzar())).join("")}</div></div>
  <div id="cofreRes"></div>
  <div class="row"><button class="btn" id="cofreOpen" ${bal<COFRE_COSTO?"disabled":""}>ABRIR · ${COFRE_COSTO} ESCAMAS</button><button class="btn sm" id="armBtn">ARMARIO</button><button class="btn sm" id="back">VOLVER</button></div>
- <p class="foot">${bal<COFRE_COSTO?`Te faltan ${COFRE_COSTO-bal} escamas. `:""}Ganás 1 escama cada 10 puntos que hacés en cualquier partida; la primera pesca diaria del día da 20 más, y 5 más por cada día de racha. Si sale algo que ya tenés, se te junta repetido: los repetidos se pueden intercambiar con tus amigos.</p>
+ <p class="foot">${bal<COFRE_COSTO?`Te faltan ${COFRE_COSTO-bal} escamas. `:""}Ganás 1 escama cada 10 puntos que hacés en cualquier partida; la primera pesca diaria del día da 20 más, y 5 más por cada día de racha. Si sale algo que ya tenés, se te junta repetido. Todo lo del cofre se puede intercambiar con tus amigos.</p>
  <div class="frBox"><h3>CHANCES</h3><div class="rarRow">${RAR.slice(1).map(r=>`<span style="--rc:${r[1]}"><b>${r[0]}</b>${r[2]}%</span>`).join("")}</div>
   <h3>QUÉ PUEDE SALIR</h3><div class="itGrid">${[5,4,3,2,1].flatMap(r=>ITEMS.filter(i=>i[4]===r)).map(it=>itemHTML(it,has(it[0])?'<em>✓</em>':"")).join("")}</div></div>`);
  paintItems($("endIn"));$("back").onclick=()=>go("lobby");$("armBtn").onclick=()=>armarioSheet();$("cofreOpen").onclick=cofreAbrir}
@@ -2093,7 +2093,7 @@ function armarioSheet(){const c=cofreGet().o,have=store.get("abisal-logros")||{}
  <div class="frBox"><canvas id="kPrev"></canvas></div>
  ${Object.keys(CAT_N).map(cat=>{const l=mine.filter(i=>i[1]===cat);return l.length?`<div class="frBox"><h3>${CAT_N[cat].toUpperCase()}${cat==="dc"?" (PODÉS PONER VARIOS)":""}</h3><div class="itGrid">${l.map(it=>`<button class="itB${puesto(it)?" on":""}" data-eq="${it[0]}">${itemHTML(it,badge(it))}</button>`).join("")}</div></div>`:""}).join("")}
  ${fromCofre.length?"":'<p class="foot">Todavía no sacaste nada del cofre: con 100 escamas podés tirar la ruleta.</p>'}
- <p class="foot">Acá está todo lo tuyo: lo del cofre y los colores y accesorios de los logros. Los repetidos del cofre (×2 o más) se pueden intercambiar en Amigos.</p>
+ <p class="foot">Acá está todo lo tuyo: lo del cofre y los colores y accesorios de los logros. Lo del cofre se puede intercambiar con tus amigos en Amigos.</p>
  <div class="row"><button class="btn sm" id="toCofre">COFRE</button><button class="btn sm" id="back">VOLVER</button></div>`);
  krillCanvas($("kPrev"),KRL,7);paintItems($("endIn"));
  $("endIn").querySelectorAll("[data-eq]").forEach(b=>b.onclick=()=>{const it=MAP[b.dataset.eq];equipar(it,puesto(it)&&!(it[1]==="skin"&&it[2]==="rosa"));armarioSheet()});
