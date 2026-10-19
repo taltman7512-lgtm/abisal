@@ -1069,7 +1069,9 @@ Decidí si la respuesta es válida y qué tan rara es.
 - etiqueta: la respuesta escrita prolija y corta (máximo 6 palabras).
 Respondé solo con JSON: {"valida": true|false, "rareza": 1-4, "etiqueta": "..."}`;
 async function aiCheck(pi,raw,opt={}){AI.err=false;if(!AI.url&&!CLAUDE_AI)return null;const key=pi+"|"+norm(raw)+(opt.extra?"|r":"");if(AI.cache.has(key))return AI.cache.get(key);let res=null;
- const datos=opt.datos===false?false:!P[pi].ia,q=P[pi].q+(datos?AI_DATOS:"")+(opt.extra||"");
+ const datos=opt.datos===false?false:!P[pi].ia;let q=P[pi].q+(datos?AI_DATOS:"")+(opt.extra||"");
+ // lo que se encontró en internet va al final, sin pasarse del largo que acepta el Worker
+ if(opt.pistas)q+=opt.pistas.slice(0,Math.max(0,495-q.length));
  // ejemplos para que la IA calibre qué tan rara es (sin las "Muy vivo", que son trampas)
  const ej=P[pi].t.flatMap((s,tier)=>tier===1?[]:s.split(",").map(g=>g.split("/")[0].trim()).filter(Boolean)).slice(0,40);
  const toHit=d=>d&&d.valida?{tier:Math.min(datos?4:5,1+Math.min(4,Math.max(1,+d.rareza||1))),label:String(d.etiqueta||raw).slice(0,60),key:norm(String(d.etiqueta||raw)),exact:false,ai:true,g:!!d.google}:null;
@@ -1086,6 +1088,82 @@ async function aiCheck(pi,raw,opt={}){AI.err=false;if(!AI.url&&!CLAUDE_AI)return
    if(r.ok){res=toHit(await r.json());AI.cache.set(key,res);AI.err=false;break}AI.err=true}
   catch(e){AI.err=true;if(e instanceof TypeError&&!AI.ok){AI.on=false;break}if(e&&e.name==="AbortError")break}}
  return res}
+
+// ===================== Otras fuentes =====================
+// Si tampoco está en Wikidata ni en Wikipedia, algunas preguntas se revisan en una fuente especializada (FU_Q: enunciado → fuente):
+// in:<grupos> iNaturalist (animales y plantas, nombres en español) · pk[:fire|water|legend] PokéAPI · mb:<artista|otro> MusicBrainz (canciones)
+// of:<b = solo marca>:<expresión sobre las categorías>[:ar] Open Food Facts · tm:<a actor|d director>:<nombre> TMDB (películas).
+// Open Food Facts y TMDB pasan por el Worker de la IA (?off= y ?tmdb=): el primero no deja consultarlo desde otra página y el segundo necesita una clave.
+// Puntos según qué tan conocido es (observaciones, versiones grabadas, votos…), con la misma escala de niveles que Wikidata.
+const FU_Q={"Nombrá un ave":"in:3","Nombrá un insecto":"in:47158","Nombrá un mamífero que no sea perro ni gato":"in:40151","Nombrá un reptil o un anfibio":"in:26036,20978","Nombrá un felino salvaje":"in:41944","Nombrá un ave de rapiña":"in:71261,67570,19350,559244","Nombrá un tipo de mono":"in:43367","Nombrá un tipo de tiburón":"in:551307","Nombrá un tipo de ballena o delfín":"in:152871","Nombrá una serpiente":"in:85553","Nombrá un tipo de araña":"in:47118","Nombrá una mariposa o polilla":"in:47157","Nombrá un roedor":"in:43698","Nombrá un marsupial":"in:848319","Nombrá un crustáceo o un molusco":"in:85493,47115","Nombrá un cactus o planta suculenta":"in:47903,51890","Nombrá un hongo (no comestible)":"in:47170","Nombrá una flor":"in:47125","Nombrá un Pokémon":"pk","Nombrá un Pokémon de tipo fuego":"pk:fire","Nombrá un Pokémon de tipo agua":"pk:water","Nombrá un Pokémon legendario o singular":"pk:legend","Nombrá una golosina o un chocolate":"of::confection|chocolat|candie|candy|golosina|alfajor|bonbon|caramel|chewing-gum|lollipop","Nombrá una golosina argentina":"of::confection|chocolat|candie|candy|golosina|alfajor|bonbon|caramel|chewing-gum|lollipop:ar","Nombrá un alfajor argentino":"of::alfajor","Nombrá un cereal de desayuno":"of::breakfast-cereal|cereales|cereals","Nombrá una galletita":"of::biscuit|cookie|galletit|galleta|cracker","Nombrá un caramelo o chicle":"of::candie|candy|caramel|chewing-gum|lollipop|bonbon|caramelo|chicle","Nombrá un snack salado":"of::salty-snack|chips|crisps|snack","Nombrá una marca de yerba mate":"of:b:yerba|mate","Nombrá una cerveza":"of::beer|cerveza|bier","Nombrá una marca de gaseosa":"of:b:soda|soft-drink|carbonated|gaseosa|cola","Nombrá una marca de agua mineral":"of:b:water|agua","Nombrá una marca de chocolates":"of:b:chocolat","Nombrá una marca de bebidas energéticas":"of:b:energy-drink|energizante|energetica","Nombrá una marca de café":"of:b:coffee|cafe","Nombrá un tipo de whisky o una marca":"of::whisk","Nombrá un licor o aperitivo":"of::liqueur|aperitif|bitter|vermouth|licor|aperitivo|amaro|fernet","Nombrá una película con Ricardo Darín":"tm:a:Ricardo Darín","Nombrá una película con Leonardo DiCaprio":"tm:a:Leonardo DiCaprio","Nombrá una película con Tom Hanks":"tm:a:Tom Hanks","Nombrá una película con Will Smith":"tm:a:Will Smith","Nombrá una película con Brad Pitt":"tm:a:Brad Pitt","Nombrá una película con Jim Carrey":"tm:a:Jim Carrey","Nombrá una película con Adam Sandler":"tm:a:Adam Sandler","Nombrá una película con Keanu Reeves":"tm:a:Keanu Reeves","Nombrá una película con Robin Williams":"tm:a:Robin Williams","Nombrá una película con Tom Cruise":"tm:a:Tom Cruise","Nombrá una película con Meryl Streep":"tm:a:Meryl Streep","Nombrá una película con Johnny Depp":"tm:a:Johnny Depp","Nombrá una película con Denzel Washington":"tm:a:Denzel Washington","Nombrá una película con Robert De Niro":"tm:a:Robert De Niro","Nombrá una película con Julia Roberts":"tm:a:Julia Roberts","Nombrá una película con Morgan Freeman":"tm:a:Morgan Freeman","Nombrá una película con Arnold Schwarzenegger":"tm:a:Arnold Schwarzenegger","Nombrá una película con Sylvester Stallone":"tm:a:Sylvester Stallone","Nombrá una película con Scarlett Johansson":"tm:a:Scarlett Johansson","Nombrá una película con Guillermo Francella":"tm:a:Guillermo Francella","Nombrá una película con Dwayne Johnson (La Roca)":"tm:a:Dwayne Johnson","Nombrá una película de Christopher Nolan":"tm:d:Christopher Nolan","Nombrá una película de Steven Spielberg":"tm:d:Steven Spielberg","Nombrá una película de Tim Burton":"tm:d:Tim Burton","Nombrá una película de Martin Scorsese":"tm:d:Martin Scorsese","Nombrá una película de Quentin Tarantino":"tm:d:Quentin Tarantino","Nombrá una película de Stanley Kubrick":"tm:d:Stanley Kubrick","Nombrá una película de Alfred Hitchcock":"tm:d:Alfred Hitchcock","Nombrá una película de Pedro Almodóvar":"tm:d:Pedro Almodóvar","Nombrá una canción de Taylor Swift":"mb:Taylor Swift","Nombrá una canción de Bad Bunny":"mb:Bad Bunny","Nombrá una canción de los Beatles":"mb:Beatles","Nombrá una canción de Soda Stereo":"mb:Soda Stereo","Nombrá una canción de Charly García":"mb:Charly García","Nombrá una canción de los Redondos":"mb:Patricio Rey y sus Redonditos de Ricota","Nombrá una canción de Fito Páez":"mb:Fito Páez","Nombrá una canción de Los Fabulosos Cadillacs":"mb:Fabulosos Cadillacs","Nombrá una canción de Los Piojos":"mb:Piojos","Nombrá una canción de Duki":"mb:Duki","Nombrá una canción de Shakira":"mb:Shakira","Nombrá una canción de Michael Jackson":"mb:Michael Jackson","Nombrá una canción de Queen":"mb:Queen","Nombrá una canción de ABBA":"mb:ABBA","Nombrá una canción de Coldplay":"mb:Coldplay","Nombrá una canción de Gustavo Cerati solista":"mb:Gustavo Cerati","Nombrá una canción de Andrés Calamaro":"mb:Andrés Calamaro","Nombrá una canción de Luis Alberto Spinetta":"mb:Luis Alberto Spinetta","Nombrá una canción de La Renga":"mb:La Renga","Nombrá una canción de Divididos":"mb:Divididos","Nombrá una canción de Los Auténticos Decadentes":"mb:Auténticos Decadentes","Nombrá una canción de Babasónicos":"mb:Babasónicos","Nombrá una canción de Bersuit Vergarabat":"mb:Bersuit Vergarabat","Nombrá una canción de Tini":"mb:Tini","Nombrá una canción de María Becerra":"mb:María Becerra","Nombrá una canción de Lali":"mb:Lali","Nombrá una canción de Luis Miguel":"mb:Luis Miguel","Nombrá una canción de Maná":"mb:Maná","Nombrá una canción de Ricky Martin":"mb:Ricky Martin","Nombrá una canción de Enrique Iglesias":"mb:Enrique Iglesias","Nombrá una canción de Daddy Yankee":"mb:Daddy Yankee","Nombrá una canción de Karol G":"mb:Karol G","Nombrá una canción de Rosalía":"mb:Rosalía","Nombrá una canción de Madonna":"mb:Madonna","Nombrá una canción de Britney Spears":"mb:Britney Spears","Nombrá una canción de Lady Gaga":"mb:Lady Gaga","Nombrá una canción de Rihanna":"mb:Rihanna","Nombrá una canción de Beyoncé":"mb:Beyoncé","Nombrá una canción de Ed Sheeran":"mb:Ed Sheeran","Nombrá una canción de Billie Eilish":"mb:Billie Eilish","Nombrá una canción de Dua Lipa":"mb:Dua Lipa","Nombrá una canción de The Weeknd":"mb:The Weeknd","Nombrá una canción de Bruno Mars":"mb:Bruno Mars","Nombrá una canción de Elvis Presley":"mb:Elvis Presley","Nombrá una canción de los Rolling Stones":"mb:Rolling Stones","Nombrá una canción de Pink Floyd":"mb:Pink Floyd","Nombrá una canción de AC/DC":"mb:AC/DC","Nombrá una canción de Nirvana":"mb:Nirvana","Nombrá una canción de Guns N' Roses":"mb:Guns N' Roses","Nombrá una canción de Metallica":"mb:Metallica","Nombrá una canción de Oasis":"mb:Oasis","Nombrá una canción de U2":"mb:U2","Nombrá una canción de Bon Jovi":"mb:Bon Jovi","Nombrá una canción de Red Hot Chili Peppers":"mb:Red Hot Chili Peppers","Nombrá una canción de Arctic Monkeys":"mb:Arctic Monkeys","Nombrá una canción de Eminem":"mb:Eminem","Nombrá una canción de Adele":"mb:Adele","Nombrá una canción de Ariana Grande":"mb:Ariana Grande","Nombrá una canción de BTS":"mb:BTS","Nombrá una canción de One Direction o de Harry Styles":"mb:One Direction|Harry Styles","Nombrá una canción de Calle 13 o Residente":"mb:Calle 13|Residente","Nombrá una canción de Joaquín Sabina":"mb:Joaquín Sabina","Nombrá una canción de Héroes del Silencio":"mb:Héroes del Silencio","Nombrá una canción de Café Tacvba":"mb:Café Tacvba","Nombrá una canción de Los Enanitos Verdes o de Los Prisioneros":"mb:Enanitos Verdes|Prisioneros"};
+const FU={on:{},ok:{},cache:new Map(),note:new Map(),list:{}};
+const FU_NAME={in:"iNaturalist",pk:"PokéAPI",mb:"MusicBrainz",of:"Open Food Facts",tm:"TMDB"};
+const fuOf=pi=>{const f=FU_Q[P[pi].q];return f&&FU.on[f.slice(0,2)]!==false?f:null};
+async function fuFetch(url,ms=8000){const c=new AbortController(),t=setTimeout(()=>c.abort(),ms);
+ try{const r=await fetch(url,{signal:c.signal});if(!r.ok)throw new Error("HTTP "+r.status);return await r.json()}finally{clearTimeout(t)}}
+const fuBest=(rows,src)=>{let b=null;for(const r of rows)if(r.score>=3&&(!b||r.score>b.score||(r.score===b.score&&r.pop>b.pop)))b=r;
+ return b&&{tier:b.tier,label:b.label,key:norm(b.label),exact:false,fu:src,_r:b}};
+const fuSleep=ms=>new Promise(r=>setTimeout(r,ms));
+const fuClean=s=>String(s||"").replace(/[^\p{L}\p{N}' ]/gu," ").replace(/\s+/g," ").trim().slice(0,80);
+async function fuCheck(pi,raw){const f=fuOf(pi);if(!f)return null;const key=pi+"|"+norm(raw);if(FU.cache.has(key))return FU.cache.get(key);
+ const kind=f.slice(0,2),arg=f.slice(3),want=norm(raw);let res=null;
+ try{
+  if(kind==="in"){
+   const d=await fuFetch(`https://api.inaturalist.org/v1/taxa/autocomplete?q=${encodeURIComponent(raw)}&locale=es&preferred_place_id=7190&per_page=10&taxon_id=${arg}`);
+   const ids=arg.split(",").map(Number);
+   res=fuBest((d.results||[]).filter(t=>!ids.includes(t.id)).map(t=>{const o=t.observations_count||0;
+    return {label:t.preferred_common_name||t.matched_term||t.name,pop:o,tier:o>=5e4?2:o>=1e4?3:o>=1e3?4:5,score:Math.max(wdScore(want,t.matched_term||""),wdScore(want,t.preferred_common_name||""),wdScore(want,t.name||""))}}),"INATURALIST");
+   // si no es del grupo pedido, se busca qué es para contárselo a la IA
+   if(!res){const o=await fuFetch(`https://api.inaturalist.org/v1/taxa/autocomplete?q=${encodeURIComponent(raw)}&locale=es&per_page=1`).catch(()=>null),t=o&&o.results&&o.results[0];
+    if(t&&wdScore(want,t.matched_term||"")>=3)FU.note.set(key,`iNaturalist: "${t.matched_term}" es ${t.name} (${t.iconic_taxon_name||t.rank}), no es del grupo que pide la pregunta`)}}
+  else if(kind==="pk"){
+   if(!FU.list.pk)FU.list.pk=(await fuFetch("https://pokeapi.co/api/v2/pokemon-species?limit=2000")).results.map((s,i)=>({name:s.name,id:i+1}));
+   const m=fuBest(FU.list.pk.map(s=>({label:s.name.replace(/-/g," ").replace(/\b\w/g,c=>c.toUpperCase()),pop:-s.id,tier:s.id<=151?3:s.id<=493?4:5,score:wdScore(want,s.name),name:s.name,id:s.id})),"POKÉAPI");
+   if(m&&arg){const s=m._r;
+    if(arg==="legend"){const sp=await fuFetch("https://pokeapi.co/api/v2/pokemon-species/"+s.name);if(sp.is_legendary||sp.is_mythical)res=m;else FU.note.set(key,`PokéAPI: ${m.label} no es legendario ni singular`)}
+    else{const pk=await fuFetch("https://pokeapi.co/api/v2/pokemon/"+s.id),ty=pk.types.map(t=>t.type.name);if(ty.includes(arg))res=m;else FU.note.set(key,`PokéAPI: ${m.label} es de tipo ${ty.join(" y ")}`)}}
+   else res=m}
+  else if(kind==="mb"){
+   const arts=arg.split("|"),aq="("+arts.map(a=>`artist:"${a}"`).join(" OR ")+")",ws=fuClean(raw).split(" ").filter(Boolean);
+   const okArt=r=>(r["artist-credit"]||[]).some(c=>arts.some(a=>wdScore(norm(a),c.name)>=3||wdScore(norm(a),(c.artist&&c.artist.name)||"")>=3));
+   const look=async q=>((await fuFetch("https://musicbrainz.org/ws/2/recording?fmt=json&limit=40&query="+encodeURIComponent(q))).recordings||[]);
+   let recs=await look(`recording:"${ws.join(" ")}" AND ${aq}`);
+   // con errores de tipeo se prueba una búsqueda aproximada (MusicBrainz pide no hacer más de un pedido por segundo)
+   if(!recs.some(okArt)&&ws.length){await fuSleep(1100);recs=await look(`recording:(${ws.map(w=>w.length>3?w+"~":w).join(" AND ")}) AND ${aq}`)}
+   const mine=recs.filter(okArt).map(r=>({label:r.title,score:wdScore(want,r.title.replace(/\s*[\(\[].*$/,""))})).filter(r=>r.score>=3);
+   if(mine.length){const n=mine.length,b=mine.sort((a,b)=>b.score-a.score)[0];res={tier:n>=12?2:n>=6?3:n>=2?4:5,label:b.label.replace(/\s*[\(\[].*$/,""),key:norm(b.label),exact:false,fu:"MUSICBRAINZ"}}
+   else{const o=await (async()=>{await fuSleep(1100);return look(`recording:"${ws.join(" ")}"`)})().catch(()=>[]),r=o.find(r=>wdScore(want,r.title)>=3);
+    if(r)FU.note.set(key,`MusicBrainz: "${r.title}" existe pero es de ${(r["artist-credit"]||[]).map(c=>c.name).join(", ")}`)}}
+  else if(kind==="of"){if(!AI.url)return null;
+   const [only,rx,ar]=arg.split(":"),re=new RegExp(rx,"i"),d=await fuFetch(AI.url+"?off="+encodeURIComponent(fuClean(raw)));
+   if(!d||!Array.isArray(d.hits))throw new TypeError("sin Open Food Facts");
+   const rows=[];for(const h of d.hits){const cats=(h.categories_tags||[]).join(" "),bs=[].concat(h.brands||[]).join(",").split(",").map(s=>s.trim()).filter(Boolean);
+    if(ar&&!(h.countries_tags||[]).includes("en:argentina"))continue;if(!re.test(cats))continue;
+    for(const b of bs)rows.push({label:b,score:wdScore(want,b),brand:1});if(!only&&h.product_name)rows.push({label:h.product_name,score:wdScore(want,h.product_name)})}
+   const n=rows.filter(r=>r.score>=3).length;res=fuBest(rows.map(r=>({...r,pop:n,tier:n>=10?3:n>=3?4:5})),"OPEN FOOD FACTS")}
+  else if(kind==="tm"){if(!AI.url)return null;
+   const role=arg[0],who=arg.slice(2),pk="tm|"+who;
+   if(!FU.list[pk]){const s=await fuFetch(AI.url+"?tmdb=search/person&query="+encodeURIComponent(who));if(!s||!s.results)throw new TypeError("sin TMDB");
+    const p=s.results[0];if(!p)return null;const c=await fuFetch(AI.url+`?tmdb=person/${p.id}/movie_credits`);
+    FU.list[pk]=role==="d"?(c.crew||[]).filter(m=>m.job==="Director"):(c.cast||[])}
+   res=fuBest(FU.list[pk].map(m=>{const v=m.vote_count||0;return {label:m.title,pop:v,tier:v>=1e4?2:v>=2e3?3:v>=300?4:5,score:Math.max(wdScore(want,m.title||""),wdScore(want,m.original_title||""))}}),"TMDB")}
+  FU.ok[kind]=true;if(res)delete res._r;FU.cache.set(key,res)}
+ // si la fuente no contesta nunca (link de Claude, sin internet o el Worker todavía sin esa parte) se apaga en esta partida
+ catch(e){if(!FU.ok[kind]&&(e instanceof TypeError||e instanceof SyntaxError||(e&&/HTTP (404|501)/.test(e.message))))FU.on[kind]=false}
+ return res}
+
+// ===================== Pistas para la IA =====================
+// Antes de preguntarle a la IA se buscan unas líneas en internet (Wikipedia, Wikcionario y lo que vio la fuente especializada)
+// y se las pasa como ayuda: así no depende solo de lo que recuerda. Van después de " [" para que la memoria del Worker no cambie.
+async function pistas(pi,raw){if(!WP.on)return "";const out=[],key=pi+"|"+norm(raw);if(FU.note.has(key))out.push(FU.note.get(key));
+ const strip=s=>String(s||"").replace(/<[^>]*>/g,"").replace(/&quot;/g,'"').replace(/&amp;/g,"&").replace(/\s+/g," ").trim();
+ try{const d=await wpFetch("action=query&list=search&srlimit=2&srprop=snippet&srsearch="+encodeURIComponent(raw),5000);
+  for(const h of (d.query&&d.query.search)||[])out.push(`Wikipedia "${h.title}": ${strip(h.snippet).slice(0,110)}`)}catch(e){}
+ // palabras sueltas en preguntas sin Wikidata ni Wikipedia: la definición del Wikcionario
+ if(!P[pi].wd&&!P[pi].wp&&!/\s/.test(raw.trim()))try{const c=new AbortController(),t=setTimeout(()=>c.abort(),5000);
+  const d=await (await fetch("https://es.wiktionary.org/w/api.php?action=query&prop=extracts&explaintext=1&exchars=400&format=json&origin=*&titles="+encodeURIComponent(raw.trim().toLowerCase()),{signal:c.signal}).finally(()=>clearTimeout(t))).json();
+  const p=Object.values(d.query.pages)[0];if(p&&p.extract){const m=p.extract.replace(/=+[^=]+=+/g," ").replace(/\s+/g," ").trim();out.push(`Wikcionario "${p.title}": ${m.slice(0,130)}`)}}catch(e){}
+ return out.length?" [PISTAS de internet (solo ayuda, pueden no ser exactas): "+out.join(" | ").replace(/[\[\]]/g,"")+"]":""}
 
 // ===================== Sonido (sintetizado, sin archivos) =====================
 const sfx=(()=>{let ctx=null,master=null,ambF=null,ambG=null,on=store.get("abisal-sound")!==false;
@@ -1183,15 +1261,19 @@ $("bar").addEventListener("submit",async e=>{e.preventDefault();if(phase!=="answ
  // y si tampoco está ahí, en Wikipedia
  if(!hit&&P[current].wp&&WP.on){const pi=current;phase="checking";toast(`Buscando “${esc(v)}” en Wikipedia${TDOTS}<small>EL RELOJ ESTÁ EN PAUSA</small>`,false,30000);
   const r=await wpCheck(pi,v);if(phase!=="checking"||current!==pi)return;phase="answering";if(r)hit=r}
+ // y si tampoco, en la fuente especializada de la pregunta (iNaturalist, PokéAPI, MusicBrainz, Open Food Facts, TMDB)
+ if(!hit&&fuOf(current)){const pi=current;phase="checking";toast(`Buscando “${esc(v)}” en ${FU_NAME[fuOf(pi).slice(0,2)]}${TDOTS}<small>EL RELOJ ESTÁ EN PAUSA</small>`,false,30000);
+  const r=await fuCheck(pi,v);if(phase!=="checking"||current!==pi)return;phase="answering";if(r)hit=r}
  // y si nada la encontró, se le pregunta a la IA (en cualquier pregunta)
  const useAI=!hit&&v.length>=2&&(CLAUDE_AI||(AI.url&&AI.on));
  if(useAI){const pi=current;phase="checking";toast(`Consultando a ${CLAUDE_AI?"Claude":"la IA"} por “${esc(v)}”${TDOTS}<small>EL RELOJ ESTÁ EN PAUSA</small>`,false,30000);
-  let r=await aiCheck(pi,v,rl?{datos:false,extra:RULE_NOTE}:{});if(!r&&AI.err&&rl&&rl[2]&&WP.on)r=await wikcCheck(v);
+  const pz=rl?"":await pistas(pi,v);let r=await aiCheck(pi,v,rl?{datos:false,extra:RULE_NOTE}:{pistas:pz});if(!r&&AI.err&&rl&&rl[2]&&WP.on)r=await wikcCheck(v);
   if(phase!=="checking"||current!==pi)return;phase="answering";if(r)hit=r;
   // si la IA no contestó (está saturada), no se cuenta como error: se puede volver a probar
   else if(AI.err){toast(`La IA está saturada y no pudo revisar “${esc(v)}”<small>NO PERDÉS TIEMPO · PROBÁ DE NUEVO</small>`,true);$("answer").select();return}}
- if(!hit){const pen=mode==="run"?3:2,src=[P[current].wd&&WD.on&&"Wikidata",P[current].wp&&WP.on&&"Wikipedia"].filter(Boolean).join(" ni en ");timeLeft-=pen;sfx.wrong();toast(`“${esc(v)}” no está en la lista${src?" ni en "+src:""}${useAI&&AI.on?" y la IA no la aceptó":""}<small>−${pen} SEGUNDOS</small>`,true);const a=$("answer");a.classList.remove("shake");void a.offsetWidth;a.classList.add("shake");a.select();return}
+ if(!hit){const pen=mode==="run"?3:2,src=[P[current].wd&&WD.on&&"Wikidata",P[current].wp&&WP.on&&"Wikipedia",fuOf(current)&&FU_NAME[fuOf(current).slice(0,2)]].filter(Boolean).join(" ni en ");timeLeft-=pen;sfx.wrong();toast(`“${esc(v)}” no está en la lista${src?" ni en "+src:""}${useAI&&AI.on?" y la IA no la aceptó":""}<small>−${pen} SEGUNDOS</small>`,true);const a=$("answer");a.classList.remove("shake");void a.offsetWidth;a.classList.add("shake");a.select();return}
  if(hit.wk)toast(`“${esc(v)}” → “${esc(hit.label)}”<small>ESTÁ EN EL DICCIONARIO (WIKCIONARIO)</small>`);
+ else if(hit.fu)toast(`“${esc(v)}” → “${esc(hit.label)}”<small>VERIFICADA EN ${hit.fu}</small>`);
  else if(hit.wd||hit.wp)toast(`“${esc(v)}” → “${esc(hit.label)}”<small>VERIFICADA EN ${hit.wd?"WIKIDATA":"WIKIPEDIA"}</small>`);
  else if(hit.ai)toast(`“${esc(v)}” → “${esc(hit.label)}”<small>${hit.g?"ACEPTADA POR LA IA · LA BUSCÓ EN GOOGLE":"ACEPTADA POR LA IA"}</small>`);
  else if(!hit.exact)toast(`“${esc(v)}” → “${esc(hit.label)}”<small>${hit.desc?"ACEPTADA POR DESCRIPCIÓN":"SE ACEPTA CON ERRORES DE TIPEO"}</small>`);
