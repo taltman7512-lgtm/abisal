@@ -1168,6 +1168,27 @@ async function pistas(pi,raw){if(!WP.on)return "";const out=[],key=pi+"|"+norm(r
   const p=Object.values(d.query.pages)[0];if(p&&p.extract){const m=p.extract.replace(/=+[^=]+=+/g," ").replace(/\s+/g," ").trim();out.push(`Wikcionario "${p.title}": ${m.slice(0,130)}`)}}catch(e){}
  return out.length?" [PISTAS de internet (solo ayuda, pueden no ser exactas): "+out.join(" | ").replace(/[\[\]]/g,"")+"]":""}
 
+// ===================== Memoria de todas las fuentes =====================
+// Antes de buscar en ningún lado se le pregunta al Worker si esa respuesta ya se decidió: por la IA, o por Wikidata,
+// Wikipedia u otra fuente (esas valen recién cuando las confirmaron dos jugadores distintos). Así la misma respuesta
+// da siempre la misma rareza y es más rápido. Cuando una fuente acepta una respuesta, se la manda a la memoria.
+// Si el Worker todavía no tiene esta parte (?memo), se apaga sola.
+const MEM={on:null,cache:new Map()};
+const MEM_SRC={wd:"WIKIDATA",wp:"WIKIPEDIA",in:"INATURALIST",pk:"POKÉAPI",mb:"MUSICBRAINZ",of:"OPEN FOOD FACTS",tm:"TMDB"};
+async function memOn(){if(MEM.on!==null)return MEM.on;if(!AI.url||CLAUDE_AI)return MEM.on=false;
+ try{const c=new AbortController(),t=setTimeout(()=>c.abort(),5000);const d=await (await fetch(AI.url+"?memo",{signal:c.signal}).finally(()=>clearTimeout(t))).json();MEM.on=!!d.memo}catch(e){MEM.on=false}
+ return MEM.on}
+async function memCheck(pi,raw){const key=pi+"|"+norm(raw);if(MEM.cache.has(key))return MEM.cache.get(key);if(!await memOn())return null;let res=null;
+ try{const c=new AbortController(),t=setTimeout(()=>c.abort(),4000);
+  const d=await (await fetch(AI.url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mem:"leer",q:P[pi].q,a:raw}),signal:c.signal}).finally(()=>clearTimeout(t))).json(),h=d&&d.hit;
+  // lo que decidió la IA vale igual que en aiCheck (en las preguntas de datos, como mucho Hallazgo profundo)
+  if(h&&h.ia){const lab=String(h.etiqueta||raw).slice(0,60);res={tier:Math.min(P[pi].ia?5:4,1+Math.min(4,Math.max(1,+h.rareza||1))),label:lab,key:norm(lab),exact:false,mem:"LA IA"}}
+  else if(h&&h.tier>=2&&h.tier<=5){const lab=String(h.label||raw).slice(0,60);res={tier:h.tier,label:lab,key:norm(lab),exact:false,mem:MEM_SRC[h.src]||"OTRA FUENTE"}}
+  MEM.cache.set(key,res)}catch(e){}
+ return res}
+function memSave(pi,raw,hit){if(!MEM.on||!hit||(R&&R.explorer))return;const src=hit.wd?"wd":hit.wp?"wp":hit.fu?(fuOf(pi)||"").slice(0,2):"";if(!MEM_SRC[src])return;
+ fetch(AI.url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mem:"guardar",q:P[pi].q,a:raw,tier:hit.tier,label:hit.label,src})}).catch(()=>{})}
+
 // ===================== Sonido (sintetizado, sin archivos) =====================
 const sfx=(()=>{let ctx=null,master=null,ambF=null,ambG=null,on=store.get("abisal-sound")!==false;
  function init(){if(ctx)return ctx;const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;ctx=new C();master=ctx.createGain();master.gain.value=on?.9:0;master.connect(ctx.destination);
@@ -1258,6 +1279,9 @@ function beginAnswer(){phase="answering";UI.pill.hidden=true;UI.bar.hidden=false
 
 $("bar").addEventListener("submit",async e=>{e.preventDefault();if(phase!=="answering")return;const v=$("answer").value.trim();if(!v)return;let hit=judge(current,v);
  const rl=!hit&&RULES[P[current].q];if(rl&&!rl[0](ruleWord(v))){const pen=mode==="run"?3:2;timeLeft-=pen;sfx.wrong();toast(`“${esc(v)}” no cumple: ${rl[1]}<small>−${pen} SEGUNDOS</small>`,true);const a=$("answer");a.classList.remove("shake");void a.offsetWidth;a.classList.add("shake");a.select();return}
+ // primero la memoria: si esa respuesta ya se decidió antes (por la IA o por otra fuente), vale lo mismo
+ if(!hit&&!rl&&AI.url&&!CLAUDE_AI&&MEM.on!==false){const pi=current;phase="checking";
+  const r=await memCheck(pi,v);if(phase!=="checking"||current!==pi)return;phase="answering";if(r)hit=r}
  // si no está en la lista, se consulta Wikidata (el reloj se pausa mientras busca)
  if(!hit&&P[current].wd&&WD.on){const pi=current;phase="checking";toast(`Buscando “${esc(v)}” en Wikidata${TDOTS}<small>EL RELOJ ESTÁ EN PAUSA</small>`,false,30000);
   const r=await wdCheck(pi,v);if(phase!=="checking"||current!==pi)return;phase="answering";if(r)hit=r}
@@ -1267,6 +1291,8 @@ $("bar").addEventListener("submit",async e=>{e.preventDefault();if(phase!=="answ
  // y si tampoco, en la fuente especializada de la pregunta (iNaturalist, PokéAPI, MusicBrainz, Open Food Facts, TMDB)
  if(!hit&&fuOf(current)){const pi=current;phase="checking";toast(`Buscando “${esc(v)}” en ${FU_NAME[fuOf(pi).slice(0,2)]}${TDOTS}<small>EL RELOJ ESTÁ EN PAUSA</small>`,false,30000);
   const r=await fuCheck(pi,v);if(phase!=="checking"||current!==pi)return;phase="answering";if(r)hit=r}
+ // lo que aceptó una fuente se manda a la memoria (vale para todos cuando lo confirma otro jugador)
+ if(hit&&(hit.wd||hit.wp||hit.fu))memSave(current,v,hit);
  // y si nada la encontró, se le pregunta a la IA (en cualquier pregunta)
  const useAI=!hit&&v.length>=2&&(CLAUDE_AI||(AI.url&&AI.on));
  if(useAI){const pi=current;phase="checking";toast(`Consultando a ${CLAUDE_AI?"Claude":"la IA"} por “${esc(v)}”${TDOTS}<small>EL RELOJ ESTÁ EN PAUSA</small>`,false,30000);
@@ -1276,6 +1302,7 @@ $("bar").addEventListener("submit",async e=>{e.preventDefault();if(phase!=="answ
   else if(AI.err){toast(`La IA está saturada y no pudo revisar “${esc(v)}”<small>NO PERDÉS TIEMPO · PROBÁ DE NUEVO</small>`,true);$("answer").select();return}}
  if(!hit){const pen=mode==="run"?3:2,src=[P[current].wd&&WD.on&&"Wikidata",P[current].wp&&WP.on&&"Wikipedia",fuOf(current)&&FU_NAME[fuOf(current).slice(0,2)]].filter(Boolean).join(" ni en ");timeLeft-=pen;sfx.wrong();toast(`“${esc(v)}” no está en la lista${src?" ni en "+src:""}${useAI&&AI.on?" y la IA no la aceptó":""}<small>−${pen} SEGUNDOS</small>`,true);const a=$("answer");a.classList.remove("shake");void a.offsetWidth;a.classList.add("shake");a.select();return}
  if(hit.wk)toast(`“${esc(v)}” → “${esc(hit.label)}”<small>ESTÁ EN EL DICCIONARIO (WIKCIONARIO)</small>`);
+ else if(hit.mem)toast(`“${esc(v)}” → “${esc(hit.label)}”<small>YA LA CONOCÍAMOS · LA DECIDIÓ ${hit.mem}</small>`);
  else if(hit.fu)toast(`“${esc(v)}” → “${esc(hit.label)}”<small>VERIFICADA EN ${hit.fu}</small>`);
  else if(hit.wd||hit.wp)toast(`“${esc(v)}” → “${esc(hit.label)}”<small>VERIFICADA EN ${hit.wd?"WIKIDATA":"WIKIPEDIA"}</small>`);
  else if(hit.ai)toast(`“${esc(v)}” → “${esc(hit.label)}”<small>${hit.g?"ACEPTADA POR LA IA · LA BUSCÓ EN GOOGLE":"ACEPTADA POR LA IA"}</small>`);
