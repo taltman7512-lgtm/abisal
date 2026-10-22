@@ -767,7 +767,7 @@ function wallR(m){const c=canyonW(m,7);if(m<1200)return c*pw;const f=Math.min(1,
 
 let cam=0,camTarget=0,T=0,prevCam=0;
 const scrY=m=>surfY+(m-cam)*PPM;
-const CRE=[];(function(){const r=mulberry(99);const add=(type,a,b,n,sp,pal,o={})=>{for(let i=0,nn=Math.max(1,Math.round(n*.5));i<nn;i++)CRE.push({type,m:a+r()*(b-a),x:r(),dir:r()<.5?-1:1,sp:sp*(.6+r()*.8),pal,ph:r()*7,...o})};
+const CRE=[];(function(){const r=mulberry(99);const add=(type,a,b,n,sp,pal,o={})=>{for(let i=0,nn=n<=1?n:Math.max(1,Math.round(n*.25));i<nn;i++)CRE.push({type,m:a+r()*(b-a),x:r(),dir:r()<.5?-1:1,sp:sp*(.6+r()*.8),pal,ph:r()*7,...o})};
  // superficie (0–300 m): peces de colores, cardúmenes, delfines, tortugas, mantas y medusas rosadas
  add("fishStripe",15,250,3,7,{X:"#ff8a3d",W:"#fff4e6",O:"#1a0e08"});add("fishTail",10,230,3,8,{X:"#2f7bff",T:"#ffd23f",O:"#06142a"});
  add("fishM",8,200,2,9,{X:"#ffd23f",O:"#2a1a00"});add("fishM",20,260,2,8,{X:"#3fe0a8",O:"#0b2a22"});add("fishM",40,300,2,7,{X:"#ff6fa5",O:"#2a0b18"});
@@ -788,10 +788,10 @@ const CRE=[];(function(){const r=mulberry(99);const add=(type,a,b,n,sp,pal,o={})
  add("isopod",4500,8000,6,.6,{X:"#d6c2b0",A:"#a08872",O:"#1b1008"});add("cucumber",4300,6500,6,.6,{X:"#a8466a",A:"#ff8fb0"});add("snail",6500,8800,6,1.5,{X:"#d9b8c8",O:"#3a2030"});
  add("lantern",3500,11000,12,6,{X:"#0a1626",G:"#ff7ab0"});add("titanic",3800,3800,1,0,{X:"#1b2c3e"},{x:.55});
  // fuentes hidrotermales con gusanos tubo, pegadas a las paredes
- for(const m of [2200,2600,3000,3400,3900,4400,4800,5200,5700,6300,7000,7800,8600])CRE.push({type:"tubes",m,wall:r()<.5?"L":"R",x:0,dir:1,sp:0,ph:r()*7,pal:{R:"#ff3d5a",W:"#e8e2d8"}});
+ for(const m of [2600,3900,5200,6300,7800])CRE.push({type:"tubes",m,wall:r()<.5?"L":"R",x:0,dir:1,sp:0,ph:r()*7,pal:{R:"#ff3d5a",W:"#e8e2d8"}});
  // gaviotas en el cielo
  for(let i=0;i<4;i++)CRE.push({type:"gull",m:-(8+r()*24),x:r(),dir:r()<.5?-1:1,sp:6+r()*6,ph:r()*7,pal:{X:"#f4f8fb"},sky:1});
- for(let i=0;i<18;i++){const m=1300+r()*9000,left=r()<.5;CRE.push({type:"spark",m,x:left?.02+r()*.12:.86+r()*.12,dir:1,sp:0,ph:r()*7,col:r()<.6?"255,79,139":"79,216,240"})}})();
+ for(let i=0;i<8;i++){const m=1300+r()*9000,left=r()<.5;CRE.push({type:"spark",m,x:left?.02+r()*.12:.86+r()*.12,dir:1,sp:0,ph:r()*7,col:r()<.6?"255,79,139":"79,216,240"})}})();
 {const PIXELABLES=new Set(["fishM","fishS","fishStripe","fishTail","angel","hatchet","lantern","school","squid","shark"]);for(const c of CRE)c.px=PIXELABLES.has(c.type)&&hash(c.m*7.3,c.x*91)<.4}
 // arrecife sobre la plataforma (270 m, a la izquierda): algas que se mecen y corales de colores
 const KELP=[[.07,22,"#1f6b4a"],[.088,30,"#2a8a5a"],[.105,18,"#1f6b4a"],[.129,26,"#34a06a"],[.152,20,"#2a8a5a"],[.181,28,"#1f6b4a"],[.202,16,"#34a06a"]];
@@ -811,7 +811,7 @@ const PEEK=[{m:420,side:0,len:16,c1:"#6b8f3a",c2:"#6b8f3a",eye:"#ffe066",ph:0},{
  {m:4200,side:0,len:18,c1:"#8a3a4a",c2:"#8a3a4a",eye:"#ffd0d8",ph:.9},{m:5400,side:1,len:20,c1:"#3a5a3a",c2:"#d9e8b0",eye:"#ffffff",ph:2.5},{m:6800,side:0,len:16,c1:"#5a4a6e",c2:"#5a4a6e",eye:"#ff9ad5",ph:5.3}];
 // colores de los peces que acompañan a la respuesta cerca de la superficie
 const ESCORT_PAL=[{X:"#ffd23f",O:"#2a1a00"},{X:"#ff8a3d",O:"#1a0e08"},{X:"#3fe0a8",O:"#0b2a22"},{X:"#5aa8ff",O:"#06142a"},{X:"#ff6fa5",O:"#2a0b18"},{X:"#b8d8e8",O:"#2c5578"}];
-const snow=Array.from({length:70},()=>({x:Math.random(),y:Math.random(),v:2+Math.random()*5,par:.5+Math.random()*.6}));
+const snow=Array.from({length:30},()=>({x:Math.random(),y:Math.random(),v:2+Math.random()*5,par:.5+Math.random()*.6}));
 const bubbles=[];
 const krill={x:0,y:0,wx:0,wy:0,wt:0,dir:1};
 let tagState=null;
@@ -909,7 +909,7 @@ function scene(dt){
  decoFX(pyOf);
  // paredes: rocas, corales y esponjas en el borde (cada 14 m se sortea siempre igual si hay adorno y cuál)
  const mTop=cam-surfY/PPM,mBot=cam+(H-surfY)/PPM;
- for(let m=Math.max(42,Math.ceil(mTop/14)*14);m<=mBot+14;m+=14)for(const side of [0,1]){if(hash(m/14,side?11:5)>.15||under(m))continue;const w=side?wallR(m):wallL(m);if(w<3)continue;
+ for(let m=Math.max(42,Math.ceil(mTop/14)*14);m<=mBot+14;m+=14)for(const side of [0,1]){if(hash(m/14,side?11:5)>.07||under(m))continue;const w=side?wallR(m):wallL(m);if(w<3)continue;
   const [n,pal]=WALL_DECOR[Math.floor(hash(m/14,side+20)*WALL_DECOR.length)],s=sprite(n,pal,side===1);drawSpr(s,side?pw-w-s.width/2+1:w+s.width/2-1,pyOf(m))}
  // restos de barcos y expediciones (encallados en la pared, un poco metidos en la roca)
  for(const w of WRECKS){const py=pyOf(w.m);if(py<-40||py>ph+40||under(w.m))continue;const s=sprite(w.s,w.pal,w.side==="R");
@@ -940,7 +940,7 @@ function scene(dt){
   // los animales pasan por detrás de las paredes de roca (no se dibujan encima)
   if(!c.sky&&c.type!=="titanic"&&(px<wallL(c.m)-3||px>pw-wallR(c.m)+3))continue;
   const bob=Math.sin(T*1.5+c.ph)*(c.type==="jelly"||c.type==="comb"||c.type==="dumbo"?2.5:c.type==="seahorse"?1.5:.8)+(c.oy||0);
-  if(c.type==="school"){for(let i=0;i<5;i++)(c.px?drawPixel:drawSpr)(sprite("fishS",c.pal,c.dir<0),px+((i%4)*6-9)*(1+(c.spread||0))+Math.sin(T*2+i)*1.5,py+(Math.floor(i/4)*4-2)*(1+(c.spread||0)*1.5)+bob+Math.cos(T*1.7+i));continue}
+  if(c.type==="school"){for(let i=0;i<4;i++)(c.px?drawPixel:drawSpr)(sprite("fishS",c.pal,c.dir<0),px+((i%4)*6-9)*(1+(c.spread||0))+Math.sin(T*2+i)*1.5,py+(Math.floor(i/4)*4-2)*(1+(c.spread||0)*1.5)+bob+Math.cos(T*1.7+i));continue}
   const s=sprite(frameOf(c.type,c.ph),c.pal,c.dir<0&&c.type!=="titanic");
   if(c.glow){L();glowPx(px,py+bob,9,c.glow,.3+.12*Math.sin(T*2+c.ph));S()}
   (c.px?drawPixel:drawSpr)(s,px,py+bob);
