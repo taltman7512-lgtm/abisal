@@ -439,7 +439,7 @@ const BEARING=[[0,150,0,"Plancton. Te quedaste cerca de la superficie."],[151,25
 const NOTES=[[40,"la luz roja es la primera en desaparecer"],[200,"acá se termina casi toda la luz del sol"],[332,"el buceo con tanque más profundo · 332 m"],[565,"hasta acá puede bajar un pingüino emperador"],
  [1000,"ZONA DE MEDIANOCHE · ya no llega luz"],[1500,"los cachalotes cazan calamares gigantes"],[2000,"territorio del pez abisal"],[2992,"récord de buceo de un mamífero · zifio de Cuvier"],
  [3000,"la presión es 300 veces la de la superficie"],[3800,"acá descansan los restos del Titanic"],[4000,"ZONA ABISAL"],[6000,"ZONA HADAL · las fosas"],[8336,"el pez más profundo jamás filmado"],[10935,"Abismo Challenger · el punto más hondo"],
- [440,"un casco de buzo de otra época"],[830,"restos de un galeón hundido"],[1710,"un submarino que nunca volvió"],[2510,"un avión perdido en el mar"],[5210,"el robot de una expedición perdida"],[10850,"el batiscafo Trieste · 1960"]].sort((a,b)=>a[0]-b[0]);
+ [830,"restos de un galeón hundido"],[1710,"un submarino que nunca volvió"],[2510,"un avión perdido en el mar"],[5210,"el robot de una expedición perdida"],[10850,"el batiscafo Trieste · 1960"]].sort((a,b)=>a[0]-b[0]);
 
 // ===================== Preguntas (preguntas.js) =====================
 const P=window.PREGUNTAS||[];P.forEach(p=>{if(p.t.length===5)p.t.splice(1,0,"")});
@@ -615,7 +615,7 @@ function iconCanvas(t,scale){const s=sprite(TIER_SPR[t],tierPal(t));const c=docu
 // ===================== Escena =====================
 const pc=$("px"),pcx=pc.getContext("2d"),hc=$("hi"),hcx=hc.getContext("2d");
 const PX=3;let W,H,pw,ph,img,buf,PPM,surfY;
-function resize(){W=Math.max(1,innerWidth);H=Math.max(1,innerHeight);pw=Math.ceil(W/PX);ph=Math.ceil(H/PX);pc.width=pw;pc.height=ph;pc.style.width=pw*PX+"px";pc.style.height=ph*PX+"px";
+function resize(){W=Math.max(1,innerWidth);H=Math.max(1,innerHeight);pw=Math.ceil(W/PX);ph=Math.ceil(H/PX)+1;pc.width=pw;pc.height=ph;pc.style.width=pw*PX+"px";pc.style.height=ph*PX+"px";
  img=pcx.createImageData(pw,ph);buf=new Uint32Array(img.data.buffer);const d=Math.min(2,devicePixelRatio||1);hc.width=W*d;hc.height=H*d;hcx.setTransform(d,0,0,d,0,0);
  PPM=W<700?1.5:2;surfY=H*(W<700?.2:.22)}
 resize();addEventListener("resize",resize);
@@ -661,7 +661,7 @@ const CRE=[];(function(){const r=mulberry(99);const add=(type,a,b,n,sp,pal,o={})
  add("isopod",4500,8000,6,.6,{X:"#d6c2b0",A:"#a08872",O:"#1b1008"});add("cucumber",4300,6500,6,.6,{X:"#a8466a",A:"#ff8fb0"});add("snail",6500,8800,6,1.5,{X:"#d9b8c8",O:"#3a2030"});
  add("lantern",3500,11000,12,6,{X:"#0a1626",G:"#ff7ab0"});add("titanic",3800,3800,1,0,{X:"#1b2c3e"},{x:.55});
  // fuentes hidrotermales con gusanos tubo, pegadas a las paredes
- for(const m of [2600,3900,5200,6300,7800])CRE.push({type:"tubes",m,wall:r()<.5?"L":"R",x:0,dir:1,sp:0,ph:r()*7,pal:{R:"#ff3d5a",W:"#e8e2d8"}});
+ for(const m of [])CRE.push({type:"tubes",m,wall:r()<.5?"L":"R",x:0,dir:1,sp:0,ph:r()*7,pal:{R:"#ff3d5a",W:"#e8e2d8"}});
  // gaviotas en el cielo
  for(let i=0;i<4;i++)CRE.push({type:"gull",m:-(8+r()*24),x:r(),dir:r()<.5?-1:1,sp:6+r()*6,ph:r()*7,pal:{X:"#f4f8fb"},sky:1});
  for(let i=0;i<8;i++){const m=1300+r()*9000,left=r()<.5;CRE.push({type:"spark",m,x:left?.02+r()*.12:.86+r()*.12,dir:1,sp:0,ph:r()*7,col:r()<.6?"255,79,139":"79,216,240"})}})();
@@ -674,11 +674,12 @@ const CLOUDS=[[.12,-34,1],[.58,-46,.6],[.83,-28,.8]];
 // adornos de las paredes: rocas, corales de aguas frías, esponjas, abanicos y anémonas
 const WALL_DECOR=[["wcoral",{X:"#ff6f91"}],["wsponge",{X:"#e8c547"}],["wrock",{X:"#2c3d52"}],["wrock",{X:"#3a4c62"}],["wrock",{X:"#26354a"}],["wrock",{X:"#34465a"}],["wfan",{X:"#b07cff"}],["wrock",{X:"#2a3a4c"}]];   // menos corales, más piedras
 // restos de barcos y expediciones: pegados a una pared (L/R) o flotando (x)
-const WRECKS=[{s:"helmet",m:430,side:"L",pal:{X:"#b8873a",G:"#2a4d5e"}},{s:"galleon",m:820,side:"L",pal:{X:"#5a3e28",W:"#1e140c"}},
+const PEEK=[];   // serpientes y morenas que salían de las paredes: sacadas
+const WRECKS=[{s:"galleon",m:820,side:"L",pal:{X:"#5a3e28",W:"#1e140c"}},
  {s:"sub",m:1700,side:"R",pal:{X:"#4a5a52",W:"#1b2420"}},{s:"plane",m:2500,side:"L",pal:{X:"#6a7480",W:"#1b2433"}},
  {s:"rov",m:5200,side:"L",pal:{X:"#e8c547",G:"#7ff6ff"},blink:1},{s:"trieste",m:10850,x:.68,pal:{X:"#b9c2c8",G:"#7ff6ff"}}];
 // morenas y serpientes marinas que se asoman de huecos en las paredes y se vuelven a esconder
-const PEEK=[{m:420,side:0,len:16,c1:"#6b8f3a",c2:"#6b8f3a",eye:"#ffe066",ph:0},{m:1500,side:1,len:20,c1:"#2e3b4e",c2:"#cfd8e0",eye:"#ffffff",ph:1.7},
+const PEEK_VIEJO=[{m:420,side:0,len:16,c1:"#6b8f3a",c2:"#6b8f3a",eye:"#ffe066",ph:0},{m:1500,side:1,len:20,c1:"#2e3b4e",c2:"#cfd8e0",eye:"#ffffff",ph:1.7},
  {m:2300,side:0,len:18,c1:"#7a6a2e",c2:"#7a6a2e",eye:"#ffe066",ph:3.1},{m:3100,side:1,len:22,c1:"#1f4f7a",c2:"#0b1626",eye:"#ffffff",ph:4.2},
  {m:4200,side:0,len:18,c1:"#8a3a4a",c2:"#8a3a4a",eye:"#ffd0d8",ph:.9},{m:5400,side:1,len:20,c1:"#3a5a3a",c2:"#d9e8b0",eye:"#ffffff",ph:2.5},{m:6800,side:0,len:16,c1:"#5a4a6e",c2:"#5a4a6e",eye:"#ff9ad5",ph:5.3}];
 // colores de los peces que acompañan a la respuesta cerca de la superficie
@@ -711,19 +712,26 @@ let SPF=[];function agujas(){const p=.45,SL=230,camV=cam*p,top=camV-surfY/PPM-60
  for(let j=Math.floor(top/SL);j<=Math.floor(bot/SL);j++){if(j<2)continue;for(let q=0;q<2;q++){const id=j*2+q;if(hash(id,61)<.35)continue;
   const xc=(.1+.8*hash(id,62))*pw,hw=8+hash(id,63)*14,hgt=90+hash(id,64)*170,yb=(j*SL+SL-camV)*PPM/PX+surfY/PX;SPF.push({xc,hw,hgt,yb,top:yb-hgt,id,lit:clamp(1-(j*SL)/3000,.35,1)})}}}
 function agujaEn(x,y){for(const a of SPF){if(y<a.top||y>a.yb)continue;const u=(a.yb-y)/a.hgt,w=a.hw*(1-u)**.8+(hash(a.id*31+(y>>2),67)-.5)*2.4,b=(hash(a.id*17+(y>>3),68)-.5)*2;if(Math.abs(x-a.xc-b)<w)return a.lit}return 0}
+let SOFF=0;   // fracción de píxel que se corre el lienzo (desplazamiento suave): lo que se ubica en coordenadas de pantalla la suma
+const BCOL=new Float32Array(12),BPK=new Uint32Array(4),SPI=new Float32Array(300);
 function bg(){agujas();WLC.clear();if(RKW!==pw){RKC.clear();RKW=pw}const F=FLOOR=floorOn()?floorBase():0,y268=scrY(268)/PX,swL=wallL(272),shelfOn=y268>-8&&y268<ph+8;
  if(F){if(!FLM||FLM.length!==pw){FLM=new Float32Array(pw);FY=new Float32Array(pw)}for(let x=0;x<pw;x++){FLM[x]=floorM(x,F);FY[x]=scrY(FLM[x])/PX}}
  for(let y=0;y<ph;y++){const sy=y*PX+PX/2,m=cam+(sy-surfY)/PPM,row=y*pw;
   if(m<-6){const t=clamp(sy/surfY,0,1),d=(y&1)?5:0;buf.fill(skyPack(t,d),row,row+pw);continue}
   const wc=nightWater(waterAt(Math.max(0,m)),m),wl=wallL(m),wr=wallR(m),rayA=m<320?(1-Math.max(0,m)/320)*16*(1-SKY.n*.85)*(WEATHER==="clear"?1:.5):0,dotA=m>700?Math.min(1,(m-700)/600)*5:0,wrow=Math.floor(m*PPM/PX);
+  // agua: los 4 colores con su tramado se calculan una vez por fila; las agujas del fondo como tramos de la fila
+  const b4=(y&3)*4,BC=BCOL;for(let i=0;i<4;i++){const bd=(B4[b4+i]/16-.5)*5;BC[i*3]=wc[0]+bd;BC[i*3+1]=wc[1]+bd;BC[i*3+2]=wc[2]+bd;BPK[i]=pack(BC[i*3],BC[i*3+1],BC[i*3+2])}
+  let sp=0;if(m>350)for(const a of SPF){if(y<a.top||y>a.yb)continue;const u=(a.yb-y)/a.hgt,w=a.hw*(1-u)**.8+(hash(a.id*31+(y>>2),67)-.5)*2.4,b=(hash(a.id*17+(y>>3),68)-.5)*2;if(w<=0)continue;SPI[sp++]=a.xc+b-w;SPI[sp++]=a.xc+b+w;SPI[sp++]=a.lit}
+  const lisa=!sp&&!rayA&&!dotA;
   const skyT=clamp(sy/surfY,0,1),skyC=skyPack(skyT,0);let rc=RKC.get(wrow);if(!rc){if(RKC.size>3000)RKC.clear();rc=new Uint32Array(pw);RKC.set(wrow,rc)}
   for(let x=0;x<pw;x++){
    if(m<6){const s=Math.sin(x*.16+T*1.5)*1.1+Math.sin(x*.045-T*.8)*.9,dp=m*PPM/PX-s;if(dp<0){buf[row+x]=skyC;continue}if(dp<1.2){buf[row+x]=pack(176,222,234);continue}}
-   if(F&&m>=FLM[x]){buf[row+x]=rockPx(x,wrow,(m-FLM[x])*PPM/PX,m);continue}
+   if(F&&m>=FLM[x]){let c=rc[x];if(!c||c===1){c=rockPx(x,wrow,0,m);rc[x]=c}buf[row+x]=c;continue}
    let dip=false;if(shelfOn&&x<swL){const st=shelfTop(x),dy=y268-(y+.5);if(st>0&&dy>0&&dy<st){buf[row+x]=rockPx(x,wrow,st-dy,272);continue}if(st<0&&dy<=0&&dy>st)dip=true}
    if(!dip&&((wl>0&&x<wl+RB)||(wr>0&&x>=pw-wr-RB))){let c=rc[x];if(!c){c=((wl>0&&x<wl-RB)||(wr>0&&x>=pw-wr+RB))?rockPx(x,wrow,0,m):(rocaBorde(x,wrow,m,x<pw/2)||1);rc[x]=c}if(c!==1){buf[row+x]=c;continue}}
-   const bd=(B4[(y&3)*4+(x&3)]/16-.5)*5;let r=wc[0]+bd,g=wc[1]+bd,b=wc[2]+bd;
-   if(m>350&&SPF.length){const ag=agujaEn(x,y);if(ag){r+=9*ag;g+=12*ag;b+=16*ag}}
+   if(lisa){buf[row+x]=BPK[x&3];continue}
+   const q=(x&3)*3;let r=BC[q],g=BC[q+1],b=BC[q+2];
+   for(let k=0;k<sp;k+=3)if(x>SPI[k]&&x<SPI[k+1]){const ag=SPI[k+2];r+=9*ag;g+=12*ag;b+=16*ag;break}
    if(rayA){const k=((x+y*.55+T*3)%46+46)%46;if(k<8){r+=rayA*.55;g+=rayA*.9;b+=rayA}}
    if(dotA&&x%3===0&&y%3===0){r+=dotA;g+=dotA;b+=dotA*1.5}
    buf[row+x]=pack(r,g,b)}}
@@ -793,7 +801,7 @@ function scene(dt){
   const px=w.side==="L"?wallL(w.m)+s.width/2-3:w.side==="R"?pw-wallR(w.m)-s.width/2+3:w.x*pw;drawSpr(s,px,py);
   if(w.blink&&Math.sin(T*4)>0){L();glowPx(px-2,py-1,6,"127,246,255",.6);S()}}
  // hilos de burbujas que salen de las grietas de la roca
- for(let m=Math.max(60,Math.ceil(mTop/70)*70);m<=mBot+70;m+=70)for(const side of [0,1]){const h=hash(m/70,side+40);if(h>.3||under(m))continue;const w=side?wallR(m):wallL(m);if(w<3)continue;
+ for(let m=Math.max(60,Math.ceil(mTop/70)*70);m<=mBot+70;m+=70)for(const side of [0,1]){const h=hash(m/70,side+40);if(true||h>.3||under(m))continue;const w=side?wallR(m):wallL(m);if(w<3)continue;
   const ex=side?pw-w-1:w,py0=pyOf(m);pcx.fillStyle="rgba(200,230,245,.55)";
   for(let k=0;k<9;k++){const u=(T*16+k*8+h*90)%72;pcx.fillRect(Math.round(ex+(side?-1:1)*(1+Math.sin(T*2+k)*1.2)),Math.round(py0-u),1,1)}}
  // morenas y serpientes marinas: salen del hueco, ondulan un rato y se vuelven a meter
@@ -845,7 +853,7 @@ function scene(dt){
  else{krill.wt-=dt;if(krill.wt<=0){krill.wt=2.5+Math.random()*2.5;krill.wx=W*(.43+Math.random()*.14);krill.wy=H*(.54+Math.random()*.12)}
   const vx=(krill.wx-krill.x)*Math.min(1,dt*.9);krill.x+=vx;krill.y+=(krill.wy-krill.y)*Math.min(1,dt*.9);if(Math.abs(vx)>.05)krill.dir=vx>0?1:-1}
  if(!(FX.boss&&FX.boss.eaten)){
-  drawKrill(krill.x/PX,krill.y/PX+Math.sin(T*3)*.5,krill.dir)}
+  drawKrill(krill.x/PX,krill.y/PX+SOFF+Math.sin(T*3)*.5,krill.dir)}
  tierFX(dt);swarmFX(dt);trailFX(dt);petFX();
  if(R&&R.kind==="duel"&&!FX.boss)drawRival();
  if(FX.boss)drawBoss(dt);
@@ -920,7 +928,7 @@ function scene(dt){
     // burbujitas que entran por el túnel y suben a la cápsula
     pcx.fillStyle="rgba(210,240,255,.9)";for(let k=0;k<5;k++){const u=(T*.5+k*.2)%1,j=Math.min(N,Math.floor(u*1.3*N)),[bx,by]=tun[j];pcx.fillRect(Math.round(u<.77?bx:cx_+Math.sin(k)*4),Math.round(u<.77?by:py-(u-.77)/.23*(py-lvl)),1,1)}
     // el krill adentro: se dibuja de nuevo encima de la cueva
-    if(a.in&&a.kt!=null){drawKrill(krill.x/PX,krill.y/PX+Math.sin(T*3)*.5,krill.dir)}
+    if(a.in&&a.kt!=null){drawKrill(krill.x/PX,krill.y/PX+SOFF+Math.sin(T*3)*.5,krill.dir)}
     pcx.globalAlpha=1;a.sx=cx_*PX;a.sy=(cy_-R_-6)*PX;a.g={mx:xa*PX,my:py*PX,cx:cx_*PX,cy:(lvl+1)*PX};
     if(a.in&&a.kt>2.2){const kx=krill.x/PX,sl=lvl;                                                   // chapoteo: gotitas que saltan y ondas
      for(let k=0;k<6;k++){const p=(T*1.4+k/6)%1,dx=(k-2.5)*1.6+(k%2?1:-1)*p*5,dy=-Math.sin(p*Math.PI)*(4+k%3*1.5);pcx.fillStyle=`rgba(235,250,255,${1-p*.6})`;pcx.fillRect(Math.round(kx+dx),Math.round(sl+dy),1,1)}
@@ -1005,7 +1013,7 @@ function swarmStartViejo(){SWARM.length=0;for(let i=0;i<16;i++)SWARM.push({a:Mat
 function swarmBurst(){for(const k of SWARM){const a=Math.random()*7;k.vx=Math.cos(a)*(14+Math.random()*18);k.vy=Math.sin(a)*(8+Math.random()*12);k.free=1.6+Math.random()*.6}}
 function swarmFX(dt){if(!SWARM.length)return;const s=tagState&&!tagState.burst?tagState:null;
  for(let i=SWARM.length-1;i>=0;i--){const k=SWARM[i];k.a+=k.sp*dt;let nx,ny;
-  if(s&&k.free==null){const cx=s.x/PX,cy=s.y/PX,hw=s.w/PX/2;const tx=cx+Math.cos(k.a)*hw*(.6+k.rx),ty=cy+k.oy+Math.sin(k.a*1.3)*k.ry;nx=k.x+(tx-k.x)*Math.min(1,dt*3.2);ny=k.y+(ty-k.y)*Math.min(1,dt*3.2)}
+  if(s&&k.free==null){const cx=s.x/PX,cy=s.y/PX+SOFF,hw=s.w/PX/2;const tx=cx+Math.cos(k.a)*hw*(.6+k.rx),ty=cy+k.oy+Math.sin(k.a*1.3)*k.ry;nx=k.x+(tx-k.x)*Math.min(1,dt*3.2);ny=k.y+(ty-k.y)*Math.min(1,dt*3.2)}
   else{if(k.free==null)swarmBurst();k.free-=dt;nx=k.x+k.vx*dt;ny=k.y+k.vy*dt;k.vx*=1-dt*.8;k.vy*=1-dt*.8;k.f=Math.max(0,Math.min(1,k.free/.8))}
   if(Math.abs(nx-k.x)>.02)k.dir=nx>k.x?1:-1;k.x=nx;k.y=ny;if(k.f<=0){SWARM.splice(i,1);continue}if(k.y<scrY(0)/PX+3)continue;
   const X=Math.round(k.x),Y=Math.round(k.y+Math.sin(T*8+i)*.6),d=k.dir,P=(a,b)=>pcx.fillRect(d>0?X+a:X-a,Y+b,1,1);
@@ -1013,8 +1021,8 @@ function swarmFX(dt){if(!SWARM.length)return;const s=tagState&&!tagState.burst?t
   if(k.kind==="z"){pcx.globalAlpha=k.f*(.65+.35*Math.abs(Math.sin(T*3+k.ph)));pcx.fillStyle=k.ph>5?"#ffffff":"#cfe3ee";pcx.fillRect(Math.round(k.x+Math.sin(T*1.7+k.ph)*1.5),Math.round(k.y+Math.cos(T*1.3+k.ph)*1.5),1,1);pcx.globalAlpha=1;continue}
   pcx.globalAlpha=k.f;pcx.fillStyle="#ff3d5e";for(const q of [[0,-2],[1,-2],[2,-2],[-1,-1],[3,-1],[2,-1],[-2,0],[2,0],[3,0],[-2,1],[-1,1],[0,1],[1,1],[-3,1],[1,2],[3,1]])P(q[0],q[1]);pcx.fillStyle="#ffb0c0";P(0,-2);P(1,-2);pcx.fillStyle="#2a0010";P(3,-1);pcx.globalAlpha=1}}
 function tierFX(dt){const dc=(cam-fxCam)*PPM/PX;fxCam=cam;const s=tagState&&!tagState.burst?tagState:null;
- if(s){const cx=s.x/PX,cy=s.y/PX,hw=s.w/PX/2;
-  if(s.tier===3)for(let j=0;j<2;j++)INK.push({x:krill.x/PX+(Math.random()-.5)*8-(Math.random()*hw*.8),y:krill.y/PX-2-Math.random()*6,r:4+Math.random()*4,a:.22+Math.random()*.12});
+ if(s){const cx=s.x/PX,cy=s.y/PX+SOFF,hw=s.w/PX/2;
+  if(s.tier===3)for(let j=0;j<2;j++)INK.push({x:krill.x/PX+(Math.random()-.5)*8-(Math.random()*hw*.8),y:krill.y/PX+SOFF-2-Math.random()*6,r:4+Math.random()*4,a:.22+Math.random()*.12});
   if(s.tier===4){const g=pcx.createRadialGradient(cx,cy-4,2,cx,cy-4,hw+26);g.addColorStop(0,"rgba(120,230,235,.22)");g.addColorStop(.55,"rgba(90,200,220,.08)");g.addColorStop(1,"rgba(60,160,200,0)");pcx.fillStyle=g;pcx.fillRect(cx-hw-30,cy-hw-34,hw*2+60,hw*2+60);
    if(Math.random()<.45)CHISPA.push({x:cx+(Math.random()-.5)*hw*2.2,y:cy+(Math.random()-.5)*26,v:3+Math.random()*6,life:1.6,col:"#9ff3ff"})}
   if(s.tier===1&&Math.random()<.18)CHISPA.push({x:cx+(Math.random()-.5)*hw*2,y:cy+(Math.random()-.5)*12,v:5+Math.random()*6,life:.9,col:"#ffb066"})}
@@ -2101,7 +2109,7 @@ function whaleDraw(){const m0=1050,py=scrY(m0)/PX;if(py<-90||py>ph+90)return;con
  pcx.save();pcx.beginPath();for(let yy=Math.floor(y-hg/2);yy<y+hg/2;yy++){const m=cam+(yy*PX+PX/2-surfY)/PPM,a=wallL(m),b=pw-wallR(m);if(b>a)pcx.rect(a,yy,b-a,1)}
  pcx.clip();pcx.globalAlpha=.42;pcx.imageSmoothingEnabled=false;pcx.drawImage(s,Math.round(x),Math.round(y-hg/2),w,hg);pcx.globalAlpha=1;pcx.restore()}
 // ojo de calamar gigante: entre los 3.000 y los 4.000 m, a veces se abre un ojo enorme en una grieta de la pared, mira al krill y se cierra
-const SQUID_EYES=[{m:3300,side:1,ph:0},{m:3850,side:0,ph:2.4}];
+const SQUID_EYES=[];   // (sacado: lo viejo de las paredes)
 function squidEyes(){for(const e of SQUID_EYES){const py=scrY(e.m)/PX;if(py<-20||py>ph+20)continue;const sd=wallL(e.m)>=wallR(e.m)?0:1,w=sd?wallR(e.m):wallL(e.m);if(w<14)continue;
  const op=clamp((Math.sin(T*.22+e.ph)-.45)*3,0,1),cx=sd?pw-w+6:w-7,cy=Math.round(py);
  pcx.fillStyle="#02060c";for(let yy=-4;yy<=4;yy++){const hw=Math.round(6*Math.sqrt(Math.max(0,1-(yy/4.6)**2)));pcx.fillRect(cx-hw,cy+yy,hw*2+1,1)}
@@ -2453,11 +2461,13 @@ function loop(now){const rdt=clamp((now-last)/1000,0,3600),dt=Math.min(rdt,.05);
  // efectos
  FX.dark+=(FX.darkT-FX.dark)*Math.min(1,dt*(FX.darkT>FX.dark?4:1.5));FX.flash=Math.max(0,FX.flash-dt*1.4);FX.shake=Math.max(0,FX.shake-dt*7);
  FX.sx=reduce?0:(Math.random()-.5)*FX.shake*2;FX.sy=reduce?0:(Math.random()-.5)*FX.shake*2;
- const tr=`translate(${FX.sx}px,${FX.sy}px)`;pc.style.transform=tr;hc.style.transform=tr;
+ // desplazamiento suave: el mundo se dibuja alineado a la grilla de píxeles y el lienzo se corre la fracción que falta
+ const camReal=cam,unitM=PX/PPM,camR=Math.floor(cam/unitM)*unitM,offPx=(cam-camR)*PPM;SOFF=offPx/PX;
+ const tr=`translate(${FX.sx}px,${(FX.sy-offPx).toFixed(2)}px)`;pc.style.transform=tr;hc.style.transform=tr;
  const dk=$("dark");dk.style.opacity=FX.dark.toFixed(3);const fx=tagState?tagState.x:W/2,fy=tagState?tagState.y:H*.4;dk.style.setProperty("--x",fx+"px");dk.style.setProperty("--y",fy+"px");
  const fl=$("flash");fl.style.opacity=FX.flash.toFixed(3);fl.style.setProperty("--fc",FX.flashCol);
  {const ck=phase==="checking";if(!ck&&!$("thinking").hidden&&UI.toast.innerHTML.includes("tdots"))UI.toast.hidden=true;$("thinking").hidden=!ck}
- scene(dt);overlay(dt);$("depthTxt").textContent=fmtM(Math.max(0,cam));if((T*10|0)%5===0)sfx.depth(Math.max(0,cam));
+ cam=camR;scene(dt);overlay(dt);cam=camReal;$("depthTxt").textContent=fmtM(Math.max(0,cam));if((T*10|0)%5===0)sfx.depth(Math.max(0,cam));
  requestAnimationFrame(loop)}
 krill.x=krill.wx=W*.5;krill.y=krill.wy=H*.6;
 if(P.length)go("lobby");
