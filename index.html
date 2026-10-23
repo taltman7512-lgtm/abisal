@@ -469,7 +469,7 @@ const INDEX=P.map((p,pi)=>{const list=[],map=new Map();
 const MIL={done:new Set()};
 const milId=s=>{let h=2166136261;for(const c of s){h^=c.codePointAt(0);h=Math.imul(h,16777619)}return (h>>>0).toString(36)};
 function milAdd(pi,d){const map=MAPS[pi],list=INDEX[pi],p=P[pi];
- for(const tier in d)for(const v of d[tier].split(",")){const l=v.trim(),key=norm(l);if(!key||map.has(key))continue;const it={tier:+tier,label:l,key,src:l};map.set(key,it);list.push(it);
+ for(const tier in d)for(const v of d[tier].split(",")){const l=v.trim(),key=norm(l);if(!key||map.has(key))continue;const it={tier:Math.min(+tier,4),label:l,key,src:l};map.set(key,it);list.push(it);   // las sumadas valen como máximo Hallazgo profundo: el 100 queda para la lista armada a mano
   for(const f of forms(key))if(!map.has(f))map.set(f,it);
   if(p.n){const w=words(l);if(w.length>1)for(const t of [w[0],w[w.length-1]])if(t.length>=4&&!map.has(t))map.set(t,it)}}}
 function milLoad(pi){if(window.claude||MIL.done.has(pi)||!P[pi])return;MIL.done.add(pi);
@@ -1055,7 +1055,8 @@ function sinkPlanViejo(tier,inf){const k=inf?.6:1,ev=[];let dur;
 // Los puntos salen de qué tan conocida es: en cuántas Wikipedias tiene artículo (muchas = conocida = menos puntos).
 // En el link de Claude el sitio no deja consultar afuera: ahí se sigue jugando solo con las listas.
 const WD={on:true,cache:new Map()};
-const wdTier=n=>n>=150?2:n>=60?3:n>=15?4:5;
+// Uno en un abismo cuesta: solo si está en 4 Wikipedias o menos (antes, menos de 15)
+const wdTier=n=>n>=150?2:n>=50?3:n>=5?4:5;
 // vale el nombre completo o sin prefijos ("Provincia de Córdoba" → "córdoba"), con errores chicos, o una palabra del nombre ("Boca", "Hermione")
 const WD_GEN=new Set("provincia ciudad departamento partido rio lago laguna monte cerro volcan isla islas mar oceano desierto estado club atletico asociacion the la el los las de del".split(" "));
 const wdRaw=s=>s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9 ]/g," ").split(" ").filter(Boolean);
@@ -1196,7 +1197,7 @@ async function fuCheck(pi,raw){const f=fuOf(pi);if(!f)return null;const key=pi+"
    const d=await fuFetch(`https://api.inaturalist.org/v1/taxa/autocomplete?q=${encodeURIComponent(raw)}&locale=es&preferred_place_id=7190&per_page=10&taxon_id=${arg}`);
    const ids=arg.split(",").map(Number);
    res=fuBest((d.results||[]).filter(t=>!ids.includes(t.id)).map(t=>{const o=t.observations_count||0;
-    return {label:t.preferred_common_name||t.matched_term||t.name,pop:o,tier:o>=5e4?2:o>=1e4?3:o>=1e3?4:5,score:Math.max(wdScore(want,t.matched_term||""),wdScore(want,t.preferred_common_name||""),wdScore(want,t.name||""))}}),"INATURALIST");
+    return {label:t.preferred_common_name||t.matched_term||t.name,pop:o,tier:o>=5e4?2:o>=1e4?3:o>=200?4:5,score:Math.max(wdScore(want,t.matched_term||""),wdScore(want,t.preferred_common_name||""),wdScore(want,t.name||""))}}),"INATURALIST");
    // si no es del grupo pedido, se busca qué es para contárselo a la IA
    if(!res){const o=await fuFetch(`https://api.inaturalist.org/v1/taxa/autocomplete?q=${encodeURIComponent(raw)}&locale=es&per_page=1`).catch(()=>null),t=o&&o.results&&o.results[0];
     if(t&&wdScore(want,t.matched_term||"")>=3)FU.note.set(key,`iNaturalist: "${t.matched_term}" es ${t.name} (${t.iconic_taxon_name||t.rank}), no es del grupo que pide la pregunta`)}}
@@ -1224,13 +1225,13 @@ async function fuCheck(pi,raw){const f=fuOf(pi);if(!f)return null;const key=pi+"
    const rows=[];for(const h of d.hits){const cats=(h.categories_tags||[]).join(" "),bs=[].concat(h.brands||[]).join(",").split(",").map(s=>s.trim()).filter(Boolean);
     if(ar&&!(h.countries_tags||[]).includes("en:argentina"))continue;if(!re.test(cats))continue;
     for(const b of bs)rows.push({label:b,score:wdScore(want,b),brand:1});if(!only&&h.product_name)rows.push({label:h.product_name,score:wdScore(want,h.product_name)})}
-   const n=rows.filter(r=>r.score>=3).length;res=fuBest(rows.map(r=>({...r,pop:n,tier:n>=10?3:n>=3?4:5})),"OPEN FOOD FACTS")}
+   const n=rows.filter(r=>r.score>=3).length;res=fuBest(rows.map(r=>({...r,pop:n,tier:n>=10?3:n>=2?4:5})),"OPEN FOOD FACTS")}
   else if(kind==="tm"){if(!AI.url)return null;
    const role=arg[0],who=arg.slice(2),pk="tm|"+who;
    if(!FU.list[pk]){const s=await fuFetch(AI.url+"?tmdb=search/person&query="+encodeURIComponent(who));if(!s||!s.results)throw new TypeError("sin TMDB");
     const p=s.results[0];if(!p)return null;const c=await fuFetch(AI.url+`?tmdb=person/${p.id}/movie_credits`);
     FU.list[pk]=role==="d"?(c.crew||[]).filter(m=>m.job==="Director"):(c.cast||[])}
-   res=fuBest(FU.list[pk].map(m=>{const v=m.vote_count||0;return {label:m.title,pop:v,tier:v>=1e4?2:v>=2e3?3:v>=300?4:5,score:Math.max(wdScore(want,m.title||""),wdScore(want,m.original_title||""))}}),"TMDB")}
+   res=fuBest(FU.list[pk].map(m=>{const v=m.vote_count||0;return {label:m.title,pop:v,tier:v>=1e4?2:v>=2e3?3:v>=60?4:5,score:Math.max(wdScore(want,m.title||""),wdScore(want,m.original_title||""))}}),"TMDB")}
   FU.ok[kind]=true;if(res)delete res._r;FU.cache.set(key,res)}
  // si la fuente no contesta nunca (link de Claude, sin internet o el Worker todavía sin esa parte) se apaga en esta partida
  catch(e){if(!FU.ok[kind]&&(e instanceof TypeError||e instanceof SyntaxError||(e&&/HTTP (404|501)/.test(e.message))))FU.on[kind]=false}
