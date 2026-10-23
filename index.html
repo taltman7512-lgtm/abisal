@@ -463,6 +463,17 @@ const INDEX=P.map((p,pi)=>{const list=[],map=new Map();
   add(v,e?{tier:e.tier,label:e.label}:{tier:4,label:v})}
  if(p.n)for(const it of [...list]){const w=words(it.src);if(w.length<2)continue;for(const t of [w[0],w[w.length-1]])if(t.length>=4&&!map.has(t))map.set(t,it)}
  MAPS[pi]=map;return list});
+// Mil respuestas: cada pregunta tiene un archivito mil/<id>.json con muchas más respuestas (bajadas de Wikidata, Wikipedia,
+// iNaturalist, MusicBrainz, TMDB… o escritas a mano; lo arma herramientas/mil_build.js). Se baja cuando aparece la pregunta
+// y se suma a la lista sin pisar las que ya estaban. En el link de Claude no está (no se puede bajar), se sigue con la lista de siempre.
+const MIL={done:new Set()};
+const milId=s=>{let h=2166136261;for(const c of s){h^=c.codePointAt(0);h=Math.imul(h,16777619)}return (h>>>0).toString(36)};
+function milAdd(pi,d){const map=MAPS[pi],list=INDEX[pi],p=P[pi];
+ for(const tier in d)for(const v of d[tier].split(",")){const l=v.trim(),key=norm(l);if(!key||map.has(key))continue;const it={tier:+tier,label:l,key,src:l};map.set(key,it);list.push(it);
+  for(const f of forms(key))if(!map.has(f))map.set(f,it);
+  if(p.n){const w=words(l);if(w.length>1)for(const t of [w[0],w[w.length-1]])if(t.length>=4&&!map.has(t))map.set(t,it)}}}
+function milLoad(pi){if(window.claude||MIL.done.has(pi)||!P[pi])return;MIL.done.add(pi);
+ fetch("mil/"+milId(P[pi].q)+".json").then(r=>r.ok?r.json():null).then(d=>{if(d)milAdd(pi,d)}).catch(()=>{})}
 // Versión "fonética" para perdonar errores típicos: b/v, s/z/c, ll/y, h muda, letras dobles, qu/k...
 const phon=k=>k.replace(/ph/g,"f").replace(/qu/g,"k").replace(/c([ei])/g,"s$1").replace(/c/g,"k").replace(/z/g,"s").replace(/v/g,"b").replace(/w/g,"u").replace(/ll/g,"y").replace(/h/g,"").replace(/y$/,"i").replace(/(.)\1+/g,"$1");
 const tolFor=n=>n>=11?3:n>=7?2:n>=4?1:0;
@@ -1297,7 +1308,7 @@ $("answer").addEventListener("input",()=>{const el=$("answer"),r=el.getBoundingC
 let bubCtx=null;
 $("startBtn").onclick=()=>mode==="run"?nextQ():startInf();
 
-function askPrompt(pi,eyebrow){current=pi;markSeen(pi);lobby(false);UI.card.hidden=false;$("introBody").hidden=true;$("hint").hidden=false;$("eyebrow").textContent=eyebrow;$("prompt").textContent=P[pi].q;bottleHintUI()}
+function askPrompt(pi,eyebrow){current=pi;milLoad(pi);markSeen(pi);lobby(false);UI.card.hidden=false;$("introBody").hidden=true;$("hint").hidden=false;$("eyebrow").textContent=eyebrow;$("prompt").textContent=P[pi].q;bottleHintUI()}
 function countdown(sec){phase="countdown";cd=sec;UI.bar.hidden=true;UI.pill.hidden=false}
 function beginAnswer(){phase="answering";UI.pill.hidden=true;UI.bar.hidden=false;$("skip").hidden=mode!=="inf";const a=$("answer");a.value="";a.focus()}
 
