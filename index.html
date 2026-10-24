@@ -2213,6 +2213,7 @@ const RULES={
  "Nombrá una palabra con todas las vocales":[w=>unaPal(w)&&[..."aeiou"].every(v=>w.includes(v)),"tiene que tener las cinco vocales (a, e, i, o, u)",1],
  "Nombrá una palabra que se escriba igual al revés (palíndromo)":[w=>{const l=letras(w);return unaPal(w)&&l.length>=3&&l===[...l].reverse().join("")},"tiene que leerse igual al derecho y al revés",1],
  "Nombrá una palabra de tres letras":[w=>unaPal(w)&&letras(w).length===3,"tiene que tener exactamente tres letras",1],
+ "Nombrá una palabra que empiece y termine con la misma letra":[w=>{const l=letras(w);return unaPal(w)&&l.length>=2&&l[0]===l[l.length-1]},"tiene que empezar y terminar con la misma letra",1],
  "Nombrá una palabra con \"ñ\"":[w=>unaPal(w)&&w.includes("ñ"),"tiene que tener una ñ",1],
  "Nombrá una palabra con \"x\"":[w=>unaPal(w)&&w.includes("x"),"tiene que tener una x",1],
  "Nombrá una palabra que empiece con \"Z\"":[w=>unaPal(w)&&/^z/.test(w),"tiene que empezar con z",1],
