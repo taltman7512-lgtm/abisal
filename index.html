@@ -160,7 +160,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--cyan);outline-o
 @keyframes bossIn{from{opacity:0;transform:translate(-50%,14px)}}
 /* Pantalla de inicio (lobby): la misma tarjeta, más ancha, centrada y con el logo */
 #logo{display:flex;align-items:center;gap:14px}
-#logo canvas{position:static;image-rendering:pixelated;filter:drop-shadow(0 0 10px rgba(255,61,110,.7));animation:float 2.4s ease-in-out infinite}
+#logo canvas{position:static;image-rendering:pixelated;width:57px;height:44px;filter:drop-shadow(0 0 10px rgba(255,61,110,.7));animation:float 2.4s ease-in-out infinite}
 #logo b{display:block;font:400 clamp(2.1rem,9vw,2.9rem)/1 var(--f-pix);letter-spacing:.14em;color:#fff;text-shadow:3px 0 var(--pink),-3px 0 var(--cyan),0 0 26px rgba(79,216,240,.45)}
 #logo small{display:block;margin-top:6px;font:400 .62rem var(--f-pix);letter-spacing:.22em;color:var(--dim)}
 #card.lobby{top:50%;transform:translate(-50%,-50%);width:min(540px,calc(100% - 32px));max-height:calc(100% - 32px);padding:24px 26px 20px;gap:14px;box-shadow:0 24px 70px rgba(0,0,0,.5),0 0 40px rgba(79,216,240,.08)}
@@ -290,6 +290,7 @@ pre.share{background:rgba(10,22,38,.9);border:1px solid var(--line);padding:12px
 .duelRes{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;text-align:center}
 .duelRes b{display:block;font:400 1.6rem var(--f-pix)}.duelRes span{font-size:.75rem;color:var(--dim)}
 .tdots{display:inline-flex;gap:3px;margin-left:6px;vertical-align:middle}.tdots i{width:4px;height:4px;background:var(--cyan);animation:tk 1.1s infinite ease-in-out}.tdots i:nth-child(2){animation-delay:.18s}.tdots i:nth-child(3){animation-delay:.36s}
+#sug{position:absolute;bottom:calc(100% + 10px);left:50%;transform:translateX(-50%);background:rgba(6,18,30,.95);border:2px solid #4fd8f0;padding:6px 12px;color:#d7e6f0;font-size:13px;text-align:center;white-space:nowrap;pointer-events:none;z-index:4}#sug b{color:#7ff6ff}#sug small{display:block;font-size:10px;letter-spacing:1px;opacity:.75;margin-top:2px}#sug[hidden]{display:none}
 #thinking{position:absolute;bottom:calc(100% + 10px);left:50%;transform:translateX(-50%);display:flex;gap:7px;pointer-events:none}#thinking[hidden]{display:none}
 #thinking i{width:8px;height:8px;background:var(--cyan);box-shadow:0 0 6px rgba(79,216,240,.6);animation:tk 1.1s infinite ease-in-out}
 #thinking i:nth-child(2){animation-delay:.18s}#thinking i:nth-child(3){animation-delay:.36s}
@@ -358,7 +359,7 @@ pre.share{background:rgba(10,22,38,.9);border:1px solid var(--line);padding:12px
 </div>
 
 <div id="card" class="notch">
-  <div id="logo" hidden><canvas id="logoKrill" width="44" height="24"></canvas><div><b>ABISAL</b><small>PESCA DE RESPUESTAS RARAS</small></div><button class="mode acctLobby" id="acctLobby"></button></div>
+  <div id="logo" hidden><canvas id="logoKrill" width="44" height="34"></canvas><div><b>ABISAL</b><small>PESCA DE RESPUESTAS RARAS</small></div><button class="mode acctLobby" id="acctLobby"></button></div>
   <span class="eyebrow" id="eyebrow">PESCA DIARIA</span>
   <h1 id="prompt">Cuanto más rara tu respuesta, más hondo se hunde.</h1>
   <p id="bottleHint" hidden></p>
@@ -382,7 +383,7 @@ pre.share{background:rgba(10,22,38,.9);border:1px solid var(--line);padding:12px
 </div>
 
 <form id="bar" autocomplete="off" hidden>
-  <div id="thinking" hidden aria-label="Pensando"><i></i><i></i><i></i></div>
+  <div id="sug" hidden></div><div id="thinking" hidden aria-label="Pensando"><i></i><i></i><i></i></div>
   <div id="ring"><svg viewBox="0 0 42 42"><circle cx="21" cy="21" r="17" fill="rgba(8,18,32,.95)" stroke="#1d3350" stroke-width="3"/><circle id="ringArc" cx="21" cy="21" r="17" fill="none" stroke="#4fd8f0" stroke-width="3" stroke-dasharray="106.8" stroke-dashoffset="0"/></svg><span id="ringTxt">25</span></div>
   <input id="answer" type="text" placeholder="escribí una respuesta…" aria-label="Tu respuesta" enterkeyhint="send" autocapitalize="off" spellcheck="false">
   <button class="btn" type="submit">BUCEAR</button>
@@ -1360,7 +1361,7 @@ $("startBtn").onclick=()=>mode==="run"?nextQ():startInf();
 
 function askPrompt(pi,eyebrow){current=pi;milLoad(pi);markSeen(pi);lobby(false);UI.card.hidden=false;$("introBody").hidden=true;$("hint").hidden=false;$("eyebrow").textContent=eyebrow;$("prompt").textContent=P[pi].q;bottleHintUI()}
 function countdown(sec){phase="countdown";cd=sec;UI.bar.hidden=true;UI.pill.hidden=false}
-function beginAnswer(){phase="answering";UI.pill.hidden=true;UI.bar.hidden=false;$("skip").hidden=mode!=="inf";const a=$("answer");a.value="";a.focus()}
+function beginAnswer(){phase="answering";sugUI();UI.pill.hidden=true;UI.bar.hidden=false;$("skip").hidden=mode!=="inf";const a=$("answer");a.value="";a.focus()}
 
 $("bar").addEventListener("submit",async e=>{e.preventDefault();if(phase!=="answering")return;const v=$("answer").value.trim();if(!v)return;let hit=judge(current,v);
  const rl=!hit&&RULES[P[current].q];if(rl&&!rl[0](ruleWord(v))){sfx.wrong();toast(`“${esc(v)}” no cumple: ${rl[1]}<small>PROBÁ OTRA</small>`,true);const a=$("answer");a.classList.remove("shake");void a.offsetWidth;a.classList.add("shake");a.select();return}
@@ -1386,6 +1387,9 @@ $("bar").addEventListener("submit",async e=>{e.preventDefault();if(phase!=="answ
   // si la IA no contestó (está saturada), no se cuenta como error: se puede volver a probar
   else if(AI.err){toast(`La IA está saturada y no pudo revisar “${esc(v)}”<small>NO PERDÉS TIEMPO · PROBÁ DE NUEVO</small>`,true);$("answer").select();return}}
  if(!hit){const src=[P[current].wd&&WD.on&&"Wikidata",P[current].wp&&WP.on&&"Wikipedia",fuOf(current)&&FU_NAME[fuOf(current).slice(0,2)]].filter(Boolean).join(" ni en ");sfx.wrong();toast(`“${esc(v)}” no está en la lista${src?" ni en "+src:""}${useAI&&AI.on?" y la IA no la aceptó":""}<small>PROBÁ OTRA</small>`,true);const a=$("answer");a.classList.remove("shake");void a.offsetWidth;a.classList.add("shake");a.select();return}
+ // como en Krillion: si lo escrito tiene errores de tipeo, primero se propone la corrección en el cuadro y hay que mandarla de nuevo
+ if(hit&&!hit.desc&&!hit.ai&&!hit.mem&&!hit.wk&&esTipeo(v,hit.src||hit.label)){const a=$("answer"),bien=String(hit.src||hit.label).split("/")[0];a.value=bien;sugUI(v,bien);a.focus();a.setSelectionRange(a.value.length,a.value.length);return}
+ sugUI();
  if(hit.wk)toast(`“${esc(v)}” → “${esc(hit.label)}”<small>ESTÁ EN EL DICCIONARIO (WIKCIONARIO)</small>`);
  else if(hit.mem)toast(`“${esc(v)}” → “${esc(hit.label)}”<small>YA LA CONOCÍAMOS · LA DECIDIÓ ${hit.mem}</small>`);
  else if(hit.fu)toast(`“${esc(v)}” → “${esc(hit.label)}”<small>VERIFICADA EN ${hit.fu}</small>`);
@@ -1394,6 +1398,9 @@ $("bar").addEventListener("submit",async e=>{e.preventDefault();if(phase!=="answ
  else if(!hit.exact)toast(`“${esc(v)}” → “${esc(hit.label)}”<small>${hit.desc?"ACEPTADA POR DESCRIPCIÓN":"SE ACEPTA CON ERRORES DE TIPEO"}</small>`);
  mode==="run"?runHit(hit):infHit(hit)});
 
+// "¿quisiste decir…?": hay error de tipeo si alguna palabra escrita no está tal cual (o en plural/singular) en lo encontrado
+function esTipeo(v,label){const lw=new Set(words(String(label)));return words(v).some(w=>!lw.has(w)&&!lw.has(w.replace(/e?s$/,""))&&!lw.has(w+"s")&&!lw.has(w+"es"))}
+function sugUI(v,l){const e=$("sug");if(!v){e.hidden=true;return}e.innerHTML=`“${esc(v)}” → <b>“${esc(l)}”</b><small>MANDALO DE NUEVO PARA CONFIRMAR · O CORREGILO</small>`;e.hidden=false}
 // --- La respuesta se hunde
 function sink(text,tier,then){phase="sinking";UI.bar.hidden=true;$("answer").blur();
  const start=cam+(Math.max(H*(W<700?.34:.3),scrY(0)+80)-surfY)/PPM,d=TIERS[tier].pts*M_PER_PT,plan=sinkPlan(tier,mode==="inf"),t=TIERS[tier];
@@ -1889,8 +1896,8 @@ function skinPal(c){if(c==="arcoiris"){const h=(Math.floor(T*2)%12)*30;return{X:
  const s=SKINS[c]||SKINS.rosa;if(s[4]){const [X,A,O]=s[4](T);return{X,A,O,g:hexRgb(s[1])}}return{X:s[1],A:s[2],O:s[3],g:hexRgb(s[1])}}
 // dibuja el krill (11×6) con su gorro, con la esquina de arriba a la izquierda en x0,y0 y cada píxel de k×k
 function paintKrill(ctx,x0,y0,dir,look,k,anim){const p=skinPal(look.c),a0=ctx.globalAlpha;ctx.imageSmoothingEnabled=false;if(look.c==="fantasma"||look.c==="transp")ctx.globalAlpha=a0*.55;
- ctx.drawImage(sprite(anim?frameOf("krill",0):"krill",{X:p.X,A:p.A,O:p.O},dir<0),x0,y0,11*k,6*k);
- const h=HATS[look.h];if(h){const rows=h[1],w=rows[0].length,hh=rows.length,dx=dir<0?11-h[2]-w:h[2],top=(h[3]||0)-(hh-1);
+ {const ks=krillPx({X:p.X,A:p.A,O:p.O},dir<0,anim?Math.floor(T*6)%2:0);ctx.drawImage(ks,x0,y0+6*k-ks.height*k*11/ks.width,11*k,ks.height*k*11/ks.width)}
+ const h=HATS[look.h];if(h){const cara=(h[3]||0)>0,rows=h[1],w=rows[0].length,hh=rows.length,dx=(dir<0?11-h[2]-w:h[2])+(cara?(dir<0?1:-1):0),top=(h[3]||0)-(hh-1)-(cara?2:0);   // anteojos y bigote más arriba: el camarón nuevo tiene la cara más alta
   for(let r=0;r<hh;r++)for(let c=0;c<w;c++){const ch=rows[r][dir<0?w-1-c:c];if(ch===".")continue;ctx.fillStyle=HPAL[ch];ctx.fillRect(x0+(dx+c)*k,y0+(top+r)*k,k,k)}}
  ctx.globalAlpha=a0}
 const KPX=new Map();
@@ -1912,7 +1919,7 @@ function drawKrill(x,y,dir){const p=skinPal(KRL.c);pcx.globalCompositeOperation=
  {const ks=krillPx({X:p.X,A:p.A,O:p.O},dir<0,Math.sin(T*6)>0?1:0);pcx.drawImage(ks,Math.round(x-ks.width/2),Math.round(y-ks.height/2))}
  if(KRL.h==="minero"){pcx.globalCompositeOperation="lighter";glowPx(x+(dir<0?-6:6),y-5,9,"255,250,200",.35);pcx.globalCompositeOperation="source-over"}}
 function krillCanvas(cv,look,k){cv.width=13*k;cv.height=11*k;const x=cv.getContext("2d");x.clearRect(0,0,cv.width,cv.height);paintKrill(x,k,5*k,1,look||{},k)}
-function paintLogoKrill(){const k=$("logoKrill"),x=k.getContext("2d"),p=skinPal(KRL.c);x.imageSmoothingEnabled=false;x.clearRect(0,0,44,24);if(KRL.c==="fantasma")x.globalAlpha=.6;x.drawImage(sprite("krill",{X:p.X,A:p.A,O:p.O}),0,0,44,24);x.globalAlpha=1}
+function paintLogoKrill(){const k=$("logoKrill"),x=k.getContext("2d"),p=skinPal(KRL.c);x.imageSmoothingEnabled=false;x.clearRect(0,0,k.width,k.height);if(KRL.c==="fantasma")x.globalAlpha=.6;x.drawImage(krillPx({X:p.X,A:p.A,O:p.O},false,0),0,0,k.width,k.height);x.globalAlpha=1}
 function paintKls(root){root.querySelectorAll("canvas[data-kl]").forEach(cv=>{let l={};try{l=JSON.parse(cv.dataset.kl)}catch(e){}krillCanvas(cv,l,2)})}
 function krillSet(ch){KRL={...KRL,...ch};if(!KRL.h)delete KRL.h;store.set("abisal-krill",KRL);paintLogoKrill();profStats()}
 
@@ -2258,7 +2265,7 @@ Object.assign(SKINS,{menta:["Menta","#7ef0c4","#d4fff0","#0a3324"],lila:["Lila",
  cebra:["Cebra","#f2f2f2","#202020","#000000"],camu:["Camuflaje","#5d7a3a","#8a6a3a","#1a2010"],choco:["Chocolate","#7a4a2a","#c08a5a","#1a0a04"],transp:["Transparente","#cfefff","#ffffff","#3a6a8a"],
  neon:["Neón","#39ff8e","#c4ffe0","#00301a",t=>Math.floor(t*6)%2?["#39ff8e","#c4ffe0","#00301a"]:["#1fae5e","#7fe0aa","#00301a"]],
  lava:["Lava","#ff4a1a","#ffd23d","#2a0800",t=>{const h=8+(Math.floor(t*5)%6)*5;return[`hsl(${h},95%,52%)`,`hsl(${h+30},100%,62%)`,"#2a0800"]}],
- hielo:["Hielo","#bfeeff","#ffffff","#2a5a7a"],
+ hielo:["Hielo","#bfeeff","#ffffff","#2a5a7a"],plateado:["Plateado","#b9c4ce","#ffffff","#27303a"],
  galaxia:["Galaxia","#2a1a5a","#ff9ad5","#ffffff",t=>Math.floor(t*3)%2?["#2a1a5a","#ffffff","#ff9ad5"]:["#321e6a","#b48cff","#ffffff"]],
  oro:["Oro brillante","#ffc23d","#fff3b0","#3a2400",t=>Math.floor(t*2)%3===0?["#ffe07a","#ffffff","#3a2400"]:["#ffc23d","#fff3b0","#3a2400"]],
  dragon:["Krill dragón","#2fd3a0","#ffd23d","#ff2a4a",t=>{const h=140+(Math.floor(t*6)%8)*12;return[`hsl(${h},80%,50%)`,`hsl(${(h+180)%360},95%,60%)`,"#ff2a4a"]}]});
@@ -2283,7 +2290,7 @@ const DPAL={S:"#e2c98f",K:"#5a4426",R:"#e8323c",W:"#f4f8fb",N:"#7a5230",P:"#ff7a
 // el catálogo: [id, categoría, valor, nombre, rareza]
 const ITEMS=[
  ["s-menta","skin","menta","Menta",1],["s-lila","skin","lila","Lila",1],["s-coral","skin","coral","Coral",1],["s-piedra","skin","piedra","Piedra",1],
- ["s-cebra","skin","cebra","Cebra",2],["s-camu","skin","camu","Camuflaje",2],["s-choco","skin","choco","Chocolate",2],["s-transp","skin","transp","Transparente",2],
+ ["s-dorado","skin","dorado","Dorado",2],["s-plata","skin","plateado","Plateado",2],["s-cebra","skin","cebra","Cebra",2],["s-camu","skin","camu","Camuflaje",2],["s-choco","skin","choco","Chocolate",2],["s-transp","skin","transp","Transparente",2],
  ["s-neon","skin","neon","Neón",3],["s-lava","skin","lava","Lava",3],["s-hielo","skin","hielo","Hielo",3],["s-galaxia","skin","galaxia","Galaxia",4],["s-oro","skin","oro","Oro brillante",4],["s-dragon","skin","dragon","Krill dragón",5],
  ["h-lentes","hat","lentes","Anteojos de sol",1],["h-bigote","hat","bigote","Bigote",1],["h-chef","hat","chef","Gorro de chef",1],["h-flores","hat","flores","Corona de flores",2],["h-auris","hat","auris","Auriculares",2],
  ["h-diablo","hat","diablo","Cuernitos de diablo",2],["h-cowboy","hat","cowboy","Sombrero de cowboy",3],["h-vikingo","hat","vikingo","Casco vikingo",3],["h-llamas","hat","llamas","Aureola de fuego",4],
