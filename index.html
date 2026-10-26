@@ -1241,7 +1241,11 @@ async function fuCheck(pi,raw){const f=fuOf(pi);if(!f)return null;const key=pi+"
 // ===================== Pistas para la IA =====================
 // Antes de preguntarle a la IA se buscan unas líneas en internet (Wikipedia, Wikcionario y lo que vio la fuente especializada)
 // y se las pasa como ayuda: así no depende solo de lo que recuerda. Van después de " [" para que la memoria del Worker no cambie.
-async function pistas(pi,raw){if(!WP.on)return "";const out=[],key=pi+"|"+norm(raw);if(FU.note.has(key))out.push(FU.note.get(key));
+// red: lo que ya trajo pistasRed (se busca al mismo tiempo que las fuentes); la nota de la fuente se suma acá, cuando ya terminó
+async function pistas(pi,raw,red){if(!WP.on)return "";const out=[],key=pi+"|"+norm(raw);if(FU.note.has(key))out.push(FU.note.get(key));
+ out.push(...(red||await pistasRed(pi,raw)));
+ return out.length?" [PISTAS de internet (solo ayuda, pueden no ser exactas): "+out.join(" | ").replace(/[\[\]]/g,"")+"]":""}
+async function pistasRed(pi,raw){if(!WP.on)return [];const out=[];
  const strip=s=>String(s||"").replace(/<[^>]*>/g,"").replace(/&quot;/g,'"').replace(/&amp;/g,"&").replace(/\s+/g," ").trim();
  try{const d=await wpFetch("action=query&list=search&srlimit=2&srprop=snippet&srsearch="+encodeURIComponent(raw),5000);
   for(const h of (d.query&&d.query.search)||[])out.push(`Wikipedia "${h.title}": ${strip(h.snippet).slice(0,110)}`)}catch(e){}
@@ -1249,7 +1253,7 @@ async function pistas(pi,raw){if(!WP.on)return "";const out=[],key=pi+"|"+norm(r
  if(!P[pi].wd&&!P[pi].wp&&!/\s/.test(raw.trim()))try{const c=new AbortController(),t=setTimeout(()=>c.abort(),5000);
   const d=await (await fetch("https://es.wiktionary.org/w/api.php?action=query&prop=extracts&explaintext=1&exchars=400&format=json&origin=*&titles="+encodeURIComponent(raw.trim().toLowerCase()),{signal:c.signal}).finally(()=>clearTimeout(t))).json();
   const p=Object.values(d.query.pages)[0];if(p&&p.extract){const m=p.extract.replace(/=+[^=]+=+/g," ").replace(/\s+/g," ").trim();out.push(`Wikcionario "${p.title}": ${m.slice(0,130)}`)}}catch(e){}
- return out.length?" [PISTAS de internet (solo ayuda, pueden no ser exactas): "+out.join(" | ").replace(/[\[\]]/g,"")+"]":""}
+ return out}
 
 // ===================== Memoria de todas las fuentes =====================
 // Antes de buscar en ningún lado se le pregunta al Worker si esa respuesta ya se decidió: por la IA, o por Wikidata,
@@ -1365,24 +1369,25 @@ function beginAnswer(){phase="answering";sugUI();UI.pill.hidden=true;UI.bar.hidd
 
 $("bar").addEventListener("submit",async e=>{e.preventDefault();if(phase!=="answering")return;const v=$("answer").value.trim();if(!v)return;let hit=judge(current,v);
  const rl=!hit&&RULES[P[current].q];if(rl&&!rl[0](ruleWord(v))){sfx.wrong();toast(`“${esc(v)}” no cumple: ${rl[1]}<small>PROBÁ OTRA</small>`,true);const a=$("answer");a.classList.remove("shake");void a.offsetWidth;a.classList.add("shake");a.select();return}
- // primero la memoria: si esa respuesta ya se decidió antes (por la IA o por otra fuente), vale lo mismo
- if(!hit&&!rl&&AI.url&&!CLAUDE_AI&&MEM.on!==false){const pi=current;phase="checking";
-  const r=await memCheck(pi,v);if(phase!=="checking"||current!==pi)return;phase="answering";if(r)hit=r}
- // si no está en la lista, se consulta Wikidata (el reloj se pausa mientras busca)
- if(!hit&&P[current].wd&&WD.on){const pi=current;phase="checking";
-  const r=await wdCheck(pi,v);if(phase!=="checking"||current!==pi)return;phase="answering";if(r)hit=r}
- // y si tampoco está ahí, en Wikipedia
- if(!hit&&P[current].wp&&WP.on){const pi=current;phase="checking";
-  const r=await wpCheck(pi,v);if(phase!=="checking"||current!==pi)return;phase="answering";if(r)hit=r}
- // y si tampoco, en la fuente especializada de la pregunta (iNaturalist, PokéAPI, MusicBrainz, Open Food Facts, TMDB)
- if(!hit&&fuOf(current)){const pi=current;phase="checking";
-  const r=await fuCheck(pi,v);if(phase!=="checking"||current!==pi)return;phase="answering";if(r)hit=r}
+ // si no está en la lista se busca en todos lados a la vez (el reloj se pausa mientras busca): la memoria (si esa
+ // respuesta ya se decidió antes, vale lo mismo), Wikidata, Wikipedia y la fuente especializada de la pregunta
+ // (iNaturalist, PokéAPI, MusicBrainz, Open Food Facts, TMDB); manda la primera de esa lista que la encuentre.
+ // Las pistas para la IA también se buscan ya, por si nadie la encuentra.
+ let pzP=null;
+ if(!hit){const pi=current,q=[];
+  if(!rl&&AI.url&&!CLAUDE_AI&&MEM.on!==false)q.push(memCheck(pi,v));
+  if(P[pi].wd&&WD.on)q.push(wdCheck(pi,v));
+  if(P[pi].wp&&WP.on)q.push(wpCheck(pi,v));
+  if(fuOf(pi))q.push(fuCheck(pi,v));
+  if(!rl&&v.length>=2&&(CLAUDE_AI||(AI.url&&AI.on)))pzP=pistasRed(pi,v).catch(()=>[]);
+  if(q.length){phase="checking";
+   const rs=await Promise.all(q.map(p=>p.catch(()=>null)));if(phase!=="checking"||current!==pi)return;phase="answering";hit=rs.find(r=>r)||null}}
  // lo que aceptó una fuente se manda a la memoria (vale para todos cuando lo confirma otro jugador)
  if(hit&&(hit.wd||hit.wp||hit.fu))memSave(current,v,hit);
  // y si nada la encontró, se le pregunta a la IA (en cualquier pregunta)
  const useAI=!hit&&v.length>=2&&(CLAUDE_AI||(AI.url&&AI.on));
  if(useAI){const pi=current;phase="checking";
-  const pz=rl?"":await pistas(pi,v);let r=await aiCheck(pi,v,rl?{datos:false,extra:RULE_NOTE}:{pistas:pz});if(!r&&AI.err&&rl&&rl[2]&&WP.on)r=await wikcCheck(v);
+  const pz=rl?"":await pistas(pi,v,pzP&&await pzP);let r=await aiCheck(pi,v,rl?{datos:false,extra:RULE_NOTE}:{pistas:pz});if(!r&&AI.err&&rl&&rl[2]&&WP.on)r=await wikcCheck(v);
   if(phase!=="checking"||current!==pi)return;phase="answering";if(r)hit=r;
   // si la IA no contestó (está saturada), no se cuenta como error: se puede volver a probar
   else if(AI.err){toast(`La IA está saturada y no pudo revisar “${esc(v)}”<small>NO PERDÉS TIEMPO · PROBÁ DE NUEVO</small>`,true);$("answer").select();return}}
