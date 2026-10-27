@@ -1401,7 +1401,17 @@ $("bar").addEventListener("submit",async e=>{e.preventDefault();if(phase!=="answ
  else if(hit.wd||hit.wp)toast(`“${esc(v)}” → “${esc(hit.label)}”<small>VERIFICADA EN ${hit.wd?"WIKIDATA":"WIKIPEDIA"}</small>`);
  else if(hit.ai)toast(`“${esc(v)}” → “${esc(hit.label)}”<small>${hit.g?"ACEPTADA POR LA IA · LA BUSCÓ EN GOOGLE":"ACEPTADA POR LA IA"}</small>`);
  else if(!hit.exact)toast(`“${esc(v)}” → “${esc(hit.label)}”<small>${hit.desc?"ACEPTADA POR DESCRIPCIÓN":"SE ACEPTA CON ERRORES DE TIPEO"}</small>`);
+ cuentaSumar(current,hit);
  mode==="run"?runHit(hit):infHit(hit)});
+
+// Conteo de respuestas (como Krillion): cada respuesta aceptada suma 1 en Firestore, cuentas/{id de la pregunta} =
+// {q, total, r:{respuesta normalizada: cuántas veces}}. Sirve para calcular la rareza real con herramientas/conteo.js.
+// Cuenta una vez por pregunta y respuesta en cada partida; el explorador no cuenta. Sin la regla "match /cuentas" Firestore
+// contesta permission-denied y no pasa nada.
+const CUENTA={hechas:new Set()};
+function cuentaSumar(pi,hit){const F=ACCT.fb;if(!F||!hit||!P[pi]||(R&&R.explorer))return;
+ const k=norm(String(hit.src||hit.label).split("/")[0]).slice(0,60),id=pi+"|"+k;if(!k||CUENTA.hechas.has(id))return;CUENTA.hechas.add(id);
+ F.setDoc(F.doc(F.db,"cuentas",milId(P[pi].q)),{q:P[pi].q,total:F.increment(1),r:{[k]:F.increment(1)}},{merge:true}).catch(()=>{})}
 
 // "¿quisiste decir…?": hay error de tipeo si alguna palabra escrita no está tal cual (o en plural/singular) en lo encontrado
 function esTipeo(v,label){const lw=new Set(words(String(label)));return words(v).some(w=>!lw.has(w)&&!lw.has(w.replace(/e?s$/,""))&&!lw.has(w+"s")&&!lw.has(w+"es"))}
