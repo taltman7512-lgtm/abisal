@@ -1393,7 +1393,7 @@ $("bar").addEventListener("submit",async e=>{e.preventDefault();if(phase!=="answ
   else if(AI.err){toast(`La IA está saturada y no pudo revisar “${esc(v)}”<small>NO PERDÉS TIEMPO · PROBÁ DE NUEVO</small>`,true);$("answer").select();return}}
  if(!hit){const src=[P[current].wd&&WD.on&&"Wikidata",P[current].wp&&WP.on&&"Wikipedia",fuOf(current)&&FU_NAME[fuOf(current).slice(0,2)]].filter(Boolean).join(" ni en ");sfx.wrong();toast(`“${esc(v)}” no está en la lista${src?" ni en "+src:""}${useAI&&AI.on?" y la IA no la aceptó":""}<small>PROBÁ OTRA</small>`,true);const a=$("answer");a.classList.remove("shake");void a.offsetWidth;a.classList.add("shake");a.select();return}
  // como en Krillion: si lo escrito tiene errores de tipeo, primero se propone la corrección en el cuadro y hay que mandarla de nuevo
- if(hit&&!hit.desc&&!hit.ai&&!hit.mem&&!hit.wk&&esTipeo(v,hit.src||hit.label)){const a=$("answer"),bien=String(hit.src||hit.label).split("/")[0];a.value=bien;sugUI(v,bien);a.focus();a.setSelectionRange(a.value.length,a.value.length);return}
+ if(hit&&!hit.exact&&!hit.desc&&!hit.ai&&!hit.mem&&!hit.wk&&esTipeo(v,hit.src||hit.label)){const a=$("answer"),bien=String(hit.src||hit.label).split("/")[0];a.value=bien;sugUI(v,bien);a.focus();a.setSelectionRange(a.value.length,a.value.length);return}
  sugUI();
  if(hit.wk)toast(`“${esc(v)}” → “${esc(hit.label)}”<small>ESTÁ EN EL DICCIONARIO (WIKCIONARIO)</small>`);
  else if(hit.mem)toast(`“${esc(v)}” → “${esc(hit.label)}”<small>YA LA CONOCÍAMOS · LA DECIDIÓ ${hit.mem}</small>`);
