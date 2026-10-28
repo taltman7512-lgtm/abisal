@@ -40,6 +40,7 @@ html,body{height:100%;overflow:hidden}
 body{background:#0a1626;color:var(--ink);font-family:var(--f-mono);font-size:15px;padding-inline:16px;-webkit-font-smoothing:antialiased}
 canvas{position:fixed;left:0;top:0;display:block}
 #px{image-rendering:pixelated;image-rendering:crisp-edges}
+#agua{image-rendering:auto}
 #hi{width:100%;height:100%;pointer-events:none}
 #crt{position:fixed;inset:0;pointer-events:none;z-index:50;background:repeating-linear-gradient(0deg,rgba(0,0,0,.10) 0 1px,transparent 1px 3px),radial-gradient(ellipse at center,transparent 42%,rgba(0,4,10,.62))}
 #dark{position:fixed;inset:0;pointer-events:none;z-index:8;opacity:0;background:radial-gradient(circle at var(--x,50%) var(--y,50%),rgba(1,3,8,0) 0,rgba(1,3,8,0) 70px,rgba(1,3,8,.97) 250px)}
@@ -222,6 +223,28 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--cyan);outline-o
 .bigScore{display:flex;align-items:baseline;gap:10px;font-family:var(--f-pix)}
 .bigScore b{font-size:clamp(3.4rem,15vw,4.8rem);font-weight:400;line-height:1;color:#f2f7fa}
 .bigScore span{color:var(--dim);font-size:.8rem}.bigScore em{font-style:normal;color:var(--cyan);font-size:.8rem}
+/* tu pesca: repaso de las 7 rondas con todas las respuestas */
+.pesca{display:flex;flex-direction:column;gap:6px}
+.pr{border:1px solid var(--line);background:rgba(10,22,38,.7)}.pr.on{border-color:var(--cyan)}
+.prH{display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;background:none;border:0;color:var(--ink);text-align:left;cursor:pointer;font:inherit}
+.prH:hover{background:rgba(79,216,240,.06)}
+.prI{width:30px;flex:none;display:flex;justify-content:center}
+.prT{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.prT small{font-size:.66rem;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prT b{font-size:.92rem;overflow-wrap:anywhere}
+.prH em{font:400 .8rem var(--f-pix);font-style:normal;flex:none}
+.prB{padding:0 10px 10px}
+.prTabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
+.prTabs button{font:400 .55rem var(--f-pix);letter-spacing:.06em;padding:5px 7px;background:rgba(8,18,32,.9);color:var(--c,var(--ink));border:1px solid var(--line);cursor:pointer}
+.prTabs button.on{border-color:var(--c,var(--cyan));background:rgba(79,216,240,.12)}
+.prQ{width:100%;box-sizing:border-box;background:rgba(8,18,32,.95);border:1px solid var(--line);color:var(--ink);padding:8px 10px;font:inherit;font-size:.85rem}
+.prQ:focus{border-color:var(--cyan);outline:none}
+.prL{max-height:260px;overflow-y:auto;margin-top:6px}
+.prL div{display:flex;align-items:center;gap:8px;padding:4px 2px;font-size:.82rem;border-bottom:1px solid rgba(42,68,97,.35)}
+.prL i{width:8px;height:8px;flex:none}.prL span{flex:1;overflow-wrap:anywhere}.prL b{font:400 .62rem var(--f-pix)}
+.prL div.mio{background:rgba(255,209,102,.14)}
+.prL p{font-size:.8rem;color:var(--dim);margin:8px 0}
+.prN{display:block;margin-top:6px;font-size:.66rem;color:var(--dim)}
 .sec{font:400 .65rem var(--f-pix);letter-spacing:.2em;color:var(--dim);border-bottom:1px dashed var(--line);padding-bottom:6px}
 .sec span{color:#4f6b84;margin-left:8px}
 .log{display:grid;grid-template-columns:34px repeat(7,1fr);height:190px;position:relative;font:400 .55rem var(--f-pix);color:#4f6b84}
@@ -320,7 +343,7 @@ pre.share{background:rgba(10,22,38,.9);border:1px solid var(--line);padding:12px
 #bottleHint{margin:8px 0 0;font-size:.82rem;color:#f1e3c0;background:rgba(160,112,58,.18);border-left:3px solid #a0703a;padding:5px 9px}
 </style>
 
-<canvas id="px" aria-hidden="true"></canvas>
+<canvas id="agua" aria-hidden="true"></canvas><canvas id="px" aria-hidden="true"></canvas>
 <canvas id="hi" aria-hidden="true"></canvas>
 <div id="dim" style="opacity:0"></div>
 <div id="dark"></div>
@@ -615,8 +638,10 @@ function iconCanvas(t,scale){const s=sprite(TIER_SPR[t],tierPal(t));const c=docu
 
 // ===================== Escena =====================
 const pc=$("px"),pcx=pc.getContext("2d"),hc=$("hi"),hcx=hc.getContext("2d");
+// el agua y el cielo van en un lienzo aparte que se agranda suave (sin píxeles ni tramado); en #px queda transparente donde hay agua
+const ac=$("agua"),acx=ac.getContext("2d");let aimg,abuf;
 const PX=3;let W,H,pw,ph,img,buf,PPM,surfY;
-function resize(){W=Math.max(1,innerWidth);H=Math.max(1,innerHeight);pw=Math.ceil(W/PX);ph=Math.ceil(H/PX)+1;pc.width=pw;pc.height=ph;pc.style.width=pw*PX+"px";pc.style.height=ph*PX+"px";
+function resize(){W=Math.max(1,innerWidth);H=Math.max(1,innerHeight);pw=Math.ceil(W/PX);ph=Math.ceil(H/PX)+1;pc.width=pw;pc.height=ph;pc.style.width=pw*PX+"px";pc.style.height=ph*PX+"px";ac.width=pw;ac.height=ph;ac.style.width=pw*PX+"px";ac.style.height=ph*PX+"px";aimg=acx.createImageData(pw,ph);abuf=new Uint32Array(aimg.data.buffer);
  img=pcx.createImageData(pw,ph);buf=new Uint32Array(img.data.buffer);const d=Math.min(2,devicePixelRatio||1);hc.width=W*d;hc.height=H*d;hcx.setTransform(d,0,0,d,0,0);
  PPM=W<700?1.5:2;surfY=H*(W<700?.2:.22)}
 resize();addEventListener("resize",resize);
@@ -712,31 +737,30 @@ const shelfTop=x=>{const u=x/pw;return 5*Math.exp(-(((u-.115)/.024)**2))-3.5*Mat
 let SPF=[];function agujas(){const p=.45,SL=230,camV=cam*p,top=camV-surfY/PPM-60,bot=camV+(H-surfY)/PPM+300;SPF=[];
  for(let j=Math.floor(top/SL);j<=Math.floor(bot/SL);j++){if(j<2)continue;for(let q=0;q<2;q++){const id=j*2+q;if(hash(id,61)<.35)continue;
   const xc=(.1+.8*hash(id,62))*pw,hw=8+hash(id,63)*14,hgt=90+hash(id,64)*170,yb=(j*SL+SL-camV)*PPM/PX+surfY/PX;SPF.push({xc,hw,hgt,yb,top:yb-hgt,id,lit:clamp(1-(j*SL)/3000,.35,1)})}}}
-function agujaEn(x,y){for(const a of SPF){if(y<a.top||y>a.yb)continue;const u=(a.yb-y)/a.hgt,w=a.hw*(1-u)**.8+(hash(a.id*31+(y>>2),67)-.5)*2.4,b=(hash(a.id*17+(y>>3),68)-.5)*2;if(Math.abs(x-a.xc-b)<w)return a.lit}return 0}
+function agujaEn(x,y){for(const a of SPF){if(y<a.top||y>a.yb)continue;const u=(a.yb-y)/a.hgt,w=a.hw*(1-u)**.8+Math.sin(y*.21+a.id*1.7)*.9+Math.sin(y*.07+a.id)*1.1,b=Math.sin(y*.05+a.id*2.3)*1.2;if(Math.abs(x-a.xc-b)<w)return a.lit}return 0}
 let SOFF=0;   // fracción de píxel que se corre el lienzo (desplazamiento suave): lo que se ubica en coordenadas de pantalla la suma
 const BCOL=new Float32Array(12),BPK=new Uint32Array(4),SPI=new Float32Array(300);
 function bg(){agujas();WLC.clear();if(RKW!==pw){RKC.clear();RKW=pw}const F=FLOOR=floorOn()?floorBase():0,y268=scrY(268)/PX,swL=wallL(272),shelfOn=y268>-8&&y268<ph+8;
  if(F){if(!FLM||FLM.length!==pw){FLM=new Float32Array(pw);FY=new Float32Array(pw)}for(let x=0;x<pw;x++){FLM[x]=floorM(x,F);FY[x]=scrY(FLM[x])/PX}}
  for(let y=0;y<ph;y++){const sy=y*PX+PX/2,m=cam+(sy-surfY)/PPM,row=y*pw;
-  if(m<-6){const t=clamp(sy/surfY,0,1),d=(y&1)?5:0;buf.fill(skyPack(t,d),row,row+pw);continue}
-  const wc=nightWater(waterAt(Math.max(0,m)),m),wl=wallL(m),wr=wallR(m),rayA=m<320?(1-Math.max(0,m)/320)*16*(1-SKY.n*.85)*(WEATHER==="clear"?1:.5):0,dotA=m>700?Math.min(1,(m-700)/600)*5:0,wrow=Math.floor(m*PPM/PX);
-  // agua: los 4 colores con su tramado se calculan una vez por fila; las agujas del fondo como tramos de la fila
-  const b4=(y&3)*4,BC=BCOL;for(let i=0;i<4;i++){const bd=(B4[b4+i]/16-.5)*5;BC[i*3]=wc[0]+bd;BC[i*3+1]=wc[1]+bd;BC[i*3+2]=wc[2]+bd;BPK[i]=pack(BC[i*3],BC[i*3+1],BC[i*3+2])}
-  let sp=0;if(m>350)for(const a of SPF){if(y<a.top||y>a.yb)continue;const u=(a.yb-y)/a.hgt,w=a.hw*(1-u)**.8+(hash(a.id*31+(y>>2),67)-.5)*2.4,b=(hash(a.id*17+(y>>3),68)-.5)*2;if(w<=0)continue;SPI[sp++]=a.xc+b-w;SPI[sp++]=a.xc+b+w;SPI[sp++]=a.lit}
-  const lisa=!sp&&!rayA&&!dotA;
+  if(m<-6){const t=clamp(sy/surfY,0,1);abuf.fill(skyPack(t,0),row,row+pw);buf.fill(0,row,row+pw);continue}
+  const wc=nightWater(waterAt(Math.max(0,m)),m),wl=wallL(m),wr=wallR(m),rayA=m<320?(1-Math.max(0,m)/320)*16*(1-SKY.n*.85)*(WEATHER==="clear"?1:.5):0,wrow=Math.floor(m*PPM/PX);
+  // agua: un color liso por fila (en el lienzo suave); las agujas del fondo como tramos de la fila
+  const wp=pack(wc[0],wc[1],wc[2]);abuf.fill(wp,row,row+pw);
+  let sp=0;if(m>350)for(const a of SPF){if(y<a.top||y>a.yb)continue;const u=(a.yb-y)/a.hgt,w=a.hw*(1-u)**.8+Math.sin(y*.21+a.id*1.7)*.9+Math.sin(y*.07+a.id)*1.1,b=Math.sin(y*.05+a.id*2.3)*1.2;if(w<=0)continue;SPI[sp++]=a.xc+b-w;SPI[sp++]=a.xc+b+w;SPI[sp++]=a.lit}
+  const lisa=!sp&&!rayA;
   const skyT=clamp(sy/surfY,0,1),skyC=skyPack(skyT,0);let rc=RKC.get(wrow);if(!rc){if(RKC.size>3000)RKC.clear();rc=new Uint32Array(pw);RKC.set(wrow,rc)}
   for(let x=0;x<pw;x++){
-   if(m<6){const s=Math.sin(x*.16+T*1.5)*1.1+Math.sin(x*.045-T*.8)*.9,dp=m*PPM/PX-s;if(dp<0){buf[row+x]=skyC;continue}if(dp<1.2){buf[row+x]=pack(176,222,234);continue}}
+   if(m<6){const s=Math.sin(x*.16+T*1.5)*1.1+Math.sin(x*.045-T*.8)*.9,dp=m*PPM/PX-s;if(dp<0){abuf[row+x]=skyC;buf[row+x]=0;continue}if(dp<1.2){buf[row+x]=pack(176,222,234);continue}}
    if(F&&m>=FLM[x]){let c=rc[x];if(!c||c===1){c=rockPx(x,wrow,0,m);rc[x]=c}buf[row+x]=c;continue}
    let dip=false;if(shelfOn&&x<swL){const st=shelfTop(x),dy=y268-(y+.5);if(st>0&&dy>0&&dy<st){buf[row+x]=rockPx(x,wrow,st-dy,272);continue}if(st<0&&dy<=0&&dy>st)dip=true}
    if(!dip&&((wl>0&&x<wl+RB)||(wr>0&&x>=pw-wr-RB))){let c=rc[x];if(!c){c=((wl>0&&x<wl-RB)||(wr>0&&x>=pw-wr+RB))?rockPx(x,wrow,0,m):(rocaBorde(x,wrow,m,x<pw/2)||1);rc[x]=c}if(c!==1){buf[row+x]=c;continue}}
-   if(lisa){buf[row+x]=BPK[x&3];continue}
-   const q=(x&3)*3;let r=BC[q],g=BC[q+1],b=BC[q+2];
+   buf[row+x]=0;if(lisa)continue;
+   let r=wc[0],g=wc[1],b=wc[2];
    for(let k=0;k<sp;k+=3)if(x>SPI[k]&&x<SPI[k+1]){const ag=SPI[k+2];r+=9*ag;g+=12*ag;b+=16*ag;break}
    if(rayA){const k=((x+y*.55+T*3)%46+46)%46;if(k<8){r+=rayA*.55;g+=rayA*.9;b+=rayA}}
-   if(dotA&&x%3===0&&y%3===0){r+=dotA;g+=dotA;b+=dotA*1.5}
-   buf[row+x]=pack(r,g,b)}}
- pcx.putImageData(img,0,0)}
+   abuf[row+x]=pack(r,g,b)}}
+ pcx.putImageData(img,0,0);acx.putImageData(aimg,0,0)}
 // textura de roca: bloques grandes y chicos, grietas, la cara de arriba de cada bloque iluminada,
 // el borde que da al agua más claro, y todo se va oscureciendo con la profundidad
 // relieve: ruido suave en tres tamaños (bultos grandes, piedras medianas, grano chico); la luz viene de arriba a la izquierda
@@ -869,7 +893,8 @@ function scene(dt){
  const dCam=(cam-prevCam)*PPM/PX;prevCam=cam;
  if(tagState&&tagState.moving)for(let j=0;j<2;j++)bubbles.push({x:tagState.x/PX+(Math.random()-.5)*tagState.w/PX*.5,y:tagState.y/PX,v:6+Math.random()*10,life:2.2});
  pcx.fillStyle="rgba(190,225,240,.7)";for(let i=bubbles.length-1;i>=0;i--){const b=bubbles[i];b.y-=b.v*dt+dCam;b.x+=Math.sin(T*5+i)*.08;b.life-=dt;if(b.life<=0||b.y<pyOf(0)){bubbles.splice(i,1);continue}pcx.fillRect(Math.round(b.x),Math.round(b.y),1,1);if(i%3===0)pcx.fillRect(Math.round(b.x)+1,Math.round(b.y)-1,1,1)}
- pcx.fillStyle="rgba(170,205,225,.35)";for(const s of snow){s.y-=(s.v*dt+dCam*s.par)/ph;if(s.y<-.02)s.y+=1.04;if(s.y>1.02)s.y-=1.04;const py=s.y*ph;if(py<pyOf(0)+3||(FLOOR&&py>=FY[Math.min(pw-1,Math.floor(s.x*pw))]))continue;pcx.fillRect(Math.round(s.x*pw),Math.round(py),1,1)}
+// (la nieve marina se sacó: el dueño no quería puntitos en el fondo)
+ if(0)for(const s of snow){s.y-=(s.v*dt+dCam*s.par)/ph;if(s.y<-.02)s.y+=1.04;if(s.y>1.02)s.y-=1.04;const py=s.y*ph;if(py<pyOf(0)+3||(FLOOR&&py>=FY[Math.min(pw-1,Math.floor(s.x*pw))]))continue;pcx.fillRect(Math.round(s.x*pw),Math.round(py),1,1)}
  plankGlow(dt);worldFront(dt);celebFX(dt);
  // bolsa de aire: un grupito de burbujas transparentes que sube despacio por el agua hacia la superficie; si la tocás, +10 s
  // y las burbujas suben y se desvanecen en unos 2,5 s
@@ -1694,6 +1719,31 @@ function bestiarioSheet(page=0,sel,other){const b=other?Object.fromEntries(CR.ma
   $("endIn").querySelectorAll(".slot").forEach(s=>s.classList.toggle("sel",+s.dataset.id===id))};
  $("endIn").querySelectorAll(".slot.ok").forEach(s=>s.onclick=()=>info(+s.dataset.id));if(sel)info(sel);
  $("bPrev").onclick=()=>bestiarioSheet(page-1,0,other);$("bNext").onclick=()=>bestiarioSheet(page+1,0,other);$("back").onclick=()=>other?friendsSheet():go("lobby")}
+// Tu pesca (como el repaso de Krillion): las 7 rondas con tu respuesta; al tocar una se abren todas las respuestas
+// que valían, separadas por nivel y con un buscador para fijarse si estaba la que pensaste. Sin estadísticas de otros jugadores.
+function pescaHTML(){if(!R.picks||!R.results.length)return "";
+ return `<div class="sec">TU PESCA<span>TOCÁ UNA RONDA PARA VER TODAS LAS RESPUESTAS</span></div><div class="pesca">${R.results.map((r,i)=>{const pi=R.picks[i],t=r.tier>=0?TIERS[r.tier]:null;if(!P[pi])return "";
+  return `<div class="pr" data-i="${i}"><button class="prH" type="button"><span class="prI" data-t="${r.tier}"></span><span class="prT"><small>${i+1}. ${esc(P[pi].q)}</small><b>${t?esc(r.answer||"—"):"SIN RESPUESTA"}</b></span><em style="color:${t?t.color:"var(--dim)"}">${t?"+"+t.pts:"0"}</em></button><div class="prB" hidden></div></div>`}).join("")}</div>`}
+function pescaInit(){const box=$("endIn").querySelector(".pesca");if(!box)return;
+ box.querySelectorAll(".prI[data-t]").forEach(s=>{const t=+s.dataset.t;if(t>=0){const c=iconCanvas(t,2);c.style.height="20px";s.append(c)}});
+ box.querySelectorAll(".pr").forEach(row=>{const i=+row.dataset.i,body=row.querySelector(".prB");
+  row.querySelector(".prH").onclick=()=>{const abrir=body.hidden;box.querySelectorAll(".prB").forEach(b=>b.hidden=true);box.querySelectorAll(".pr").forEach(r=>r.classList.remove("on"));
+   if(abrir){row.classList.add("on");body.hidden=false;pescaAbrir(body,R.picks[i],R.results[i])}}})}
+function pescaAbrir(body,pi,res){milLoad(pi);let filtro=-1,q="",lista=[];const mio=res&&res.tier>=0?norm(res.answer):"",TOPE=300;
+ const armar=()=>{const vis=new Set();lista=[];for(const e of INDEX[pi]){const k=norm(e.label);if(!k||vis.has(k))continue;vis.add(k);lista.push({e,k})}lista.sort((a,b)=>b.e.tier-a.e.tier||a.e.label.localeCompare(b.e.label,"es"))};
+ body.innerHTML=`<div class="prTabs"></div><input class="prQ" type="search" placeholder="Buscá una respuesta… ¿estaba la tuya?" autocomplete="off" spellcheck="false"><div class="prL"></div><small class="prN"></small>`;
+ const tabs=body.querySelector(".prTabs"),inp=body.querySelector(".prQ"),L=body.querySelector(".prL"),N=body.querySelector(".prN");
+ const pint=()=>{const n=[0,0,0,0,0,0];for(const x of lista)n[x.e.tier]++;
+  tabs.innerHTML=`<button type="button" data-f="-1" class="${filtro<0?"on":""}">TODAS ${lista.length}</button>`+[5,4,3,2,1,0].filter(t=>n[t]).map(t=>`<button type="button" data-f="${t}" class="${filtro===t?"on":""}" style="--c:${TIERS[t].color}">${TIERS[t].name} ${n[t]}</button>`).join("");
+  const qq=norm(q),ver=lista.filter(x=>(filtro<0||x.e.tier===filtro)&&(!qq||x.k.includes(qq)));
+  L.innerHTML=ver.slice(0,TOPE).map(x=>{const t=TIERS[x.e.tier];return `<div class="${x.k===mio?"mio":""}"><i style="background:${t.color}"></i><span>${esc(x.e.label)}</span><b style="color:${t.color}">+${t.pts}</b></div>`}).join("")
+   ||`<p>${qq?"No está en la lista. Igual puede valer: en el juego también la buscan Wikipedia, Wikidata y la IA.":"Sin respuestas."}</p>`;
+  N.textContent=ver.length>TOPE?`Mostrando ${TOPE} de ${ver.length} · buscá para encontrar más`:`${ver.length} de ${lista.length} respuestas`};
+ tabs.onclick=e=>{const b=e.target.closest("[data-f]");if(!b)return;filtro=+b.dataset.f;pint()};
+ inp.oninput=()=>{q=inp.value;pint()};
+ armar();pint();
+ // si las respuestas guardadas (mil/) todavía estaban bajando, se vuelve a armar cuando llegan
+ let k=0;const re=setInterval(()=>{if(++k>10||!body.isConnected||body.hidden){clearInterval(re);return}const n0=lista.length;armar();if(lista.length!==n0)pint()},500)}
 function endRun(){sfx.end();logrosRun();const pts=runPts(),m=pts*M_PER_PT;let best=0;if(R.kind==="daily"){best=store.get("abisal-dbest")||0;if(pts>best)store.set("abisal-dbest",pts)}
  const bear=BEARING.find(b=>pts>=b[0]&&pts<=b[1])||BEARING[0];
  const cols=R.results.map((r,i)=>{const t=r.tier>=0?TIERS[r.tier]:null,h=t?t.pts:2;return `<div class="logcol" style="--c:${t?t.color:"#3a4654"};--c0:${t?t.color+"22":"#3a465422"}"><div class="ln" style="height:${h*1.5}px"></div><span data-i="${i}"></span><span class="num">${i+1}</span></div>`}).join("");
@@ -1704,6 +1754,7 @@ function endRun(){sfx.end();logrosRun();const pts=runPts(),m=pts*M_PER_PT;let be
  ${catchHTML()}
  <div class="sec">REGISTRO DE INMERSIÓN<span>MÁS HONDO = MÁS RARO</span></div>
  <div class="log"><div class="ax"><span>0</span><span>-25</span><span>-50</span><span>-75</span><span>-100</span></div>${cols}</div>
+ ${pescaHTML()}
  <div class="sec">TU RUMBO</div><div class="bear">${BEARING.map(b=>`<div class="${b===bear?"me":""}"><span data-t="${b[2]}"></span><b style="color:${TIERS[b[2]].color}">${b[0]}–${b[1]}</b><span>${b[3]}</span></div>`).join("")}</div>
  <pre class="share">${esc(share)}</pre>
  <div class="row"><button class="btn" id="copyBtn">COPIAR RESULTADO</button>${again}</div>
@@ -1714,7 +1765,7 @@ function endRun(){sfx.end();logrosRun();const pts=runPts(),m=pts*M_PER_PT;let be
  $("endIn").querySelectorAll(".logcol span[data-i]").forEach(s=>{const r=R.results[+s.dataset.i];if(r.tier>=0){const c=iconCanvas(r.tier,2);c.style.filter=`drop-shadow(0 0 4px ${TIERS[r.tier].color})`;s.append(c)}});
  $("endIn").querySelectorAll(".bear span[data-t]").forEach(s=>{const c=iconCanvas(+s.dataset.t,2);c.style.height="16px";s.append(c)});
  if(R.catch&&$("catchCv")){const c=CR.find(x=>x.id===R.catch.id),s=crSprite(c,R.catch.esc),cv=$("catchCv"),k=Math.max(2,Math.floor(Math.min(160/s.width,80/s.height)));cv.width=s.width*k;cv.height=s.height*k;const x=cv.getContext("2d");x.imageSmoothingEnabled=false;x.drawImage(s,0,0,cv.width,cv.height);$("catchBest").onclick=()=>bestiarioSheet(Math.floor(CR.indexOf(c)/10),c.id)}
- $("copyBtn").onclick=()=>copy(share,$("copyBtn"));$("again").onclick=()=>R.kind==="pack"?startRun(makeRun("pack",R.pack),true):startRun(makeRun("free"),true);phase="end";rollSheet(pts,m);hud()}
+ pescaInit();$("copyBtn").onclick=()=>copy(share,$("copyBtn"));$("again").onclick=()=>R.kind==="pack"?startRun(makeRun("pack",R.pack),true):startRun(makeRun("free"),true);phase="end";rollSheet(pts,m);hud()}
 
 // --- Selectores
 function packsSheet(){showSheet(`<div class="endHead"><b>PACKS</b><span>7 PREGUNTAS DE UN TEMA · 25 S CADA UNA</span></div>
@@ -2492,7 +2543,7 @@ function loop(now){const rdt=clamp((now-last)/1000,0,3600),dt=Math.min(rdt,.05);
  FX.sx=reduce?0:(Math.random()-.5)*FX.shake*2;FX.sy=reduce?0:(Math.random()-.5)*FX.shake*2;
  // desplazamiento suave: el mundo se dibuja alineado a la grilla de píxeles y el lienzo se corre la fracción que falta
  const camReal=cam,unitM=PX/PPM,camR=Math.floor(cam/unitM)*unitM,offPx=(cam-camR)*PPM;SOFF=offPx/PX;
- const tr=`translate(${FX.sx}px,${(FX.sy-offPx).toFixed(2)}px)`;pc.style.transform=tr;hc.style.transform=tr;
+ const tr=`translate(${FX.sx}px,${(FX.sy-offPx).toFixed(2)}px)`;pc.style.transform=tr;hc.style.transform=tr;ac.style.transform=tr;
  const dk=$("dark");dk.style.opacity=FX.dark.toFixed(3);const fx=tagState?tagState.x:W/2,fy=tagState?tagState.y:H*.4;dk.style.setProperty("--x",fx+"px");dk.style.setProperty("--y",fy+"px");
  const fl=$("flash");fl.style.opacity=FX.flash.toFixed(3);fl.style.setProperty("--fc",FX.flashCol);
  {const ck=phase==="checking";if(!ck&&!$("thinking").hidden&&UI.toast.innerHTML.includes("tdots"))UI.toast.hidden=true;$("thinking").hidden=!ck}
