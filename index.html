@@ -1400,13 +1400,15 @@ $("bar").addEventListener("submit",async e=>{e.preventDefault();if(phase!=="answ
  // Las pistas para la IA también se buscan ya, por si nadie la encuentra.
  let pzP=null;
  if(!hit){const pi=current,q=[];
-  if(!rl&&AI.url&&!CLAUDE_AI&&MEM.on!==false)q.push(memCheck(pi,v));
+  const conMem=!rl&&AI.url&&!CLAUDE_AI&&MEM.on!==false;if(conMem)q.push(memCheck(pi,v));
   if(P[pi].wd&&WD.on)q.push(wdCheck(pi,v));
   if(P[pi].wp&&WP.on)q.push(wpCheck(pi,v));
   if(fuOf(pi))q.push(fuCheck(pi,v));
   if(!rl&&v.length>=2&&(CLAUDE_AI||(AI.url&&AI.on)))pzP=pistasRed(pi,v).catch(()=>[]);
   if(q.length){phase="checking";
-   const rs=await Promise.all(q.map(p=>p.catch(()=>null)));if(phase!=="checking"||current!==pi)return;phase="answering";hit=rs.find(r=>r)||null}}
+   // si la memoria ya la conoce, vale al instante (no se espera a Wikidata ni a Wikipedia)
+   const ps=q.map(p=>p.catch(()=>null)),todas=Promise.all(ps);
+   const rs=await (conMem?Promise.race([ps[0].then(r=>r?[r]:todas),todas]):todas);if(phase!=="checking"||current!==pi)return;phase="answering";hit=rs.find(r=>r)||null}}
  // lo que aceptó una fuente se manda a la memoria (vale para todos cuando lo confirma otro jugador)
  if(hit&&(hit.wd||hit.wp||hit.fu))memSave(current,v,hit);
  // y si nada la encontró, se le pregunta a la IA (en cualquier pregunta)
