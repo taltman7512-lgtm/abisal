@@ -1,0 +1,22 @@
+<!doctype html>
+<!-- Vista previa: abrir este archivo en Chrome. ?f=600 salta a un cuadro; el render lo maneja render.mjs. -->
+<html><head><meta charset="utf-8"><title>Shorts de física 2D</title>
+<style>html,body{margin:0;background:#111;height:100%;display:flex;align-items:center;justify-content:center}canvas{height:100vh;aspect-ratio:9/16}</style></head>
+<body><canvas id="c"></canvas>
+<script src="motor/base.js"></script><script src="motor/fuente.js"></script><script src="motor/fisica.js"></script>
+<script src="motor/dibujo.js"></script><script src="motor/fondo.js"></script>
+<script>
+(async () => {
+  const q = new URLSearchParams(location.search), video = q.get('video') || 'pop', S = +(q.get('scale') || 1);
+  await new Promise((ok, no) => { const s = document.createElement('script'); s.src = 'videos/' + video + '/escena.js'; s.onload = ok; s.onerror = no; document.head.appendChild(s); });
+  await M.fuenteLista;
+  const cv = document.getElementById('c'); cv.width = M.W * S; cv.height = M.H * S; const c = cv.getContext('2d');
+  M.Fondo.build(S); M.Video.init(); let cur = -1;
+  // Avanza la simulación hasta el cuadro f (siempre en orden) y lo dibuja
+  M.goto = (f, draw = true) => { if (f < cur) { M.Video.init(); cur = -1; } while (cur < f) M.Video.step(++cur); if (draw) { c.setTransform(S, 0, 0, S, 0, 0); M.Video.draw(c, f); } };
+  M.png = (f) => { M.goto(f); return cv.toDataURL('image/png'); };
+  M.jpg = (f) => { M.goto(f); return cv.toDataURL('image/jpeg', 0.97); };
+  M.ready = true;
+  if (!q.get('render')) { const f0 = +(q.get('f') || 0), t0 = performance.now(); const loop = () => { const f = Math.min(M.Video.frames - 1, f0 + Math.floor((performance.now() - t0) / 1000 * 60)); M.goto(f); if (f < M.Video.frames - 1 && !q.get('f')) requestAnimationFrame(loop); }; loop(); }
+})();
+</script></body></html>
