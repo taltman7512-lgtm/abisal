@@ -23,6 +23,13 @@ out = head + M[3:93] + [""] + M[162:176] + ["", sec["MUNDO"], sec["ELENCO"], L(r
        "const SUBY = L => [I.goldfish, I.one, I.cold2, I.alive, I.heart].includes(L) ? .22 : .75;   // sube al 22 % cuando la acción está abajo",
        L(r_suby + 1, r_dbg - 1), "window.DBG = { cam, ALL, ME, QUILL, PIM, GARROW, TURT, CABEZA, THREE, TOMAS };"]
 s = "\n".join(out)
+for n in ["T_SHINGLE", "T_STONE", "T_PLANK", "T_DIRT"]: s = s.replace("const " + n + " = tex(", "const " + n + "0 = tex(", 1)
+s = s.replace("// ---------- materiales", sec["TEXTURAS"] + "\n// ---------- materiales", 1)
+s = s.replace('const WALLC = ["#b8a184", "#a89276", "#c2ab8a", "#9f8a70", "#b39a7c"];', 'const WALLC = ["#b8a184", "#a89276", "#c2ab8a", "#9f8a70", "#b39a7c", "#c9b598", "#a8957a", "#bfa07a", "#d0c0a0", "#9a8468", "#b8a890", "#c4a684", "#ad9c80", "#c8b08c", "#a48a6c", "#bcae96"];', 1)
+s = s.replace("const M_WALL = WALLC.map((c, i) => SMt(T_TIMBER(40 + i, c), { bumpMap: T_TIMBER(40 + i, c), bumpScale: 1.2 }));", "const M_WALL = WALLC.map((c, i) => { const t = T_PARED(40 + i, c); return SMt(t, { bumpMap: t, bumpScale: 1.2 }) });", 1)
+s = s.replace("M_WALL[v % 5]", "M_WALL[v % M_WALL.length]")
+s = s.replace("if (pelo) peloFacetado(k.head, ...pelo);", "if (pelo) peloVolze(k.head, ...pelo);", 1)
+s = s.replace("COMP.addPass(new RenderPass(scene, cam));", 'COMP.addPass(new RenderPass(scene, cam)); try { const { GTAOPass } = await import("three/addons/postprocessing/GTAOPass.js"); const ao = new GTAOPass(scene, cam, W, H); ao.updateGtaoMaterial({ radius: .8, distanceExponent: 1.5, thickness: 1.5, scale: 1.2 }); ao.blendIntensity = .9; const aoR = ao.render.bind(ao); ao.render = (...q) => { const oc = []; scene.traverse(o => { if (o.isSprite && o.visible) { o.visible = false; oc.push(o) } }); aoR(...q); oc.forEach(o => o.visible = true) }; COMP.addPass(ao) } catch (e) { console.log("sin GTAO", e.message) }', 1)
 # ajustes: caras que no existen, Garrow vuelve a la tortuga, filtro sepia del recuerdo
 s = s.replace('"furious"', '"angry"').replace('"overjoyed"', '"excited"')
 s = s.replace('ALL.forEach(c => { c.g.visible = false;', 'if (GARROW.g.parent !== TURT) TURT.add(GARROW.g);\n  ALL.forEach(c => { c.g.visible = false;', 1)

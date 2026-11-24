@@ -20,12 +20,30 @@ anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.c
   bloque, cara impresa con ojos ovalados grandes, pelo facetado. Nada de estilo propio (mangas por partes, manos).
 - **Calidad (24-nov-2026)**: siempre 1080×1920 a 60 fps y **más detalle** que el mínimo: utilería en cada rincón,
   texturas con relieve, nada de superficies lisas ni planos vacíos. Ante la duda, sumar detalle.
+- **Todo dibujado a mano, sin patrones (24-nov-2026)**: nada de texturas repetidas en grilla (escamas en óvalos
+  iguales, adoquines clonados, placas en fila). Cada textura se pinta entera: un lienzo grande sin repetir, con
+  trazos irregulares, manchas, desgaste y variación, como un dibujo casero. Vale para el caparazón, las casas, la piel
+  y la cara de la criatura y el pelo.
+- **Pelo como el de Volze**: mechones orgánicos esculpidos (curvos, con puntas que se afinan y volumen redondeado) y
+  pintados a mano con mechas y brillo. Nunca una mezcla de cubos y rectángulos facetados.
+- **Criatura**: ojos con detalle (iris, pupila, brillo húmedo, párpado con arrugas) y cuello con pliegues y arrugas.
+- **Luz**: más cuidada. Sol cálido con sombras suaves, relleno del cielo, luz de contorno y oclusión en los rincones.
+  Más detalle en todo; ante la duda, sumar.
 - **Voz provisoria**: no hacer una voz de reemplazo para el video. Si Chrome no está conectado, armar el video y
   esperar a ElevenLabs. Kokoro solo sirve para medir los tiempos de las tomas y nunca se entrega.
 - **Historias**: la de la polilla y las lámparas («Nobody Lights A Third Lamp», terror) no le gustó. La siguiente que
   eligió fue de día: «We Live On Its Back» (pueblo arriba de una tortuga gigante).
 
 Responder siempre en español rioplatense simple. El video va en inglés.
+
+## Ejemplo de día: `ejemplo-dia/` (la tortuga, 24-nov-2026)
+Partir de acá para videos nuevos, no de la polilla:
+- `_pintado.js`: texturas pintadas a mano sin patrones (`T_PARED` con una pared distinta por casa, tejas, piedra,
+  tablas, tierra, caparazón, piel con escamas sueltas, cuello con pliegues, iris), `peloVolze()` (casco liso +
+  mechones que se afinan; reemplaza a `peloFacetado`), ojo de criatura con iris, córnea, párpados y arrugas, luz de
+  contorno, más utilería (hiedra, chimeneas con humo, pozo, bancos, cajones).
+- `_tortuga.js`: mundo, elenco, `SHOTS` y `setScene`. `_juntar.py` arma `historia.js` con la base de la polilla e
+  inyecta las texturas, 16 paredes, `peloVolze` y la oclusión ambiental (GTAO, sin afectar los sprites).
 
 ## Las 10 reglas (medidas, ordenadas por impacto)
 
