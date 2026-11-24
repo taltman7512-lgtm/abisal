@@ -111,6 +111,9 @@ de cocinero?»).
 11. **Luz cinematográfica**: luz principal con dirección clara, contraluz o luz de borde que despegue a los
     personajes del fondo, sombras largas, profundidad (bruma, desenfoque de fondo) y contraste. Marcá los planos con
     luz pareja y chata.
+12. **Caminatas y agua**: quien camina tiene que avanzar (nada de piernas moviéndose en el lugar: comparar dos cuadros
+    seguidos de la misma toma). El agua tiene olas que se mueven, refleja el cielo y brilla con el sol sin manchas
+    blancas que revienten el cuadro; la espuma es de vetas y burbujas, no círculos repetidos.
 
 ## Revisión cuadro a cuadro y ultradetalle (pedido del dueño, 24-nov-2026)
 En modo `despues`, primero correr `python <skill>/herramientas/chequeo_cuadros.py salida/<video>.mp4 --hojas salida/revision`.

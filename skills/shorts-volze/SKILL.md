@@ -71,6 +71,12 @@ anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.c
   - **Oficios**: el cocinero con gorro y chaqueta detallados; la vieja sabia (Olga) con barba de **maestro sensei**.
   - **Casas pegadas al piso**: nada flota ni se buguea cuando se mueve el suelo.
   - **Corridas como las de Volze**.
+  - **Caminatas de verdad** (24-nov-2026): quien camina **avanza** al ritmo de las piernas, con balanceo; nunca piernas
+    moviéndose en el lugar. En `crowd()` del ejemplo, `walk` entre 0 y 1,2 avanza a 1,5 × walk por segundo, centrado en
+    la marca de la escena (pasa por ahí a mitad de la frase).
+  - **Agua ultra realista como la de Volze** (24-nov-2026): material físico con normales de olas en tres escalas que se
+    mueven, reflejo del cielo con fresnel (`ENV_AGUA`, prefiltrado con PMREM), brillitos de sol chicos (sin manchas
+    que revienten el cuadro), espuma de vetas finas y burbujas contra la orilla. Nunca un plano con textura dibujada.
   - **Luz cinematográfica**: dirección clara, contraluz o luz de borde, sombras largas y contraste.
   - Dónde está hecho (en `ejemplo-dia/_tortuga.js` y `_juntar.py`): `peloRoblox()` y `mechR()` (pelo), `telaReal()`
     (tela con relieve y piezas 3D), `cocinero()`, `barbaSensei()`, `zanahoria()`, `correr()` (corrida con polvo; la
