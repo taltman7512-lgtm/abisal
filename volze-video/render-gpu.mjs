@@ -83,7 +83,7 @@ if (modo === "video") {
   // audio: la mezcla completa (música + efectos + voz) se calcula en la página y se guarda como WAV
   const wav = out.replace(/\.mp4$/, ".wav");
   if (!flag("sinaudio", false)) {
-    const b64 = await wavB64(main.p);
+    const b64 = await wavB64(main.p, flag("sinmusica", false) ? "sinmusica" : null);
     fs.writeFileSync(wav, Buffer.from(b64, "base64")); console.log("audio listo", ((Date.now() - t0) / 1000).toFixed(1), "s");
   }
   const desde = +flag("desde", 0), hasta = +flag("hasta", main.NF), total = hasta - desde, paso = Math.ceil(total / conc);

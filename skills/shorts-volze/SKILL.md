@@ -99,7 +99,8 @@ donde la imagen tiene que respirar. Medir: palabras ÷ duración × 60 entre 245
 entra con resorte (0,55 → 1), tiempos **reales** de cada palabra (whisper), texto del guion.
 
 ## Música (sintetizada en `partes/musica.js`, nunca canciones ajenas dentro del MP4)
-- **Siempre se entregan dos MP4 con el mismo video**: con música propia y **sin música** (voz + efectos,
+- **Por ahora el dueño pidió el video sin canción de fondo** (24-nov-2026): la entrega principal es **sin música**
+  (voz + efectos). La música propia queda como opción: se entregan dos MP4 con el mismo video, con música y **sin música** (voz + efectos,
   `node render-gpu.mjs audio` → `salida/sin-musica.wav`, unido con `ffmpeg -c:v copy`). El dueño puede ponerle una
   canción con licencia desde la app de YouTube al subir (por ejemplo «Numbers» de Temporex). Nunca meter la
   canción adentro del archivo.
@@ -120,24 +121,32 @@ entra con resorte (0,55 → 1), tiempos **reales** de cada palabra (whisper), te
 2. **Carpeta** `<repo>/videos/<nombre>/`: copiar `motor/render-gpu.mjs` y `motor/package.json` a la raíz,
    `motor/armar.js` a `partes/`, y como punto de partida `ejemplo-terror/{historia.js, musica.js}` a `partes/`.
    `npm i` (instala playwright-core). Escribir `partes/frases.json`.
-3. **Voz** (elegida por el dueño el 24-nov-2026: **ElevenLabs**, voz de biblioteca **«Liam – Viral Short-Form
-   Storyteller»**, modelo Eleven v4, estabilidad 35 %, similitud 75 %, **sin Auto-tag** porque agrega `[whisper]`,
+3. **Voz** (24-nov-2026: **ElevenLabs**, voz de biblioteca **«Skylar – Viral Zillennial Voice»**, filtros Male + Young; reemplazó a «Liam – Viral Short-Form
+   Storyteller», que el dueño rechazó. Modelo Eleven v4, estabilidad 35 %, similitud 75 %, **sin Auto-tag** porque agrega `[whisper]`,
    `[sighs]`, etc.):
    - Generarla con Claude in Chrome en `elevenlabs.io/app/speech-synthesis/text-to-speech`, con la cuenta del dueño
      ya abierta. Pegar el guion entero (las frases de `voz.json` separadas por espacios), «Generate speech»,
      descargar la generación más corta y copiarla a `voz-eleven/completa.mp3`. Chrome tiene que tener permitidas
      las descargas múltiples de elevenlabs.io (ya habilitado).
-   - Cortarla por frases: `python <skill>/herramientas/cortar_completo.py voz-eleven/completa.mp3 --tempo 1.35`.
-     Alinea con whisper, acorta las pausas internas y acelera ×1,35 sin cambiar el tono, porque Liam habla a
-     ≈ 175 palabras por minuto y el canal a ≈ 260. Después correr `verif_voz.py` y `palabras.py`.
-   - Medición (`perfil_voz.py`, contra la voz de Volze aislada con Demucs: 172 Hz, rango 68 Hz): ninguna voz de
-     ElevenLabs probada llega a ese tono (Liam Viral 129 Hz, Revenant 123, PJ 114, Snap 110); Liam fue la más
-     cercana en conjunto. La más parecida medida es **Chatterbox** (gratis, local, en la GPU):
+   - Cortarla por frases: `python <skill>/herramientas/cortar_completo.py voz-eleven/completa.mp3 --tempo 1.45`.
+     Alinea con whisper, corta en el último silencio antes de cada frase, acorta las pausas internas y acelera
+     ×1,45 sin cambiar el tono, porque Skylar habla a ≈ 172 palabras por minuto y el canal a ≈ 260. Después correr `verif_voz.py` y `palabras.py`.
+   - Medición (`perfil_voz.py`, contra la voz de Volze aislada con Demucs: 172 Hz, rango 68 Hz): Skylar es la de ElevenLabs más
+     parecida (151 Hz, rango 73 Hz, distancia 2,7). Más lejos: Liam Viral 4,2, Revenant 4,3, Mike Story 4,9,
+     Mike POV 4,8, PJ 5,5, Snap 6,2. La más parecida medida es **Chatterbox** (gratis, local, en la GPU):
      `python <skill>/herramientas/voz.py` (motor por defecto), por si se acaban los créditos.
 4. **Escena**: reescribir en `historia.js` el mundo, el elenco, `SHOTS`, `LUGAR` y los `case` de `setScene`.
    `node partes/armar.js` (chequea sintaxis).
-5. **Revisión barata**: `node render-gpu.mjs tomas` → `salida/tomas-NN.jpg` (un cuadro del medio de cada toma).
-   Arreglar nucas, paredes, cosas quemadas o negras; volver a sacar solo esas (`--lineas=8,13,40`).
+5. **Revisión barata + agente revisor (obligatorio, pedido del dueño 24-nov-2026)**: `node render-gpu.mjs tomas` →
+   `salida/tomas-NN.jpg` (un cuadro del medio de cada toma). Lanzar el agente **`revisor-volze`** en modo `antes`
+   (`agentes/revisor-volze.md`, instalado en `~/.claude/agents/`; si la sesión no lo tiene cargado, lanzar un agente
+   general con «leé y seguí agentes/revisor-volze.md»). Compara contra frames reales del canal: estilo de los
+   personajes, detalles, espacios vacíos y bugs visuales. Corregir lo de gravedad alta y media y volver a sacar solo
+   esas tomas (`--lineas=8,13,40`). **Después del render**, el mismo agente en modo `despues` sobre el MP4; no se
+   entrega hasta que diga «listo para entregar».
+   **Personajes**: siempre pasarlos por `robloxify()` (en `ejemplo-terror/historia.js`): cabeza cubo redondeado sin
+   cuello, cara impresa con ojos ovalados y cejas y boca gruesas, torso, brazos y piernas de un bloque. Así son los
+   del canal; el estilo propio de `kid()` (mangas por partes, manos, cordones) no va.
 6. **Música** y medición de audio (paso de abajo).
 7. **Comparar con el canal**: `python <skill>/herramientas/comparar.py <tmp> salida/<video>.mp4` y llevar las medidas a
    la tabla del modo. Mirar 8 frames propios contra 8 del canal lado a lado y corregir las 3 diferencias más grandes.
@@ -171,7 +180,7 @@ python -c "import numpy as np,soundfile as sf;db=lambda x:20*np.log10(np.sqrt(np
 - Si algo no anda en GPU: avisar y recién ahí usar CPU para esa parte (`--cpu` = SwiftShader + libx264).
 
 ```powershell
-node render-gpu.mjs video salida/<nombre>.mp4 --conc=3
+node render-gpu.mjs video salida/<nombre>.mp4 --conc=3 --sinmusica
 ```
 
 ## Checklist antes de exportar

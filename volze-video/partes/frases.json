@@ -12,7 +12,7 @@
  {
   "n": "whole",
   "t": "Not the people inside. The whole house.",
-  "gap": 0.18
+  "gap": 0.25
  },
  {
   "n": "morning",
@@ -92,7 +92,7 @@
  {
   "n": "three",
   "t": "That made three.",
-  "gap": 0.55
+  "gap": 0.7
  },
  {
   "n": "song",
@@ -117,7 +117,7 @@
  {
   "n": "up",
   "t": "No screaming. Just the song, getting smaller, going up.",
-  "gap": 0.5
+  "gap": 0.6
  },
  {
   "n": "raked",
@@ -187,7 +187,7 @@
  {
   "n": "stops",
   "t": "Then she stops counting.",
-  "gap": 0.55
+  "gap": 0.7
  },
  {
   "n": "never",
@@ -257,6 +257,6 @@
  {
   "n": "last",
   "t": "Tonight, I'm the third lamp.",
-  "gap": 0.35
+  "gap": 0.5
  }
 ]

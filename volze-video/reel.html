@@ -28,7 +28,7 @@ const mk = (w, h) => { const c = document.createElement("canvas"); c.width = w; 
 // ---------- voz: cada frase marca el tiempo de su plano
 const LINES = await fetch("voz.json").then(r => r.json()), VOZ = [], S = [], D = [];
 // ★ HISTORIA: pausas extra después de cada frase (índice → segundos)
-const GAP = {"0":0.06,"1":0.06,"2":0.18,"3":0.06,"4":0.22,"5":0.06,"6":0.06,"7":0.06,"8":0.2,"9":0.06,"10":0.06,"11":0.06,"12":0.25,"13":0.3,"14":0.06,"15":0.25,"16":0.06,"17":0.06,"18":0.55,"19":0.06,"20":0.06,"21":0.4,"22":0.4,"23":0.5,"24":0.06,"25":0.2,"26":0.35,"27":0.3,"28":0.06,"29":0.06,"30":0.2,"31":0.06,"32":0.3,"33":0.3,"34":0.06,"35":0.2,"36":0.25,"37":0.55,"38":0.3,"39":0.06,"40":0.06,"41":0.06,"42":0.06,"43":0.35,"44":0.3,"45":0.35,"46":0.4,"47":0.35,"48":0.3,"49":0.25,"50":0.35,"51":0.35};
+const GAP = {"0":0.06,"1":0.06,"2":0.25,"3":0.06,"4":0.22,"5":0.06,"6":0.06,"7":0.06,"8":0.2,"9":0.06,"10":0.06,"11":0.06,"12":0.25,"13":0.3,"14":0.06,"15":0.25,"16":0.06,"17":0.06,"18":0.7,"19":0.06,"20":0.06,"21":0.4,"22":0.4,"23":0.6,"24":0.06,"25":0.2,"26":0.35,"27":0.3,"28":0.06,"29":0.06,"30":0.2,"31":0.06,"32":0.3,"33":0.3,"34":0.06,"35":0.2,"36":0.25,"37":0.7,"38":0.3,"39":0.06,"40":0.06,"41":0.06,"42":0.06,"43":0.35,"44":0.3,"45":0.35,"46":0.4,"47":0.35,"48":0.3,"49":0.25,"50":0.35,"51":0.5};
 {
   const ac = new AudioContext({ sampleRate: 48000 }); let cur = .02;
   // ?completo=archivo.mp3 → un solo MP3 con todas las frases (por ejemplo de ElevenLabs): se corta en las pausas más largas
@@ -795,6 +795,86 @@ const VEIL = new THREE.Mesh(new THREE.ConeGeometry(.75, 2.2, 20, 1, true), new T
 PELL.body.scale.setScalar(.74); WREN.body.scale.setScalar(1.04); BKID.body.scale.setScalar(.8);
 const HATS = [BDAD, BMOM, BKID].map((k, i) => { const h = part(new THREE.ConeGeometry(.26, .62, 16), SM(["#c94b4b", "#3f8a6a", "#d9a03a"][i]), 0, 1.15, 0, k.head, 0); return h });
 const ALL = [ME, PELL, WREN, BDAD, BMOM, BKID, ...FOLK, GROOM, BRIDE];
+
+// ---------- estilo de bloques como el de Volze (pedido del dueño, 24-nov-2026): cabeza = cubo redondeado más ancho que alto, sin cuello,
+// cara impresa al frente (ojos ovalados negros con brillo, cejas y boca gruesas); torso = un bloque; brazos y piernas = un bloque cada
+// uno, del mismo ancho, con la piel abajo del brazo y el calzado pintado en la pierna. Diseños de cara propios (no la cara de fábrica de Roblox).
+// Mantiene los mismos puntos de giro que kid(): pose(), los primeros planos (shF) y las velas siguen funcionando.
+const CARAS_R6 = {};
+function caraR6(kind) {
+  if (CARAS_R6[kind]) return CARAS_R6[kind];
+  return CARAS_R6[kind] = tex(512, 384, (g, w, h) => {
+    const ink = "#141014", ex = [176, 336], ey = 165;
+    const K = { neutral: [1, 0, "flat"], worried: [1, 1, "frown"], gloomy: [.8, 1, "flat"], pleading: [1, 1, "frown"], sad: [1, 1, "frown"], scared: [1.35, 1.2, "o"], terrified: [1.5, 1.4, "scream"], horrified: [1.45, 1.3, "scream"], panic: [1.4, 1.3, "scream"],
+      shock: [1.35, -1, "o"], gasp: [1.35, -1, "o"], happy: [1, 0, "smile"], warm: [.9, 0, "smile"], laugh: [.95, -.5, "open"], excited: [1.15, -.6, "open"], starstruck: [1.2, -.8, "open"], hopeful: [1.1, .6, "smile"],
+      relieved: [.9, .8, "smile"], squint: [.6, -1.2, "flat"], suspicious: [.7, -1.4, "smirk"], determined: [.85, -1.4, "smirk"], brave: [.9, -1.2, "flat"], angry: [.9, -1.6, "frown"], curious: [1.15, -.4, "o"] }[kind] || [1, 0, "flat"];
+    const [es, bro, boca] = K;
+    g.fillStyle = ink; g.strokeStyle = ink; g.lineCap = "round"; g.lineJoin = "round";
+    // ojos: óvalo negro vertical con un brillo blanco
+    ex.forEach((x, i) => { g.fillStyle = ink; g.beginPath(); g.ellipse(x, ey, 26 * Math.min(1.2, es), 46 * Math.min(1.25, es), 0, 0, 7); g.fill(); g.fillStyle = "#ffffff"; g.beginPath(); g.ellipse(x - 8, ey - 18 * Math.min(1.25, es), 8, 11, 0, 0, 7); g.fill();
+      // cejas gruesas: bro > 0 preocupada (sube adentro), bro < 0 enojada (baja adentro)
+      g.strokeStyle = ink; g.lineWidth = 18; const s = i ? 1 : -1, yb = ey - 10 - 66 * Math.min(1.25, es) - (bro < 0 && boca === "o" ? 14 : 0); g.beginPath(); g.moveTo(x - s * 36, yb + bro * 10 * -1 * 0 + (bro > 0 ? 8 : bro < 0 ? -12 : 0)); g.lineTo(x + s * 26, yb + (bro > 0 ? -14 : bro < 0 ? 12 : 0)); g.stroke() });
+    // boca gruesa
+    g.fillStyle = ink; g.lineWidth = 18; const my = 290;
+    if (boca === "flat") { g.beginPath(); g.moveTo(222, my); g.lineTo(290, my); g.stroke() }
+    if (boca === "frown") { g.beginPath(); g.moveTo(214, my + 16); g.quadraticCurveTo(256, my - 22, 298, my + 16); g.stroke() }
+    if (boca === "smile") { g.beginPath(); g.moveTo(206, my - 14); g.quadraticCurveTo(256, my + 34, 306, my - 14); g.stroke() }
+    if (boca === "smirk") { g.beginPath(); g.moveTo(220, my + 6); g.quadraticCurveTo(268, my + 10, 300, my - 14); g.stroke() }
+    if (boca === "o") { g.beginPath(); g.ellipse(256, my, 22, 28, 0, 0, 7); g.fill() }
+    if (boca === "open") { g.beginPath(); g.moveTo(196, my - 22); g.quadraticCurveTo(256, my + 62, 316, my - 22); g.closePath(); g.fill(); g.fillStyle = "#c94b5a"; g.beginPath(); g.ellipse(256, my + 18, 26, 10, 0, 0, 7); g.fill() }
+    if (boca === "scream") { g.beginPath(); g.moveTo(214, my - 26); g.quadraticCurveTo(256, my - 44, 298, my - 26); g.lineTo(306, my + 40); g.quadraticCurveTo(256, my + 58, 206, my + 40); g.closePath(); g.fill(); g.fillStyle = "#ffffff"; g.fillRect(224, my - 30, 64, 12) }
+  });
+}
+const LIMBT = {};
+const brazoTex = (shirt, skin, manga) => LIMBT["b" + shirt + skin + manga] ||= tex(128, 256, (g, w, h) => { g.fillStyle = skin; g.fillRect(0, 0, w, h); const y = h * manga; g.fillStyle = shirt; g.fillRect(0, 0, w, y); const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, "rgba(255,255,255,.06)"); gr.addColorStop(1, "rgba(0,0,0,.14)"); g.fillStyle = gr; g.fillRect(0, 0, w, h); g.fillStyle = "rgba(0,0,0,.18)"; g.fillRect(0, y - 6, w, 6) });
+const piernaTex = (pants, shoes) => LIMBT["p" + pants + shoes] ||= tex(128, 256, (g, w, h) => { g.fillStyle = pants; g.fillRect(0, 0, w, h); g.fillStyle = "rgba(0,0,0,.12)"; g.fillRect(w / 2 - 2, 0, 4, h * .86); g.fillStyle = shoes; g.fillRect(0, h * .86, w, h * .14); g.fillStyle = "rgba(255,255,255,.12)"; g.fillRect(0, h * .86, w, 5); const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, "rgba(255,255,255,.05)"); gr.addColorStop(1, "rgba(0,0,0,.12)"); g.fillStyle = gr; g.fillRect(0, 0, w, h) });
+function robloxify(k, { skin, shirt, alt = "#ffffff", cloth = "plain", pants, shoes = "#2a2420", manga = .82, pelo = null }) {
+  k.r6 = true; k.skin = skin;
+  const quitar = grp => [...grp.children].forEach(c => { if (c.isMesh) grp.remove(c) });
+  // brazos y piernas: un solo bloque cada uno (mismo ancho), con la misma articulación que kid()
+  [k.legL, k.legR].forEach(p => { quitar(p); const m = new THREE.MeshStandardMaterial({ map: piernaTex(pants, shoes), roughness: .7 }); part(RB(.5, 1.02, .5, .045), m, 0, -.5, 0, p, 0) });
+  [k.armL, k.armR].forEach((p, i) => { quitar(p); const m = new THREE.MeshStandardMaterial({ map: brazoTex(shirt, skin, manga), roughness: .7 }); part(RB(.5, 1.04, .5, .045), m, 0, -.44, 0, p, 0); const hnd = new THREE.Object3D(); hnd.position.set(0, -.86, 0); p.add(hnd); if (i) k.handR = hnd; else k.handL = hnd });
+  k.handMat = new THREE.MeshStandardMaterial({ color: skin });   // power() lo toca: material suelto, no pinta los brazos
+  // torso: un bloque con la ropa estampada
+  [...k.body.children].forEach(c => { if (c.isMesh) k.body.remove(c) });
+  const sh = SM(shirt), fr = new THREE.MeshStandardMaterial({ map: clothTex(cloth, shirt, alt), roughness: .75 }), bk = new THREE.MeshStandardMaterial({ map: clothTex(cloth, shirt, alt, true), roughness: .75 });
+  part(RB(1.04, 1.04, .52, .045), boxMats(sh, fr, bk), 0, 1.54, 0, k.body, 0);
+  // cabeza: cubo redondeado más ancho que alto, sin cuello, cara impresa al frente
+  [...k.head.children].forEach(c => { if (c.isMesh && (c.geometry.type === "LatheGeometry" || (c.geometry.type === "CylinderGeometry" && c !== k.decal))) k.head.remove(c) });
+  part(RB(.7, .62, .66, .15), SM(skin, { roughness: .55 }), 0, .38, 0, k.head, 0);
+  k.decal.geometry = new THREE.PlaneGeometry(.62, .465); k.decal.position.set(0, .39, .332); k.decal.material.map = caraR6("neutral"); k.decal.material.needsUpdate = true;
+  // pelo de piezas facetadas (como el canal: mechones con caras planas, en punta y con volumen arriba); se saca el pelo blando de kid()
+  [...k.head.children].forEach(c => { if (c.isMesh && (c.userData.shell || (c.material && c.material.map === HAIRT))) k.head.remove(c) });
+  if (pelo) peloFacetado(k.head, ...pelo);
+}
+function peloFacetado(head, estilo, color) {
+  const m = new THREE.MeshStandardMaterial({ color, roughness: .55, flatShading: true }), md = new THREE.MeshStandardMaterial({ color: new THREE.Color(color).multiplyScalar(.78), roughness: .6, flatShading: true });
+  const blk = (w, hh, d, x, y, z, rx = 0, ry = 0, rz = 0, mm = m) => { const p = part(RB(w, hh, d, .05, 1), mm, x, y, z, head, 0); p.rotation.set(rx, ry, rz); return p };
+  const pico = (r, l, x, y, z, rx, rz, mm = m) => { const c = part(new THREE.ConeGeometry(r, l, 5), mm, x, y, z, head, 0); c.rotation.set(rx, 0, rz); return c };
+  const bola = (r, x, y, z, mm = m) => part(new THREE.IcosahedronGeometry(r, 0), mm, x, y, z, head, 0);
+  // casquete: arriba, atrás y costados (tapa las esquinas del cubo de la cabeza)
+  blk(.76, .22, .72, 0, .77, -.01); blk(.76, .4, .14, 0, .52, -.34, 0, 0, 0, md); for (const s of [-1, 1]) blk(.08, .18, .5, s * .37, .7, -.08, 0, 0, 0, md);
+  if (estilo === "puntas") { [[-.22, .12, -.45], [0, .18, 0], [.22, .12, .45], [-.12, -.1, -.3], [.14, -.1, .3], [0, -.22, 0], [-.28, -.18, -.75], [.28, -.18, .75]].forEach(([x, z, a]) => pico(.13, .4, x, 1.0, z, .35 + z * .8, -a * .55));
+    [-.2, 0, .2].forEach((x, i) => pico(.11, .3, x, .82, .3, 1.15, (i - 1) * .35)) }
+  if (estilo === "liso") { blk(.62, .14, .12, .04, .66, .34, -.2, 0, -.12); blk(.42, .12, .5, -.1, .86, .06, 0, 0, .1) }
+  if (estilo === "corto") { blk(.66, .08, .1, 0, .66, .35, -.15) }
+  if (estilo === "trenzas") { blk(.66, .12, .12, 0, .66, .34, -.2); for (const s of [-1, 1]) for (let k2 = 0; k2 < 4; k2++) bola(.1 - k2 * .01, s * .4, .42 - k2 * .16, -.1, k2 % 2 ? md : m) }
+  if (estilo === "rodete") { blk(.6, .1, .1, 0, .66, .35, -.15); bola(.2, 0, .9, -.2); blk(.3, .06, .3, 0, .82, -.2, 0, .6, 0, md) }
+  if (estilo === "melena" || estilo === "largo") { blk(.7, .14, .12, 0, .65, .34, -.2); const L = estilo === "largo" ? .9 : .6; blk(.8, L, .16, 0, .66 - L / 2, -.37, 0, 0, 0, md); for (const s of [-1, 1]) blk(.12, L - .1, .5, s * .4, .7 - L / 2, -.06) }
+  if (estilo === "rulos") { for (let k2 = 0; k2 < 16; k2++) { const a = k2 / 16 * Math.PI * 2, rr = .22 + (k2 % 3) * .06; bola(.12, Math.cos(a) * rr, .86 + (k2 % 2) * .05, Math.sin(a) * rr * .9 - .05, k2 % 4 ? m : md) } }
+}
+const setFace0 = setFace;
+setFace = (k, f) => { if (!k.r6) return setFace0(k, f); const t = caraR6(f); if (k.decal.material.map !== t) { k.decal.material.map = t; k.decal.material.needsUpdate = true } };
+robloxify(ME, { skin: "#e8b48c", shirt: "#55613a", pants: "#3a2f28", shoes: "#4a3020", pelo: ["puntas", "#4a2f1f"] });
+{ const sc = SM("#c94b4b"); part(new THREE.TorusGeometry(.33, .1, 10, 22), sc, 0, 2.06, 0, ME.body, 0).rotation.x = Math.PI / 2; part(RB(.2, .5, .1, .04), sc, .2, 1.8, .3, ME.body, 0) }   // la bufanda roja del protagonista
+robloxify(PELL, { skin: "#efc8a8", shirt: "#6f8fb8", cloth: "sweater", alt: "#e6d6b4", pants: "#6f8fb8", shoes: "#e6d6b4", pelo: ["trenzas", "#b5562a"] });
+robloxify(WREN, { skin: "#d9b08c", shirt: "#4a3f5a", alt: "#cbb8a0", cloth: "cardigan", pants: "#3a3236", shoes: "#2a2420", pelo: ["rodete", "#d9d4cc"] });
+robloxify(BDAD, { skin: "#c98e64", shirt: "#7a3a2a", alt: "#d9b36a", cloth: "plaid", pants: "#3a3236", pelo: ["corto", "#2b211b"] });
+robloxify(BMOM, { skin: "#f2cfae", shirt: "#3f6a8a", alt: "#d9c7a0", cloth: "sweater", pants: "#3a3f4a", pelo: ["melena", "#6b3f22"] });
+robloxify(BKID, { skin: "#c98e64", shirt: "#c9a23a", pants: "#3a3f4a", shoes: "#5a3a2a", manga: .45, pelo: ["rulos", "#2b211b"] });
+[["#5a3a2a", "plain", "#3a3236", "#e8b48c"], ["#6a6a4a", "sweater", "#3a2f28", "#c98e64"], ["#3a4a5a", "plain", "#2a2420", "#f2cfae"], ["#7a5a3a", "plaid", "#3a3236", "#8a5a3c"], ["#4a3a4a", "cardigan", "#3a3236", "#efc8a8"]].forEach(([sh, c, p, sk], i) => robloxify(FOLK[i], { skin: sk, shirt: sh, cloth: c, alt: "#d9c7a0", pants: p, pelo: [["corto", "#1d1a17"], ["liso", "#7a4a2a"], ["melena", "#c9a06a"], ["puntas", "#2b211b"], ["rodete", "#9a9a9a"]][i] }));
+robloxify(GROOM, { skin: "#e8b48c", shirt: "#1e1d22", cloth: "suit", alt: "#7a2a2a", pants: "#1e1d22", shoes: "#111", pelo: ["liso", "#3a2a20"] });
+robloxify(BRIDE, { skin: "#f2cfae", shirt: "#f2ece0", pants: "#f2ece0", shoes: "#f2ece0", pelo: ["largo", "#c9a06a"] });
 const handW = (k, h = "R") => { k.g.updateMatrixWorld(true); return (h === "R" ? k.handR : k.handL).getWorldPosition(new THREE.Vector3()) };
 const attach = (obj, k, h = "R", o = [0, -.15, .1]) => { const hand = h === "R" ? k.handR : k.handL; if (obj.parent !== hand) hand.add(obj); obj.position.set(...o); obj.visible = true };
 
@@ -837,26 +917,26 @@ const shF = (w, k, d0, d1, ang = 0, dy = 0, f = 62, ldy = 0, o = {}) => { const 
 const JARP = (o) => () => add(JAR.position.toArray(), o);
 const SHOTS = {
   [I.hook]: [sh(0, [0, 9, 22], [0, 6.5, 15], [0, 3, -20], [0, 3.5, -24], 58), sh(6, [-.6, 2.7, -7.2], [-.2, 2.6, -8.6], [5.5, 2.5, -10], [5.5, 2.6, -10], 62)],
-  [I.third]: [sh(0, [2.4, 4.6, -6.5], [3, 5.2, -7.6], [5.6, 7.4, -10], [5.6, 7.6, -10], 58), sh(5, [-1, .9, -3.5], [-1.4, .8, -4.5], [8.5, 15, -10], [8.5, 20, -10], 74)],
+  [I.third]: [sh(0, [0, 3.6, -3], [.4, 3.9, -4], [6.5, 5.5, -10], [6.5, 6.2, -10], 58), sh(5, [-1, .9, -3.5], [-1.4, .8, -4.5], [8.5, 15, -10], [8.5, 20, -10], 74)],
   [I.whole]: [sh(0, [-4, 1.4, -1], [-4.6, 1.2, 0], [8.5, 6, -10], [8.5, 12, -10], 64), sh(4, [-6, 46, -2], [-5, 50, -6], [8.5, 14, -10], [8.5, 22, -10], 50)],
   [I.morning]: [sh(0, [6.6, 2.3, -6.6], [6.4, 2.4, -7.8], [2.6, 2.1, -9.4], [2.6, 2.1, -9.6], 58), sh(6, [7.5, 13, -5.5], [8.3, 11.5, -9], [8.5, 0, -10.2], [8.5, 0, -10.6], 50)],
-  [I.twelve]: [sh(0, [-18, 46, 18], [-10, 50, 2], [0, 0, -14], [0, 0, -20], 52), sh(4, [-1.6, 1.8, -12.5], [-1.8, 1.8, -16.5], [-8.5, 1.4, -17], [-8.5, 1.2, -19.5], 62)],
-  [I.wicks]: [shF(0, ME, 1.8, 1.5, .45, .15, 70), sh(3, [5.0, 2.5, -.15], [4.95, 2.45, -.35], [4.05, 2.25, -1.42], [4.05, 2.25, -1.42], 58)],
+  [I.twelve]: [sh(0, [-18, 46, 18], [-10, 50, 2], [0, 0, -14], [0, 0, -20], 52), sh(4, [-2.4, 3.4, -10.6], [-2.6, 3.4, -13], [-8.5, 1.0, -17], [-8.5, 1.0, -19], 60)],
+  [I.wicks]: [shF(0, ME, 1.8, 1.5, .45, .15, 70), sh(3, [4.6, 2.3, -2.6], [4.55, 2.3, -2.4], [4.0, 2.2, -1.5], [4.0, 2.2, -1.5], 58)],
   [I.wren]: [sh(0, [-.6, 2.6, 5.2], [-.6, 2.5, 7.4], [-.8, 2.4, -.5], [-.8, 2.4, 1.8], 60), sh(7, [-2.6, 3.4, -1.2], [-2.8, 3.6, -.2], [8.5, 3.2, -2], [8.5, 3.4, -1.6], 58)],
-  [I.count]: [sh(0, [2.4, 2.6, -4.6], [2.6, 2.6, .6], [5.5, 2.5, -4.1], [5.5, 2.5, .1], 62), shF(2, WREN, 1.7, 1.45, -.45, .05, 70), shF(4, WREN, 3.0, 2.7, .35, -1.7, 64, -1.3), sh(9, [-1.5, 2.2, 3], [-1.8, 2.4, 4], [1.6, 1.6, -3], [1.8, 1.6, -5], 56)],
+  [I.count]: [sh(0, [-.6, 2.0, -4.2], [-.4, 2.1, -3.0], [5.5, 3.0, -3.0], [5.5, 3.0, -1.4], 60), shF(2, WREN, 1.7, 1.45, -.45, .05, 70), shF(4, WREN, 3.0, 2.7, .35, -1.7, 64, -1.3), sh(9, [-1.5, 2.2, 3], [-1.8, 2.4, 4], [1.6, 1.6, -3], [1.8, 1.6, -5], 56)],
   [I.eat]: [sh(0, OH(-1.5, 2.7, -2.45), OH(-2.3, 2.6, -2.4), OH(-1.9, 2.2, -.3), OH(-1.9, 2.2, -.3), 66), shF(5, PELL, 1.9, 1.6, .25, .15, 66), sh(10, [0, 2.6, -42], [0, 2.5, -43.6], [0, 2.4, -47.6], [0, 2.4, -47.6], 58, { cut: true })],
-  [I.nobody]: [sh(0, [0, .8, -30], [0, 1, -33], [0, 13, -60], [0, 17, -60], 60), sh(5, [2.2, 1.1, -4], [2.0, 1.0, -5.2], [0, 30, -20], [0, 32, -22], 66)],
+  [I.nobody]: [sh(0, [0, .8, -30], [0, 1, -33], [0, 13, -60], [0, 17, -60], 60), sh(5, [2.2, 1.1, -4], [2.0, 1.0, -5.2], [0, 10, -40], [0, 12, -42], 62)],
   [I.dust]: [shF(0, ME, 1.7, 1.45, .3, .45, 72), sh(4, [.6, 3.4, 1.5], [.5, 3.2, 1.5], [1, 4.6, -.6], [1, 3.4, -.6], 62)],
-  [I.snow]: [sh(0, [0, 3, 11], [0, 3.6, 7], [0, 3.4, -24], [0, 3.6, -24], 56), sh(6, [1.7, .6, 1.4], [1.6, .6, .8], [0, 30, -8], [1, 30, -10], 80, { shake: .08 })],
+  [I.snow]: [sh(0, [0, 3, 11], [0, 3.6, 7], [0, 3.4, -24], [0, 3.6, -24], 56), sh(6, [.8, 1.0, .9], [.7, 1.0, .6], [0, 5, -3], [0, 6, -4], 80, { shake: .08 })],
   [I.wings]: [sh(0, [0, 1.8, -24], [0, 1.5, -29], [0, 18, -58], [0, 22, -58], 64), sh(3, [46, 30, -26], [40, 36, -34], [0, 24, -58], [0, 24, -58], 52)],
   [I.eyes]: [sh(0, EYEC(16, 4, -2), EYEC(11, 3, -1.5), () => EYEW(), () => EYEW(), 54), sh(10, EYEC(8.5, 1.5, 0), EYEC(7, 1, 0), () => EYEW(), () => EYEW(), 50)],
   [I.pell]: [shF(0, PELL, 1.6, 1.35, .25, 0, 68), sh(4, OH(1.7, 2.0, -1.0), OH(1.6, 2.0, -1.2), OH(-3.3, 3.4, -2.8), OH(-3.3, 3.2, -2.8), 58)],
   [I.corners]: [sh(0, OH(-3, .6, -2.4), OH(-2.8, .6, -2.2), OH(1.2, 1.6, -1.6), OH(1.2, 1.6, -1.6), 72), sh(6, OH(1.6, 1.9, -1.1), OH(.6, 2.3, -1.6), OH(-3.34, 3.6, -2.84), OH(-3.34, 3.6, -2.84), 56)],
-  [I.winter]: [sh(0, OH(1.6, 2.2, 1.0), OH(1.4, 2.2, 1.4), BH(-1.2, 2.2, 0), BH(-1.2, 2.2, 0), 46), sh(5, BH(-1.4, 3, 2.4), BH(-1.6, 2.9, 2.1), BH(-.6, 1.9, .3), BH(-.6, 1.9, .3), 70)],
-  [I.candle]: [sh(0, BH(-.4, 2.05, 1.2), BH(-.5, 2.0, 1.05), BH(-.6, 2.1, .3), BH(-.6, 2.2, .3), 56), shF(5, BKID, 1.4, 1.15, -.3, .1, 70)],
+  [I.winter]: [sh(0, BH(-1.2, 2.4, 5.2), BH(-1.2, 2.4, 4.4), BH(-.8, 2.1, 0), BH(-.8, 2.1, 0), 50), sh(5, BH(-1.4, 3, 2.4), BH(-1.6, 2.9, 2.1), BH(-.6, 1.9, .3), BH(-.6, 1.9, .3), 70)],
+  [I.candle]: [sh(0, BH(-.2, 2.3, 1.8), BH(-.3, 2.25, 1.6), BH(-.6, 2.0, .3), BH(-.6, 2.05, .3), 56), shF(5, BKID, 1.4, 1.15, .6, .1, 70)],
   [I.three]: [sh(0, [-1.4, 2.6, 7.2], [-2.6, 2.6, 7.2], [-5.6, 2.45, 7.2], [-5.6, 2.45, 7.2], 50)],
-  [I.song]: [sh(0, [-2, 1.4, 9], [-2.4, 1.3, 10], [-8.5, 9, 6], [-8.5, 9.5, 6], 66), sh(6, BH(.4, 2.2, 1.6), BH(.3, 2.2, 1.3), BH(-.6, 2.3, -.3), BH(-.6, 2.3, -.3), 70)],
-  [I.watch]: [sh(0, [3.6, 2.7, 7.6], [4.2, 2.7, 7.4], OH(1.2, 2.5, 1.6), OH(1.2, 2.5, 1.6), 52), shF(6, PELL, 1.25, 1.05, .3, .1, 70)],
+  [I.song]: [sh(0, [-2, 1.4, 9], [-2.4, 1.3, 10], [-8.5, 9, 6], [-8.5, 9.5, 6], 66), sh(6, BH(1.1, 2.5, 2.3), BH(.9, 2.5, 2.0), BH(-.6, 2.3, -.3), BH(-.6, 2.3, -.3), 66)],
+  [I.watch]: [sh(0, [3.6, 2.7, 7.6], [4.2, 2.7, 7.4], OH(1.2, 2.5, 1.6), OH(1.2, 2.5, 1.6), 52), shF(6, PELL, 1.4, 1.2, .5, .1, 66, .15)],
   [I.roof]: [sh(0, OH(1.6, 2.0, 1.2), OH(1.5, 2.1, 1.5), [-8.5, 6, 6], [-8.5, 9, 6], 58), sh(5, [-1, .8, 13], [-.4, .7, 12], [-8.5, 9, 6], [-8.5, 13, 6], 72)],
   [I.walls]: [sh(0, [3, 2.2, 13], [2.6, 2.4, 12], [-8.5, 6, 6], [-8.5, 9, 6], 62), sh(3, [-.6, 1.4, .6], [-.9, 1.4, 1.2], [-6, 3, 4.4], [-6, 5, 4.4], 64), sh(6, [-3.4, 3, 7], [-3.6, 4, 7], [-8, 5, 7], [-8, 9, 7], 66)],
   [I.up]: [sh(0, [-3, .7, 9], [-3, .6, 9.4], [-8.5, 30, 6], [-8.5, 40, 6], 74), sh(5, [8, 70, 30], [6, 76, 28], [-8.5, 40, 6], [-8.5, 46, 6], 50)],
@@ -867,27 +947,27 @@ const SHOTS = {
   [I.stopped]: [shF(0, PELL, 1.7, 1.45, .35, 0, 64)],
   [I.smiling]: [shF(0, PELL, 1.35, 1.15, -.25, 0, 70), shF(5, PELL, 1.05, .9, .3, 0, 72)],
   [I.why]: [shF(0, ME, 2.3, 1.9, .3, 0, 62)],
-  [I.blanket]: [sh(0, OH(2.9, 3.1, .4), OH(2.7, 2.9, .2), OH(1.2, 1.1, -1.7), OH(1.2, 1.1, -1.7), 64)],
+  [I.blanket]: [sh(0, OH(2.9, 3.1, .4), OH(2.7, 2.9, .2), OH(1.2, 1.4, -1.5), OH(1.2, 1.4, -1.5), 64)],
   [I.jar]: [sh(0, JARP([-1.1, .35, -.25]), JARP([-.85, .3, -.2]), JARP([0, .28, 0]), JARP([0, .28, 0]), 50)],
   [I.blink]: [sh(0, JARP([-.75, .2, .3]), JARP([-.6, .2, .25]), JARP([0, .28, 0]), JARP([0, .28, 0]), 60), shF(3, PELL, 1.15, .95, .4, 0, 70)],
   [I.ourroof]: [sh(0, [2, 1.4, 1], [2.2, 1.3, 1.8], [8.5, 9, 6], [8.5, 12, 6], 70), sh(4, [3, 26, -4], [4, 24, -2], [8.5, 6, 6], [8.5, 6, 6], 54)],
-  [I.gold]: [sh(0, [4.2, 6.4, 3], [4.4, 6.0, 3.6], [6, 6.8, 6], [6, 6.6, 6], 60), sh(5, [3.2, 2.6, 2.6], [3.4, 2.5, 3.0], [5.5, 1.8, 4.4], [5.5, 1.8, 4.4], 62), sh(8, [3.6, 2.6, 8.6], [3.8, 2.6, 8.2], [5.5, 2.5, 7.2], [5.5, 2.5, 7.2], 60)],
+  [I.gold]: [sh(0, [4.2, 6.4, 3], [4.4, 6.0, 3.6], [6, 6.8, 6], [6, 6.6, 6], 60), sh(5, [2.6, 2.0, 1.4], [2.8, 2.0, 1.9], [5.5, 1.8, 4.4], [5.5, 1.8, 4.4], 62), sh(8, [3.6, 2.6, 8.6], [3.8, 2.6, 8.2], [5.5, 2.5, 7.2], [5.5, 2.5, 7.2], 60)],
   [I.outside]: [sh(0, [-1.4, 3.6, 2], [-1.6, 3.6, 3], [5.5, 3, 7], [5.5, 3, 7], 56), shF(6, WREN, 1.9, 1.6, .2, -.4, 66), shF(8, WREN, 1.25, 1.05, .1, -.6, 74, .15)],
   [I.stops]: [shF(0, WREN, 1.35, 1.15, -.2, -.7, 78, .1, { shake: .02 })],
   [I.never]: [sh(0, [1.2, 15, 7.4], [1.1, 12, 7], [.4, 1, 5.6], [.4, 1, 5.6], 54)],
-  [I.mine]: [sh(0, OH(2.9, 3.3, .5), OH(2.7, 3.1, .3), OH(.9, 1.4, -1.5), OH(.9, 1.4, -1.5), 62), shF(7, PELL, 1.05, .9, .1, 0, 72)],
+  [I.mine]: [sh(0, OH(3.2, 3.0, .9), OH(3.0, 2.9, .7), OH(.9, 1.4, -1.5), OH(.9, 1.4, -1.5), 62), shF(7, PELL, 1.05, .9, .1, 0, 72)],
   [I.lamps]: [shF(0, ME, 2.5, 2.1, .7, .2, 62), shF(5, ME, 1.5, 1.3, -.45, 0, 66)],
   [I.light]: [shF(0, ME, 1.9, 1.6, -.6, .25, 64), sh(5, OH(-2.0, 2.4, -.3), OH(-2.0, 2.25, -.5), OH(-2.2, 1.6, -1.2), OH(-2.2, 1.6, -1.2), 66)],
-  [I.tie]: [shF(0, ME, 2.1, 1.85, .4, 0, 62), shF(5, ME, 1.4, 1.25, .3, -.75, 66, -.8), shF(7, ME, 1.4, 1.25, -.3, -1.25, 66, -1.3), shF(9, ME, 1.6, 1.4, .3, -2.0, 70, -2.45)],
+  [I.tie]: [shF(0, ME, 2.1, 1.85, .4, 0, 62), shF(5, ME, 2.0, 1.8, .3, -.5, 64, -.5), shF(7, ME, 2.0, 1.8, -.3, -.9, 64, -.9), sh(9, () => [ME.g.position.x + .9, .5, ME.g.position.z + 1.2], null, () => [ME.g.position.x, .35, ME.g.position.z], null, 66)],
   [I.brightest]: [shF(0, ME, 2.7, 2.4, .25, -2.0, 76, -.2)],
-  [I.brighter]: [shF(0, ME, 1.7, 1.45, .2, 0, 70), sh(4, OH(1.6, 3.6, -1.4), OH(1.2, 3.8, -1.2), OH(-1.6, 1.8, 2.2), OH(-1.6, 1.8, 2.2), 56)],
+  [I.brighter]: [shF(0, ME, 1.7, 1.45, .2, 0, 70), sh(4, OH(-1.6, 2.6, 3.6), OH(-1.6, 2.7, 3.3), OH(-1.6, 2.2, 2.0), OH(-1.6, 2.2, 2.0), 58)],
   [I.run]: [sh(0, [2.6, 2.4, 3.4], [2.8, 2.4, 3.8], [5.5, 2, 4.4], [5.5, 2, 4.4], 62), sh(5, () => [ME.g.position.x - 3.4, 2.2, ME.g.position.z - .5], null, () => [ME.g.position.x, 1.6, ME.g.position.z + .6], null, 64), sh(8, [-2.2, 1.6, 15.8], [-2.6, 1.6, 16.4], [0, 1.4, 14], [0, 1.6, 15], 62), sh(10, () => [ME.g.position.x, 2.6, ME.g.position.z - 4], null, () => [ME.g.position.x, 1.8, ME.g.position.z + 4], null, 60)],
   [I.dark]: [sh(0, [2.5, 4.6, 33], [2, 4.1, 31], [0, 3, -10], [0, 3, -14], 46)],
   [I.nobodybright]: [sh(0, [-14, 30, 34], [-12, 34, 28], [0, 0, -10], [0, 0, -14], 48)],
   [I.above]: [sh(0, [-2.4, .6, 23.6], [-2.6, .6, 24], [0, 26, 32], [0, 26, 33], 82, { shake: .06 }), sh(3, [5, 4, 33], [4, 3, 32], [0, 18, 30], [0, 16, 30], 70)],
-  [I.wind2]: [sh(0, [3.4, 1.0, 23], [3.0, .9, 23.6], [0, 1.6, 26], [0, 1.8, 26], 62, { shake: .05 }), shF(5, ME, 1.6, 1.35, .9, -1.2, 66, -1.0)],
+  [I.wind2]: [sh(0, [3.4, 1.0, 23], [3.0, .9, 23.6], [0, 1.6, 26], [0, 1.8, 26], 62, { shake: .05 }), shF(5, ME, 1.8, 1.55, 1.6, -.5, 66, -.6)],
   [I.life]: [shF(0, ME, 1.55, 1.3, .25, .1, 66, 0, { shake: .03 })],
-  [I.last]: [sh(0, [0, 40, 25.6], [0, 30, 25.8], [0, 0, 26], [0, 0, 26], 52)],
+  [I.last]: [sh(0, [6, 34, 31], [4, 28, 29], [0, 0, 26], [0, 0, 26], 52)],
 };
 // tiempos de inicio de cada toma y cortes; window.SUBF: más sub-cuadros (desenfoque) en los barridos
 const TOMAS = []; Object.entries(SHOTS).forEach(([L, list]) => { L = +L; list.forEach((s0, j) => { const a = j === 0 ? S[L] : wt(L, s0.w) - .06; TOMAS.push({ L, j, a, s: s0 }) }) });
@@ -940,7 +1020,7 @@ function setScene(t) {
 
   switch (L) {
     case I.hook: case I.third: case I.whole: {
-      const on3 = L > I.hook ? (L === I.third ? P(t, W(2) - .05, W(2) + .15) : 1) : 0; HOOK.attic.emissiveIntensity = 2.2 * on3; HOOK.atticGlow.scale.setScalar(.001 + 3 * on3);
+      const on3 = L > I.hook ? (L === I.third ? P(t, W(2) - .05, W(2) + .15) : 1) : 0; HOOK.attic.emissiveIntensity = 2.2 * on3; HOOK.atticGlow.scale.setScalar(.001 + 1.4 * on3);
       const md = L === I.hook ? 0 : L === I.third ? eOut(P(t, W(4), e(I.third) + .2)) : 1, lift = L === I.whole ? eIO(P(lt, .1, len)) : 0;
       if (L > I.hook) { const p = MPOS.hook; moth(t, { pos: [p[0], lerp(70, p[1], md) + lift * 26, p[2]], yaw: Math.PI / 2 + .3, flap: 1, sp: 1.1, grab: lift > 0 ? 1 : md * .6 }); dust(t, [8.5, 0, -10], { R: 13, top: 24 + lift * 20, k: .2 + md * .8, wind: lift }) }
       HOOK.g.position.y = lift * 26; HOOK.g.rotation.x = Math.sin(t * 2) * .03 * lift;
@@ -948,16 +1028,16 @@ function setScene(t) {
       break }
     case I.morning: case I.twelve: {
       crowd([[FOLK[0], 3.6, -7.2, Math.PI / 2], [FOLK[1], 4.1, -12.3, Math.PI / 2 - .3, "worried"], [FOLK[2], 3.2, -10.2, Math.PI / 2 + .2], [PELL, 2.5, -8.6, Math.PI / 2], [ME, 2.2, -9.6, Math.PI / 2]]);
-      if (L === I.twelve) { const a = lt * .5; crowd([[FOLK[3], -8.5 + Math.cos(a) * 4.6, -18 + Math.sin(a) * 4, -a, "neutral", 1], [FOLK[4], -8.5 + Math.cos(a + 2) * 4.6, -18 + Math.sin(a + 2) * 4, -a - 2, "neutral", 1], [FOLK[0], -8.5 + Math.cos(a + 4) * 4.6, -18 + Math.sin(a + 4) * 4, -a - 4, "neutral", 1]]) }
+      if (L === I.twelve) { const a = lt * .5; crowd([[FOLK[3], -8.5 + Math.cos(a) * 5.5, -18 + Math.sin(a) * 4, -a, "neutral", 1], [FOLK[4], -8.5 + Math.cos(a + 2) * 5.5, -18 + Math.sin(a + 2) * 4.4, -a - 2, "neutral", 1], [FOLK[0], -8.5 + Math.cos(a + 4) * 5.5, -18 + Math.sin(a + 4) * 4, -a - 4, "neutral", 1]]) }
       break }
     case I.wicks: {
-      place(ME, 3.6, -1.6, Math.PI / 2); setFace(ME, "neutral"); pose(ME, t, { armFwd: .55 }); TL[0].g.visible = true; TL[0].g.position.set(4.05, 1.78, -1.42); attach(SCISS, ME, "L", [0, -.2, .3]); SCISS.rotation.set(.3, 0, Math.sin(t * 14) * .1);
+      place(ME, 3.6, -1.6, Math.PI / 2); setFace(ME, "neutral"); pose(ME, t, { armFwd: .55 }); TL[0].g.visible = true; TL[0].g.position.set(4.05, 1.78, -1.42); lamp(TL[0], .6); attach(SCISS, ME, "L", [0, -.2, .3]); SCISS.rotation.set(.3, 0, Math.sin(t * 14) * .1);
       LL.push([[4.2, 2.6, -1.0], 5, AMBER, 7]); break }
     case I.wren: case I.count: {
       const walkZ = L === I.wren ? lerp(-3.4, 1.2, k) : -2; place(WREN, 1.5, walkZ, L === I.wren && k < .75 ? 0 : Math.PI / 2); pose(WREN, t, { walk: L === I.wren && k < .75 ? .5 : 0, armFwd: .2 }); WREN.body.rotation.x = .12; setFace(WREN, "squint");
       attach(CANE, WREN, "R", [0, -.15, .15]); attach(LANT, WREN, "L", [0, -.5, .1]); LANT.rotation.z = Math.sin(t * 3) * .1;
       if (L === I.count) { const tap = [W(7), W(7) + .35].some(a => t > a && t < a + .15); WREN.armR.rotation.x = tap ? -.45 : -.2; if (t > W(9)) { place(WREN, 1.5, -2 + (t - W(9)) * 1.2, 0); pose(WREN, t, { walk: .5 }); WREN.body.rotation.x = .12 } }
-      LL.push([[WREN.g.position.x, 1.8, WREN.g.position.z + .4], 6, AMBER, 8]); break }
+      LL.push([[WREN.g.position.x, 2.7, WREN.g.position.z + 1.0], 6, AMBER, 8]); break }
     case I.eat: {
       if (t < W(10)) { // comer y leer, adentro
         TL.forEach((l, i) => { l.g.visible = true; l.g.position.set(...OH(-2.7 + i * 1.4, 1.62, -1.5)) });
@@ -991,14 +1071,14 @@ function setScene(t) {
     case I.winter: case I.candle: case I.three: case I.song: {
       crowd([[BDAD, ...[BH(-.6, 0, -.8)[0], BH(-.6, 0, -.8)[2]], 0], [BMOM, BH(-1.7, 0, .3)[0], BH(-1.7, 0, .3)[2], 0], [BKID, BH(.4, 0, .5)[0], BH(.4, 0, .5)[2], 0]]);
       [BDAD, BMOM, BKID].forEach(c => { faceTo(c, CAKE.position.x, CAKE.position.z); setFace(c, L === I.song ? "laugh" : "happy"); pose(c, t, { armFwd: L === I.song ? .3 : .1 }) }); setFace(BKID, L === I.candle ? "excited" : L === I.song ? "laugh" : "happy");
-      branLamps(); LL.push([[CAKE.position.x, CAKE.position.y + 1, CAKE.position.z], 3, AMBER, 6]);
+      branLamps(); LL.push([[CAKE.position.x, CAKE.position.y + 1, CAKE.position.z], 1.2, AMBER, 6]);
       if (L === I.winter) { place(ME, ...[OH(1.2, 0, .2)[0], OH(1.2, 0, .2)[2]], 0); faceTo(ME, -8.5, 7.2); place(PELL, OH(1.4, 0, .5)[0], OH(1.4, 0, .5)[2], 0); faceTo(PELL, -8.5, 7.2); ourLamps() }
       if (L === I.song) { const p = MPOS.bran; moth(t, { pos: [p[0], lerp(60, p[1] + 6, eOut(k)), p[2]], yaw: .4, flap: 1, sp: 1, grab: .3 }); dust(t, [-8.5, 0, 6], { R: 10, top: 24, k: .3 + k * .7 }) }
       break }
     case I.watch: case I.roof: case I.walls: case I.up: {
       // nosotros en la ventana; enfrente se van el techo, las paredes, el porche y la torta (con la familia)
-      const wp = OH(1.2, 0, 1.3); place(ME, wp[0] + .55, wp[2] - .3, -Math.PI / 2); place(PELL, wp[0], wp[2] + .1, -Math.PI / 2); setFace(ME, "horrified"); setFace(PELL, "scared");
-      pose(ME, t, { armFwd: .9 }); ME.armR.rotation.set(-2.2, 0, .7); ourLamps();
+      const wp = OH(1.2, 0, 1.3); place(ME, wp[0] + .35, wp[2] - .2, -Math.PI / 2); place(PELL, wp[0], wp[2] + .1, -Math.PI / 2); setFace(ME, "horrified"); setFace(PELL, "scared");
+      pose(ME, t, { armFwd: .9 }); ME.armR.rotation.set(-1.5, 0, -.6); ourLamps();
       crowd([[BDAD, BH(-.6, 0, -.8)[0], BH(-.6, 0, -.8)[2], 0, "laugh"], [BMOM, BH(-1.7, 0, .3)[0], BH(-1.7, 0, .3)[2], 0, "laugh"], [BKID, BH(.4, 0, .5)[0], BH(.4, 0, .5)[2], 0, "laugh"]]); [BDAD, BMOM, BKID].forEach(c => faceTo(c, CAKE.position.x, CAKE.position.z));
       const tR = L === I.roof ? P(t, W(1), e(L) + .3) : L > I.roof ? 1 : 0, tW = L === I.walls ? P(t, W(1), W(3) + .4) : L > I.walls ? 1 : 0, tP = L === I.walls ? P(t, W(4), W(6) + .3) : L > I.walls ? 1 : 0, tC = L === I.walls ? P(t, W(7), e(L) + .4) : L > I.walls ? 1 : 0;
       const up = L === I.up ? eIO(k) * 40 : 0, ROOFY = eIO(tR) * 14 + eIO(tW) * 8 + up, WALLY = eIO(tW) * 12 + up, PORY = eIO(tP) * 12 + up, CAKY = eIO(tC) * 10 + up;
@@ -1037,8 +1117,8 @@ function setScene(t) {
       const rk = L === I.run ? P(t, W(1), e(L) + .3) : 1, seg = rk * (path.length - 1), si = Math.min(path.length - 2, Math.floor(seg)), sq = seg - si, x = lerp(path[si][0], path[si + 1][0], sq), z = lerp(path[si][1], path[si + 1][1], sq);
       place(ME, x, z, Math.atan2(path[si + 1][0] - path[si][0], path[si + 1][1] - path[si][1])); pose(ME, t, { walk: L === I.run && rk < 1 ? 1.4 : 0, armL: .05, armR: .05 }); setFace(ME, L >= I.life ? "neutral" : "brave");
       if (L >= I.above) { ME.g.rotation.y = Math.PI; ME.head.rotation.x = L === I.above ? -.6 : -.35 } if (L === I.last) ME.head.rotation.x = -.9;
-      HL.forEach((l, i) => attach(l.g, ME, i ? "R" : "L", [0, -.35, .2])); CANDLES.forEach((c, i) => { c.g.visible = true; c.fl.visible = true; c.gl.scale.setScalar((.45 + Math.sin(t * 13 + i) * .06) * (L >= I.above ? 1.2 : 1)); if (L === I.wind2) c.g.rotation.z = .35 + Math.sin(t * 9 + i) * .06 });
-      LL.push([[x, 2.2, z + .3], 6, "#ffc070", 12]); LL.push([[x, 1, z - .4], 3, AMBER, 7]);
+      HL.forEach((l, i) => attach(l.g, ME, i ? "R" : "L", [0, -.35, .2])); CANDLES.forEach((c, i) => { c.g.visible = true; c.fl.visible = true; c.gl.scale.setScalar((.45 + Math.sin(t * 13 + i) * .06) * (L === I.wind2 ? .8 : L >= I.above ? 1.2 : 1)); if (L === I.wind2) c.g.rotation.z = .35 + Math.sin(t * 9 + i) * .06 });
+      LL.push([[x, 2.2, z + .3], L === I.wind2 ? 3 : 6, "#ffc070", 12]); LL.push([[x, 1, z - .4], 3, AMBER, 7]);
       if (L === I.run && t < W(5)) { place(ME, 4.6, 4.4, -Math.PI / 2); pose(ME, t, {}) }
       // las ventanas del pueblo se apagan una por una, de las lejanas a las cercanas
       if (L >= I.dark) { const kd = L === I.dark ? P(lt, .1, len * .9) : 1; HOUSES.forEach(H => { const d = 1 - cl((H.z + 45) / 55), off = kd > d; H.panes.forEach(p => p.emissiveIntensity = off ? 0 : 1.6); H.glows.forEach(g => g.visible = !off) }); HL.forEach(l => { }); }
@@ -1055,7 +1135,7 @@ function setScene(t) {
 const VIG2 = (() => { const c = mk(W, H), g = c.getContext("2d"), r = g.createRadialGradient(W / 2, H * .48, Math.min(W, H) * .28, W / 2, H * .48, Math.max(W, H) * .6); r.addColorStop(0, "rgba(0,0,0,0)"); r.addColorStop(1, "rgba(10,5,0,.32)"); g.fillStyle = r; g.fillRect(0, 0, W, H); return c })();
 let POST = {};
 COMP = new EffectComposer(R); COMP.setPixelRatio(1); COMP.setSize(W, H); COMP.addPass(new RenderPass(scene, cam)); COMP.addPass(new UnrealBloomPass(new THREE.Vector2(W, H), .55, .6, .72)); COMP.addPass(new OutputPass());
-const SUBY = L => [I.tie, I.brightest, I.never].includes(L) ? .22 : .75;   // sube al 22 % cuando la acción está abajo
+const SUBY = L => [I.tie, I.brightest, I.never, I.mine, I.stops].includes(L) ? .22 : .75;   // sube al 22 % cuando la acción está abajo
 function subV(t) {
   let i = -1; for (let k = 0; k < WORDS.length; k++) if (t >= WORDS[k][0]) i = k; if (i < 0 || !WORDS[i][1]) return;
   const w = WORDS[i][1].toLowerCase().replace(/[.,!?"“”]/g, ""), edad = t - WORDS[i][0], size = 112, y = H * SUBY(lineAt(t));

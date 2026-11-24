@@ -29,11 +29,34 @@ for i in range(len(L)):
     ks = [idx[j] for j in range(len(gw)) if own[j] == i and idx[j] is not None]
     if not ks: print("SIN ALINEAR frase", i, L[i]); cortes.append(None); continue
     cortes.append((W[min(ks)][1], W[max(ks)][2]))
+# límites entre frases: en el silencio más largo entre la última palabra de una y la primera de la siguiente
+# (whisper a veces corre el inicio de la frase siguiente y se lleva la última palabra de la anterior: «hungry» terminaba en la frase 16)
+env = np.array([np.sqrt(np.mean(x[k:k + int(.02 * sr)] ** 2)) for k in range(0, len(x) - int(.02 * sr), int(.02 * sr))])
+def corte_en_silencio(t0, t1):
+    a0, a1 = int(t0 / .02), max(int(t0 / .02) + 1, int(t1 / .02))
+    if a1 - a0 < 3: return (t0 + t1) / 2
+    seg = np.convolve(env[a0:a1], np.ones(3) / 3, "same"); bajo = seg < .015
+    # el ÚLTIMO silencio de al menos 60 ms antes de la frase siguiente (no el más largo: una pausa dramática dentro de la frase
+    # «Two lamps. Always.» era más larga que la pausa entre frases y se llevaba «Always» a la frase siguiente)
+    k = len(seg) - 1
+    while k >= 0:
+        if bajo[k]:
+            j = k
+            while j >= 0 and bajo[j]: j -= 1
+            if k - j >= 3: return (a0 + (j + 1 + k) // 2) * .02
+            k = j
+        k -= 1
+    return (a0 + int(np.argmin(seg))) * .02
+lim = [None] * (len(cortes) + 1)
+validos = [i for i, c in enumerate(cortes) if c]
+for a_, b_ in zip(validos, validos[1:]):
+    ultimo_ini = W[max(idx[j] for j in range(len(gw)) if own[j] == a_ and idx[j] is not None)][1]
+    lim[b_] = corte_en_silencio(ultimo_ini + .08, cortes[b_][0] + .35)
 for i, c in enumerate(cortes):
     if c is None: continue
-    # hasta justo antes de la frase siguiente (si whisper no alineó la última palabra, no se pierde): el motor recorta el silencio
-    ini = max(0, c[0] - .06); sig = next((cortes[j][0] for j in range(i + 1, len(cortes)) if cortes[j]), None)
-    fin = sig - .04 if sig else min(len(x) / sr, c[1] + .5)
+    ini = lim[i] if lim[i] is not None else max(0, c[0] - .06)
+    sig = next((lim[j] for j in range(i + 1, len(cortes)) if lim[j] is not None), None)
+    fin = sig if sig else min(len(x) / sr, c[1] + .5)
     seg = x[int(ini * sr):int(fin * sr)]; out = os.path.join(P, "voz", f"{i:02d}.wav")
     # pausas internas (ElevenLabs deja ~0,5 s entre oraciones dentro de una frase): cada silencio de más de 0,2 s queda en 0,16 s
     w = int(.02 * sr); n = len(seg) // w; e = np.array([np.sqrt(np.mean(seg[k * w:(k + 1) * w] ** 2)) for k in range(n)]) < .012
