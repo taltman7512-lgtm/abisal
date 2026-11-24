@@ -1,0 +1,5 @@
+node_modules/
+salida/
+voz/
+partes/_check.mjs
+_gpu.html

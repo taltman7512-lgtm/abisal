@@ -1,0 +1,262 @@
+[
+ {
+  "n": "hook",
+  "t": "Every house in Hollow Fen burns two lamps.",
+  "gap": 0.1
+ },
+ {
+  "n": "third",
+  "t": "Light a third, and the Moth takes the house.",
+  "gap": 0.1
+ },
+ {
+  "n": "whole",
+  "t": "Not the people inside. The whole house.",
+  "gap": 0.18
+ },
+ {
+  "n": "morning",
+  "t": "In the morning, there's only a square of clean dirt.",
+  "gap": 0.1
+ },
+ {
+  "n": "twelve",
+  "t": "Twelve squares so far. We walk around them.",
+  "gap": 0.22
+ },
+ {
+  "n": "wicks",
+  "t": "I trim the wicks on our street.",
+  "gap": 0.1
+ },
+ {
+  "n": "wren",
+  "t": "Every evening, old Wren walks by and counts our windows.",
+  "gap": 0.1
+ },
+ {
+  "n": "count",
+  "t": "One. Two. Then she taps her cane twice and moves on.",
+  "gap": 0.1
+ },
+ {
+  "n": "eat",
+  "t": "We eat by two lamps. We read by two lamps. We get married by two lamps.",
+  "gap": 0.2
+ },
+ {
+  "n": "nobody",
+  "t": "Nobody has ever seen the Moth land.",
+  "gap": 0.1
+ },
+ {
+  "n": "dust",
+  "t": "You only see the dust.",
+  "gap": 0.1
+ },
+ {
+  "n": "snow",
+  "t": "It falls first, like gold snow. Then the wind comes from above.",
+  "gap": 0.1
+ },
+ {
+  "n": "wings",
+  "t": "Its wings are wider than the church.",
+  "gap": 0.25
+ },
+ {
+  "n": "eyes",
+  "t": "And on the wings, two huge eyes that never blink, because they're painted on.",
+  "gap": 0.3
+ },
+ {
+  "n": "pell",
+  "t": "My little sister Pell hates the dark.",
+  "gap": 0.1
+ },
+ {
+  "n": "corners",
+  "t": "She says two lamps leave the corners hungry.",
+  "gap": 0.25
+ },
+ {
+  "n": "winter",
+  "t": "Last winter, the Brannocks had a birthday.",
+  "gap": 0.1
+ },
+ {
+  "n": "candle",
+  "t": "One candle on a cake. Just one.",
+  "gap": 0.1
+ },
+ {
+  "n": "three",
+  "t": "That made three.",
+  "gap": 0.55
+ },
+ {
+  "n": "song",
+  "t": "The dust started falling during the song.",
+  "gap": 0.1
+ },
+ {
+  "n": "watch",
+  "t": "I watched from our window, with my hand over Pell's eyes.",
+  "gap": 0.1
+ },
+ {
+  "n": "roof",
+  "t": "The roof lifted off like a lid.",
+  "gap": 0.4
+ },
+ {
+  "n": "walls",
+  "t": "Then the walls. Then the porch. Then the cake, still lit.",
+  "gap": 0.4
+ },
+ {
+  "n": "up",
+  "t": "No screaming. Just the song, getting smaller, going up.",
+  "gap": 0.5
+ },
+ {
+  "n": "raked",
+  "t": "In the morning, Wren raked the square of dirt where they used to live.",
+  "gap": 0.1
+ },
+ {
+  "n": "well",
+  "t": "She painted new words on the well. Two lamps. Always.",
+  "gap": 0.2
+ },
+ {
+  "n": "nocandles",
+  "t": "Nobody bought candles that year. Nobody sang.",
+  "gap": 0.35
+ },
+ {
+  "n": "church2",
+  "t": "Even the church kept its two lamps. Not one more.",
+  "gap": 0.3
+ },
+ {
+  "n": "stopped",
+  "t": "Pell stopped talking about the dark after that.",
+  "gap": 0.1
+ },
+ {
+  "n": "smiling",
+  "t": "Then, three nights ago, she started smiling at bedtime.",
+  "gap": 0.1
+ },
+ {
+  "n": "why",
+  "t": "Tonight, I found out why.",
+  "gap": 0.2
+ },
+ {
+  "n": "blanket",
+  "t": "Under her blanket, there's a jar.",
+  "gap": 0.1
+ },
+ {
+  "n": "jar",
+  "t": "Inside the jar, forty fireflies.",
+  "gap": 0.3
+ },
+ {
+  "n": "blink",
+  "t": "Forty little lights, blinking on and off, on and off.",
+  "gap": 0.3
+ },
+ {
+  "n": "ourroof",
+  "t": "The dust is already falling on our roof.",
+  "gap": 0.1
+ },
+ {
+  "n": "gold",
+  "t": "Gold on our roof, on our door, on my sister's window.",
+  "gap": 0.2
+ },
+ {
+  "n": "outside",
+  "t": "Outside, Wren is counting our windows. One. Two. Forty-two.",
+  "gap": 0.25
+ },
+ {
+  "n": "stops",
+  "t": "Then she stops counting.",
+  "gap": 0.55
+ },
+ {
+  "n": "never",
+  "t": "Wren never stops counting.",
+  "gap": 0.3
+ },
+ {
+  "n": "mine",
+  "t": "Pell won't let go of the jar. She just whispers, mine.",
+  "gap": 0.1
+ },
+ {
+  "n": "lamps",
+  "t": "So I take both our lamps off the hooks.",
+  "gap": 0.1
+ },
+ {
+  "n": "light",
+  "t": "I light every candle in the kitchen drawer.",
+  "gap": 0.1
+ },
+ {
+  "n": "tie",
+  "t": "I tie them to my coat, my belt, my boots.",
+  "gap": 0.1
+ },
+ {
+  "n": "brightest",
+  "t": "I'm the brightest thing in Hollow Fen.",
+  "gap": 0.35
+ },
+ {
+  "n": "brighter",
+  "t": "Brighter than the jar. Brighter than a birthday.",
+  "gap": 0.3
+ },
+ {
+  "n": "run",
+  "t": "I open the door and run, past the well, into the marsh.",
+  "gap": 0.35
+ },
+ {
+  "n": "dark",
+  "t": "Behind me, every window in town goes dark.",
+  "gap": 0.4
+ },
+ {
+  "n": "nobodybright",
+  "t": "Nobody wants to be the brightest house tonight.",
+  "gap": 0.35
+ },
+ {
+  "n": "above",
+  "t": "Above me, the wind is coming down.",
+  "gap": 0.3
+ },
+ {
+  "n": "wind2",
+  "t": "The reeds lie flat. The candles lean, but they stay lit.",
+  "gap": 0.25
+ },
+ {
+  "n": "life",
+  "t": "My whole life, I counted to two.",
+  "gap": 0.35
+ },
+ {
+  "n": "last",
+  "t": "Tonight, I'm the third lamp.",
+  "gap": 0.35
+ }
+]
