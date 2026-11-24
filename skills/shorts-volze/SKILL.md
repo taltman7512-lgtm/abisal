@@ -40,6 +40,14 @@ anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.c
   **ultradetalle** concreto para agregar. Se aplica y se vuelve a renderizar.
 - **Luz**: más cuidada. Sol cálido con sombras suaves, relleno del cielo, luz de contorno y oclusión en los rincones.
   Más detalle en todo; ante la duda, sumar.
+- **Subir al canal «RobloxStories» (24-nov-2026)**: todo video de este estilo (historias del pueblo, personajes de
+  bloques tipo Roblox, la tanda de Volze/«Ghostly») se sube al canal de YouTube **RobloxStories** una vez que pasó
+  el revisor. Lo subo yo con Claude in Chrome en YouTube Studio: primero confirmar arriba a la derecha que la cuenta
+  activa es RobloxStories (si no, «Cambiar de cuenta»), y después seguir el método que anduvo en
+  `reel-historias/referencia/youtube.md` (pedazos de 9 MB, juntar con SHA-256 igual, `DataTransfer` al diálogo de
+  subida). Se sube el MP4 **sin música** (voz + efectos). Título = el del video (≤ 5 palabras, sin hashtags ni
+  «Roblox»); descripción corta en inglés de 1–2 líneas sin hashtags. Queda **privado**: la audiencia («¿creado para
+  niños?»), la canción desde la app y el botón de publicar los decide el dueño, salvo que pida publicarlo.
 - **Voz provisoria**: no hacer una voz de reemplazo para el video. Si Chrome no está conectado, armar el video y
   esperar a ElevenLabs. Kokoro solo sirve para medir los tiempos de las tomas y nunca se entrega.
 - **Historias**: la de la polilla y las lámparas («Nobody Lights A Third Lamp», terror) no le gustó. La siguiente que
@@ -175,10 +183,16 @@ entra con resorte (0,55 → 1), tiempos **reales** de cada palabra (whisper), te
    - Cortarla por frases: `python <skill>/herramientas/cortar_completo.py voz-eleven/completa.mp3 --tempo 1.45`.
      Alinea con whisper, corta en el último silencio antes de cada frase, acorta las pausas internas y acelera
      ×1,45 sin cambiar el tono, porque Skylar habla a ≈ 172 palabras por minuto y el canal a ≈ 260. Después correr `verif_voz.py` y `palabras.py`.
+   - Si `cortar_completo.py` dice «SIN ALINEAR frase N», esa frase quedó pegada al final de la anterior y las
+     siguientes se corren una (`verif_voz.py` lo muestra). Partir el WAV anterior con whisper en el silencio antes de
+     la primera palabra de N y guardar `voz/NN.wav` (pasó con «Warm, under the dirt, like skin» en la tortuga).
    - Medición (`perfil_voz.py`, contra la voz de Volze aislada con Demucs: 172 Hz, rango 68 Hz): Skylar es la de ElevenLabs más
      parecida (151 Hz, rango 73 Hz, distancia 2,7). Más lejos: Liam Viral 4,2, Revenant 4,3, Mike Story 4,9,
      Mike POV 4,8, PJ 5,5, Snap 6,2. La más parecida medida es **Chatterbox** (gratis, local, en la GPU):
      `python <skill>/herramientas/voz.py` (motor por defecto), por si se acaban los créditos.
+   **`musica.js` siempre propio**: el de `ejemplo-terror/` nombra frases de la polilla (`I.count`, `I.snow`…) y rompe el
+   audio del render. Reescribirlo con los efectos de la historia nueva (ver `ejemplo-dia/musica.js`), aunque la entrega
+   sea sin música; no repetir nombres de la página (`CH` ya existe).
 4. **Escena**: reescribir en `historia.js` el mundo, el elenco, `SHOTS`, `LUGAR` y los `case` de `setScene`.
    `node partes/armar.js` (chequea sintaxis).
 5. **Revisión barata + agente revisor (obligatorio, pedido del dueño 24-nov-2026)**: `node render-gpu.mjs tomas` →
@@ -197,6 +211,8 @@ entra con resorte (0,55 → 1), tiempos **reales** de cada palabra (whisper), te
 8. **Render final por GPU** (sección de abajo) y verificación del MP4.
 9. Entregar con `SendUserFile`; anotar la historia en `referencia/historias-hechas.md`; commit (el MP4 pesa
    ≈ 350 MB con CQ 19: no va al repo, queda en `salida/`, ignorado por git).
+10. **Subir al canal RobloxStories** (pedido fijo del dueño, ver «Preferencias del dueño»): privado, con título y
+    descripción; avisar el link de Studio.
 
 Medición de audio:
 ```powershell
