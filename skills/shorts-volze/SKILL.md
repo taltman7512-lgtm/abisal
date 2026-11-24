@@ -27,6 +27,13 @@ anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.c
 - **Pelo como el de Volze**: mechones orgánicos esculpidos (curvos, con puntas que se afinan y volumen redondeado) y
   pintados a mano con mechas y brillo. Nunca una mezcla de cubos y rectángulos facetados.
 - **Criatura**: ojos con detalle (iris, pupila, brillo húmedo, párpado con arrugas) y cuello con pliegues y arrugas.
+- **Flores y detalles chicos en 3D, no pintados (24-nov-2026)**: flores con tallo, pétalos, centro y hojas, pasto en
+  matas y percebes huecos, todos con relieve y sombra. Nada de puntitos blancos pintados que parezcan flores.
+- **Criatura ultradetallada, como una foto real** (el dueño mandó de referencia una tortuga gigante de Galápagos):
+  hocico chato con narinas hundidas, boca de cuerno con labio, ojos hundidos con párpados pesados y cuero rajado en
+  placas, con relieve de verdad (geometría deformada + mapa de desplazamiento). La textura de la cabeza va **muy
+  leve** (placas casi del mismo color, poco relieve) y la del **cuello bien marcada** (pliegues hondos). Ver `formaCab`
+  y `placas()` en `ejemplo-dia/_cabeza.js`.
 - **Luz**: más cuidada. Sol cálido con sombras suaves, relleno del cielo, luz de contorno y oclusión en los rincones.
   Más detalle en todo; ante la duda, sumar.
 - **Voz provisoria**: no hacer una voz de reemplazo para el video. Si Chrome no está conectado, armar el video y
