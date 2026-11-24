@@ -15,13 +15,12 @@ El dueño dio permiso (24-nov-2026) para modificar esta skill cuando haga falta.
 gusto** (pelo, aspecto de los personajes, nivel de detalle, voz, música, ritmo, tipo de historia, lo que sea),
 anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.claude/skills/shorts-volze/`.
 - **Voz**: ElevenLabs «Skylar – Viral Zillennial Voice». Rechazadas: Kokoro, Liam Viral.
-- **Música (24-nov-2026, reemplaza a «sin canción»)**: de fondo va un **piano oscuro y lento, como a 0,60** (≈ 58 por
-  minuto), en menor, con bajo en octavas, acorde arpegiado y una melodía arriba que baja como lamento. Va en **todos los
-  videos de terror de este estilo** de ahora en más (y en la tortuga). El dueño pidió «Fallen Down» (Undertale, de Toby
-  Fox) en piano a 0,60. No se copia esa melodía porque tiene derechos y Content ID la reclama aunque esté tocada en piano o
-  más lenta. Se compone uno propio con ese clima (ver `ejemplo-dia/musica.js`, bloque «PIANO OSCURO PROPIO»: cada video
-  lleva una melodía nueva). Si el dueño quiere la original, la agrega él desde la app de YouTube, que la licencia.
-  Rechazado: música sintetizada con senos puros.
+- **Música de fondo (24-nov-2026, reemplaza al piano propio)**: de ahora en más va **el MP3 que dio el dueño**,
+  «undertale-fallen down but more comforting.mp3», guardado **fuera del repo** en
+  `C:/Users/123/Documents/volze-fuentes/musica/fondo-terror.mp3` (no se sube a git ni se baja de YouTube). Se pone en
+  loop debajo de todo el video, **≈ 6 dB bajo la voz**, y el pico final queda en ≤ 0,9 (`alimiter`). Se renderiza el video
+  `--sinmusica` y se mezcla con ffmpeg (receta en «Música»). El dueño sabe que tiene derechos de terceros y asume el
+  riesgo de reclamo de Content ID en su canal. Rechazado: música sintetizada con senos puros; el piano propio no le gustó.
 - **Personajes**: estilo de bloques «robloxiano» como los de Volze, siempre con `robloxify()`: brazos y piernas de un
   bloque, cara impresa con ojos ovalados grandes, pelo facetado. Nada de estilo propio (mangas por partes, manos).
 - **Calidad (24-nov-2026)**: siempre 1080×1920 a 60 fps y **más detalle** que el mínimo: utilería en cada rincón,
@@ -186,7 +185,9 @@ donde la imagen tiene que respirar. Medir: palabras ÷ duración × 60 entre 245
 entra con resorte (0,55 → 1), tiempos **reales** de cada palabra (whisper), texto del guion.
 
 ## Música (sintetizada en `partes/musica.js`, nunca canciones ajenas dentro del MP4)
-- **Por ahora el dueño pidió el video sin canción de fondo** (24-nov-2026): la entrega principal es **sin música**
+- **Receta de la canción de fondo** (24-nov-2026): ganancia = dB(voz) − 6 − dB(canción) (medidos en RMS), y
+  `ffmpeg -i video-sinmusica.mp4 -stream_loop -1 -i fondo-terror.mp3 -filter_complex "[1:a]volume=<g>dB,afade=t=in:d=0.3[m];[0:a][m]amix=inputs=2:duration=first:normalize=0,volume=0.96,alimiter=limit=0.9:level=false[a]" -map 0:v -map "[a]" -c:v copy -c:a aac -b:a 192k -shortest salida.mp4`.
+- **(Antes) el dueño pidió el video sin canción de fondo** (24-nov-2026, reemplazado por la canción de arriba): la entrega principal es **sin música**
   (voz + efectos). La música propia queda como opción: se entregan dos MP4 con el mismo video, con música y **sin música** (voz + efectos,
   `node render-gpu.mjs audio` → `salida/sin-musica.wav`, unido con `ffmpeg -c:v copy`). El dueño puede ponerle una
   canción con licencia desde la app de YouTube al subir (por ejemplo «Numbers» de Temporex). Nunca meter la
