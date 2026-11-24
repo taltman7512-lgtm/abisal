@@ -2,19 +2,31 @@
   // tema lento y melancólico tipo caja de música, sin percusión, debajo de la voz durante todo el video, y casi sin efectos (2–7 por minuto).
   // Tramos: canción de cuna de Hollow Fen (Re menor, celesta + cuerdas) → la misma en piano para Pell → la canción de cumpleaños de los
   // Brannock (Fa mayor, coro sin palabras) que se achica y sube → mañana gris → luciérnagas → tema triste del final (entra con el giro).
-  const VOLM = 2.7, M = oc.createGain(); M.gain.value = VOLM; const LP = filt("lowpass", 5200, .5, M); M.connect(mus);
+  const VOLM = 1.4, M = oc.createGain(); M.gain.value = VOLM; const LP = filt("lowpass", 11000, .4, M); M.connect(mus);
   if (window.SOLO === "voz") { M.gain.value = 0; fx.gain.value = 0 }
+  if (window.SOLO === "sinmusica") M.gain.value = 0;   // versión para ponerle una canción desde YouTube: queda voz + efectos
   const sl = i => i < S.length ? S[i] : DUR, el = i => i < S.length ? S[i] + D[i] : DUR;
   // instrumentos propios (van a LP en vez de a mus)
-  const box = (t, m, v = .07) => { const g = envG(t, v, .002, 1.8, LP); osc("sine", mtof(m), t, t + 2, g); osc("sine", mtof(m) * 3.01, t, t + .5, envG(t, v * .25, .001, .35, LP)); osc("sine", mtof(m) * 5.4, t, t + .25, envG(t, v * .08, .001, .15, LP)) };
-  const pno = (t, m, v = .12, dur = 3) => { const f = mtof(m), lp = filt("lowpass", 1400 + v * 5000, .5, LP); [1, .4, .2, .1, .05].forEach((a, k) => { const n = k + 1; osc("sine", f * n * (1 + .0004 * n * n), t, t + dur, envG(t, v * a, .005, dur * 1.1 / Math.sqrt(n), lp)) }) };
+  // caja de música FM (portadora + moduladora inarmónica que se apaga rápido: el «tin» metálico) — antes era un seno y sonaba sintético
+  const box = (t, m, v = .07) => { const f = mtof(m), g = envG(t, v, .001, 2.4, LP), car = osc("sine", f, t, t + 2.6, g), mg = oc.createGain(); mg.gain.setValueAtTime(f * 2.2, t); mg.gain.exponentialRampToValueAtTime(f * .05, t + .6);
+    const mod = osc("sine", f * 3.53, t, t + 2.6, mg); mod.disconnect(); mod.connect(mg); mg.connect(car.frequency); osc("sine", f * 2, t, t + 1.2, envG(t, v * .22, .001, .9, LP)); noise(t, .012, filt("highpass", 5000, 0, envG(t, v * .35, .0005, .01, LP))) };
+  // piano más rico: parciales levemente inarmónicos y desafinados de a pares (coro de cuerdas), martillo, y apagado más largo en los graves
+  const pno = (t, m, v = .12, dur = 3) => { const f = mtof(m), lp = filt("lowpass", 2600 + v * 9000 + (m - 48) * 60, .4, LP), d = dur * (1.3 - Math.min(.5, (m - 40) / 80));
+    [1, .5, .28, .16, .1, .06, .035].forEach((a, k) => { const n = k + 1, fn = f * n * (1 + .00035 * n * n); for (const dt of [-.6, .6]) { const o = osc("sine", fn, t, t + d + .2, envG(t, v * a * .55, .003 + k * .001, d / Math.sqrt(n), lp)); o.detune.value = dt } });
+    noise(t, .03, filt("bandpass", 1800 + m * 20, 1.5, envG(t, v * .12, .0008, .025, lp))) };
   const pad = (notes, t0, t1, v = .022, cut = 900, att = 1.5) => { if (t1 <= t0 + .3) return; const lp = filt("lowpass", cut, .6, LP), g = oc.createGain(); g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(v, t0 + Math.min(att, (t1 - t0) / 2)); g.gain.setValueAtTime(v, Math.max(t0 + att, t1 - 1)); g.gain.linearRampToValueAtTime(0, t1); g.connect(lp); for (const m of notes) for (const d of [-6, 0, 6]) { const o = osc("sawtooth", mtof(m), t0, t1, g); o.detune.value = d } };
   const choir = (t, m, dur, v = .05, rise = 0, close = 1) => { const g = oc.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + .12); g.gain.setValueAtTime(v, t + dur * .7); g.gain.linearRampToValueAtTime(0, t + dur); const f1 = filt("bandpass", 750, 4, g), f2 = filt("bandpass", 1150, 5, g); g.connect(LP);
     const o = osc("sawtooth", mtof(m), t, t + dur, f1); o.connect(f2); if (rise) o.frequency.exponentialRampToValueAtTime(mtof(m + rise), t + dur); if (close < 1) { f1.frequency.exponentialRampToValueAtTime(750 * close, t + dur); f2.frequency.exponentialRampToValueAtTime(1150 * close, t + dur) } };
   const C2 = { Dm: [50, 53, 57], Bb: [46, 50, 53], Gm: [43, 46, 50], A: [45, 49, 52], F: [41, 45, 48], C: [48, 52, 55], Am: [45, 48, 52], E: [40, 44, 47] };
   // 1) canción de cuna de Hollow Fen: Re menor, 64 por minuto, celesta + pad grave (desde el cuadro 0: el gancho ya tiene música)
   const BT = 60 / 64, MEL = [74, 77, 76, 74, 72, 70, 69, 72, 74, 77, 79, 77, 76, 74, 73, 74], PROG = ["Dm", "Bb", "Gm", "A"];
-  const cuna = (t0, t1, inst, v = 1) => { let k = 0; for (let t = t0; t < t1 - .3; t += BT, k++) { const c = PROG[Math.floor(k / 4) % 4]; if (k % 4 === 0) pad(C2[c], t, Math.min(t1, t + BT * 4 + .4), .02 * v, 700); inst(t, MEL[k % 16] - (inst === pno ? 12 : 0), (inst === pno ? .1 : .065) * v); if (k % 2 === 0) pno(t, C2[c][0] - 12, .05 * v, 3) } };
+  // como en las pistas de terror del canal: piano lento con el acorde arpegiado en corcheas (raíz–quinta–décima–quinta) y la melodía arriba,
+  // sin percusión; pad muy bajo de fondo
+  const cuna = (t0, t1, inst, v = 1) => { let k = 0; for (let t = t0; t < t1 - .3; t += BT, k++) { const c = PROG[Math.floor(k / 4) % 4], ch = C2[c];
+    if (k % 4 === 0) pad(ch, t, Math.min(t1, t + BT * 4 + .4), .012 * v, 600);
+    [ch[0] - 12, ch[0] - 5, ch[1] + 12 - 12, ch[0] - 5].forEach((mm, j) => { const tt = t + j * BT / 2; if (j < 2 && tt < t1 - .2) pno(tt, mm + (j ? 0 : 0), (j ? .055 : .075) * v, 3.2) });
+    if (k % 2 === 1) pno(t + BT / 2, ch[1], .045 * v, 2.6);
+    inst(t, MEL[k % 16] - (inst === pno ? 12 : 0), (inst === pno ? .1 : .06) * v) } };
   cuna(0, sl(I.pell), box);
   // el polvo y la Polilla: zumbido grave que respira (sin golpes) mientras está cerca
   const drone = (t0, t1, v = .05, f = 55) => { if (t1 <= t0) return; const g = oc.createGain(); g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(v, t0 + .8); g.gain.setValueAtTime(v, Math.max(t0 + .8, t1 - .8)); g.gain.linearRampToValueAtTime(0, t1); g.connect(LP); const lfo = osc("sine", .9, t0, t1, oc.createGain()), lg = oc.createGain(); lg.gain.value = v * .6; lfo.disconnect(); lfo.connect(lg); lg.connect(g.gain);

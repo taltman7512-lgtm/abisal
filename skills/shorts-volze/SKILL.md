@@ -98,7 +98,15 @@ donde la imagen tiene que respirar. Medir: palabras ÷ duración × 60 entre 245
 `subV(t)` del ejemplo: Baloo 2 800, 112 px, `#fff200`, contorno negro de 22 % del tamaño, sombra abajo, minúscula,
 entra con resorte (0,55 → 1), tiempos **reales** de cada palabra (whisper), texto del guion.
 
-## Música (sintetizada en `partes/musica.js`, nunca canciones ajenas)
+## Música (sintetizada en `partes/musica.js`, nunca canciones ajenas dentro del MP4)
+- **Siempre se entregan dos MP4 con el mismo video**: con música propia y **sin música** (voz + efectos,
+  `node render-gpu.mjs audio` → `salida/sin-musica.wav`, unido con `ffmpeg -c:v copy`). El dueño puede ponerle una
+  canción con licencia desde la app de YouTube al subir (por ejemplo «Numbers» de Temporex). Nunca meter la
+  canción adentro del archivo.
+- Instrumentos que suenan bien: caja de música FM (moduladora 3,53× que se apaga en 0,6 s) y piano con 7 parciales
+  desafinados de a pares + martillo. El seno puro sonaba sintético: el dueño lo rechazó.
+- Forma como las pistas de terror del canal: piano lento con el acorde arpegiado y la melodía arriba, sin
+  percusión, pad casi inaudible.
 - Medir con `node render-gpu.mjs audio` + el cálculo de dB de abajo: voz − música ≈ **6 dB**, música audible 95–100 %.
 - Terror: caja de música/celesta en menor, ≈ 64 por minuto, pad grave, piano; un tema propio para el grupo que canta;
   un zumbido grave que «respira» cuando la criatura está cerca (sin golpes); tema triste nuevo desde el giro, que no
@@ -112,8 +120,20 @@ entra con resorte (0,55 → 1), tiempos **reales** de cada palabra (whisper), te
 2. **Carpeta** `<repo>/videos/<nombre>/`: copiar `motor/render-gpu.mjs` y `motor/package.json` a la raíz,
    `motor/armar.js` a `partes/`, y como punto de partida `ejemplo-terror/{historia.js, musica.js}` a `partes/`.
    `npm i` (instala playwright-core). Escribir `partes/frases.json`.
-3. **Voz**: `python <skill>/herramientas/voz.py --vel 1.3` (Kokoro `am_eric`, ≈ 160 Hz como el narrador del canal).
-   Corregir las frases que whisper oye distinto (`--solo 12,30` regenera solo esas).
+3. **Voz** (elegida por el dueño el 24-nov-2026: **ElevenLabs**, voz de biblioteca **«Liam – Viral Short-Form
+   Storyteller»**, modelo Eleven v4, estabilidad 35 %, similitud 75 %, **sin Auto-tag** porque agrega `[whisper]`,
+   `[sighs]`, etc.):
+   - Generarla con Claude in Chrome en `elevenlabs.io/app/speech-synthesis/text-to-speech`, con la cuenta del dueño
+     ya abierta. Pegar el guion entero (las frases de `voz.json` separadas por espacios), «Generate speech»,
+     descargar la generación más corta y copiarla a `voz-eleven/completa.mp3`. Chrome tiene que tener permitidas
+     las descargas múltiples de elevenlabs.io (ya habilitado).
+   - Cortarla por frases: `python <skill>/herramientas/cortar_completo.py voz-eleven/completa.mp3 --tempo 1.35`.
+     Alinea con whisper, acorta las pausas internas y acelera ×1,35 sin cambiar el tono, porque Liam habla a
+     ≈ 175 palabras por minuto y el canal a ≈ 260. Después correr `verif_voz.py` y `palabras.py`.
+   - Medición (`perfil_voz.py`, contra la voz de Volze aislada con Demucs: 172 Hz, rango 68 Hz): ninguna voz de
+     ElevenLabs probada llega a ese tono (Liam Viral 129 Hz, Revenant 123, PJ 114, Snap 110); Liam fue la más
+     cercana en conjunto. La más parecida medida es **Chatterbox** (gratis, local, en la GPU):
+     `python <skill>/herramientas/voz.py` (motor por defecto), por si se acaban los créditos.
 4. **Escena**: reescribir en `historia.js` el mundo, el elenco, `SHOTS`, `LUGAR` y los `case` de `setScene`.
    `node partes/armar.js` (chequea sintaxis).
 5. **Revisión barata**: `node render-gpu.mjs tomas` → `salida/tomas-NN.jpg` (un cuadro del medio de cada toma).

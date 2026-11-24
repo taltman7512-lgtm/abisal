@@ -2,12 +2,12 @@
  {
   "n": "hook",
   "t": "Every house in Hollow Fen burns two lamps.",
-  "gap": 0.1
+  "gap": 0.06
  },
  {
   "n": "third",
   "t": "Light a third, and the Moth takes the house.",
-  "gap": 0.1
+  "gap": 0.06
  },
  {
   "n": "whole",
@@ -17,7 +17,7 @@
  {
   "n": "morning",
   "t": "In the morning, there's only a square of clean dirt.",
-  "gap": 0.1
+  "gap": 0.06
  },
  {
   "n": "twelve",
@@ -27,17 +27,17 @@
  {
   "n": "wicks",
   "t": "I trim the wicks on our street.",
-  "gap": 0.1
+  "gap": 0.06
  },
  {
   "n": "wren",
   "t": "Every evening, old Wren walks by and counts our windows.",
-  "gap": 0.1
+  "gap": 0.06
  },
  {
   "n": "count",
   "t": "One. Two. Then she taps her cane twice and moves on.",
-  "gap": 0.1
+  "gap": 0.06
  },
  {
   "n": "eat",
@@ -47,17 +47,17 @@
  {
   "n": "nobody",
   "t": "Nobody has ever seen the Moth land.",
-  "gap": 0.1
+  "gap": 0.06
  },
  {
   "n": "dust",
   "t": "You only see the dust.",
-  "gap": 0.1
+  "gap": 0.06
  },
  {
   "n": "snow",
   "t": "It falls first, like gold snow. Then the wind comes from above.",
-  "gap": 0.1
+  "gap": 0.06
  },
  {
   "n": "wings",
@@ -72,7 +72,7 @@
  {
   "n": "pell",
   "t": "My little sister Pell hates the dark.",
-  "gap": 0.1
+  "gap": 0.06
  },
  {
   "n": "corners",
@@ -82,12 +82,12 @@
  {
   "n": "winter",
   "t": "Last winter, the Brannocks had a birthday.",
-  "gap": 0.1
+  "gap": 0.06
  },
  {
   "n": "candle",
   "t": "One candle on a cake. Just one.",
-  "gap": 0.1
+  "gap": 0.06
  },
  {
   "n": "three",
@@ -97,12 +97,12 @@
  {
   "n": "song",
   "t": "The dust started falling during the song.",
-  "gap": 0.1
+  "gap": 0.06
  },
  {
   "n": "watch",
   "t": "I watched from our window, with my hand over Pell's eyes.",
-  "gap": 0.1
+  "gap": 0.06
  },
  {
   "n": "roof",
@@ -122,7 +122,7 @@
  {
   "n": "raked",
   "t": "In the morning, Wren raked the square of dirt where they used to live.",
-  "gap": 0.1
+  "gap": 0.06
  },
  {
   "n": "well",
@@ -142,12 +142,12 @@
  {
   "n": "stopped",
   "t": "Pell stopped talking about the dark after that.",
-  "gap": 0.1
+  "gap": 0.06
  },
  {
   "n": "smiling",
   "t": "Then, three nights ago, she started smiling at bedtime.",
-  "gap": 0.1
+  "gap": 0.06
  },
  {
   "n": "why",
@@ -157,7 +157,7 @@
  {
   "n": "blanket",
   "t": "Under her blanket, there's a jar.",
-  "gap": 0.1
+  "gap": 0.06
  },
  {
   "n": "jar",
@@ -172,7 +172,7 @@
  {
   "n": "ourroof",
   "t": "The dust is already falling on our roof.",
-  "gap": 0.1
+  "gap": 0.06
  },
  {
   "n": "gold",
@@ -197,22 +197,22 @@
  {
   "n": "mine",
   "t": "Pell won't let go of the jar. She just whispers, mine.",
-  "gap": 0.1
+  "gap": 0.06
  },
  {
   "n": "lamps",
   "t": "So I take both our lamps off the hooks.",
-  "gap": 0.1
+  "gap": 0.06
  },
  {
   "n": "light",
   "t": "I light every candle in the kitchen drawer.",
-  "gap": 0.1
+  "gap": 0.06
  },
  {
   "n": "tie",
   "t": "I tie them to my coat, my belt, my boots.",
-  "gap": 0.1
+  "gap": 0.06
  },
  {
   "n": "brightest",

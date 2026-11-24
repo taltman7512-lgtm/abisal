@@ -66,6 +66,24 @@ Comparación visual: `salida/comparacion-canal-vs-propio.jpg`. No se sube al rep
   cosas quemadas cerca de cámara (velas, luciérnagas) y la niebla que borraba los planos aéreos.
 - Se agregaron 4 frases y se ajustaron las pausas para entrar en el rango de duración (101 → 108 s).
 
+## v3 (24-nov-2026): voz de ElevenLabs y música nueva, por pedido del dueño
+- **Voz**: ElevenLabs, «Liam – Viral Short-Form Storyteller» (Eleven v4, sin Auto-tag), generada en la cuenta del
+  dueño con Claude in Chrome (≈ 2.350 créditos de 114 mil).
+  - Se midió contra la voz de Volze aislada con Demucs (`perfil_voz.py`: 172 Hz, rango de entonación 68 Hz,
+    brillo 2.060 Hz).
+  - Probadas en ElevenLabs: Liam Viral (distancia 4,2), Revenant (4,3–4,6), PJ (5,5) y Snap (6,2). Todas son más
+    graves que Volze.
+  - En voces locales, Chatterbox dio la distancia más baja (2,6). Su voz quedó como alternativa en
+    `voz-chatterbox/`, fuera de git.
+- **Corte y ritmo**: el MP3 completo se cortó por frases alineando con whisper (`cortar_completo.py`) y se aceleró
+  ×1,35 sin cambiar el tono. Resultado: 112,5 s y 235 palabras por minuto en total (262 sin pausas).
+- **Música**: caja de música FM y piano con parciales desafinados en lugar de senos, con la forma de las pistas de
+  terror del canal (piano arpegiado lento, sin percusión). Queda 5,9 dB debajo de la voz.
+- **Dos MP4 con el mismo video**:
+  - `nobody-lights-a-third-lamp-v3.mp4`, con música propia.
+  - `nobody-lights-a-third-lamp-v3-sin-musica.mp4`, para agregarle «Numbers» de Temporex (u otra canción con
+    licencia) desde la app de YouTube. La canción no se mete en el archivo.
+
 ## Pendiente o mejorable
 - 243 palabras por minuto, apenas debajo del piso medido (245).
 - La luminancia quedó en 0,34 contra 0,41 del canal (el promedio del canal incluye `top03`, de día).

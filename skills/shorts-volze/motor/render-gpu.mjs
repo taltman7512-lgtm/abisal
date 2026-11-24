@@ -46,7 +46,7 @@ const wavB64 = (p, solo = null) => p.evaluate(async (solo) => { window.SOLO = so
   const w = (o, s) => [...s].forEach((c, i) => v.setUint8(o + i, c.charCodeAt(0))); w(0, "RIFF"); v.setUint32(4, 36 + n * 4, true); w(8, "WAVEfmt "); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 2, true); v.setUint32(24, 48000, true); v.setUint32(28, 192000, true); v.setUint16(32, 4, true); v.setUint16(34, 16, true); w(36, "data"); v.setUint32(40, n * 4, true);
   for (let i = 0; i < n; i++) { v.setInt16(44 + i * 4, Math.max(-1, Math.min(1, L[i])) * 32767, true); v.setInt16(46 + i * 4, Math.max(-1, Math.min(1, R[i])) * 32767, true) }
   let s = "", u = new Uint8Array(ab); for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s) }, solo);
-if (modo === "audio") { const { p } = await abrir(); for (const [solo, nom] of [[null, "mezcla"], ["mus", "solo-musica"], ["voz", "solo-voz"]]) { const f = path.join(DIR, "salida", nom + ".wav"); fs.mkdirSync(path.dirname(f), { recursive: true }); fs.writeFileSync(f, Buffer.from(await wavB64(p, solo), "base64")); console.log("audio", f) } }
+if (modo === "audio") { const { p } = await abrir(); for (const [solo, nom] of [[null, "mezcla"], ["mus", "solo-musica"], ["voz", "solo-voz"], ["sinmusica", "sin-musica"]]) { const f = path.join(DIR, "salida", nom + ".wav"); fs.mkdirSync(path.dirname(f), { recursive: true }); fs.writeFileSync(f, Buffer.from(await wavB64(p, solo), "base64")); console.log("audio", f) } }
 
 if (modo === "info") {
   const { p, DUR, NF } = await abrir(); console.log(JSON.stringify({ placa: await placa(p), DUR, NF }));
