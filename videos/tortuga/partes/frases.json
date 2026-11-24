@@ -1,0 +1,302 @@
+[
+ {
+  "n": "hook",
+  "t": "We live on the back of a turtle.",
+  "gap": 0.06
+ },
+ {
+  "n": "cost",
+  "t": "Dig deeper than one shovel, and it dives.",
+  "gap": 0.06
+ },
+ {
+  "n": "down",
+  "t": "And the whole town goes down with it.",
+  "gap": 0.15
+ },
+ {
+  "n": "walks",
+  "t": "It walks the shallow sea, one step every hour.",
+  "gap": 0.06
+ },
+ {
+  "n": "rattle",
+  "t": "Every step rattles every cup in Shellbrook.",
+  "gap": 0.06
+ },
+ {
+  "n": "carrots",
+  "t": "We plant carrots in one shovel of dirt.",
+  "gap": 0.06
+ },
+ {
+  "n": "goldfish",
+  "t": "We bury our goldfish in one shovel of dirt.",
+  "gap": 0.06
+ },
+ {
+  "n": "ruler",
+  "t": "Mayor Quill checks every hole with a yellow ruler.",
+  "gap": 0.06
+ },
+ {
+  "n": "sign",
+  "t": "The sign in the square says, one shovel, no more.",
+  "gap": 0.1
+ },
+ {
+  "n": "doors",
+  "t": "Every house has a ruler hanging by the door.",
+  "gap": 0.06
+ },
+ {
+  "n": "twelve",
+  "t": "Kids can't own a shovel until they turn twelve. I got mine last spring.",
+  "gap": 0.1
+ },
+ {
+  "n": "edge",
+  "t": "From the edge of town, you can see its head.",
+  "gap": 0.06
+ },
+ {
+  "n": "church",
+  "t": "It's bigger than the church.",
+  "gap": 0.2
+ },
+ {
+  "n": "barnacles",
+  "t": "Barnacles grow on its eyelids.",
+  "gap": 0.06
+ },
+ {
+  "n": "breath",
+  "t": "Every morning, it breathes out a cloud warm enough to dry our laundry.",
+  "gap": 0.06
+ },
+ {
+  "n": "heart",
+  "t": "At night I lie on the shell and feel its heart. Slow, like a drum underwater.",
+  "gap": 0.2
+ },
+ {
+  "n": "hum",
+  "t": "Sometimes it hums, and the windows hum back.",
+  "gap": 0.2
+ },
+ {
+  "n": "pim",
+  "t": "When I was six, Pim the baker wanted a cellar.",
+  "gap": 0.06
+ },
+ {
+  "n": "two",
+  "t": "Two shovels deep. Just two.",
+  "gap": 0.1
+ },
+ {
+  "n": "cold",
+  "t": "The ground went cold under our feet.",
+  "gap": 0.06
+ },
+ {
+  "n": "stopped",
+  "t": "The turtle stopped walking.",
+  "gap": 0.1
+ },
+ {
+  "n": "tilted",
+  "t": "Then the whole town tilted.",
+  "gap": 0.06
+ },
+ {
+  "n": "water",
+  "t": "Seawater poured down the streets.",
+  "gap": 0.06
+ },
+ {
+  "n": "bakery",
+  "t": "The bakery slid off the edge and sank, bread still warm.",
+  "gap": 0.15
+ },
+ {
+  "n": "filled",
+  "t": "Pim filled the hole with his bare hands.",
+  "gap": 0.06
+ },
+ {
+  "n": "rose",
+  "t": "The turtle rose again, slowly, like nothing happened.",
+  "gap": 0.06
+ },
+ {
+  "n": "rulers",
+  "t": "Pim never baked again. He sells rulers now.",
+  "gap": 0.2
+ },
+ {
+  "n": "firstone",
+  "t": "Mayor Quill bought the first one.",
+  "gap": 0.2
+ },
+ {
+  "n": "noticed",
+  "t": "But I noticed something that day.",
+  "gap": 0.06
+ },
+ {
+  "n": "away",
+  "t": "When it dove, it dove away from the hole.",
+  "gap": 0.06
+ },
+ {
+  "n": "nobody",
+  "t": "Nobody else saw it. Everyone else was holding on.",
+  "gap": 0.25
+ },
+ {
+  "n": "turned",
+  "t": "This morning, the turtle turned.",
+  "gap": 0.06
+ },
+ {
+  "n": "deep",
+  "t": "Away from the shore. Toward the deep water.",
+  "gap": 0.1
+ },
+ {
+  "n": "garrow",
+  "t": "Old Garrow climbed onto its head with his telescope.",
+  "gap": 0.06
+ },
+ {
+  "n": "quiet",
+  "t": "He came down very quiet.",
+  "gap": 0.06
+ },
+ {
+  "n": "home",
+  "t": "He says it's old. It's going home.",
+  "gap": 0.06
+ },
+ {
+  "n": "born",
+  "t": "Turtles go back to where they were born.",
+  "gap": 0.06
+ },
+ {
+  "n": "bottom",
+  "t": "And home is at the bottom.",
+  "gap": 0.25
+ },
+ {
+  "n": "higher",
+  "t": "With every step, the water climbs higher on the shell.",
+  "gap": 0.06
+ },
+ {
+  "n": "market",
+  "t": "The fish market goes under. Then the school.",
+  "gap": 0.06
+ },
+ {
+  "n": "steps",
+  "t": "The water reaches the steps of the church.",
+  "gap": 0.06
+ },
+ {
+  "n": "pray",
+  "t": "Mayor Quill tells everyone to pray.",
+  "gap": 0.06
+ },
+ {
+  "n": "uphill",
+  "t": "Everyone runs uphill, to the top of the shell.",
+  "gap": 0.06
+ },
+ {
+  "n": "bell",
+  "t": "Old Garrow stays at the bell, ringing and ringing.",
+  "gap": 0.06
+ },
+ {
+  "n": "shovel",
+  "t": "I run the other way, with my shovel.",
+  "gap": 0.06
+ },
+ {
+  "n": "side",
+  "t": "To the very edge, on the deep water side.",
+  "gap": 0.06
+ },
+ {
+  "n": "yells",
+  "t": "Mayor Quill yells my name.",
+  "gap": 0.06
+ },
+ {
+  "n": "everybody",
+  "t": "Then everybody yells my name.",
+  "gap": 0.1
+ },
+ {
+  "n": "one",
+  "t": "One shovel.",
+  "gap": 0.1
+ },
+ {
+  "n": "two2",
+  "t": "Two.",
+  "gap": 0.15
+ },
+ {
+  "n": "cold2",
+  "t": "The ground goes cold.",
+  "gap": 0.1
+ },
+ {
+  "n": "three",
+  "t": "Three.",
+  "gap": 0.2
+ },
+ {
+  "n": "alive",
+  "t": "I hit something hard. Something alive.",
+  "gap": 0.06
+ },
+ {
+  "n": "warm",
+  "t": "Warm, under the dirt, like skin.",
+  "gap": 0.1
+ },
+ {
+  "n": "flinch",
+  "t": "The turtle flinches.",
+  "gap": 0.1
+ },
+ {
+  "n": "turns",
+  "t": "And slowly, it turns away from the hole.",
+  "gap": 0.06
+ },
+ {
+  "n": "shore",
+  "t": "Back toward the shore.",
+  "gap": 0.1
+ },
+ {
+  "n": "sigh",
+  "t": "The water slides off the streets like a long sigh.",
+  "gap": 0.3
+ },
+ {
+  "n": "life",
+  "t": "My whole life, one shovel kept us safe.",
+  "gap": 0.15
+ },
+ {
+  "n": "last",
+  "t": "Today, three shovels brought us home.",
+  "gap": 0.4
+ }
+]

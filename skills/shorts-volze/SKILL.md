@@ -10,6 +10,21 @@ Receta para hacer, con un solo pedido, un Short con el estilo que hace destacar 
 `volze-video/salida/nobody-lights-a-third-lamp.mp4` (modo terror). **No preguntes el estilo**: está decidido acá.
 Lo único que se aprueba es la historia (paso 1) si la persona quiere verla; si pidió «hacelo», elegí vos y seguí.
 
+## Preferencias del dueño (mandan sobre todo lo demás; se van sumando)
+El dueño dio permiso (24-nov-2026) para modificar esta skill cuando haga falta. **Cada vez que pida un cambio de
+gusto** (pelo, aspecto de los personajes, nivel de detalle, voz, música, ritmo, tipo de historia, lo que sea),
+anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.claude/skills/shorts-volze/`.
+- **Voz**: ElevenLabs «Skylar – Viral Zillennial Voice». Rechazadas: Kokoro, Liam Viral.
+- **Música**: sin canción de fondo por ahora (voz + efectos). Rechazado: música sintetizada con senos puros.
+- **Personajes**: estilo de bloques «robloxiano» como los de Volze, siempre con `robloxify()`: brazos y piernas de un
+  bloque, cara impresa con ojos ovalados grandes, pelo facetado. Nada de estilo propio (mangas por partes, manos).
+- **Calidad (24-nov-2026)**: siempre 1080×1920 a 60 fps y **más detalle** que el mínimo: utilería en cada rincón,
+  texturas con relieve, nada de superficies lisas ni planos vacíos. Ante la duda, sumar detalle.
+- **Voz provisoria**: no hacer una voz de reemplazo para el video. Si Chrome no está conectado, armar el video y
+  esperar a ElevenLabs. Kokoro solo sirve para medir los tiempos de las tomas y nunca se entrega.
+- **Historias**: la de la polilla y las lámparas («Nobody Lights A Third Lamp», terror) no le gustó. La siguiente que
+  eligió fue de día: «We Live On Its Back» (pueblo arriba de una tortuga gigante).
+
 Responder siempre en español rioplatense simple. El video va en inglés.
 
 ## Las 10 reglas (medidas, ordenadas por impacto)
