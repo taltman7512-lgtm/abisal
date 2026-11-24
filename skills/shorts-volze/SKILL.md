@@ -15,7 +15,13 @@ El dueño dio permiso (24-nov-2026) para modificar esta skill cuando haga falta.
 gusto** (pelo, aspecto de los personajes, nivel de detalle, voz, música, ritmo, tipo de historia, lo que sea),
 anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.claude/skills/shorts-volze/`.
 - **Voz**: ElevenLabs «Skylar – Viral Zillennial Voice». Rechazadas: Kokoro, Liam Viral.
-- **Música**: sin canción de fondo por ahora (voz + efectos). Rechazado: música sintetizada con senos puros.
+- **Música (24-nov-2026, reemplaza a «sin canción»)**: de fondo va un **piano oscuro y lento, como a 0,60** (≈ 58 por
+  minuto), en menor, con bajo en octavas, acorde arpegiado y una melodía arriba que baja como lamento. Va en **todos los
+  videos de terror de este estilo** de ahora en más (y en la tortuga). El dueño pidió «Fallen Down» (Undertale, de Toby
+  Fox) en piano a 0,60. No se copia esa melodía porque tiene derechos y Content ID la reclama aunque esté tocada en piano o
+  más lenta. Se compone uno propio con ese clima (ver `ejemplo-dia/musica.js`, bloque «PIANO OSCURO PROPIO»: cada video
+  lleva una melodía nueva). Si el dueño quiere la original, la agrega él desde la app de YouTube, que la licencia.
+  Rechazado: música sintetizada con senos puros.
 - **Personajes**: estilo de bloques «robloxiano» como los de Volze, siempre con `robloxify()`: brazos y piernas de un
   bloque, cara impresa con ojos ovalados grandes, pelo facetado. Nada de estilo propio (mangas por partes, manos).
 - **Calidad (24-nov-2026)**: siempre 1080×1920 a 60 fps y **más detalle** que el mínimo: utilería en cada rincón,
@@ -24,15 +30,16 @@ anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.c
   iguales, adoquines clonados, placas en fila). Cada textura se pinta entera: un lienzo grande sin repetir, con
   trazos irregulares, manchas, desgaste y variación, como un dibujo casero. Vale para el caparazón, las casas, la piel
   y la cara de la criatura y el pelo.
-- **Pelo como el de Volze**: mechones orgánicos esculpidos (curvos, con puntas que se afinan y volumen redondeado) y
-  pintados a mano con mechas y brillo. Nunca una mezcla de cubos y rectángulos facetados.
+- **Pelo**: ver «pelo como los accesorios de Roblox» más abajo (24-nov-2026, reemplaza al casco liso): `peloRoblox()` en
+  `ejemplo-dia/_tortuga.js`. Nunca una mezcla de cubos y rectángulos sueltos.
 - **Criatura**: ojos con detalle (iris, pupila, brillo húmedo, párpado con arrugas) y cuello con pliegues y arrugas.
 - **Flores y detalles chicos en 3D, no pintados (24-nov-2026)**: flores con tallo, pétalos, centro y hojas, pasto en
   matas y percebes huecos, todos con relieve y sombra. Nada de puntitos blancos pintados que parezcan flores.
 - **Criatura ultradetallada, como una foto real** (el dueño mandó de referencia una tortuga gigante de Galápagos):
   hocico chato con narinas hundidas, boca de cuerno con labio, ojos hundidos con párpados pesados y cuero rajado en
-  placas, con relieve de verdad (geometría deformada + mapa de desplazamiento). La textura de la cabeza va **muy
-  leve** (placas casi del mismo color, poco relieve) y la del **cuello bien marcada** (pliegues hondos). Ver `formaCab`
+  placas, con relieve de verdad (geometría deformada + mapa de desplazamiento). La cabeza lleva **textura bien visible**
+  (placas de cuero con contraste y relieve; el dueño la pidió así el 24-nov-2026 después de una versión muy lisa) y el **cuello
+  bien marcado** (pliegues hondos). Sin percebes en fila sobre el párpado: parecían una ceja pegada. Ver `formaCab`
   y `placas()` en `ejemplo-dia/_cabeza.js`.
 - **Revisión cuadro a cuadro (24-nov-2026)**: después de cada render, `python herramientas/chequeo_cuadros.py
   salida/<video>.mp4 --hojas salida/revision` mide TODOS los cuadros (negros, quemados, congelados, parpadeos) y arma
@@ -48,6 +55,28 @@ anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.c
   subida). Se sube el MP4 **sin música** (voz + efectos). Título = el del video (≤ 5 palabras, sin hashtags ni
   «Roblox»); descripción corta en inglés de 1–2 líneas sin hashtags. Queda **privado**: la audiencia («¿creado para
   niños?»), la canción desde la app y el botón de publicar los decide el dueño, salvo que pida publicarlo.
+- **Revisión del dueño a la tortuga (24-nov-2026)**: le gustó, pero pidió para este video y los siguientes:
+  - **Nunca dibujar cosas planas**, salvo una pintura o un cartel: el piso, la tierra y las piedras llevan relieve de
+    verdad (geometría con desplazamiento).
+  - **Ropa con textura y relieve de tela** (costuras, pliegues, bolsillos, botones), con aspecto Roblox. **Nunca
+    figuras o personas dibujadas sobre la ropa.**
+  - **Pelo como los accesorios de pelo de la tienda de Roblox** (mandó «Pelo de colega», un flequillo rubio en capas y
+    un pelo castaño de mechones): masa de mechones gruesos y algo facetados, con puntas en pico que salen hacia arriba
+    y para los costados, mechones largos que caen sobre la frente y la nuca, degradé de color (más oscuro en la raíz) y
+    mechas pintadas a lo largo de cada mechón con brillo. No un casco liso.
+  - **Comida y utilería con detalle real** (zanahorias con hojas, estrías y tierra pegada).
+  - **Cámara**: ángulos más fluidos y **siempre transiciones con movimiento de cámara**, no saltos.
+  - **Criatura**: textura también en la cabeza, ojo con más detalle (iris, brillo, párpado) y sin ceja, salvo que quede
+    muy bien. Se mueve **como el animal de verdad** (patas, cuello, cabeza, balanceo), no solo para adelante y atrás.
+  - **Oficios**: el cocinero con gorro y chaqueta detallados; la vieja sabia (Olga) con barba de **maestro sensei**.
+  - **Casas pegadas al piso**: nada flota ni se buguea cuando se mueve el suelo.
+  - **Corridas como las de Volze**.
+  - **Luz cinematográfica**: dirección clara, contraluz o luz de borde, sombras largas y contraste.
+  - Dónde está hecho (en `ejemplo-dia/_tortuga.js` y `_juntar.py`): `peloRoblox()` y `mechR()` (pelo), `telaReal()`
+    (tela con relieve y piezas 3D), `cocinero()`, `barbaSensei()`, `zanahoria()`, `correr()` (corrida con polvo; la
+    multitud con `walk ≥ 1.2` corre y avanza sola), empedrado 3D `PISO_LIBRE`, zócalos hondos en `casa()`,
+    `tortuga()` (aletas en diagonal, balanceo, cuello, parpadeo, cola), barrido de cámara también entre lugares
+    (`WC` en `_juntar.py`) y la luz (`ENV.dia`, sol bajo en `(-56, 36, -40)`, contraluz 1,7).
 - **Voz provisoria**: no hacer una voz de reemplazo para el video. Si Chrome no está conectado, armar el video y
   esperar a ElevenLabs. Kokoro solo sirve para medir los tiempos de las tomas y nunca se entrega.
 - **Historias**: la de la polilla y las lámparas («Nobody Lights A Third Lamp», terror) no le gustó. La siguiente que
@@ -58,8 +87,8 @@ Responder siempre en español rioplatense simple. El video va en inglés.
 ## Ejemplo de día: `ejemplo-dia/` (la tortuga, 24-nov-2026)
 Partir de acá para videos nuevos, no de la polilla:
 - `_pintado.js`: texturas pintadas a mano sin patrones (`T_PARED` con una pared distinta por casa, tejas, piedra,
-  tablas, tierra, caparazón, piel con escamas sueltas, cuello con pliegues, iris), `peloVolze()` (casco liso +
-  mechones que se afinan; reemplaza a `peloFacetado`), ojo de criatura con iris, córnea, párpados y arrugas, luz de
+  tablas, tierra, caparazón, piel con escamas sueltas, cuello con pliegues, iris), `peloVolze()` (casco liso, ya reemplazado por
+  `peloRoblox()` de `_tortuga.js`), ojo de criatura con iris, córnea, párpados y arrugas, luz de
   contorno, más utilería (hiedra, chimeneas con humo, pozo, bancos, cajones).
 - `_tortuga.js`: mundo, elenco, `SHOTS` y `setScene`. `_juntar.py` arma `historia.js` con la base de la polilla e
   inyecta las texturas, 16 paredes, `peloVolze` y la oclusión ambiental (GTAO, sin afectar los sprites).

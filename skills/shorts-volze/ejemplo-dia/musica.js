@@ -1,6 +1,5 @@
-  // ★ HISTORIA "We Live On Its Back" (modo día). El dueño pidió el video SIN canción de fondo: la entrega es voz + efectos
-  // (--sinmusica). La música propia queda solo para la versión «con música»: ostinato curioso en mayor, sin batería.
-  const VOLM = 1.2, M = oc.createGain(); M.gain.value = VOLM; const LP = filt("lowpass", 10000, .4, M); M.connect(mus);
+  // ★ HISTORIA "We Live On Its Back". Fondo: piano oscuro propio y lento (pedido del dueño, 24-nov-2026) + efectos.
+  const VOLM = 1.5, M = oc.createGain(); M.gain.value = VOLM; const LP = filt("lowpass", 10000, .4, M); M.connect(mus);
   if (window.SOLO === "voz") { M.gain.value = 0; fx.gain.value = 0 }
   if (window.SOLO === "sinmusica") M.gain.value = 0;
   const sl = i => i < S.length ? S[i] : DUR, el = i => i < S.length ? S[i] + D[i] : DUR;
@@ -12,13 +11,22 @@
   const tramo = (t0, t1, prog, bpm, v) => { const bt = 60 / bpm; let k = 0; for (let t = t0; t < t1 - .2; t += bt / 2, k++) { const c = ACR[prog[Math.floor(k / 8) % prog.length]];
       if (k % 8 === 0) pad(c.map(m => m + 12), t, Math.min(t1, t + bt * 4 + .3), .012 * v);
       pno(t, [c[0], c[2], c[1] + 12, c[2]][k % 4] + 12, (k % 4 ? .04 : .06) * v, 1.4) } };
-  tramo(0, sl(I.cold), ["C", "G", "Am", "F"], 104, 1);                // el pueblo, curioso
-  tramo(sl(I.cold), sl(I.rose), ["Am", "F", "Dm", "E"], 84, .8);       // el sótano de Pim
-  tramo(sl(I.rose), sl(I.turned), ["C", "G", "Am", "F"], 96, .8);
-  tramo(sl(I.turned), sl(I.turns), ["Dm", "Bb", "Am", "E"], 92, .9);  // se va a lo hondo
-  tramo(sl(I.turns), DUR, ["F", "C", "G", "C"], 80, 1);                // vuelve a la costa
+  // ★ PIANO OSCURO PROPIO (pedido del dueño 24-nov-2026: «piano lento, a 0,60, tenebroso, de fondo»). Composición original
+  // en re menor a 58 por minuto (≈ 0,60 de un tempo normal): bajo grave en octavas, acorde arpegiado lento y una melodía
+  // arriba que baja como un lamento. No copia ninguna canción.
+  const BPM = 58, bt = 60 / BPM, BAR = bt * 4;
+  const martillo = (t, m, v) => noise(t, .03, filt("bandpass", mtof(m) * 3, 2, envG(t, v * .25, .001, .03, LP)));
+  const tecla = (t, m, v, dur) => { pno(t, m, v, dur); martillo(t, m, v) };
+  const ACO = [[38, [50, 53, 57]], [34, [50, 53, 58]], [43, [50, 55, 58]], [45, [49, 52, 57]], [38, [50, 53, 57]], [41, [48, 53, 57]], [43, [50, 55, 58]], [38, [50, 53, 57]]];
+  const MEL = [[[0, 69, 1], [1, 74, 1.5], [2.5, 76, .5], [3, 77, 1]], [[0, 74, 2], [2, 72, 1], [3, 70, 1]], [[0, 70, 1], [1, 74, 1], [2, 72, 1.5], [3.5, 70, .5]], [[0, 69, 3], [3, 73, 1]],
+               [[0, 74, 1], [1, 77, 1.5], [2.5, 76, .5], [3, 74, 1]], [[0, 72, 2], [2, 69, 1], [3, 72, 1]], [[0, 70, 1.5], [1.5, 69, .5], [2, 67, 1], [3, 73, 1]], [[0, 74, 4]]];
+  for (let b = 0, t0 = 0; t0 < DUR - .3; b++, t0 += BAR) { const k = b % 8, [bajo, ac] = ACO[k], vuelta = b >= 8 && b % 16 >= 8;
+    tecla(t0, bajo, .1, BAR * 1.1); tecla(t0, bajo + 12, .05, BAR);
+    [ac[0], ac[1], ac[2], ac[1] + 12, ac[2], ac[1], ac[0] + 12, ac[1]].forEach((m, q) => { const t = t0 + q * bt / 2; if (t < DUR) tecla(t, m, .028, bt * 1.6) });
+    MEL[k].forEach(([be, m, d]) => { const t = t0 + be * bt; if (t < DUR - .2) tecla(t, m + (vuelta ? 12 : 0), vuelta ? .055 : .07, d * bt * 1.3) });
+    pad(ac.map(m => m - 12), t0, Math.min(DUR, t0 + BAR + .2), .008, 500) }
 
-  // ---- efectos (≈ 6 por minuto, debajo de la voz) ----
+// ---- efectos (≈ 6 por minuto, debajo de la voz) ----
   const thud = (t, a = .3, f = 60, dec = .5) => { const o = osc("sine", f * 1.8, t, t + dec + .3, envG(t, a, .004, dec, fx)); o.frequency.exponentialRampToValueAtTime(f * .6, t + .15); noise(t, .06, filt("lowpass", 400, 1, envG(t, a * .3, .002, .06, fx))) };
   const rumble = (t, dur, a = .12, f = 45) => { const g = oc.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(a, t + dur * .3); g.gain.linearRampToValueAtTime(0, t + dur); g.connect(fx); noise(t, dur, filt("lowpass", 160, 1, g)); osc("sine", f, t, t + dur, g) };
   const whoosh = (t, dur, a = .1, f0 = 200, f1 = 1400) => { const g = oc.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(a, t + dur * .4); g.gain.linearRampToValueAtTime(0, t + dur); g.connect(fx); const bp = filt("bandpass", f0, 1.2, g); bp.frequency.exponentialRampToValueAtTime(f1, t + dur); noise(t, dur, bp) };

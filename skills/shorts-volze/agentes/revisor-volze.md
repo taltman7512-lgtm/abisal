@@ -83,6 +83,35 @@ Sé exigente: si dudás entre «está bien» y «se puede mejorar», marcá el p
 problemas que no ves: cada fila tiene que poder verificarse mirando el cuadro citado.
 
 
+## Revisión con el ojo del dueño (pedido del dueño, 24-nov-2026)
+El dueño revisa así, y vos tenés que revisar igual: mirando cada cosa que se ve en cámara y diciendo qué le falta,
+con el segundo y el arreglo. Además de esta lista, sumá lo propio de cada video (cada criatura, oficio, utilería y
+lugar de la historia tiene su propia vara: «¿la zanahoria parece zanahoria de verdad?», «¿el gorro del cocinero es
+de cocinero?»).
+1. **Nada dibujado plano, salvo una pintura o un cartel**: el piso, la tierra y las piedras con relieve de verdad
+   (geometría o desplazamiento, no solo un dibujo). Si algo parece «pintado sobre una superficie lisa», marcalo.
+2. **Ropa con tela**: textura y relieve de tela (costuras, pliegues, trama, bolsillos, botones en 3D), con aspecto
+   Roblox. Nunca figuras ni dibujos impresos encima de la ropa.
+3. **Pelo como los accesorios de pelo de Roblox** (ver «Pelo» en SKILL.md): mechones gruesos, puntas, degradé y
+   mechas pintadas. Marcá el pelo que parezca casco liso, cubos o un bloque sin mechones.
+4. **Barbas y vestimenta de cada oficio** bien hechas (barba larga de maestro sensei, gorro y chaqueta de cocinero
+   con pliegues, botones y delantal).
+5. **Comida, plantas y utilería con detalle real** (zanahorias con hojas, estrías y tierra; no un cono naranja).
+6. **Criatura**: textura en la cabeza, ojo con detalle (iris, brillo, párpado), cejas solo si quedan bien (si
+   parecen un trazo pegado, sacarlas), y **movimiento natural del animal** (una tortuga mueve patas, cuello y cabeza
+   con peso y balanceo, no se desliza para adelante y para atrás).
+7. **Todo apoyado en el piso**: casas, cercas y utilería pegadas al suelo; nada flota, nada se hunde, nada parpadea
+   ni se «buguea» cuando la criatura se mueve. Revisá a cuadro completo cada toma donde se mueva el suelo.
+8. **Cosas raras**: cualquier objeto, forma o movimiento que no se entienda en un vistazo («hay algo raro en esa
+   toma») se marca, aunque no sepas qué es.
+9. **Cámara fluida**: ángulos que cambian con movimiento continuo y transiciones hechas con **movimientos de cámara**
+   (barridos, giros, acompañar a un personaje), no cortes secos ni saltos de ángulo.
+10. **Corridas como en Volze**: cuerpo inclinado hacia adelante, brazos y piernas bien abiertos y rápidos, rebote
+    del cuerpo, polvo en los pies y la cámara que acompaña.
+11. **Luz cinematográfica**: luz principal con dirección clara, contraluz o luz de borde que despegue a los
+    personajes del fondo, sombras largas, profundidad (bruma, desenfoque de fondo) y contraste. Marcá los planos con
+    luz pareja y chata.
+
 ## Revisión cuadro a cuadro y ultradetalle (pedido del dueño, 24-nov-2026)
 En modo `despues`, primero correr `python <skill>/herramientas/chequeo_cuadros.py salida/<video>.mp4 --hojas salida/revision`.
 Revisa los 60 cuadros por segundo de forma automática y arma hojas densas de 4 cuadros por segundo. Mirar TODAS las

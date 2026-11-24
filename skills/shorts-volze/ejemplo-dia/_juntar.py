@@ -31,12 +31,22 @@ s = s.replace("M_WALL[v % 5]", "M_WALL[v % M_WALL.length]")
 s = s.replace("const M_GABLE = WALLC.map(c => SM(c, { roughness: .95 }));", "const M_GABLE = WALLC.map((c, i) => { const t = T_PARED(80 + i, c); return SMt(t, { bumpMap: t, bumpScale: 1 }) });", 1)
 s = s.replace("new THREE.ShapeGeometry(sh), M_GABLE[v % 5]", "gableUV(new THREE.ShapeGeometry(sh), Wd, rh), M_GABLE[v % M_GABLE.length]", 1)
 s = s.replace('ENV.dia = { top: "#5aa0e8", hor: "#cfe4f2", fog: .004', 'ENV.dia = { top: "#5aa0e8", hor: "#cfe4f2", fog: .0022', 1)
-s = s.replace("if (pelo) peloFacetado(k.head, ...pelo);", "if (pelo) peloVolze(k.head, ...pelo);", 1)
+s = s.replace("if (pelo) peloFacetado(k.head, ...pelo);", "if (pelo) peloRoblox(k.head, ...pelo);", 1)
 s = s.replace("COMP.addPass(new RenderPass(scene, cam));", 'COMP.addPass(new RenderPass(scene, cam)); try { const { GTAOPass } = await import("three/addons/postprocessing/GTAOPass.js"); const ao = new GTAOPass(scene, cam, W, H); ao.updateGtaoMaterial({ radius: .8, distanceExponent: 1.5, thickness: 1.5, scale: 1.2 }); ao.blendIntensity = .9; const aoR = ao.render.bind(ao); ao.render = (...q) => { const oc = []; scene.traverse(o => { if (o.isSprite && o.visible) { o.visible = false; oc.push(o) } }); aoR(...q); oc.forEach(o => o.visible = true) }; COMP.addPass(ao) } catch (e) { console.log("sin GTAO", e.message) }', 1)
 # ajustes: caras que no existen, Garrow vuelve a la tortuga, filtro sepia del recuerdo
 s = s.replace('"furious"', '"angry"').replace('"overjoyed"', '"excited"')
 s = s.replace('ALL.forEach(c => { c.g.visible = false;', 'if (GARROW.g.parent !== TURT) TURT.add(GARROW.g);\n  ALL.forEach(c => { c.g.visible = false;', 1)
 s = s.replace("  subV(t);\n}", '  if (POST.sepia > 0) { X.globalAlpha = POST.sepia * .55; X.globalCompositeOperation = "color"; X.fillStyle = "#b08a5a"; X.fillRect(0, 0, W, H); X.globalCompositeOperation = "source-over"; X.globalAlpha = 1 }\n  subV(t);\n}', 1)
 s = s.replace('hemi: 1.4, hemiG: "#8a7a60"', 'hemi: 1.8, hemiG: "#8a7a60"')
+
+# luz cinematográfica (pedido del dueño): sol más bajo y cálido (sombras largas), menos relleno plano, un poco más de exposición
+s = s.replace('ENV.dia = { top: "#5aa0e8", hor: "#cfe4f2", fog: .0022, hemi: 1.8, hemiG: "#8a7a60", sun: 3.0, sunCol: "#fff1dc", exp: 1.1', 'ENV.dia = { top: "#5aa0e8", hor: "#cfe4f2", fog: .0026, hemi: 1.15, hemiG: "#7a6a50", sun: 3.8, sunCol: "#ffe0b4", exp: 1.16', 1)
+s = s.replace("sun.position.set(-40, 60, -20);", "sun.position.set(-56, 36, -40);", 1)
+# transiciones siempre con movimiento de cámara: también cuando cambia el lugar, un barrido rápido (sale girando y la toma
+# nueva entra girando desde el otro lado) con desenfoque, en vez del corte seco
+s = s.replace("window.SUBF = t => { const k = tomaAt(t), T = TOMAS[k], N = TOMAS[k + 1]; return (N && !N.corte && N.a - t < WHIP * .6) || (!T.corte && t - T.a < WHIP * .4) ? 12 : 3 };",
+              "const WC = .18; window.SUBF = t => { const k = tomaAt(t), T = TOMAS[k], N = TOMAS[k + 1]; return (N && !N.corte && N.a - t < WHIP * .6) || (!T.corte && t - T.a < WHIP * .4) || (N && N.corte && N.a - t < WC) || (T.corte && k > 0 && t - T.a < WC) ? 12 : 3 };", 1)
+s = s.replace("  if (T.s.shake) { const a = T.s.shake;",
+              "  { const Y = new THREE.Vector3(0, 1, 0); if (N && N.corte && N.a - t < WC) { const u = 1 - (N.a - t) / WC; quat.multiply(new THREE.Quaternion().setFromAxisAngle(Y, -u * u * .95)) } if (T.corte && k > 0 && t - T.a < WC) { const u = 1 - (t - T.a) / WC; quat.multiply(new THREE.Quaternion().setFromAxisAngle(Y, u * u * .95)) } }\n  if (T.s.shake) { const a = T.s.shake;", 1)
 open(base + r"\historia.js", "w", encoding="utf-8").write(s)
 print("líneas", s.count("\n") + 1, "| restos de la polilla:", [w for w in ["MOTH", "PELL", "WREN", "CAKE", "JAR", "CANDLES", "BRAN", "OURS", " IN."] if w in s])
