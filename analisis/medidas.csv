@@ -1,0 +1,23 @@
+video,id,duracion_s,palabras,palabras_por_min,primera_palabra_s,fin_ultima_palabra_s,cortes_duros,barridos,cambios_encuadre_por_min,encuadre_mediana_s,sfx_por_min,musica_shazam,musica_db_bajo_voz,musica_audible_pct,voz_f0_mediana_hz,voz_f0_iqr_hz
+bajo01,j9b3kgroAKM,61.63,232,226,0.0,61.34,0,42,40.9,1.2,18.5,No Surprises — Radiohead,8.2,100.0,274.0,85.0
+bajo02,1UhPinXEh8o,56.37,205,218,0.0,56.04,0,52,55.4,0.9,19.2,No Surprises — Radiohead,3.9,100.0,246.0,70.0
+bajo03,r9T5scbTjiU,58.93,242,246,0.0,58.7,8,36,44.8,1.04,13.2,No Surprises — Radiohead,11.5,100.0,235.0,60.0
+bajo04,tHViw6S1tRI,33.99,126,222,0.0,33.64,23,2,44.2,1.2,58.2,Hide and Sneak — The Fly Guy Five,13.0,100.0,257.0,62.0
+bajo05,kj72Wz-qWVA,65.29,280,257,0.0,64.8,44,18,57.0,1.0,1.8,Apocalyptic Echoes — Jimena Contreras,8.2,100.0,296.0,53.0
+bajo06,JzOKaNTpI9k,80.81,357,265,0.0,80.46,23,60,61.6,0.83,53.5,Hide and Sneak — The Fly Guy Five,15.8,95.0,178.0,37.0
+rec01,hYEhPBmzW88,143.03,615,258,0.0,142.66,36,89,50.3,0.97,0.0,Fallen Down (Reprise) — Toby Fox,5.9,100.0,176.0,31.0
+rec02,a80qLrTBaNA,142.83,618,260,0.0,142.46,29,100,54.2,0.92,2.9,Fallen Down (Reprise) — Toby Fox,6.3,100.0,172.0,24.0
+rec03,cy-TJqQhiV8,147.31,639,260,0.0,146.88,44,39,33.8,1.48,4.5,Fallen Down (Reprise) — Toby Fox,4.5,100.0,167.0,22.0
+rec04,5i0qXnGB-bg,145.13,641,265,0.0,144.74,37,51,36.4,1.44,2.5,Fallen Down (Reprise) — Toby Fox,4.6,100.0,167.0,32.0
+rec05,J_UnkkuaI_c,143.55,639,267,0.0,143.18,22,104,52.7,0.9,1.7,Fallen Down (Reprise) — Toby Fox,6.1,100.0,167.0,28.0
+rec06,GQCC7eqoDkc,144.03,665,277,0.0,143.62,28,95,50.8,0.87,0.8,Fallen Down (Reprise) — Toby Fox,5.6,100.0,172.0,27.0
+top01,k-RS0IlTp7U,104.99,490,280,0.0,104.72,23,63,49.2,1.03,57.7,Hide and Sneak — The Fly Guy Five,15.4,98.1,172.0,40.0
+top02,Z30w7q0siMw,141.29,613,260,0.0,139.5,26,31,24.2,2.09,4.7,nosleep funk — akinari,6.0,100.0,172.0,31.0
+top03,k8Z1xyv-xKE,155.59,655,253,0.0,155.14,4,79,32.0,1.28,2.3,Fallen Down (Reprise) — Toby Fox,6.4,100.0,178.0,39.0
+top04,W3sBrH7ANqg,130.11,606,279,0.0,129.86,18,54,33.2,1.1,47.0,Hide and Sneak — The Fly Guy Five,16.6,95.0,172.0,32.0
+top05,9XVbwfdwryI,140.81,576,245,0.0,138.74,30,62,39.2,1.1,6.8,nosleep funk — akinari,5.3,100.0,179.0,33.0
+top06,AG--yFSe3C0,177.85,801,270,0.0,177.7,80,38,39.8,1.23,17.5,Ebb — Density & Time,17.5,96.3,176.0,33.0
+top07,GS1P52baszE,157.25,679,259,0.0,156.52,21,86,40.4,1.13,2.3,Fallen Down (Reprise) — Toby Fox,5.9,100.0,175.0,36.0
+top08,S4e7VhMpztE,138.89,664,287,0.0,138.52,11,67,33.7,1.3,57.0,Hide and Sneak — The Fly Guy Five,16.5,94.6,167.0,37.0
+top09,fyAoReU-yQw,124.61,533,257,0.0,124.3,45,69,54.9,0.66,62.1,Hide and Sneak — The Fly Guy Five,14.8,98.8,172.0,30.0
+top10,btKAjr1PKP4,158.45,683,259,0.0,157.98,25,43,25.8,1.66,6.1,Fallen Down (Reprise) — Toby Fox,6.4,100.0,169.0,28.0
