@@ -84,6 +84,25 @@ Comparación visual: `salida/comparacion-canal-vs-propio.jpg`. No se sube al rep
   - `nobody-lights-a-third-lamp-v3-sin-musica.mp4`, para agregarle «Numbers» de Temporex (u otra canción con
     licencia) desde la app de YouTube. La canción no se mete en el archivo.
 
+## v5 (24-nov-2026): voz Skylar, personajes estilo Volze, revisor y sin canción
+- **Voz**: ElevenLabs, «Skylar – Viral Zillennial Voice». Es la más parecida al narrador de las 6 probadas en
+  ElevenLabs (151 Hz, rango 73 Hz, distancia 2,7; Liam 4,2). Corte por frases en el último silencio, ×1,45.
+  Resultado: 105,2 s y 251 palabras por minuto.
+- **Sin canción de fondo**, por pedido del dueño: voz + efectos (`--sinmusica`). «Numbers» de Temporex no está en
+  el disco y no se baja: se la puede agregar después desde la app de YouTube.
+- **Personajes al estilo de bloques del canal** con `robloxify()`:
+  - Cabeza: cubo redondeado (0,67 del ancho del torso) sin cuello.
+  - Cara: impresa al frente, con ojos ovalados grandes con brillo y cejas y boca gruesas.
+  - Cuerpo: torso, brazos y piernas de un bloque, con la piel abajo del brazo y el calzado pintado.
+  - Pelo: facetado en 7 peinados.
+  - Son diseños propios: ni el protagonista de Volze ni la cara de fábrica de Roblox.
+- **Agente `revisor-volze`**: dos pasadas, antes y después del render, contra frames reales del canal.
+  - Antes del render marcó 24 problemas: pelo blando, ojos chicos, cabeza ancha y 6 planos rotos.
+  - Después del render marcó 20 más: cuadros quemados por velas, barridos ilegibles, la cámara rozando el techo y
+    el torso, y rincones lisos.
+  - Se corrigieron los de gravedad alta y media: barridos de 0,14 s con menos desenfoque, menos bloom, utilería
+    en el cuarto y tomas reubicadas.
+
 ## Pendiente o mejorable
 - 243 palabras por minuto, apenas debajo del piso medido (245).
 - La luminancia quedó en 0,34 contra 0,41 del canal (el promedio del canal incluye `top03`, de día).

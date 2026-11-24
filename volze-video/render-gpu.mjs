@@ -48,6 +48,7 @@ const wavB64 = (p, solo = null) => p.evaluate(async (solo) => { window.SOLO = so
   let s = "", u = new Uint8Array(ab); for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s) }, solo);
 if (modo === "audio") { const { p } = await abrir(); for (const [solo, nom] of [[null, "mezcla"], ["mus", "solo-musica"], ["voz", "solo-voz"], ["sinmusica", "sin-musica"]]) { const f = path.join(DIR, "salida", nom + ".wav"); fs.mkdirSync(path.dirname(f), { recursive: true }); fs.writeFileSync(f, Buffer.from(await wavB64(p, solo), "base64")); console.log("audio", f) } }
 
+if (modo === "tiempos") { const { p } = await abrir(); const T = await p.evaluate(() => window.DBG.TOMAS.map(x => [x.L, x.j, +x.a.toFixed(2), +x.b.toFixed(2), x.corte])); const N = JSON.parse(fs.readFileSync(path.join(DIR, "partes", "frases.json"), "utf8")).map(f => f.n); T.forEach(([L, j, a, b, c]) => console.log(`${a.toFixed(1).padStart(6)}-${b.toFixed(1).padStart(6)}  ${N[L]}.${j}${c ? "  (corte)" : ""}`)) }
 if (modo === "info") {
   const { p, DUR, NF } = await abrir(); console.log(JSON.stringify({ placa: await placa(p), DUR, NF }));
 }
