@@ -34,6 +34,10 @@ anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.c
   placas, con relieve de verdad (geometría deformada + mapa de desplazamiento). La textura de la cabeza va **muy
   leve** (placas casi del mismo color, poco relieve) y la del **cuello bien marcada** (pliegues hondos). Ver `formaCab`
   y `placas()` en `ejemplo-dia/_cabeza.js`.
+- **Revisión cuadro a cuadro (24-nov-2026)**: después de cada render, `python herramientas/chequeo_cuadros.py
+  salida/<video>.mp4 --hojas salida/revision` mide TODOS los cuadros (negros, quemados, congelados, parpadeos) y arma
+  hojas densas de 4 cuadros por segundo. El agente `revisor-volze` las mira todas y devuelve dos listas: bugs y
+  **ultradetalle** concreto para agregar. Se aplica y se vuelve a renderizar.
 - **Luz**: más cuidada. Sol cálido con sombras suaves, relleno del cielo, luz de contorno y oclusión en los rincones.
   Más detalle en todo; ante la duda, sumar.
 - **Voz provisoria**: no hacer una voz de reemplazo para el video. Si Chrome no está conectado, armar el video y

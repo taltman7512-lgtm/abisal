@@ -28,6 +28,9 @@ s = s.replace("// ---------- materiales", sec["TEXTURAS"] + "\n// ---------- mat
 s = s.replace('const WALLC = ["#b8a184", "#a89276", "#c2ab8a", "#9f8a70", "#b39a7c"];', 'const WALLC = ["#b8a184", "#a89276", "#c2ab8a", "#9f8a70", "#b39a7c", "#c9b598", "#a8957a", "#bfa07a", "#d0c0a0", "#9a8468", "#b8a890", "#c4a684", "#ad9c80", "#c8b08c", "#a48a6c", "#bcae96"];', 1)
 s = s.replace("const M_WALL = WALLC.map((c, i) => SMt(T_TIMBER(40 + i, c), { bumpMap: T_TIMBER(40 + i, c), bumpScale: 1.2 }));", "const M_WALL = WALLC.map((c, i) => { const t = T_PARED(40 + i, c); return SMt(t, { bumpMap: t, bumpScale: 1.2 }) });", 1)
 s = s.replace("M_WALL[v % 5]", "M_WALL[v % M_WALL.length]")
+s = s.replace("const M_GABLE = WALLC.map(c => SM(c, { roughness: .95 }));", "const M_GABLE = WALLC.map((c, i) => { const t = T_PARED(80 + i, c); return SMt(t, { bumpMap: t, bumpScale: 1 }) });", 1)
+s = s.replace("new THREE.ShapeGeometry(sh), M_GABLE[v % 5]", "gableUV(new THREE.ShapeGeometry(sh), Wd, rh), M_GABLE[v % M_GABLE.length]", 1)
+s = s.replace('ENV.dia = { top: "#5aa0e8", hor: "#cfe4f2", fog: .004', 'ENV.dia = { top: "#5aa0e8", hor: "#cfe4f2", fog: .0022', 1)
 s = s.replace("if (pelo) peloFacetado(k.head, ...pelo);", "if (pelo) peloVolze(k.head, ...pelo);", 1)
 s = s.replace("COMP.addPass(new RenderPass(scene, cam));", 'COMP.addPass(new RenderPass(scene, cam)); try { const { GTAOPass } = await import("three/addons/postprocessing/GTAOPass.js"); const ao = new GTAOPass(scene, cam, W, H); ao.updateGtaoMaterial({ radius: .8, distanceExponent: 1.5, thickness: 1.5, scale: 1.2 }); ao.blendIntensity = .9; const aoR = ao.render.bind(ao); ao.render = (...q) => { const oc = []; scene.traverse(o => { if (o.isSprite && o.visible) { o.visible = false; oc.push(o) } }); aoR(...q); oc.forEach(o => o.visible = true) }; COMP.addPass(ao) } catch (e) { console.log("sin GTAO", e.message) }', 1)
 # ajustes: caras que no existen, Garrow vuelve a la tortuga, filtro sepia del recuerdo

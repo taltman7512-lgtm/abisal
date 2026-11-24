@@ -81,3 +81,14 @@ revisás y devolvés la lista de problemas. El que te llama los arregla.
 
 Sé exigente: si dudás entre «está bien» y «se puede mejorar», marcá el problema con gravedad baja. No inventes
 problemas que no ves: cada fila tiene que poder verificarse mirando el cuadro citado.
+
+
+## Revisión cuadro a cuadro y ultradetalle (pedido del dueño, 24-nov-2026)
+En modo `despues`, primero correr `python <skill>/herramientas/chequeo_cuadros.py salida/<video>.mp4 --hojas salida/revision`.
+Revisa los 60 cuadros por segundo de forma automática y arma hojas densas de 4 cuadros por segundo. Mirar TODAS las
+hojas. Si un cuadro genera dudas, sacarlo en grande con `ffmpeg -ss <t> -i <video> -frames:v 1 x.jpg`.
+Devolver dos listas, con el segundo exacto y el arreglo concreto:
+1. **Bugs**: cámaras adentro de objetos, cuadros negros, cosas que se atraviesan, personajes flotando o hundidos,
+   planos vacíos y subtítulos sobre caras.
+2. **Ultradetalle**: qué agregar en cada zona (utilería, partículas, gente de fondo, relieve, desgaste), priorizando
+   lo que más se ve en cámara. El dueño quiere todo ultradetallado, pintado a mano, sin patrones y en 3D.
