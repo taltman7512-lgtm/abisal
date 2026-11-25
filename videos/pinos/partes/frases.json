@@ -1,0 +1,232 @@
+[
+ {
+  "n": "hook",
+  "t": "I just cut down the oldest pine in the valley.",
+  "gap": 0.06
+ },
+ {
+  "n": "stood0",
+  "t": "And up on the mountain, something stood up.",
+  "gap": 0.06
+ },
+ {
+  "n": "rule",
+  "t": "In Hollowpine, you never cut a living tree.",
+  "gap": 0.06
+ },
+ {
+  "n": "cost",
+  "t": "Cut one, and the Watcher comes down for you.",
+  "gap": 0.2
+ },
+ {
+  "n": "valley",
+  "t": "Our village sits in a valley of pines, buried in snow half the year.",
+  "gap": 0.06
+ },
+ {
+  "n": "burn",
+  "t": "We only burn what falls. Branches, pinecones, old fences.",
+  "gap": 0.06
+ },
+ {
+  "n": "sleds",
+  "t": "Every morning, the kids drag sleds into the woods and pick up sticks.",
+  "gap": 0.06
+ },
+ {
+  "n": "watch",
+  "t": "And every night, it watches us from the tree line.",
+  "gap": 0.06
+ },
+ {
+  "n": "antlers",
+  "t": "All you can see are its antlers. Wider than the river.",
+  "gap": 0.06
+ },
+ {
+  "n": "eyes",
+  "t": "And two pale eyes, floating between the trunks.",
+  "gap": 0.06
+ },
+ {
+  "n": "lantern",
+  "t": "Stare back too long, and your lantern goes out.",
+  "gap": 0.06
+ },
+ {
+  "n": "ilse",
+  "t": "Grandma Ilse says it was here before the first cabin.",
+  "gap": 0.06
+ },
+ {
+  "n": "brask",
+  "t": "When she was a girl, a woodcutter named Brask cut one pine for a new roof.",
+  "gap": 0.06
+ },
+ {
+  "n": "quiet",
+  "t": "That night, the whole forest went quiet.",
+  "gap": 0.06
+ },
+ {
+  "n": "shaking",
+  "t": "Then the ground started shaking, one step at a time.",
+  "gap": 0.06
+ },
+ {
+  "n": "taller",
+  "t": "It walked out of the trees, taller than the church.",
+  "gap": 0.06
+ },
+ {
+  "n": "stepped",
+  "t": "It stepped on Brask's cabin like it was a pinecone.",
+  "gap": 0.06
+ },
+ {
+  "n": "back",
+  "t": "Then it walked back into the dark. Brask was never found.",
+  "gap": 0.2
+ },
+ {
+  "n": "stump",
+  "t": "His stump is still in the square. Nobody sits on it.",
+  "gap": 0.06
+ },
+ {
+  "n": "doors",
+  "t": "We carve its antlers on every door, so it knows we remember.",
+  "gap": 0.06
+ },
+ {
+  "n": "winter",
+  "t": "This winter is the worst in a hundred years.",
+  "gap": 0.06
+ },
+ {
+  "n": "buried",
+  "t": "The snow buried every fallen branch.",
+  "gap": 0.06
+ },
+ {
+  "n": "fences",
+  "t": "We burned our fences. Then our chairs.",
+  "gap": 0.06
+ },
+ {
+  "n": "mila",
+  "t": "Last night, my little sister Mila stopped shivering.",
+  "gap": 0.06
+ },
+ {
+  "n": "badcold",
+  "t": "Grandma says that's the bad kind of cold.",
+  "gap": 0.06
+ },
+ {
+  "n": "out",
+  "t": "Our fire was out. Mila's lips were blue.",
+  "gap": 0.15
+ },
+ {
+  "n": "axe",
+  "t": "So I took Brask's old axe from the shed.",
+  "gap": 0.06
+ },
+ {
+  "n": "oldest",
+  "t": "I walked to the oldest pine. Hollow and gray, right at the tree line.",
+  "gap": 0.06
+ },
+ {
+  "n": "swing",
+  "t": "I swung until my hands bled.",
+  "gap": 0.06
+ },
+ {
+  "n": "fell",
+  "t": "It fell. And inside the hollow trunk, something moved.",
+  "gap": 0.06
+ },
+ {
+  "n": "calf",
+  "t": "A little deer, made of bark and moss, curled up and shaking.",
+  "gap": 0.06
+ },
+ {
+  "n": "baby",
+  "t": "A baby. Its baby.",
+  "gap": 0.25
+ },
+ {
+  "n": "stood",
+  "t": "Up on the mountain, the Watcher stood up.",
+  "gap": 0.06
+ },
+ {
+  "n": "home",
+  "t": "I picked up the baby and ran home with the wood.",
+  "gap": 0.06
+ },
+ {
+  "n": "lit",
+  "t": "I lit the fire. I put the baby next to Mila.",
+  "gap": 0.06
+ },
+ {
+  "n": "shook",
+  "t": "The ground shook. The cups fell off the shelf.",
+  "gap": 0.06
+ },
+ {
+  "n": "window",
+  "t": "Its eye filled our whole window.",
+  "gap": 0.06
+ },
+ {
+  "n": "roof",
+  "t": "One antler tore our roof open. Snow fell on the bed.",
+  "gap": 0.06
+ },
+ {
+  "n": "saw",
+  "t": "Then it saw its baby, warm, next to my sister.",
+  "gap": 0.06
+ },
+ {
+  "n": "stopped",
+  "t": "It stopped.",
+  "gap": 0.35
+ },
+ {
+  "n": "lay",
+  "t": "It lay down around our cabin, like a wall of fur.",
+  "gap": 0.06
+ },
+ {
+  "n": "breath",
+  "t": "And all night, its breath kept us warm.",
+  "gap": 0.2
+ },
+ {
+  "n": "morning",
+  "t": "In the morning, Mila was laughing. Her cheeks were pink again.",
+  "gap": 0.06
+ },
+ {
+  "n": "gone",
+  "t": "The baby was gone, and the forest was quiet.",
+  "gap": 0.06
+ },
+ {
+  "n": "pile",
+  "t": "But outside our door was a pile of fallen branches, taller than our roof.",
+  "gap": 0.15
+ },
+ {
+  "n": "last",
+  "t": "My whole life, the Watcher watched us. Last night, it watched over us.",
+  "gap": 0.06
+ }
+]

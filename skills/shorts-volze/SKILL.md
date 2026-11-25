@@ -75,6 +75,16 @@ anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.c
     «I grabbed the mic at a stranger's wedding…», «Last night, I jammed their gate.»), y recién después la regla y el
     contexto. Nunca arrancar con «We live on…» o la descripción del mundo. Ej.: «I just whistled down the well. In
     Wrenmoor, that's the one thing you never do.» La historia después vuelve atrás y alcanza ese momento.
+  - **Cada video, un mundo nuevo** (25-nov-2026, el de la anguila no le gustó por esto): pueblo distinto (clima,
+    estación, arquitectura, paisaje), tema distinto y **personajes nuevos** (otros diseños, ropa, pelo y nombres). No
+    reciclar el pueblo de techos de paja/entramado ni a Garrow, Quill, Pim ni al chico de remera naranja. Mirar
+    `referencia/historias-hechas.md` y cambiar todo lo que se vea.
+  - **Tema que le gusta**: un **monstruo que acecha al pueblo y se enoja por algo**; el narrador hace justo eso que lo
+    enoja, **con un motivo** (salvar a alguien), y el monstruo también tiene **su motivo** para enojarse, que se revela
+    al final.
+  - **Transiciones lentas y que se noten** (25-nov-2026): que se vea que es una transición y no un corte: barrido de
+    ≈ 0,5 s con la cámara girando y desenfoque fuerte (`WHIP = .5`, `WC = .5`, giro ≈ 1,4 rad), también al cambiar de
+    lugar. Nunca un corte seco.
   - **Barridos y pasadas de cámara más lentos** (25-nov-2026): los de Volze duran 0,2–0,3 s (≈ 7 cuadros) y el top 10
     sostiene cada encuadre más (≈ 36 cambios por minuto). En el motor: `WHIP = .3` entre tomas y `WC = .3` al cambiar
     de lugar (en `_juntar.py`), y recorridos de cámara cortos dentro de cada toma.

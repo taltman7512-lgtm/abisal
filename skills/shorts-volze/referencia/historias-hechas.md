@@ -21,3 +21,11 @@ alguien silba y se lleva lo que silbó. Recuerdo: la pava del hojalatero silbó 
 Hoy se incendia la panadería; el chico silba a propósito en el pozo y la anguila, siempre mojada, apaga seis casas
 enroscándose en los techos. Primer video con el arranque «como Volze» («I just whistled down the well.»). Giro:
 «My whole life, nobody whistled in Wrenmoor. Today, I whistled, and it saved us.»
+
+## «Don't Cut The Pines» (aldea nevada de noche, 25-nov-2026), en `videos/pinos/`
+Hollowpine, aldea de cabañas de troncos en un valle de pinos. El Watcher, un ciervo gigante de corteza y musgo con
+cuernos enormes y ojos pálidos, mira desde el borde del bosque; si alguien corta un árbol vivo, baja. Recuerdo: Brask
+cortó un pino y el Watcher le pisó la cabaña. Hoy la hermana Mila se congela; el narrador corta el pino más viejo y
+adentro estaba la cría del Watcher (su motivo para enojarse). El Watcher rompe el techo, ve a su cría al calor junto a
+Mila, se acuesta alrededor de la cabaña y los calienta. Giro: «My whole life, the Watcher watched us. Last night, it
+watched over us.» Primer video con transiciones de 0,5 s.
