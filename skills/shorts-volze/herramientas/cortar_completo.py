@@ -19,8 +19,11 @@ norm = lambda t: re.sub(r"[^a-z0-9]", "", t.lower())
 num = {"12": "twelve", "40": "forty", "42": "fortytwo", "1": "one", "2": "two", "3": "three"}
 hw = [num.get(norm(w), norm(w)) for w, _, _ in W]
 gw, own = [], []
+# nombres inventados que whisper oye en dos palabras («Onetusk» → «on tusk»): voz-alias.json = {"onetusk": ["on", "tusk"]}
+ALIAS = json.load(open(os.path.join(P, "voz-alias.json"), encoding="utf-8")) if os.path.exists(os.path.join(P, "voz-alias.json")) else {}
 for i, l in enumerate(L):
-    for t in l.split(): gw.append(norm(t)); own.append(i)
+    for t in l.split():
+        for q in ALIAS.get(norm(t), [norm(t)]): gw.append(q); own.append(i)
 sm = difflib.SequenceMatcher(None, gw, hw, autojunk=False); idx = [None] * len(gw)
 for b in sm.get_matching_blocks():
     for k in range(b.size): idx[b.a + k] = b.b + k

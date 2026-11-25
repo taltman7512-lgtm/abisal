@@ -1,0 +1,277 @@
+[
+ {
+  "n": "rule",
+  "t": "Nobody blows the horn in Dustmere.",
+  "gap": 0.1
+ },
+ {
+  "n": "cost",
+  "t": "Whoever blows it calls Onetusk down from the ridge.",
+  "gap": 0.12
+ },
+ {
+  "n": "today",
+  "t": "This morning, I blew it.",
+  "gap": 0.2
+ },
+ {
+  "n": "horn",
+  "t": "The horn sits on our tower, long as three houses, white as bone.",
+  "gap": 0.1
+ },
+ {
+  "n": "wed",
+  "t": "We don't blow it for weddings. We tap spoons on cups.",
+  "gap": 0.1
+ },
+ {
+  "n": "babies",
+  "t": "We don't blow it for babies. We just whisper their names.",
+  "gap": 0.1
+ },
+ {
+  "n": "school",
+  "t": "School starts when Miss Ode waves a red flag.",
+  "gap": 0.1
+ },
+ {
+  "n": "roost",
+  "t": "Even our roosters are quiet. We ate the loud ones.",
+  "gap": 0.14
+ },
+ {
+  "n": "ridge",
+  "t": "And up on the ridge, Onetusk stands and watches.",
+  "gap": 0.1
+ },
+ {
+  "n": "tall",
+  "t": "It is taller than our tower. Its legs are like four mesas.",
+  "gap": 0.1
+ },
+ {
+  "n": "tusk",
+  "t": "It has one tusk. Nobody asks where the other one went.",
+  "gap": 0.1
+ },
+ {
+  "n": "sixty",
+  "t": "It has not moved in sixty years.",
+  "gap": 0.14
+ },
+ {
+  "n": "bee",
+  "t": "My little sister Bee is six. She hears everything.",
+  "gap": 0.1
+ },
+ {
+  "n": "listen1",
+  "t": "Listen, she says. Beetles under the floor. Rain, two days away.",
+  "gap": 0.1
+ },
+ {
+  "n": "listen2",
+  "t": "Listen, she says, and points at the ridge. It's humming.",
+  "gap": 0.1
+ },
+ {
+  "n": "nobody",
+  "t": "Nobody else hears it.",
+  "gap": 0.16
+ },
+ {
+  "n": "dez",
+  "t": "Sixty years ago, a boy named Dez blew the horn to warn us of a fire.",
+  "gap": 0.1
+ },
+ {
+  "n": "note",
+  "t": "One note.",
+  "gap": 0.1
+ },
+ {
+  "n": "eleven",
+  "t": "Onetusk walked down the ridge in eleven steps.",
+  "gap": 0.1
+ },
+ {
+  "n": "nine",
+  "t": "It flattened nine houses, looking for the sound.",
+  "gap": 0.1
+ },
+ {
+  "n": "night",
+  "t": "Then it stood over the tower all night, and left at dawn.",
+  "gap": 0.1
+ },
+ {
+  "n": "ponds",
+  "t": "Its footprints are our ponds now. Eleven of them.",
+  "gap": 0.1
+ },
+ {
+  "n": "sign",
+  "t": "We painted one word on the tower. Never.",
+  "gap": 0.2
+ },
+ {
+  "n": "storm",
+  "t": "This morning, a sandstorm swallowed the valley.",
+  "gap": 0.1
+ },
+ {
+  "n": "orange",
+  "t": "The sky went orange. I couldn't see my own hands.",
+  "gap": 0.1
+ },
+ {
+  "n": "goat",
+  "t": "And Bee was outside, chasing our goat.",
+  "gap": 0.1
+ },
+ {
+  "n": "scream",
+  "t": "I screamed her name. The wind ate it.",
+  "gap": 0.1
+ },
+ {
+  "n": "forty",
+  "t": "Forty neighbors screamed. The wind ate that too.",
+  "gap": 0.1
+ },
+ {
+  "n": "louder",
+  "t": "Only one thing in Dustmere is louder than a storm.",
+  "gap": 0.14
+ },
+ {
+  "n": "climb",
+  "t": "I climbed the tower. Ninety-two steps.",
+  "gap": 0.1
+ },
+ {
+  "n": "mouth",
+  "t": "I put my mouth on the horn.",
+  "gap": 0.1
+ },
+ {
+  "n": "blew",
+  "t": "I blew until my ribs hurt.",
+  "gap": 0.1
+ },
+ {
+  "n": "rolling",
+  "t": "One note, rolling over the dunes.",
+  "gap": 0.5
+ },
+ {
+  "n": "turned",
+  "t": "On the ridge, Onetusk turned its head.",
+  "gap": 0.1
+ },
+ {
+  "n": "one",
+  "t": "One step. The cups jumped off our shelves.",
+  "gap": 0.1
+ },
+ {
+  "n": "five",
+  "t": "Five steps. The ponds splashed out.",
+  "gap": 0.1
+ },
+ {
+  "n": "shadow",
+  "t": "Eleven steps, and its shadow covered the square.",
+  "gap": 0.1
+ },
+ {
+  "n": "stayed",
+  "t": "Everybody ran. I stayed. I kept blowing.",
+  "gap": 0.1
+ },
+ {
+  "n": "trunk",
+  "t": "Its trunk wrapped around the tower. The stone cracked.",
+  "gap": 0.1
+ },
+ {
+  "n": "face",
+  "t": "Then I saw its face, right next to mine.",
+  "gap": 0.1
+ },
+ {
+  "n": "stump",
+  "t": "A broken stump, where the other tusk should be.",
+  "gap": 0.1
+ },
+ {
+  "n": "same",
+  "t": "The same curve. The same cracks. The same white.",
+  "gap": 0.7
+ },
+ {
+  "n": "built",
+  "t": "We never built this horn.",
+  "gap": 0.1
+ },
+ {
+  "n": "cut",
+  "t": "We cut it off.",
+  "gap": 0.5
+ },
+ {
+  "n": "pins",
+  "t": "I pulled the pins. The horn slid off the tower.",
+  "gap": 0.1
+ },
+ {
+  "n": "caught",
+  "t": "Onetusk caught it, and held it against its face.",
+  "gap": 0.1
+ },
+ {
+  "n": "eyes",
+  "t": "It closed its eyes. The humming stopped.",
+  "gap": 0.2
+ },
+ {
+  "n": "small",
+  "t": "And down by its foot, something small let go of its leg.",
+  "gap": 0.1
+ },
+ {
+  "n": "found",
+  "t": "Bee. Covered in sand. Holding the goat.",
+  "gap": 0.1
+ },
+ {
+  "n": "followed",
+  "t": "I followed the humming, she said.",
+  "gap": 0.2
+ },
+ {
+  "n": "back",
+  "t": "It walked back up the ridge, carrying its tusk.",
+  "gap": 0.1
+ },
+ {
+  "n": "life",
+  "t": "My whole life, nobody blew the horn.",
+  "gap": 0.1
+ },
+ {
+  "n": "ours",
+  "t": "It was never our horn.",
+  "gap": 0.3
+ },
+ {
+  "n": "listen3",
+  "t": "Listen, Bee said.",
+  "gap": 0.1
+ },
+ {
+  "n": "heard",
+  "t": "And for the first time, I heard it too.",
+  "gap": 0.02
+ }
+]

@@ -1,0 +1,67 @@
+# Guion de «Nobody Blows The Horn»: escribe partes/frases.json, voz.json y guion.txt
+import json, os
+D = os.path.dirname(os.path.abspath(__file__))
+G = [  # nombre, texto, pausa después
+ ("rule", "Nobody blows the horn in Dustmere.", .1),
+ ("cost", "Whoever blows it calls Onetusk down from the ridge.", .12),
+ ("today", "This morning, I blew it.", .2),
+ ("horn", "The horn sits on our tower, long as three houses, white as bone.", .1),
+ ("wed", "We don't blow it for weddings. We tap spoons on cups.", .1),
+ ("babies", "We don't blow it for babies. We just whisper their names.", .1),
+ ("school", "School starts when Miss Ode waves a red flag.", .1),
+ ("roost", "Even our roosters are quiet. We ate the loud ones.", .14),
+ ("ridge", "And up on the ridge, Onetusk stands and watches.", .1),
+ ("tall", "It is taller than our tower. Its legs are like four mesas.", .1),
+ ("tusk", "It has one tusk. Nobody asks where the other one went.", .1),
+ ("sixty", "It has not moved in sixty years.", .14),
+ ("bee", "My little sister Bee is six. She hears everything.", .1),
+ ("listen1", "Listen, she says. Beetles under the floor. Rain, two days away.", .1),
+ ("listen2", "Listen, she says, and points at the ridge. It's humming.", .1),
+ ("nobody", "Nobody else hears it.", .16),
+ ("dez", "Sixty years ago, a boy named Dez blew the horn to warn us of a fire.", .1),
+ ("note", "One note.", .1),
+ ("eleven", "Onetusk walked down the ridge in eleven steps.", .1),
+ ("nine", "It flattened nine houses, looking for the sound.", .1),
+ ("night", "Then it stood over the tower all night, and left at dawn.", .1),
+ ("ponds", "Its footprints are our ponds now. Eleven of them.", .1),
+ ("sign", "We painted one word on the tower. Never.", .2),
+ ("storm", "This morning, a sandstorm swallowed the valley.", .1),
+ ("orange", "The sky went orange. I couldn't see my own hands.", .1),
+ ("goat", "And Bee was outside, chasing our goat.", .1),
+ ("scream", "I screamed her name. The wind ate it.", .1),
+ ("forty", "Forty neighbors screamed. The wind ate that too.", .1),
+ ("louder", "Only one thing in Dustmere is louder than a storm.", .14),
+ ("climb", "I climbed the tower. Ninety-two steps.", .1),
+ ("mouth", "I put my mouth on the horn.", .1),
+ ("blew", "I blew until my ribs hurt.", .1),
+ ("rolling", "One note, rolling over the dunes.", .5),
+ ("turned", "On the ridge, Onetusk turned its head.", .1),
+ ("one", "One step. The cups jumped off our shelves.", .1),
+ ("five", "Five steps. The ponds splashed out.", .1),
+ ("shadow", "Eleven steps, and its shadow covered the square.", .1),
+ ("stayed", "Everybody ran. I stayed. I kept blowing.", .1),
+ ("trunk", "Its trunk wrapped around the tower. The stone cracked.", .1),
+ ("face", "Then I saw its face, right next to mine.", .1),
+ ("stump", "A broken stump, where the other tusk should be.", .1),
+ ("same", "The same curve. The same cracks. The same white.", .7),
+ ("built", "We never built this horn.", .1),
+ ("cut", "We cut it off.", .5),
+ ("pins", "I pulled the pins. The horn slid off the tower.", .1),
+ ("caught", "Onetusk caught it, and held it against its face.", .1),
+ ("eyes", "It closed its eyes. The humming stopped.", .2),
+ ("small", "And down by its foot, something small let go of its leg.", .1),
+ ("found", "Bee. Covered in sand. Holding the goat.", .1),
+ ("followed", "I followed the humming, she said.", .2),
+ ("back", "It walked back up the ridge, carrying its tusk.", .1),
+ ("life", "My whole life, nobody blew the horn.", .1),
+ ("ours", "It was never our horn.", .3),
+ ("listen3", "Listen, Bee said.", .1),
+ ("heard", "And for the first time, I heard it too.", .02),
+]
+assert len({n for n, _, _ in G}) == len(G)
+json.dump([{"n": n, "t": t, "gap": g} for n, t, g in G], open(os.path.join(D, "frases.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+R = os.path.dirname(D)
+json.dump([t for _, t, _ in G], open(os.path.join(R, "voz.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+open(os.path.join(R, "guion.txt"), "w", encoding="utf-8").write(" ".join(t for _, t, _ in G))
+w = sum(len(t.split()) for _, t, _ in G)
+print(len(G), "frases,", w, "palabras; a 260 por minuto:", round(w / 260 * 60 + sum(g for _, _, g in G), 1), "s")
