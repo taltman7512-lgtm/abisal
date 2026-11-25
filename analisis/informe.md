@@ -4,6 +4,11 @@ Relevado el 23-nov-2026. **Informe completo de la Fase 1**: la primera versión
 (lo visual, los subtítulos y los números públicos) se hizo en la nube; el análisis
 de video y audio se terminó el mismo día en una PC con RTX 4060.
 
+**Segunda medición (25-nov-2026)**: el análisis cuadro a cuadro, a 30 cuadros por segundo, de movimiento, cámara,
+sincronía, subtítulos, guion, diseño y luz está en `skills/shorts-volze/referencia/estilo-volze-medido.md`, y corrige
+varios puntos de este informe (los videos son 3:4, las transiciones son de cuatro tipos, el subtítulo de terror no
+sube al 22 %).
+
 Timestamps: `top03 @ 8,9 s` significa el video `top03` de `videos.csv` en el
 segundo 8,9. Las métricas por video están en `medidas.csv`.
 

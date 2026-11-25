@@ -58,11 +58,12 @@ revisás y devolvés la lista de problemas. El que te llama los arregla.
    - Partículas tapando la acción.
    - Subtítulo encima de una cara.
 5. **Lenguaje de Volze**:
-   - Gran angular en primeros planos.
+   - Gran angular en la criatura y en los planos medios cercanos (sin primeros planos de caras: pedido del dueño).
    - Contrapicado a la amenaza y cenital para la escala.
    - Criatura gigante legible en un frame.
    - Carteles del mundo legibles.
-   - Subtítulo de una palabra, amarillo `#FFF200`, minúscula, contorno negro, al 75 % (22 % si tapa la acción).
+   - Subtítulo de una palabra, amarillo `#FFF200`, minúscula, sin puntuación, contorno negro, fijo al 74,5 % del
+     alto; entra al 128 % y baja al 100 % en 0,13 s, sin rebote.
 6. **Continuidad**: el mismo lugar se ve igual entre tomas, los personajes tienen la misma ropa, y la hora y la luz
    no saltan sin razón.
 
@@ -106,8 +107,9 @@ de cocinero?»).
    toma») se marca, aunque no sepas qué es.
 9. **Cámara fluida**: ángulos que cambian con movimiento continuo y transiciones hechas con **movimientos de cámara**
    (barridos, giros, acompañar a un personaje), no cortes secos ni saltos de ángulo.
-10. **Corridas como en Volze**: cuerpo inclinado hacia adelante, brazos y piernas bien abiertos y rápidos, rebote
-    del cuerpo, polvo en los pies y la cámara que acompaña.
+10. **Corridas como en Volze** (medido): ciclo de 14–16 cuadros a 30 fps, torso inclinado 15–25°, brazos rígidos
+    apenas hacia atrás (bombeo solo en el plano clave), polvo suave en los pies (pedido del dueño) y la cámara que
+    acompaña retrocediendo de frente o de costado.
 11. **Luz cinematográfica**: luz principal con dirección clara, contraluz o luz de borde que despegue a los
     personajes del fondo, sombras largas, profundidad (bruma, desenfoque de fondo) y contraste. Marcá los planos con
     luz pareja y chata.
@@ -127,6 +129,28 @@ de cocinero?»).
 15. **Ultradetalle en TODO**: techos (sin huecos: mirá los triángulos de las puntas de cada techo, también la iglesia; cortes de tronco con anillos reales, con relieve y nieve con volumen), paredes, arbustos, árboles (ramas,
     agujas, corteza, nieve), personajes y ropa, herramientas, piso, fondo. Marcá cualquier cosa lisa, plana o de
     pocos polígonos que se vea en cámara.
+
+16. **Movimiento medido contra el canal (25-nov-2026)**: las metas y los ejemplos están en
+    `skills/shorts-volze/referencia/estilo-volze-medido.md`; leelo antes de revisar. En modo `despues`:
+    - Corré `python <skill>/herramientas/movimiento.py salida/<video>.mp4` y compará con el formato pueblo/terror:
+      deriva dentro del encuadre **13–30 % del ancho por segundo** (mediana de Volze 23,6), 0 % de encuadres quietos,
+      encuadre mediano 0,6–1,0 s, movimiento que no es de cámara ≥ 30 % (Volze 43). Si la deriva da menos de 10 %,
+      es gravedad alta: los planos están «clavados».
+    - Sacá los cuadros a 30 por segundo (`ffmpeg -i video.mp4 -vf "fps=30,scale=360:-2" -q:v 5 dir/f%05d.jpg`) y mirá
+      con `python <skill>/herramientas/tira.py dir <t0> <t1> x.jpg --paso=2` al menos: una caminata, una corrida, la
+      primera aparición de la criatura, un gesto de la criatura, un golpe y cinco transiciones.
+    - **Personajes**: caminata de ≈ 15 cuadros por ciclo y que avance; brazos en «A»; gestos de 8–15 cuadros; un
+      parpadeo por plano; la expresión cambia de golpe justo antes de la palabra; nadie más de 1,5 s en cuadro sin que
+      cambie el encuadre.
+    - **Criatura**: en el cuadro 0, en primerísimo plano; un gesto por plano de 30–60 cuadros a velocidad constante
+      (nada de moverse rápido ni de deslizarse); polvo en cada apoyo; temblor de cámara solo en 1–2 golpes; siempre
+      con casas o personas en cuadro para la escala.
+    - **Transiciones**: mezcla de vuelo (8–27 cuadros), barrido (6–9 cuadros, sin rebote) y algo que cruza por
+      delante del lente; no todas iguales; ninguna atraviesa nada.
+    - **Sincronía**: cada encuadre cambia en la primera palabra de su frase (±6 cuadros) y lo que se nombra está en
+      pantalla antes de la palabra. Marcá toda frase cuya imagen llegue tarde o no muestre lo nombrado.
+    - **Planos**: en plano entero el personaje ocupa 20–25 % del alto con ≥ 60 % de fondo; un aéreo del mundo cada
+      15–20 s; cuadro final con el protagonista abajo y la amenaza detrás.
 
 ## Revisión cuadro a cuadro y ultradetalle (pedido del dueño, 24-nov-2026)
 En modo `despues`, primero correr `python <skill>/herramientas/chequeo_cuadros.py salida/<video>.mp4 --hojas salida/revision`.

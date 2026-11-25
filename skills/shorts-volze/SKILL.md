@@ -69,8 +69,14 @@ anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.c
     muy bien. Se mueve **como el animal de verdad** (patas, cuello, cabeza, balanceo), no solo para adelante y atrás.
   - **Oficios**: el cocinero con gorro y chaqueta detallados; la vieja sabia (Olga) con barba de **maestro sensei**.
   - **Casas pegadas al piso**: nada flota ni se buguea cuando se mueve el suelo.
-  - **Corridas como las de Volze**.
-  - **Arranque como Volze** (25-nov-2026, medido en las 16 transcripciones top y recientes): la primera frase es
+  - **Corridas como las de Volze** (medidas el 25-nov-2026: ciclo de 14–16 cuadros, torso inclinado 15–25°, brazos
+    rígidos apenas hacia atrás; ver «Movimiento, cámara y sincronía»).
+  - **Arranque como Volze** (25-nov-2026). **Corregido con la segunda medición**: la primera frase en acción y en
+    primera persona es de la **comedia** (4 de 4); los **top de terror** arrancan con la **regla o la amenaza en
+    presente** (6 de 6: «We only move when the eye blinks.») y la segunda frase es el costo con «Whoever…»; recién a
+    los 5–8 s viene «This morning / Tonight…». Los recientes mezclan (3 de 6 arrancan con el incidente). Para terror
+    usar la regla en presente con la amenaza ya en el cuadro 0; el arranque en acción queda para la comedia o si el
+    dueño lo pide para un video. Lo que se había anotado: la primera frase es
     **lo que está pasando ahora, en primera persona** («I stuck out my foot and tripped the fastest man alive…»,
     «I grabbed the mic at a stranger's wedding…», «Last night, I jammed their gate.»), y recién después la regla y el
     contexto. Nunca arrancar con «We live on…» o la descripción del mundo. Ej.: «I just whistled down the well. In
@@ -155,7 +161,8 @@ Partir de acá para videos nuevos, no de la polilla:
 1. **Premisa en una oración con una regla imposible**; título de **≤ 5 palabras**, fórmula «We… / Nobody… / Don't… / It…»
    (comedia: «I…»). Sin hashtags ni «Roblox» en el título (son los peores del canal: 43 k–360 k).
 2. **Hook de dos oraciones desde el segundo 0,0**: la regla (≈ 0–2 s) y el costo (empieza antes de 3,5 s), sobre una
-   imagen que ya se mueve. Sin silencio, logo ni plano de ambientación.
+   imagen que ya se mueve. Sin silencio, logo ni plano de ambientación. **En el cuadro 0 está la amenaza en
+   primerísimo plano** (70–90 % del ancho) y el narrador entra en cuadro antes de 1,0 s.
 3. **Un gimmick visual que se entiende en un frame** (algo gigante, altísimo o multitudinario que ilustra la regla).
 4. **Un solo narrador en primera persona, rápido**: 245–287 palabras por minuto (mediana 260), diálogos citados por la
    misma voz. **Duración 105–178 s** (≈ 430–650 palabras).
@@ -163,14 +170,78 @@ Partir de acá para videos nuevos, no de la polilla:
    la última palabra: sin cierre, sin pantalla final (bucle).
 6. **Contraste de tres niveles**: personajes de bloques propios / mundo con texturas reales / criatura u objeto
    gigante, detallado y no cuadrado.
-7. **Cámara siempre en movimiento**: barridos rápidos (0,2 s con desenfoque) que cambian el encuadre cada ≈ 1,2 s
-   (24–55 por minuto); pocos cortes duros, solo cuando cambia el lugar. Alternar primer plano gran angular,
-   contrapicado a la amenaza y cenital/aéreo para la escala.
+7. **Cámara siempre en movimiento, también dentro de cada encuadre**: deriva ≈ 24 % del ancho por segundo con empuje
+   hacia adelante, y cambia de encuadre cada ≈ 0,9 s (35 por minuto; 9–14 cambios en los primeros 10 s). Las
+   transiciones son de cuatro tipos (vuelo, barrido, tapado y reencuadre; ver «Movimiento, cámara y sincronía»).
+   Reparto de planos: 30 % general o aéreo, 25 % entero, 20 % medio, 15 % detalle; contrapicado a la amenaza.
 8. **Subtítulo de una palabra** con salto de escala: minúscula, amarillo **#FFF200**, contorno negro grueso,
-   centrado al **75 %** del alto (22 % si tapa la acción), altura de x ≈ 3 % del alto.
+   **fijo al 74,5 % del alto** (en terror nunca sube; el 22 % es solo de la comedia), sin puntuación, un solo
+   color, altura de x ≈ 3 % del alto.
 9. **Música debajo de la voz todo el video**, según el modo (tabla de abajo). Nunca la música del canal.
 10. **Luz de una fuente dura, bruma lejana, profundidad de campo y desenfoque de movimiento.** Los carteles del mundo
     hacen la exposición (ej.: «TWO LAMPS. ALWAYS.» pintado en el pozo).
+
+## Movimiento, cámara y sincronía (medido a 30 cuadros por segundo, 25-nov-2026)
+Segundo análisis del canal, aspecto por aspecto, con los 22 videos a 30 cuadros por segundo. El detalle, los números
+y los ejemplos con segundo están en **`referencia/estilo-volze-medido.md`: leerlo antes de animar**. Esto reemplaza
+cualquier cosa de más abajo que diga lo contrario. Donde Volze choca con un pedido del dueño, manda el dueño (tabla
+al final de la referencia).
+
+**Personajes** (casi no se animan; la energía la pone la cámara)
+- Bloques rígidos, sin codos ni rodillas, sin estirar ni aplastar. Pose base: brazos rectos en «A» a 20–30°.
+- Caminata: ciclo de **15 cuadros** (a 30 fps), piernas ±25–30°, brazos ±5–10°, torso con balanceo lateral de ±5°,
+  sin inclinarse. Tiene que avanzar (pedido del dueño).
+- Corrida: ciclo de **14–16 cuadros** (`correr()` ya da 14,5), torso inclinado **15–25°**, brazos rígidos apenas hacia
+  atrás; bombeo a 90° solo en el plano clave. Volze no pone polvo en terror; el dueño lo pidió: polvo suave.
+- Quieto: rígido, con **un parpadeo de 4 cuadros por plano**. Nadie queda más de 1,5 s en cuadro sin que cambie el
+  encuadre.
+- Gestos: **8–15 cuadros, lineales**, sin rebote. Anticipación (agacharse 8 cuadros) solo antes de saltar.
+- Objetos pegados a la mano o al pecho; el «agarre» se resuelve en 1–2 cuadros.
+- Cara: **boca fija** (nadie mueve los labios, tampoco en los diálogos); la expresión cambia **de golpe, en 1–2
+  cuadros**, 1–3 cuadros antes de la palabra clave. 4–5 caras por personaje.
+- Entrar al plano ya en movimiento y cambiar de plano antes de frenar.
+- Grupos: 4–6 al frente sincronizados, fondo parado mirando, masas con el mismo ciclo desfasado.
+
+**Criatura**
+- En el **cuadro 0**, en primerísimo plano; alejarse a cuerpo entero en 10–40 cuadros.
+- **Un gesto por plano, de 30–60 cuadros, a velocidad constante**; el resto del cuerpo en pose. Paso pesado cada
+  25–30 cuadros. Pisada: flotar ≈ 48 cuadros, bajar en 4–6, apoyar ≈ 18, subir en 8. Parpadeo: 4 cerrar, ≈ 10 cerrado,
+  4 abrir. Cara rígida: se mueven ojos, párpado, dedos y cuello.
+- El contacto violento **se tapa** con su cuerpo llenando el cuadro; después polvo y el objeto ya no está.
+- **Polvo en cada apoyo** (aparece 4–6 cuadros después, dura 0,9–2,5 s). Escombros (40–80 trozos) y **temblor de
+  cámara** (10–12 cuadros, ±3–4 % del ancho, decayendo) solo en 1–2 golpes grandes por video; en el resto, paneo.
+- Elegir régimen: **hito** visible detrás de los personajes el 30–70 % del tiempo, o **visitante** el 13–22 % con
+  entradas de 1–3 s. Siempre con casas o personas en el mismo cuadro para la escala.
+
+**Cámara** (medir con `herramientas/movimiento.py`; metas del formato pueblo/terror)
+- Dentro del encuadre: **13–30 % del ancho por segundo** de deriva (nosotros veníamos en 1,6–3 %: es la diferencia
+  más grande con el canal) y empuje de +3 a +11 % por segundo. 0 % de encuadres quietos. El encuadre entra ya en
+  movimiento.
+- Encuadre: 0,6–0,9 s de mediana, con planos largos de 3–8 s para diálogos y para el cierre. Cada 15–20 s, un aéreo
+  del mundo entero de 1,2–1,7 s.
+- Plano entero: personaje al **20–25 % del alto**, centrado, mitad inferior, ≥ 60 % de fondo con fuga y cielo. Plano
+  medio: busto al 45 %, contrapicado, cabeza por encima del subtítulo. Sin primeros planos (dueño).
+- Transiciones, mezcladas: **vuelo** a otra posición (1 de cada 3; 8–27 cuadros, poco desenfoque, por arriba de los
+  techos o por la calle), **barrido** en el lugar (6–9 cuadros, frena en 2–4, sin rebote), **tapado** (≈ 10 por
+  minuto en Volze: algo llena el lente 2–6 cuadros y se sale en otro lugar; nosotros lo hacemos con algo que **cruza
+  por delante** del lente, sin atravesar nada) y **reencuadre continuo**. Cortes limpios: ≤ 1 por minuto.
+- Criatura: contrapicado angular con una persona al 18–25 % en primer término, o avanzando hasta tapar el lente.
+  Quien corre: picado 3/4 de frente con la cámara retrocediendo. Cuadro final: protagonista abajo, amenaza detrás.
+- Movimiento que no es de cámara: Volze ≈ 43 % del ancho por segundo, nosotros 4–11 %. En cada plano tiene que
+  moverse algo además de la cámara (gente, criatura, humo, banderas, partículas).
+
+**Sincronía con la voz**
+- **Cambiar de encuadre en la primera palabra de cada frase** (±6 cuadros); una frase, un encuadre.
+- La cosa nombrada tiene que estar en pantalla **≈ 12 cuadros antes** de la palabra y nunca más de 8 después. Las
+  acciones pegan en el verbo (±3 cuadros).
+- Frase abstracta: cara del narrador, objeto-prueba, criatura, un secundario con un gesto o un aéreo. Nunca texto.
+- Diálogo citado: plano del que habla, de frente, con un gesto de brazo; cuando contesta el narrador, encuadre a él.
+- Cifras dentro del mundo (carteles, marcas, objetos contables). Sin contadores, flechas ni emojis.
+- Voz casi sin pausas (callada ≈ 12 % del tiempo): 2–3 silencios de 0,5–1,2 s, solo justo antes de una revelación.
+- Sonido: en terror no va un «whoosh» por barrido (solo 15–23 % de los cambios de cámara tienen golpe).
+
+**Luz**: 2–4 cambios de luz por video (noche para «dormir» o el recuerdo; último acto más oscuro o más cálido).
+Pueblo poco saturado (≈ 34 %); el color fuerte lo llevan el protagonista y la criatura.
 
 ## Los dos modos (no preguntar: elegir por la premisa)
 
@@ -196,7 +267,15 @@ Lección del video de prueba: la primera versión salió **demasiado oscura, sat
 saturación 0,77, 13,7 % de negros). La exposición y los colores de esta tabla ya están corregidos: no volver al
 «todo sepia con niebla».
 
-## Plantilla de guion (inglés, ≈ 430–650 palabras, frases de 3–14 palabras)
+## Plantilla de guion (inglés, ≈ 430–650 palabras, frases de 6 palabras de mediana, un tercio de ≤ 4)
+
+Tiempos medidos en los 12 de terror (mediana, % del video): regla 0 %, costo 2 %, «This morning / Tonight…» 5 %,
+criatura 8 %, vida con la regla 10 %, personaje cercano 26 %, antecedente 30 %, decisión 48 %, clímax 69 %, giro 87 %.
+Lo que tienen los top y no los recientes: **un ser querido chico con nombre corto** (Mo, Bee, June) antes del 30 %,
+con una muletilla que vuelve en la última línea; el costo dicho con **«Whoever…»**; la regla aplicada a **bodas,
+bebés, dormir o la escuela** antes de los 25 s; un **estribillo** que vuelve 3 veces; 12–35 cifras; y un giro en el
+que la criatura no era lo que creíamos o el narrador pasa a serlo. La última frase repite palabras de las dos
+primeras (bucle).
 
 ```
 HOOK (0–3,5 s)        1. «[Every/We/Nobody] … [la regla].»              2. «[El costo concreto y visual].»
@@ -208,8 +287,8 @@ LA TENTACIÓN (≈ 55–75 s) alguien cercano al narrador rompe la regla en secr
 DECISIÓN (≈ 75–100 s) el narrador hace algo físico, en frases de una acción cada una
 GIRO (últimos ≈ 5 s)  la regla del arranque dada vuelta, en primera persona: «My whole life, I counted to two. Tonight, I'm the third lamp.»
 ```
-`partes/frases.json`: `[{ "n": "nombre", "t": "texto", "gap": 0.1 }]`. Pausa 0,1 s por defecto; 0,3–0,7 s solo
-donde la imagen tiene que respirar. Medir: palabras ÷ duración × 60 entre 245 y 287.
+`partes/frases.json`: `[{ "n": "nombre", "t": "texto", "gap": 0.1 }]`. Pausa 0,1–0,15 s por defecto (Volze: 0,14 s de mediana y
+casi ninguna de más de 0,3 s); 0,5–1,2 s solo 2–3 veces, justo antes de una revelación. Medir: palabras ÷ duración × 60 entre 245 y 287.
 
 ## Personajes (diseños propios de bloques)
 - Constructor `kid()` de la plantilla de `reel-historias` (cuerpo por partes, cara pintada, pelo de una forma, ropa
@@ -219,22 +298,33 @@ donde la imagen tiene que respirar. Medir: palabras ÷ duración × 60 entre 245
   bufanda roja). Una hermana/amigo chico (escala 0,74), una vieja del pueblo con algo en las manos (bastón, farol),
   2–5 vecinos descartables.
 - Caras: mínimas en lo serio (`neutral`, `worried`, `squint`, `scared`, `terrified`, `horrified`), exageradas en lo
-  gracioso. Cambiar de cara en el momento fuerte de la frase.
+  gracioso. Cambiar de cara **de golpe (1–2 cuadros), 1–3 cuadros antes** de la palabra fuerte. La boca no se mueve
+  al hablar.
+- Proporciones medidas en Volze (14 personajes): 4,5 cabezas de alto; torso cuadrado 1 × 1; cabeza 0,65 del ancho
+  del torso y 0,85 de alto/ancho, sin cuello; piernas 0,5 de ancho y ≈ 1 de alto, pegadas; brazos 0,42 × 1,05; ojos
+  de óvalo negro de 8 % × 15 % de la cabeza, separados 18 %; boca en arco de 35 %. Chicos: el mismo modelo a 0,88 o
+  menos. En un grupo, el protagonista es el de cabeza más clara y color más saturado.
 
 ## Cámara y luz (implementadas en el ejemplo)
 - `SHOTS[I.frase] = [sh(palabra, p0, p1, mira0, mira1, fov), …]`: cada toma arranca en una **palabra** de
-  `palabras.json`; la cámara se mueve de p0 a p1 todo el tiempo. Entre tomas del mismo lugar: barrido de 0,2 s con
-  12 sub-cuadros de desenfoque (`window.SUBF`); entre lugares: corte duro (`LUGAR()`).
+  `palabras.json`; la cámara se mueve de p0 a p1 todo el tiempo, y ese recorrido tiene que dar **13–30 % del ancho
+  por segundo** en pantalla (medirlo con `movimiento.py`; con recorridos cortos quedaba en 2–3 %). Entre tomas: vuelo,
+  barrido o algo que cruza por delante del lente (ver «Movimiento, cámara y sincronía»), con sub-cuadros de desenfoque
+  (`window.SUBF`). Nada de corte duro entre lugares.
 - `shF(palabra, personaje, d0, d1, ángulo, alto, fov)` encuadra la **cara** según hacia dónde mira el personaje (sirve
   también acostado). Usarlo para todos los primeros planos: los planos «a mano» terminaban en nucas y paredes.
-- FOV: 66–82 en primeros planos (gran angular), 46–56 en planos abiertos y aéreos.
+- FOV: gran angular (66–82) para la criatura en contrapicado y para planos medios cercanos; 46–56 en planos
+  abiertos y aéreos. Sin primeros planos de caras (dueño).
 - Una sola luz dura con sombras (sol o luna) + relleno hemisférico + **hasta 7 luces puntuales** reubicadas por
   escena (`lights()`); las ventanas son emisivas con un brillo, sin luz propia. Bloom 0,55.
 - Cuidado con lo que quema: luces puntuales a < 1 m de una cara, brillos aditivos cerca de cámara, luciérnagas.
 
 ## Subtítulos
 `subV(t)` del ejemplo: Baloo 2 800, 112 px, `#fff200`, contorno negro de 22 % del tamaño, sombra abajo, minúscula,
-entra con resorte (0,55 → 1), tiempos **reales** de cada palabra (whisper), texto del guion.
+tiempos **reales** de cada palabra (whisper), texto del guion. Medido en Volze: **nace al 128 % y baja lineal al
+100 % en 0,13 s** (8 cuadros de 60), sin rebote ni giro; una sola palabra, sin puntuación (solo apóstrofo y guion),
+cantidades en letras, un solo color, nada resaltado; fijo al 74,5 % del alto; los cuadros 0–2 van sin subtítulo y se
+apaga en silencios de ≥ 0,5 s. El resorte desde 0,55 que usábamos no es de Volze.
 
 ## Música (sintetizada en `partes/musica.js`, nunca canciones ajenas dentro del MP4)
 - **Receta de la canción de fondo** (24-nov-2026): ganancia = dB(voz) − 6 − dB(canción) (medidos en RMS), y
@@ -338,7 +428,14 @@ node render-gpu.mjs video salida/<nombre>.mp4 --conc=3 --sinmusica
 - [ ] La última frase da vuelta la regla del arranque; el video termina 0,2–2 s después de la última palabra.
 - [ ] Ningún personaje, música, logo ni asset de Volze o de Roblox; personajes propios.
 - [ ] Hoja de tomas sin nucas, paredes, cámaras adentro de algo, cosas quemadas (blanco) ni negras.
-- [ ] Subtítulos: texto del guion (no el de whisper: «Ren», «40»), amarillo, 75 %/22 %.
+- [ ] Subtítulos: texto del guion (no el de whisper: «Ren», «40»), amarillo, fijo al 74,5 %, sin puntuación,
+      entrada 128 % → 100 % en 0,13 s.
+- [ ] `movimiento.py salida/<video>.mp4`: deriva dentro del encuadre ≥ 13 % del ancho por segundo, 0 % de encuadres
+      quietos, encuadre mediano ≤ 1,0 s, movimiento que no es de cámara ≥ 30 %.
+- [ ] Cada encuadre cambia en la primera palabra de su frase; lo nombrado está en pantalla antes de la palabra.
+- [ ] La criatura está en el cuadro 0 y el narrador entra antes de 1,0 s; cuadro final con el protagonista abajo y la
+      amenaza detrás.
+- [ ] Hay un ser querido con nombre, un estribillo que vuelve 3 veces y 2–4 cambios de luz.
 - [ ] Voz − música ≈ 6 dB (terror/día); música audible > 95 %; pico ≤ 0,97.
 - [ ] `comparar.py` dentro de las metas del modo.
 - [ ] `render-gpu.mjs info` dice RTX 4060; el MP4: h264, 1080×1920, 60 fps, AAC, duración = `DUR`.
@@ -351,3 +448,9 @@ node render-gpu.mjs video salida/<nombre>.mp4 --conc=3 --sinmusica
 - `herramientas/`: `voz.py`, `palabras.py`, `verif_voz.py`, `comparar.py` y los scripts del análisis del canal
   (`procesar.py`, `musica.py`, `cortes2.py`, `resumen.py`) para volver a medir si el canal cambia.
 - `referencia/historias-hechas.md`: premisas ya usadas (no repetir).
+- `referencia/estilo-volze-medido.md`: el análisis cuadro a cuadro del canal (movimiento de personajes y criatura,
+  mundo, cámara, sincronía, subtítulos, guion, sonido, diseño, luz), con números, ejemplos y la comparación con
+  nuestros videos.
+- `herramientas/movimiento.py` (cámara con números: deriva, empuje, transiciones, temblor), `herramientas/tira.py`
+  (plancha de cuadros seguidos a 30/15/10 por segundo para mirar movimiento) y `herramientas/sonido_eventos.py`
+  (golpes de sonido contra cambios de cámara y pausas de la voz).
