@@ -2420,7 +2420,7 @@ const CBA = (o = [0, 0, 0]) => () => add(CUERNO_BASE_W(), o);
 const ESC = (r, dy) => () => { const p = ME.g.getWorldPosition(new THREE.Vector3()), dx = p.x - TORRE[0], dz = p.z - TORRE[1], d = Math.hypot(dx, dz) || 1; return [p.x + dx / d * r, p.y + dy, p.z + dz / d * r] };
 const ARENA = "#c9925a", MARFIL = "#e8dcc0", NOCHE = "#2a1a14", PIEL = "#8a7458";
 const SHOTS = {
-  [I.rule]: [sh(0, CB([9, -3, 15]), [16, 44, -92], CB([0, -3, 6]), CB([0, -8, 0]), 42), sh(3, [7, 2.2, 20], [4.6, 2.8, 15], [0, 12, -10], [0, 14, -10], 58)],
+  [I.rule]: [sh(0, CB([9, -3, 15]), [16, 44, -92], CB([0, -3, 6]), CB([0, -8, 0]), 42), sh(3, [2.6, 2.4, 23], [1.6, 3, 17], [0, 12, -10], [0, 14, -10], 58, { lat: 1 })],
   [I.cost]: [sh(0, [10, 23, 3], [5, 20.6, -3], [0, 18, -10], null, 50), sh(3, [-17, 21, 12], [-14, 26, 0], [0, 46, -160], [0, 50, -160], 30, { lat: 2 })],
   [I.today]: [sh(0, BO([-3.4, 2.8, 5.6]), BO([-2, 2.2, 3.8]), BO([-.6, 1.5, 0]), null, 50, { tr: "tapa", col: ARENA })],
   [I.horn]: [sh(0, [-24, 27, 12], [-12, 24, 20], [0, 16, -10], null, 50, { tr: "tapa", col: ARENA, dir: -1 }), sh(6, [22, 9, 24], [10, 11, 22], [0, 14, -10], null, 55), sh(10, [-10, 20.2, -6], [3, 19.8, -6.6], [6, 18.4, -10], [12, 18, -10], 45)],
@@ -2429,23 +2429,23 @@ const SHOTS = {
   [I.school]: [sh(0, [20, 5.4, -8], [25, 3.6, -12.2], [29, 2.2, -15], null, 60), sh(5, [22.6, 3, -17.4], [24.4, 2.8, -15.6], KW(QUILL, [0, 1.9, 0]), null, 52)],
   [I.roost]: [sh(0, [-20, 5, -7], [-24.6, 2.6, -11.4], [-28, .8, -14], null, 55), sh(5, [-20.6, 2.7, -11.4], [-22.2, 2.5, -12.8], KW(FOLK[3], [0, 1.8, 0]), null, 52)],
   [I.ridge]: [sh(0, [-15, 2.4, 8], [-12.6, 3, 1], [0, 40, -160], [0, 48, -160], 24, { lat: 1.2 }), sh(5, G(12, 3, -106), G(7, 3.6, -117), [0, 42, -152], [0, 48, -156], 52)],
-  [I.tall]: [sh(0, [-17, 3, 34], [-14.4, 4, 26], [-4, 26, -120], [-4, 31, -120], 34, { lat: 1.5 }), sh(6, G(28, 3, -138), G(18, 3, -146), [-2, 38, -160], [-2, 44, -160], 62)],
+  [I.tall]: [sh(0, [-17, 3, 34], [-14.4, 4, 26], [-4, 26, -120], [-4, 31, -120], 34, { lat: 1.5 }), sh(6, G(30, 9, -134), G(20, 7, -144), [-2, 38, -160], [-2, 44, -160], 62, { lat: 3 })],
   [I.tusk]: [sh(0, [-27, 45, -98], [-18, 43.4, -106], CB([-3, -9, 14]), null, 36), sh(4, [24, 47, -104], [16, 45, -114], MU(), null, 32)],
   [I.sixty]: [sh(0, [-62, 42, -88], [-48, 38, -102], [0, 44, -160], null, 40)],
   [I.bee]: [sh(0, [-2, 2.6, 9], [.8, 2.1, 11.4], KW(ME6, [0, 1.3, 0]), null, 52), sh(6, [-.4, 2, 15.4], [.8, 1.8, 14.4], KW(ME6, [0, 1.3, 0]), null, 50)],
-  [I.listen1]: [sh(0, KW(ME6, [1.8, 1.6, 3.6]), KW(ME6, [.4, 1.5, 3.2]), KW(ME6, [0, 1.3, 0]), null, 50), sh(3, KW(ME6, [-2.4, 1, 4.2]), KW(ME6, [-1.2, .9, 3.6]), KW(ME6, [0, .9, 0]), null, 52), sh(7, KW(ME6, [1.2, .9, 4.6]), KW(ME6, [2.4, .8, 3.6]), KW(ME6, [-1, 5, -6]), null, 60)],
+  [I.listen1]: [sh(0, KW(ME6, [2.8, 1.8, 5.4]), KW(ME6, [1, 1.7, 4.8]), KW(ME6, [.6, 1.3, 0]), null, 50), sh(3, KW(ME6, [-2.4, 1, 4.2]), KW(ME6, [-1.2, .9, 3.6]), KW(ME6, [0, .9, 0]), null, 52), sh(7, KW(ME6, [1.2, .9, 4.6]), KW(ME6, [2.4, .8, 3.6]), KW(ME6, [-1, 5, -6]), null, 60)],
   [I.listen2]: [sh(0, [-7.4, 2.2, 15.4], [-7.8, 2.4, 13.4], [-7, 3.6, -30], [-7, 5, -30], 50, { lat: 1 }), sh(8, [-12, 30, -56], [-8, 36, -78], CB([0, 0, 4]), null, 30)],
   [I.nobody]: [sh(0, KW(ME, [3.4, 1.8, -6.4]), KW(ME, [1.6, 1.8, -5.6]), KW(ME, [-.6, 1.4, 0]), null, 52)],
   [I.dez]: [sh(0, [34, 28, 40], [22, 22, 28], () => FUEGO_POS, null, 50, { tr: "tapa", col: NOCHE }), sh(4, BO([-3.6, 2.8, 5.8]), BO([-2, 2.2, 3.8]), BO([-.6, 1.4, 0]), null, 50), sh(10, [-14, 25, -17], [-10, 23, -14], () => FUEGO_POS, null, 52)],
   [I.note]: [sh(0, [-22, 31, 8], [-16, 27, 0], BO([-7, 0, 0]), null, 55)],
   [I.eleven]: [sh(0, BR([26, 4, 52]), BR([20, 3.4, 44]), CB([0, -10, 0]), null, 56, { shake: .2 }), sh(5, BR([-46, 62, 60]), BR([-36, 54, 46]), BR([0, 14, 10]), null, 50)],
   [I.nine]: [sh(0, BR([40, 6, 40]), BR([29, 5, 31]), BR([6, 8, 14]), null, 60, { shake: .3 }), sh(4, BR([22, 10, 60]), BR([16, 9, 52]), CB([0, -4, 4]), null, 50)],
-  [I.night]: [sh(0, [27, 4, -15], [20, 5.6, -12], [-4, 24, -24], null, 62), sh(8, [-10, 12, -20], [-9, 15.4, -28], BR([0, 20, 0]), null, 50, { tr: "tapa", col: "#d8a070" })],
+  [I.night]: [sh(0, [27, 4, -15], [20, 5.6, -12], [-4, 24, -24], null, 62), sh(8, [-12, 12, -24], [-11, 15.4, -32], BR([0, 20, 0]), null, 50, { tr: "tapa", col: "#d8a070", lat: 1 })],
   [I.ponds]: [sh(0, [0, 70, 40], [0, 56, 14], [0, 2, -70], [0, 2, -88], 55, { tr: "tapa", col: ARENA }), sh(6, [-1, 5.4, -11], [-3, 3.6, -16.4], [-6, .4, -24], null, 52)],
   [I.sign]: [sh(0, [0, 3, 23], [0, 3.8, 15], [0, 10, -10], null, 50), sh(7, [1.6, 6, 9], [1, 7.4, 3.6], [0, 10.6, -10], null, 40)],
   [I.storm]: [sh(0, [64, 42, 92], [46, 33, 72], [0, 10, -34], null, 50), sh(3, [0, 2.6, 41], [0, 2.7, 32], [0, 4.5, 0], null, 55)],
   [I.orange]: [sh(0, [3.4, 2, 27], [3, 2.2, 22], [0, 12, -10], [0, 15, -10], 55), sh(4, KW(ME, [-2.6, 1.8, 5.8]), KW(ME, [-1.4, 1.8, 4.6]), KW(ME, [0, 1.4, 0]), null, 50)],
-  [I.goat]: [sh(0, [6, 2.3, -41], [4.6, 2, -47], KW(ME6, [0, 1, -3]), null, 56), sh(3, [6, 1.9, -41], [6, 1.9, -46], KW(ME6, [0, 1, -2.4]), null, 56, { fijo: 1 })],
+  [I.goat]: [sh(0, [7, 2.4, -44], [5.6, 2.2, -50], KW(ME6, [0, 1, -3]), null, 58, { lat: 1 }), sh(3, [9, 2, -42.6], [9, 2.1, -45], [0, 1.2, -43], [0, 1.2, -45], 62, { fijo: 1 })],
   [I.scream]: [sh(0, [3.8, 2.2, -32.8], [2.6, 2.2, -31], KW(ME, [0, 1.5, 0]), null, 50), sh(4, [11, 3.2, -31], [8.4, 3, -29.6], [0, 2, -28], null, 54)],
   [I.forty]: [sh(0, [-13, 2.6, -33], [-4, 2.6, -32], [3, 2, -26], [8, 2, -26], 52), sh(3, [9, 10.5, -38], [5.4, 8, -35], [0, 1.5, -26], null, 54)],
   [I.louder]: [sh(0, [2.8, 3, -16], [2.2, 2.6, -20], KW(ME, [0, 1.5, 0]), null, 52), sh(5, [4, 3, -31], [5.4, 7, -27], [0, 17, -10], [0, 18.4, -10], 50)],
@@ -2464,17 +2464,17 @@ const SHOTS = {
   [I.same]: [sh(0, [-4, 21.4, 8], [3, 21, 6], [2, 18.6, -10], null, 50), sh(3, [-4, 19.9, -8], [-1.2, 19.6, -8.2], [0, 18.6, -10], null, 30), sh(6, BR([15, 27, 47]), BR([13, 26, 43]), MU(), null, 30)],
   [I.built]: [sh(0, BO([-5.6, 2.2, 2.8]), BO([-4.4, 2, 2.1]), BO([0, 1.5, 0]), null, 50)],
   [I.cut]: [sh(0, BR([25, 26, 57]), BR([19, 25, 48]), MU([0, -2, 0]), null, 44)],
-  [I.pins]: [sh(0, [7, 21.6, -1], [4.4, 20.2, -4.6], OW(PERNOS[0], [0, 0, 0]), null, 40), sh(4, [-22, 18, 12], [-17, 17, 7], [-4, 18, -10], [-6, 16, -10], 56)],
-  [I.caught]: [sh(0, [8, 15, 12], [5, 16.4, 6], CB([0, -9, 6]), null, 56, { tr: "tapa", col: MARFIL }), sh(3, BR([20, 21, 52]), BR([14, 20.6, 44]), MU(), null, 36)],
+  [I.pins]: [sh(0, [7, 21.6, -1], [4.4, 20.2, -4.6], OW(PERNOS[0], [0, 0, 0]), null, 40), sh(4, [21, 21, 11], [16, 19.6, 6], [1, 18, -10], [0, 16.6, -11], 54)],
+  [I.caught]: [sh(0, BR([27, 27, 60]), BR([20, 25.6, 50]), MU([0, -1.5, 0]), null, 42, { tr: "tapa", col: MARFIL }), sh(3, BR([30, 24, 62]), BR([23, 23, 52]), MU([0, -3, 2]), null, 46)],
   [I.eyes]: [sh(0, OJ([9, .4, 12]), OJ([6.4, .2, 9.4]), OJ(), null, 28)],
   [I.small]: [sh(0, [7, 9, -10], [3.6, 4, -17], KW(ME6, [0, 1, 0]), null, 54), sh(5, KW(ME6, [4, 1.7, 4.4]), KW(ME6, [2.6, 1.5, 3.2]), KW(ME6, [0, 1.1, 0]), null, 50)],
-  [I.found]: [sh(0, KW(ME6, [-2, 1.5, 3.6]), KW(ME6, [-1, 1.4, 3]), KW(ME6, [0, 1.1, 0]), null, 50), sh(4, KW(ME6, [-4.4, 2.4, 7.6]), KW(ME6, [-3, 2, 5.8]), KW(ME6, [1, 1.1, .4]), null, 56)],
-  [I.followed]: [sh(0, KW(ME6, [-4, 1.6, 5.6]), KW(ME6, [-2.8, 1.5, 4.4]), KW(ME6, [.9, 1.2, 0]), null, 52)],
+  [I.found]: [sh(0, KW(ME6, [-3, 1.7, 5.2]), KW(ME6, [-1.8, 1.6, 4.4]), KW(ME6, [0, 1.1, 0]), null, 50, { lat: .6 }), sh(4, KW(ME6, [-4.4, 2.4, 7.6]), KW(ME6, [-3, 2, 5.8]), KW(ME6, [1, 1.1, .4]), null, 56, { tr: "sigue", lat: .6 })],
+  [I.followed]: [sh(0, KW(ME6, [-4, 1.6, 5.6]), KW(ME6, [-2.8, 1.5, 4.4]), KW(ME6, [.9, 1.2, 0]), null, 52, { tr: "sigue", lat: .6 })],
   [I.back]: [sh(0, [9, 2.4, -21], [7, 2.9, -23.4], BR([0, 22, 0]), null, 56), sh(5, BR([54, 16, 14]), BR([44, 14, 4]), CB([0, -6, 6]), null, 32)],
   [I.life]: [sh(0, [9, 23, 2], [5, 21, -3.4], [0, 18, -10], null, 50), sh(3, [-44, 42, 54], [-30, 34, 40], [0, 10, -10], null, 50)],
   [I.ours]: [sh(0, KW(ME, [2.8, 1.9, -6]), KW(ME, [1.4, 1.9, -4.8]), KW(ME, [-.7, 1.4, 0]), null, 52)],
-  [I.listen3]: [sh(0, KW(ME6, [-1.8, 1.5, -3.8]), KW(ME6, [-.8, 1.4, -3]), KW(ME6, [0, 1.3, 0]), null, 50)],
-  [I.heard]: [sh(0, [-9.4, 2.4, 8.6], [-9.4, 3, 10.6], [0, 23, -160], [0, 26, -160], 34, { lat: .4 })],
+  [I.listen3]: [sh(0, KW(ME6, [-2.6, 1.7, -5.4]), KW(ME6, [-1.2, 1.6, -4.4]), KW(ME6, [.7, 1.3, 0]), null, 50)],
+  [I.heard]: [sh(0, [-9.4, 3.2, 9.4], [-9.4, 3.8, 11.6], [0, 20, -160], [0, 23, -160], 34, { lat: .4 })],
 };
 
 // tiempos de inicio de cada toma y cortes; window.SUBF: más sub-cuadros (desenfoque) en los barridos
@@ -2517,11 +2517,13 @@ function camara(t) { const k = tomaAt(t), T = TOMAS[k], q = cl((t - T.a) / Math.
   const mira = (p, l) => { MA.lookAt(p, l, V_(0, 1, 0)); return new THREE.Quaternion().setFromRotationMatrix(MA) };
   let pos = V_(...c.p), lk = V_(...c.l), fov = c.f, giro = 0; POST.tapa = null;
   const tr = enTransicion(t);
-  if (tr) { const [A, B, u, r] = tr, ca = camO(A, 1), cb = camO(B, 0), pa = V_(...ca.p), pb = V_(...cb.p), la = V_(...ca.l), lb = V_(...cb.l);
-    if (r.tipo === "vuelo") { const e = eIO(cl(u)), h = altura(pa, pb); pos = bez3(pa, pa.clone().add(V_(0, h, 0)), pb.clone().add(V_(0, h, 0)), pb, e); lk = la.clone().lerp(lb, eIO(cl(u * 1.25))); fov = lerp(ca.f, cb.f, e) + Math.sin(e * Math.PI) * 6 }
+  if (tr) { // la transición sale de donde está la toma A en ese instante y llega EXACTAMENTE a donde la toma B va a estar cuando termina
+    // (antes llegaba al inicio de B, que ya iba avanzada: al terminar pegaba un salto, que el dueño marcó)
+    const [A, B, u, r] = tr, qa = cl(1 - (r.dur / 2) / Math.max(.01, A.b - A.a)), qb = cl((r.dur / 2) / Math.max(.01, B.b - B.a)), ca = camO(A, qa), cb = camO(B, qb), pa = V_(...ca.p), pb = V_(...cb.p), la = V_(...ca.l), lb = V_(...cb.l);
+    if (r.tipo === "vuelo") { const e = eIO(cl(u)), h = altura(pa, pb); pos = bez3(pa, pa.clone().add(V_(0, h, 0)), pb.clone().add(V_(0, h, 0)), pb, e); lk = la.clone().lerp(lb, e); fov = lerp(ca.f, cb.f, e) }
     else if (r.tipo === "sigue") { const e = eIO(cl(u)); pos = pa.clone().lerp(pb, e); lk = la.clone().lerp(lb, e); fov = lerp(ca.f, cb.f, e) }
-    else if (r.tipo === "barrido") { const s = B.s.dir ?? ((k % 2) ? 1 : -1); if (u < .5) { pos = pa; lk = la; fov = ca.f; giro = -s * Math.pow(u / .5, 2) * 1.5 } else { pos = pb; lk = lb; fov = cb.f; giro = s * Math.pow(1 - (u - .5) / .5, 2.4) * 1.5 } }
-    else { if (u < .5) { pos = pa; lk = la; fov = ca.f } else { pos = pb; lk = lb; fov = cb.f } POST.tapa = { u, col: B.s.col || "#b8905a", dir: B.s.dir ?? 1 } } }
+    else if (r.tipo === "barrido") { const s = B.s.dir ?? ((TOMAS.indexOf(B) % 2) ? 1 : -1); giro = u < .5 ? -s * Math.pow(u / .5, 2) * 1.5 : s * Math.pow(1 - (u - .5) / .5, 3) * 1.5 }   // la cámara sigue el recorrido de su toma; solo se suma el giro, que termina en 0
+    else { POST.tapa = { u, col: B.s.col || "#b8905a", dir: B.s.dir ?? 1 } } }
   let quat = mira(pos, lk); if (giro) quat.premultiply(new THREE.Quaternion().setFromAxisAngle(V_(0, 1, 0), giro));
   // pulso de cámara: nunca clavada (temblor medido en Volze ≈ 0,19 % del ancho entre cuadros)
   const n1 = Math.sin(t * 5.3) + Math.sin(t * 8.1 + 1.3) * .6 + Math.sin(t * 13.7 + .4) * .3, n2 = Math.sin(t * 4.7 + 2) + Math.sin(t * 9.3 + .7) * .6 + Math.sin(t * 15.1) * .3;
@@ -2544,7 +2546,7 @@ function setScene(t) {
   const TORM = L === I.today || (L >= I.storm && L <= I.eyes), DESPUES = L >= I.small;
   const fuerza = L === I.today ? .8 : L === I.storm ? .15 + .85 * eIO(k) : (L > I.storm && L <= I.rolling) ? 1 : (L >= I.turned && L <= I.shadow) ? .55 : (L >= I.stayed && L <= I.cut) ? .5 : (L >= I.pins && L <= I.eyes) ? .5 - .3 * ((L - I.pins) + k) / 3 : 0;
   setEnv(RECUERDO ? (ALBA ? "despues" : "incendio") : TORM ? "tormenta" : DESPUES ? "despues" : "desierto");
-  if (TORM) { const A = ENV.tormenta, B = ENV.desierto, f = cl(fuerza); scene.fog.density = lerp(B.fog * 2.5, A.fog * (L >= I.turned ? .3 : (L === I.orange || L === I.rolling || L === I.storm) ? .26 : .42), f) }
+  if (TORM) { const A = ENV.tormenta, B = ENV.desierto, f = cl(fuerza); scene.fog.density = lerp(B.fog * 2.5, A.fog * (L >= I.trunk ? .16 : L >= I.turned ? .26 : L === I.rolling ? .13 : (L === I.orange || L === I.storm) ? .26 : .42), f) }
   if (L >= I.life) scene.fog.density *= .45;
   SOL.z = (L === I.ridge || L === I.tall || L === I.tusk || L === I.sixty || L === I.turned || (L === I.one && lt < Wd(2) - T0) || L === I.heard || L === I.listen2) ? -150 : 0;
   ambiente(t); tormenta(t, cam.position, TORM ? fuerza : 0); tortuga(t, { paso: 0 }); LUCES.forEach(l => l.visible = false);
@@ -2565,7 +2567,7 @@ function setScene(t) {
   else if (L === I.stayed) B = { ...baj(BAJADA.pasos + 3 + lt / SEG), orejas: 1, baja: .3 * eIO(k) };
   else if (L === I.trunk) B = { ...baj(99), orejas: 1, baja: .3, trompa: "enrosca", trompaEn: [TORRE[0], 9.5, TORRE[1]], trompaR: 4.4, trompaQ: eIO(P(k, 0, .7)) };
   else if (L >= I.face && L <= I.pins) B = { ...baj(99), orejas: .7, baja: L === I.face ? .55 + .25 * eIO(k) : L === I.stump ? lerp(.8, .22, eIO(k)) : .22, gira: L === I.face ? .32 * eIO(k) : L === I.stump ? lerp(.32, .06, eIO(k)) : .06, trompa: "enrosca", trompaEn: [TORRE[0], 9.5, TORRE[1]], trompaR: 4.4, trompaQ: 1 };
-  else if (L === I.caught) B = { ...baj(99), orejas: .4, baja: .5, gira: .2, trompa: "sostiene", trompaDe: "enrosca", trompaQ: eIO(P(k, 0, .6)), conColmillo: eIO(P(k, .1, .55)) };
+  else if (L === I.caught) B = { ...baj(99), orejas: .4, baja: .5, gira: .2, trompa: "sostiene", trompaDe: "enrosca", trompaQ: eIO(P(k, 0, .5)), conColmillo: eIO(P(k, .05, .4)) };
   else if (L >= I.eyes && L <= I.followed) B = { ...baj(99), orejas: .1, baja: .45, gira: .1, trompa: "sostiene", conColmillo: 1, ojos: L === I.eyes ? eIO(P(k, .1, .45)) : L === I.small ? 1 - eIO(P(k, .3, .6)) : 0 };
   else if (L === I.back) { const p = 6 + lt / SEG; B = { x: BFIN.x * (1 - eIO(P(p, 0, 14))), z: BFIN.z - 30 - bestiaAvance(p, 99), ry: Math.PI, paso: p, trompa: "sostiene", conColmillo: 1 } }
   else if (L >= I.life) B = { ...B, trompa: "sostiene", conColmillo: 1, ...QUIETA };
@@ -2651,7 +2653,7 @@ function overlay(t) {
   const gr = ENV[ENVNOW].grade; X.globalAlpha = gr[1]; X.globalCompositeOperation = "soft-light"; X.fillStyle = gr[0]; X.fillRect(0, 0, W, H); X.globalCompositeOperation = "source-over"; X.globalAlpha = 1; X.drawImage(VIG2, 0, 0);
   if (POST.flash > 0) { X.globalAlpha = Math.min(1, POST.flash); X.fillStyle = "#fff6e0"; X.fillRect(0, 0, W, H); X.globalAlpha = 1 }
   if (POST.sepia > 0) { X.globalAlpha = POST.sepia * .55; X.globalCompositeOperation = "color"; X.fillStyle = "#b08a5a"; X.fillRect(0, 0, W, H); X.globalCompositeOperation = "source-over"; X.globalAlpha = 1 }
-  if (POST.tapa) { const u = POST.tapa.u, cx = W / 2 + (u - .5) * POST.tapa.dir * 3.6 * W, g = X.createLinearGradient(cx - 1.5 * W, 0, cx + 1.5 * W, 0); g.addColorStop(0, "rgba(0,0,0,0)"); g.addColorStop(.18, POST.tapa.col); g.addColorStop(.82, POST.tapa.col); g.addColorStop(1, "rgba(0,0,0,0)"); X.fillStyle = g; X.fillRect(0, 0, W, H); const v = X.createRadialGradient(cx, H / 2, H * .2, cx, H / 2, H * .9); v.addColorStop(0, "rgba(0,0,0,0)"); v.addColorStop(1, "rgba(0,0,0,.45)"); X.globalAlpha = Math.max(0, 1 - Math.abs(u - .5) * 4); X.fillStyle = v; X.fillRect(0, 0, W, H); X.globalAlpha = 1 }
+  if (POST.tapa) { const u = POST.tapa.u, cx = W / 2 + (u - .5) * POST.tapa.dir * 4.6 * W, g = X.createLinearGradient(cx - 1.3 * W, 0, cx + 1.3 * W, 0); g.addColorStop(0, "rgba(0,0,0,0)"); g.addColorStop(.3, POST.tapa.col); g.addColorStop(.7, POST.tapa.col); g.addColorStop(1, "rgba(0,0,0,0)"); X.fillStyle = g; X.fillRect(0, 0, W, H); for (let i = 0; i < 46; i++) { const yy = ((i * 97.3) % 1) * H, hh = 6 + ((i * 31.7) % 1) * 60, xx = cx - 1.1 * W + ((i * 57.1) % 1) * 2.2 * W; X.fillStyle = i % 2 ? "rgba(255,240,210,.16)" : "rgba(40,22,8,.2)"; X.fillRect(xx - .5 * W, yy, W * (.5 + ((i * 13.3) % 1)), hh) } const v = X.createRadialGradient(cx, H / 2, H * .2, cx, H / 2, H * .9); v.addColorStop(0, "rgba(0,0,0,0)"); v.addColorStop(1, "rgba(0,0,0,.45)"); X.globalAlpha = Math.max(0, 1 - Math.abs(u - .5) * 4); X.fillStyle = v; X.fillRect(0, 0, W, H); X.globalAlpha = 1 }
   subV(t);
 }
 window.DBG = { cam, ALL, ME, QUILL, PIM, GARROW, TURT, THREE, TOMAS };

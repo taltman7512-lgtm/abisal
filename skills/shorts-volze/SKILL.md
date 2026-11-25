@@ -27,6 +27,20 @@ anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.c
   **1440×1920 a 60 fps**, igual que los 16 top y recientes del canal (antes 1080×1920). `motor/armar.js` ya lo fija
   (`?v916` en la URL vuelve a 1080×1920) y las hojas de `render-gpu.mjs` salen en 3:4. El campo vertical es el mismo y
   se ve un tercio más a los costados: encuadrar pensando en ese ancho.
+- **Transiciones sin salto al llegar (25-nov-2026, primera versión de «Nobody Blows The Horn»)**: al dueño le molestó
+  que, al terminar cada transición, la cámara hiciera «un movimiento raro, brusco, de golpe». Era un bug: la transición
+  llegaba al INICIO de la toma nueva, pero esa toma ya llevaba medio recorrido, y la cámara saltaba. Regla: la
+  transición sale de donde la toma anterior está en ese instante y **termina exactamente donde la toma nueva va a
+  estar cuando la transición acaba**, y la cámara sigue desde ahí sin corregirse. En los barridos y tapados la cámara
+  sigue el recorrido de su toma y solo se le suma el giro o la banda. Hecho en `videos/cuerno/partes/_camara_vuelo.js`
+  (`qa`, `qb` en `camara()`); usar ese archivo como cámara de partida en los videos nuevos.
+- **Cámara que cumple las medidas de Volze** (mismo archivo): `camO()` recorre el 55 % del camino p → p1 (menos empuje)
+  y suma un desplazamiento lateral de 0,19 × la distancia al sujeto por segundo (la mira acompaña el 62 %); con eso el
+  video dio 18,5 % del ancho por segundo. En tomas con teleobjetivo y gente en primer término, limitarlo con
+  `{ lat: 0.4–2 }` (unidades por segundo) o `{ fijo: 1 }`: si no, la órbita saca a los personajes del cuadro o mete la
+  cámara en algo. Tipos de transición por toma: `{ tr: "vuelo" | "barrido" | "tapa" | "sigue" }`.
+- **Render con mundos pesados**: con tres pestañas el archivo de memoria de Windows llena el disco («No space left on
+  device»); usar `--conc=2` y tener ≥ 8 GB libres.
 - **Calidad (24-nov-2026)**: siempre a 60 fps y **más detalle** que el mínimo: utilería en cada rincón,
   texturas con relieve, nada de superficies lisas ni planos vacíos. Ante la duda, sumar detalle.
 - **Todo dibujado a mano, sin patrones (24-nov-2026)**: nada de texturas repetidas en grilla (escamas en óvalos

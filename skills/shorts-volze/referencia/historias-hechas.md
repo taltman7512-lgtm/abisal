@@ -33,3 +33,15 @@ v3 (25-nov-2026, pedidos del dueño): pueblo al nivel del valle (antes quedaba s
 pinos y arbustos con ramas, ramitas y nieve en cada rama, techo de adentro tabla por tabla con hastiales cerrados y un
 agujero real por donde entra el cuerno, ropa estampada estilo Volze, transiciones que viajan por encima del pueblo y
 entran/salen de la cabaña por la ventana (`_camara_vuelo.js`), y planos abiertos sin primeros planos.
+
+## «Nobody Blows The Horn» (desierto de día con tormenta de arena, 25-nov-2026), en `videos/cuerno/`
+Primer video hecho con el análisis cuadro a cuadro (`estilo-volze-medido.md`) y en 3:4. Dustmere, pueblo de adobe; sobre
+la torre hay un cuerno blanco gigante que nadie sopla: quien lo sopla hace bajar de la cresta a Onetusk, una bestia
+colosal de un solo colmillo, quieta hace 60 años (sus 11 pisadas son hoy 11 estanques; aplastó 9 casas). Recuerdo: un
+chico, Dez, lo sopló por un incendio. Hoy una tormenta de arena se traga el valle con Bee (la hermanita que «oye todo»
+y dice «Listen») afuera; el narrador sopla el cuerno; Onetusk baja, enrosca la trompa en la torre y el chico ve el
+muñón: el cuerno es su otro colmillo, se lo cortaron. Se lo devuelve; Bee aparece agarrada a su pata («I followed the
+humming»). Giro: «My whole life, nobody blew the horn. It was never our horn.» Regla en presente + «Whoever…», ser
+querido con muletilla, estribillo «Listen» ×3, 104 s, 259 palabras por minuto, 95 tomas (58 cambios por minuto).
+Construido en paralelo por tres agentes (mundo, bestia, elenco) sobre copias de trabajo, con un archivo común de medidas
+(`_comun_cuerno.js`); eso funcionó bien y conviene repetirlo.
