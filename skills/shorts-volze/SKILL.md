@@ -34,7 +34,7 @@ anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.c
   3D, de pocos polígonos y color liso; la cara es una calcomanía de Roblox (óvalos negros sin brillo, cejas finas solo
   cuando expresan, boca fina, zigzag de miedo, dientes apretados de enojo). Descripción completa en
   `referencia/personajes-volze.md`; código en `videos/cuerno/partes/_volze_personajes.js` (`volze()`, `caraV()`,
-  `peloV()`). Banco de pruebas: `QUERY="provisoria&fila" node render-gpu.mjs hoja …` pone a todo el elenco en fila.
+  `peloV()`). **Cabezas rectas** (bisel ≈ 10 % del ancho): las redondeadas el dueño las rechazó («muy redondas»). Banco de pruebas: `QUERY="provisoria&fila" node render-gpu.mjs hoja …` pone a todo el elenco en fila.
 - **Transiciones sin salto al llegar (25-nov-2026, primera versión de «Nobody Blows The Horn»)**: al dueño le molestó
   que, al terminar cada transición, la cámara hiciera «un movimiento raro, brusco, de golpe». Era un bug: la transición
   llegaba al INICIO de la toma nueva, pero esa toma ya llevaba medio recorrido, y la cámara saltaba. Regla: la

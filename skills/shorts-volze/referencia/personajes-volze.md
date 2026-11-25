@@ -13,8 +13,10 @@ pieza** de plástico mate (rugosidad ≈ 0,6), con un bisel chico en las aristas
   con el borde de arriba a la altura del hombro. **Sin codo, sin mano separada, sin manga aparte, sin puño en 3D.**
 - **Piernas**: un bloque cada una, 1 × 2 × 1, pegadas entre sí debajo del torso, sin hueco, **sin rodilla ni zapato
   en 3D**.
-- **Cabeza**: un bloque ancho, ≈ 0,7 del ancho del torso y un poco menos alto que ancho, con las **aristas verticales
-  bien redondeadas** (casi un cilindro visto de arriba) y el frente plano; **sin cuello**, apoyada sobre el torso.
+- **Cabeza**: un **bloque recto**, ≈ 0,7 del ancho del torso y un poco menos alto que ancho, con un **bisel chico**
+  (≈ 10 % del ancho; `RB(.74, .66, .7, .075)`) y el frente plano; **sin cuello**, apoyada sobre el torso. El 25-nov-2026
+  la hicimos con aristas muy redondeadas (radio .2) y el dueño la rechazó: «son muy redondas, hacelas más rectas, como las
+  de Volze».
 - **Proporción total**: ≈ 4,5 cabezas de alto. Los chicos son el mismo muñeco más chico (0,7–0,9).
 
 ## La ropa: una calcomanía, no prendas
