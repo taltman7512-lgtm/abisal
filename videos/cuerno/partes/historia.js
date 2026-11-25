@@ -2408,42 +2408,82 @@ const piernaV = (o) => ROPAV["p" + JSON.stringify(o)] ||= tex(128, 256, (g, w, h
   g.fillStyle = o.zapato; g.fillRect(0, h * .87, w, h * .13); g.fillStyle = "rgba(255,255,255,.12)"; g.fillRect(0, h * .87, w, 4); sombra2D(g, w, h, .1) });
 
 // ---------- caras de Roblox (calcomanía 512 × 384 sobre el frente de la cabeza)
+// ---------- caras con el estilo del catálogo clásico de caras de Roblox (pedido del dueño, 25-nov-2026: mandó capturas del catálogo).
+// Dibujadas por nosotros, no copiadas: trazos negros que se afinan en las puntas (como pincel), ojos de óvalo negro con un
+// puntito de brillo, ojos blancos con contorno y pupila cuando hay sorpresa o risa, párpados de «chill», boca abierta bordó con
+// lengua rosa y dientes blancos. Calcomanía de 512 × 384 que cubre el frente de la cabeza.
 const CARAV = {};
-const CARA_V = {   // [tamaño de ojos, cejas, boca, modo de ojos]   cejas: 0 ninguna, 1 preocupadas (adentro arriba), -1 enojadas, 2 altas (sorpresa), 3 una levantada
-  neutral: [1, 0, "flat"], worried: [1, 1, "frown"], gloomy: [.85, 0, "flat", "medio"], pleading: [1.1, 1, "frown"], sad: [1, 1, "frown"],
-  scared: [1.12, 1, "zigzag"], terrified: [1.22, 1, "scream"], horrified: [1.2, 1, "zigzagG"], panic: [1.2, 1, "scream"],
-  shock: [1.18, 2, "o"], gasp: [1.18, 2, "o"], happy: [1, 0, "smile"], warm: [1, 0, "smileS"], laugh: [1, 0, "open", "feliz"], excited: [1.1, 2, "open"], starstruck: [1.15, 2, "open"],
-  hopeful: [1.05, 1, "smileS"], relieved: [1, 1, "smile", "feliz"], squint: [1, 0, "flat", "raya"], suspicious: [1, 3, "smirk", "uno"], determined: [1, -1, "flat"], brave: [1, -1, "smileS"],
-  angry: [1, -1, "dientes"], curious: [1.1, 3, "oS"], listen: [1.2, 2, "oS"], grito: [1, -1, "scream"], sopla: [1, 0, "o", "apret"], susurra: [.95, 1, "oS"], cerrados: [1, 0, "flat", "cerr"], paz: [1, 0, "smileS", "feliz"] };
+const TINTA = "#111012", BORDO = "#6e1830", LENGUA = "#ef9cb4";
+// trazo de pincel: curva (puntos de control) rellena con un ancho que crece al medio y se afina en las dos puntas
+function pincel(g, pts, W, { ini = .12, fin = .12, col = TINTA } = {}) { const N = 40, P = [];
+  const at = t => { if (pts.length === 3) { const u = 1 - t; return [u * u * pts[0][0] + 2 * u * t * pts[1][0] + t * t * pts[2][0], u * u * pts[0][1] + 2 * u * t * pts[1][1] + t * t * pts[2][1]] }
+    const u = 1 - t; return [u * u * u * pts[0][0] + 3 * u * u * t * pts[1][0] + 3 * u * t * t * pts[2][0] + t * t * t * pts[3][0], u * u * u * pts[0][1] + 3 * u * u * t * pts[1][1] + 3 * u * t * t * pts[2][1] + t * t * t * pts[3][1]] };
+  for (let i = 0; i <= N; i++) P.push(at(i / N)); const L = [], R = [];
+  for (let i = 0; i <= N; i++) { const t = i / N, a = P[Math.max(0, i - 1)], b = P[Math.min(N, i + 1)], dx = b[0] - a[0], dy = b[1] - a[1], d = Math.hypot(dx, dy) || 1, nx = -dy / d, ny = dx / d;
+    const w = W / 2 * Math.max(t < .5 ? ini + (1 - ini) * Math.sin(Math.min(1, t / .5) * Math.PI / 2) : fin + (1 - fin) * Math.sin(Math.min(1, (1 - t) / .5) * Math.PI / 2), .05); L.push([P[i][0] + nx * w, P[i][1] + ny * w]); R.push([P[i][0] - nx * w, P[i][1] - ny * w]) }
+  g.fillStyle = col; g.beginPath(); L.forEach((p, i) => i ? g.lineTo(...p) : g.moveTo(...p)); R.reverse().forEach(p => g.lineTo(...p)); g.closePath(); g.fill() }
+const EX = 86, EY = 150, MY = 292;   // ojos a ±86 del centro, a 39 % del alto; boca a 76 %
+// --- ojos
+const ojoNegro = (g, x, rx = 30, ry = 42, brillo = true) => { g.fillStyle = TINTA; g.beginPath(); g.ellipse(x, EY, rx, ry, 0, 0, 7); g.fill(); if (brillo) { g.fillStyle = "#ffffff"; g.beginPath(); g.ellipse(x - rx * .32, EY - ry * .42, rx * .26, ry * .2, 0, 0, 7); g.fill() } };
+const ojoGota = (g, x, s) => { g.fillStyle = TINTA; g.beginPath(); g.moveTo(x - s * 4, EY - 46); g.bezierCurveTo(x + s * 34, EY - 30, x + s * 30, EY + 40, x, EY + 40); g.bezierCurveTo(x - s * 30, EY + 40, x - s * 30, EY - 20, x - s * 4, EY - 46); g.fill(); g.fillStyle = "#fff"; g.beginPath(); g.arc(x - s * 8, EY - 14, 7, 0, 7); g.fill() };
+const ojoBlanco = (g, x, r = 40, px = 0, py = 0, rp = 15) => { g.fillStyle = "#ece6dc"; g.beginPath(); g.ellipse(x, EY, r * .86, r, 0, 0, 7); g.fill(); g.lineWidth = 9; g.strokeStyle = TINTA; g.stroke(); g.fillStyle = TINTA; g.beginPath(); g.arc(x + px, EY + py, rp, 0, 7); g.fill() };
+const ojoChill = (g, x, s) => { g.fillStyle = TINTA; g.fillRect(x - 32, EY - 6, 64, 22); pincel(g, [[x - 44, EY - 8], [x, EY - 14], [x + 44, EY - 8]], 10); pincel(g, [[x - 40, EY + 24], [x, EY + 30], [x + 40, EY + 24]], 8); pincel(g, s < 0 ? [[x - 34, EY - 40], [x, EY - 62], [x + 34, EY - 40]] : [[x - 34, EY - 56], [x, EY - 36], [x + 34, EY - 56]], 12) };
+const ojoArco = (g, x, arriba = true) => pincel(g, arriba ? [[x - 34, EY + 12], [x, EY - 30], [x + 34, EY + 12]] : [[x - 34, EY - 6], [x, EY + 30], [x + 34, EY - 6]], 15);
+const ojoApret = (g, x, s) => pincel(g, [[x - s * 30, EY - 30], [x + s * 26, EY], [x - s * 30, EY + 30]], 14, { ini: .3, fin: .3 });
+const ojoPunto = (g, x) => { g.fillStyle = TINTA; g.beginPath(); g.ellipse(x, EY, 17, 21, 0, 0, 7); g.fill() };
+// --- cejas (pincel)
+const ceja = (g, x, s, tipo) => { const y = EY - 66;
+  if (tipo === "pena") pincel(g, [[x - s * 38, y - 4], [x + s * 6, y - 16], [x + s * 36, y + 12]], 13);
+  if (tipo === "enojo") pincel(g, [[x - s * 38, y - 14], [x, y - 4], [x + s * 34, y + 18]], 15);
+  if (tipo === "alta") pincel(g, [[x - 36, y - 12], [x, y - 34], [x + 36, y - 12]], 12);
+  if (tipo === "duda") pincel(g, s < 0 ? [[x - 36, y - 18], [x - 4, y - 44], [x + 34, y - 26], [x + 44, y - 8]] : [[x - 36, y + 4], [x, y + 2], [x + 36, y - 2]], 13) };
+// --- bocas
+const bocaAbierta = (g, w = 150, h = 110, lengua = true, dientes = false, y0 = MY - 30) => { g.beginPath(); g.moveTo(256 - w / 2, y0); g.lineTo(256 + w / 2, y0); g.bezierCurveTo(256 + w / 2, y0 + h * .75, 256 + w * .3, y0 + h, 256, y0 + h); g.bezierCurveTo(256 - w * .3, y0 + h, 256 - w / 2, y0 + h * .75, 256 - w / 2, y0); g.closePath();
+  g.fillStyle = BORDO; g.fill(); g.save(); g.clip(); if (lengua) { g.fillStyle = LENGUA; g.beginPath(); g.ellipse(256, y0 + h * .98, w * .3, h * .36, 0, 0, 7); g.fill() } if (dientes) { g.fillStyle = "#fff"; g.fillRect(256 - w / 2, y0, w, h * .2) } g.restore(); g.lineWidth = 9; g.strokeStyle = TINTA; g.stroke() };
+const bocaO = (g, rx = 24, ry = 30) => { g.beginPath(); g.ellipse(256, MY, rx, ry, 0, 0, 7); g.fillStyle = BORDO; g.fill(); g.lineWidth = 9; g.strokeStyle = TINTA; g.stroke() };
+const bocaDientes = (g, w = 130, h = 54) => { g.fillStyle = "#fff"; g.beginPath(); g.roundRect(256 - w / 2, MY - h / 2, w, h, 16); g.fill(); g.lineWidth = 9; g.strokeStyle = TINTA; g.stroke(); g.lineWidth = 6; g.beginPath(); g.moveTo(256 - w / 2 + 4, MY); g.lineTo(256 + w / 2 - 4, MY); for (let i = 1; i < 5; i++) { const x = 256 - w / 2 + i * w / 5; g.moveTo(x, MY - h / 2 + 3); g.lineTo(x, MY + h / 2 - 3) } g.stroke() };
+const bocaZig = (g, w = 150) => { g.lineWidth = 11; g.strokeStyle = TINTA; g.lineJoin = "round"; g.lineCap = "round"; g.beginPath(); for (let i = 0; i <= 6; i++) g.lineTo(256 - w / 2 + i * w / 6, MY + (i % 2 ? -14 : 12)); g.stroke() };
+const bocaD = g => { g.beginPath(); g.moveTo(206, MY - 34); g.lineTo(306, MY - 34); g.bezierCurveTo(306, MY + 30, 270, MY + 46, 256, MY + 46); g.bezierCurveTo(242, MY + 46, 206, MY + 30, 206, MY - 34); g.closePath(); g.lineWidth = 15; g.strokeStyle = TINTA; g.stroke() };
+// cada cara: ojos, cejas y boca
+const CARAS_CAT = {
+  neutral: g => { [-1, 1].forEach(s => ojoNegro(g, 256 + s * EX)); pincel(g, [[218, MY], [256, MY + 4], [296, MY - 2]], 13) },
+  happy: g => { [-1, 1].forEach(s => ojoNegro(g, 256 + s * EX)); pincel(g, [[196, MY - 22], [256, MY + 40], [316, MY - 22]], 16) },
+  warm: g => { [-1, 1].forEach(s => ojoNegro(g, 256 + s * EX, 28, 38)); pincel(g, [[214, MY - 12], [256, MY + 22], [298, MY - 12]], 14) },
+  hopeful: g => { [-1, 1].forEach(s => { ojoNegro(g, 256 + s * EX); ceja(g, 256 + s * EX, s, "pena") }); pincel(g, [[218, MY - 8], [256, MY + 16], [294, MY - 8]], 13) },
+  relieved: g => { [-1, 1].forEach(s => { ojoArco(g, 256 + s * EX); ceja(g, 256 + s * EX, s, "pena") }); pincel(g, [[204, MY - 16], [256, MY + 30], [308, MY - 16]], 15) },
+  paz: g => { [-1, 1].forEach(s => ojoArco(g, 256 + s * EX)); pincel(g, [[214, MY - 10], [256, MY + 22], [298, MY - 10]], 14) },
+  laugh: g => { [-1, 1].forEach(s => ojoBlanco(g, 256 + s * EX, 40, 6, -14)); bocaAbierta(g, 170, 120) },
+  excited: g => { [-1, 1].forEach(s => ojoBlanco(g, 256 + s * EX, 42, 0, -4, 17)); bocaAbierta(g, 160, 110, true, true) },
+  starstruck: g => { [-1, 1].forEach(s => ojoBlanco(g, 256 + s * EX, 42, 0, 0, 20)); bocaAbierta(g, 160, 110, true, true) },
+  sad: g => { [-1, 1].forEach(s => { ojoGota(g, 256 + s * EX, s); ceja(g, 256 + s * EX, s, "pena") }); pincel(g, [[206, MY + 18], [232, MY - 6], [270, MY - 14], [306, MY + 14]], 13) },
+  worried: g => { [-1, 1].forEach(s => { ojoGota(g, 256 + s * EX, s); ceja(g, 256 + s * EX, s, "pena") }); pincel(g, [[214, MY + 8], [240, MY - 4], [268, MY + 6], [298, MY - 2]], 12) },
+  pleading: g => { [-1, 1].forEach(s => { ojoNegro(g, 256 + s * EX, 34, 46); ceja(g, 256 + s * EX, s, "pena") }); pincel(g, [[220, MY + 12], [256, MY - 10], [292, MY + 12]], 12) },
+  gloomy: g => { [-1, 1].forEach(s => ojoChill(g, 256 + s * EX, s)); pincel(g, [[220, MY + 6], [256, MY - 2], [292, MY + 8]], 12) },
+  squint: g => { [-1, 1].forEach(s => ojoChill(g, 256 + s * EX, s)); pincel(g, [[214, MY], [256, MY + 2], [298, MY - 2]], 13) },
+  suspicious: g => { [-1, 1].forEach(s => ojoChill(g, 256 + s * EX, s)); pincel(g, [[214, MY + 2], [262, MY - 8], [300, MY - 2]], 13); pincel(g, [[282, MY + 6], [292, MY + 14], [298, MY + 6]], 6) },
+  determined: g => { [-1, 1].forEach(s => { ojoNegro(g, 256 + s * EX, 28, 36); ceja(g, 256 + s * EX, s, s < 0 ? "duda" : "enojo") }); pincel(g, [[214, MY + 4], [262, MY + 10], [302, MY - 12]], 13) },
+  brave: g => { [-1, 1].forEach(s => { ojoNegro(g, 256 + s * EX, 28, 36); ceja(g, 256 + s * EX, s, "duda") }); pincel(g, [[206, MY - 4], [252, MY + 28], [304, MY - 18]], 14) },
+  angry: g => { [-1, 1].forEach(s => { ojoNegro(g, 256 + s * EX, 28, 34, false); ceja(g, 256 + s * EX, s, "enojo") }); bocaDientes(g) },
+  grito: g => { [-1, 1].forEach(s => { ojoNegro(g, 256 + s * EX, 26, 32, false); ceja(g, 256 + s * EX, s, "enojo") }); bocaAbierta(g, 150, 120, true, true) },
+  scared: g => { [-1, 1].forEach(s => { ojoBlanco(g, 256 + s * EX, 38, 0, 6, 12); ceja(g, 256 + s * EX, s, "pena") }); bocaZig(g) },
+  terrified: g => { [-1, 1].forEach(s => { ojoBlanco(g, 256 + s * EX, 42, 0, 0, 10); ceja(g, 256 + s * EX, s, "pena") }); bocaAbierta(g, 120, 120, false, true) },
+  horrified: g => { [-1, 1].forEach(s => { ojoBlanco(g, 256 + s * EX, 44, 0, 0, 9); ceja(g, 256 + s * EX, s, "alta") }); bocaZig(g, 170) },
+  panic: g => { [-1, 1].forEach(s => { ojoBlanco(g, 256 + s * EX, 42, s * -6, 0, 11); ceja(g, 256 + s * EX, s, "pena") }); bocaAbierta(g, 130, 110, true, true) },
+  shock: g => { [-1, 1].forEach(s => { ojoBlanco(g, 256 + s * EX, 42, 0, 0, 12); ceja(g, 256 + s * EX, s, "alta") }); bocaO(g) },
+  gasp: g => { [-1, 1].forEach(s => { ojoBlanco(g, 256 + s * EX, 40, 0, 2, 13); ceja(g, 256 + s * EX, s, "alta") }); bocaO(g, 20, 26) },
+  curious: g => { [-1, 1].forEach(s => { ojoNegro(g, 256 + s * EX); ceja(g, 256 + s * EX, s, "duda") }); bocaO(g, 14, 16) },
+  listen: g => { [-1, 1].forEach(s => { ojoBlanco(g, 256 + s * EX, 40, s * 12, -4, 15); ceja(g, 256 + s * EX, s, "alta") }); bocaO(g, 13, 15) },
+  susurra: g => { [-1, 1].forEach(s => { ojoNegro(g, 256 + s * EX, 28, 36); ceja(g, 256 + s * EX, s, "pena") }); bocaO(g, 11, 13) },
+  sopla: g => { [-1, 1].forEach(s => ojoApret(g, 256 + s * EX, s)); bocaO(g, 22, 26) },
+  cerrados: g => { [-1, 1].forEach(s => ojoArco(g, 256 + s * EX, false)); pincel(g, [[220, MY], [256, MY + 4], [292, MY - 2]], 12) },
+  happyD: g => { [-1, 1].forEach(s => ojoPunto(g, 256 + s * EX * .7)); bocaD(g) },
+};
+// el parpadeo: los mismos rasgos con los ojos como un arco cerrado
 function caraV(kind, cerr = false) { const key = kind + (cerr ? "_c" : ""); if (CARAV[key]) return CARAV[key];
-  return CARAV[key] = tex(512, 384, (g, w, h) => { const ink = "#121014", [es, ceja, boca, ojo0 = ""] = CARA_V[kind] || CARA_V.neutral, ojo = cerr && !["apret", "cerr", "feliz"].includes(ojo0) ? "cerr" : ojo0, LW = 15, EY = 145;
-    g.fillStyle = ink; g.strokeStyle = ink; g.lineCap = "round"; g.lineJoin = "round"; g.lineWidth = LW;
-    [-1, 1].forEach(s => { const x = 256 + s * 74, rx = 30 * es, ry = 40 * es;
-      if (ojo === "cerr") { g.beginPath(); g.moveTo(x - 34, EY + 2); g.quadraticCurveTo(x, EY + 26, x + 34, EY + 2); g.stroke() }
-      else if (ojo === "feliz") { g.beginPath(); g.moveTo(x - 34, EY + 12); g.quadraticCurveTo(x, EY - 24, x + 34, EY + 12); g.stroke() }
-      else if (ojo === "apret") { g.beginPath(); g.moveTo(x - s * 30, EY - 26); g.lineTo(x + s * 24, EY); g.lineTo(x - s * 30, EY + 26); g.stroke() }
-      else if (ojo === "raya" || (ojo === "uno" && s > 0)) { g.fillRect(x - 34, EY - 8, 68, 16) }
-      else if (ojo === "medio") { g.beginPath(); g.ellipse(x, EY + 6, rx, ry * .7, 0, 0, Math.PI); g.fill(); g.fillRect(x - rx, EY + 4, rx * 2, 6) }
-      else { g.beginPath(); g.ellipse(x, EY, rx, ry, 0, 0, 7); g.fill() }
-      // cejas: trazo fino y corto, pegado arriba del ojo
-      const yb = EY - ry - 24; g.lineWidth = 14;
-      if (ceja === 1) { g.beginPath(); g.moveTo(x + s * 30, yb + 8); g.lineTo(x - s * 26, yb - 10); g.stroke() }
-      if (ceja === -1) { g.beginPath(); g.moveTo(x + s * 30, yb - 10); g.lineTo(x - s * 26, yb + 12); g.stroke() }
-      if (ceja === 2) { g.beginPath(); g.moveTo(x - 28, yb - 8); g.quadraticCurveTo(x, yb - 26, x + 28, yb - 8); g.stroke() }
-      if (ceja === 3) { g.beginPath(); if (s < 0) { g.moveTo(x - 28, yb - 6); g.quadraticCurveTo(x, yb - 26, x + 28, yb - 10) } else { g.moveTo(x - 28, yb + 4); g.lineTo(x + 28, yb + 4) } g.stroke() }
-      g.lineWidth = LW });
-    const MY = 300; g.save(); g.translate(256, MY); g.scale(1.7, 1.4); g.translate(-256, -MY); g.lineWidth = LW / 1.5;
-    if (boca === "flat") { g.beginPath(); g.moveTo(226, MY); g.lineTo(286, MY); g.stroke() }
-    if (boca === "frown") { g.beginPath(); g.moveTo(218, MY + 12); g.quadraticCurveTo(256, MY - 16, 294, MY + 12); g.stroke() }
-    if (boca === "smile") { g.beginPath(); g.moveTo(206, MY - 12); g.quadraticCurveTo(256, MY + 30, 306, MY - 12); g.stroke() }
-    if (boca === "smileS") { g.beginPath(); g.moveTo(222, MY - 6); g.quadraticCurveTo(256, MY + 16, 290, MY - 6); g.stroke() }
-    if (boca === "smirk") { g.beginPath(); g.moveTo(222, MY + 4); g.quadraticCurveTo(262, MY + 8, 292, MY - 12); g.stroke() }
-    if (boca === "o") { g.beginPath(); g.ellipse(256, MY, 18, 23, 0, 0, 7); g.fill() }
-    if (boca === "oS") { g.beginPath(); g.ellipse(256, MY, 11, 13, 0, 0, 7); g.fill() }
-    if (boca === "zigzag" || boca === "zigzagG") { const W = boca === "zigzag" ? 120 : 160, n = boca === "zigzag" ? 6 : 8; g.beginPath(); for (let i = 0; i <= n; i++) g.lineTo(256 - W / 2 + i * W / n, MY + (i % 2 ? -14 : 12)); g.stroke() }
-    if (boca === "open") { g.beginPath(); g.moveTo(200, MY - 22); g.lineTo(312, MY - 22); g.quadraticCurveTo(310, MY + 46, 256, MY + 48); g.quadraticCurveTo(202, MY + 46, 200, MY - 22); g.closePath(); g.fill(); g.fillStyle = "#ffffff"; g.fillRect(212, MY - 16, 88, 14) }
-    if (boca === "scream") { g.beginPath(); g.ellipse(256, MY + 8, 46, 40, 0, 0, 7); g.fill(); g.fillStyle = "#ffffff"; g.fillRect(226, MY - 28, 60, 12) }
-    if (boca === "dientes") { g.fillStyle = "#ffffff"; g.beginPath(); g.roundRect(196, MY - 26, 120, 52, 14); g.fill(); g.lineWidth = 9; g.stroke(); g.lineWidth = 6; g.beginPath(); g.moveTo(198, MY); g.lineTo(314, MY); for (const x of [226, 256, 286]) { g.moveTo(x, MY - 24); g.lineTo(x, MY + 24) } g.stroke() } g.restore() }) }
+  return CARAV[key] = tex(512, 384, (g, w, h) => { g.lineCap = "round"; g.lineJoin = "round"; const f0 = CARAS_CAT[kind] || CARAS_CAT.neutral, f = gg => { gg.save(); gg.translate(256, 222); gg.scale(1.24, 1.24); gg.translate(-256, -222); f0(gg); gg.restore() };
+    if (!cerr) return f(g);
+    // dibuja la cara en otro lienzo, borra la franja de los ojos y pone los párpados cerrados (las cejas y la boca quedan)
+    const c2 = mk(512, 384), g2 = c2.getContext("2d"); g2.lineCap = "round"; g2.lineJoin = "round"; f(g2); const y0 = 222 + (EY - 222) * 1.24; g2.clearRect(0, y0 - 64, 512, 126); g.drawImage(c2, 0, 0); g.save(); g.translate(256, 222); g.scale(1.24, 1.24); g.translate(-256, -222); [-1, 1].forEach(s => ojoArco(g, 256 + s * EX, false)); g.restore() }) }
 caraDz = (kind, cerr = false) => caraV(kind, cerr);
 setFace = (k, f) => { k.cara = f; const t = caraV(f); if (k.decal.material.map !== t) { k.decal.material.map = t; k.decal.material.needsUpdate = true } };
 

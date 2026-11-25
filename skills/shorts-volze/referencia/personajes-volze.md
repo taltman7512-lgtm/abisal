@@ -59,3 +59,18 @@ nariz, sin cachetes, sin brillo en los ojos**.
 - Ropa en 3D encima de los bloques (ponchos, hombreras, fajas, sandalias) y telas con relieve: el brazo quedaba como
   «dos figuras» (la manga y el brazo).
 - Cabeza más chica y redonda, y rasgos chicos en el medio de la cara.
+
+## Caras: estilo del catálogo clásico de caras de Roblox (25-nov-2026, reemplaza la cara de arriba)
+La cara de óvalos negros y trazo parejo no le gustó al dueño; mandó capturas del catálogo de caras de Roblox («usá este
+catálogo de caras»). Las dibujamos nosotros con ese estilo, sin copiar ninguna cara puntual (`CARAS_CAT` y `pincel()` en
+`videos/cuerno/partes/_volze_personajes.js`):
+- **Trazo de pincel**: cada línea (cejas, bocas, párpados) es una forma rellena que **se afina en las dos puntas**.
+- **Ojos según la emoción**: óvalos negros con un **puntito de brillo** (neutra, contenta), gotas negras con brillo
+  (tristeza), ojos **blancos con contorno y pupila chica** (miedo, sorpresa, risa), párpados de «chill» (ojo como barra
+  negra con línea arriba y abajo: entrecerrado, sospecha), arcos (ojos cerrados o felices), «> <» (soplar, esfuerzo).
+- **Bocas**: arco de pincel (sonrisa, tristeza ondulada), **boca abierta bordó con lengua rosa** y a veces dientes
+  blancos (risa, grito, terror), «o» bordó (sorpresa), zigzag (miedo), dientes apretados con rayitas (enojo), sonrisa
+  torcida (valiente, sospecha).
+- **Cejas de pincel** solo cuando expresan: pena (adentro arriba), enojo (adentro abajo), altas (sorpresa), una
+  levantada (duda).
+- La cara ocupa casi todo el frente de la cabeza: ojos grandes a ≈ 40 % del alto, boca a ≈ 75 %.
