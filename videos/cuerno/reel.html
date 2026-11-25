@@ -3186,7 +3186,7 @@ async function musica() {
   function timp(t, v = .5, f = 55) { const o = osc("sine", f * 1.6, t, t + 2, envG(t, v, .005, 1.6, mus)); o.frequency.exponentialRampToValueAtTime(f, t + .15); noise(t, .3, filt("lowpass", 400, 0, envG(t, v * .3, .002, .25, mus))) }
   function heart(t) { for (const [d, a] of [[0, .3], [.18, .2]]) { const o = osc("sine", 70, t + d, t + d + .25, envG(t + d, a, .005, .18, mus)); o.frequency.exponentialRampToValueAtTime(40, t + d + .15) } }
   const B = 60 / 108, CH = { C: [48, 55, 60, 64], Am: [45, 52, 57, 60], F: [41, 48, 53, 57], G: [43, 50, 55, 59], Em: [40, 47, 52, 55], Dm: [38, 45, 50, 53], Bb: [46, 53, 58, 62], D: [38, 45, 50, 54], A: [45, 52, 57, 61], Bm: [47, 54, 59, 62] };
-  // ★ HISTORIA "Nobody Whistles In Wrenmoor". Solo efectos: la música de fondo se mezcla después.
+  // ★ HISTORIA "Nobody Blows The Horn". Solo efectos: la música de fondo se mezcla después.
   const VOLM = 1.5, M = oc.createGain(); M.gain.value = VOLM; const LP = filt("lowpass", 10000, .4, M); M.connect(mus);
   if (window.SOLO === "voz") { M.gain.value = 0; fx.gain.value = 0 }
   if (window.SOLO === "sinmusica") M.gain.value = 0;
@@ -3223,18 +3223,28 @@ async function musica() {
   const viento = (t0, dur, a = .05) => { const g = oc.createGain(); g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(a, t0 + dur * .3); g.gain.linearRampToValueAtTime(0, t0 + dur); g.connect(fx); const bp = filt("bandpass", 500, 3, g); bp.frequency.linearRampToValueAtTime(900, t0 + dur * .5); bp.frequency.linearRampToValueAtTime(400, t0 + dur); noise(t0, dur, bp) };
   const crujido = (t, dur, a = .08) => { for (let k = 0; k < dur * 14; k++) { const tt = t + k / 14 + r() * .04; noise(tt, .03, filt("bandpass", 600 + r() * 900, 4, envG(tt, a * (.3 + r() * .7), .002, .03, fx))) } };
   const caida = (t, a = .2) => { crujido(t, 1.2, .08); thud(t + 1.2, a, 40, 1.2); noise(t + 1.2, 1, filt("lowpass", 900, .7, envG(t + 1.2, a * .5, .01, .8, fx))) };
-  // arranque: el último hachazo, el pino que cae y algo en la montaña
-  hachazo(.05); hachazo(.6); caida(1.0, .22); rumble(sl(I.stood0) + .5, 1.6, .1, 38);
-  for (let k = 0; k < 4; k++) paso(sl(I.cost) + .2 + k * .7);
-  viento(0, sl(I.ilse), .03); viento(sl(I.winter), 3, .07);
-  // el recuerdo de Brask
-  for (let k = 0; k < 4; k++) hachazo(sl(I.brask) + .5 + k * .55, .09); for (let k = 0; k < 5; k++) paso(sl(I.shaking) + .3 + k * .65); for (let k = 0; k < 4; k++) paso(sl(I.taller) + .2 + k * .7);
-  thud(wt(I.stepped, 2), .35, 50, .8); crujido(wt(I.stepped, 2), 1, .1); for (let k = 0; k < 3; k++) paso(sl(I.back) + .3 + k * .8);
-  // la noche del frío: el hacha, los golpes, el pino que cae
-  for (let k = 0; k < 6; k++) hachazo(sl(I.swing) + .1 + k * .32, .11); caida(sl(I.fell), .24); rumble(sl(I.stood) + .3, 1.8, .12, 36);
-  for (let k = 0; k < 5; k++) paso(sl(I.shook) + .1 + k * .45); for (let k = 0; k < 4; k++) clink(wt(I.shook, 4) + .1 + k * .12, .05);
-  crujido(sl(I.roof), 1.4, .12); thud(sl(I.roof) + .3, .25, 60, .5); rumble(sl(I.lay), 1.6, .08, 40);
-  for (let k = 0; k < 3; k++) whoosh(sl(I.breath) + .2 + k * 1.1, .9, .06, 200, 500);
+  // el cuerno: una nota grave y larga, con armónicos y soplido (pocos efectos, debajo de la voz: en el terror de Volze no hay un golpe por barrido)
+  const cuerno = (t, dur, a = .09) => { const g = oc.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(a, t + .25); g.gain.setValueAtTime(a, t + dur * .7); g.gain.linearRampToValueAtTime(0, t + dur); g.connect(fx);
+    [[87.3, 1], [174.6, .5], [261.9, .28], [349.2, .12]].forEach(([f, v]) => { const gg = oc.createGain(); gg.gain.value = v; gg.connect(filt("lowpass", 900, .6, g)); const o = osc("sawtooth", f, t, t + dur, gg); o.frequency.setValueAtTime(f * .97, t); o.frequency.linearRampToValueAtTime(f, t + .4) }); noise(t, dur, filt("bandpass", 500, 1.5, envG(t, a * .25, .2, dur, fx))) };
+  const zumbido = (t0, t1, a = .02) => { const g = oc.createGain(); g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(a, t0 + .6); g.gain.setValueAtTime(a, Math.max(t0 + .7, t1 - .5)); g.gain.linearRampToValueAtTime(0, t1); g.connect(fx); const o = osc("sine", 58, t0, t1, g), lg = oc.createGain(); lg.gain.value = 1.5; lg.connect(o.frequency); osc("sine", .7, t0, t1, lg); osc("sine", 116, t0, t1, filt("lowpass", 300, .5, g)) };
+  // la mañana: el zumbido que solo oye Bee
+  zumbido(sl(I.listen2) + .9, sl(I.dez), .025);
+  // el recuerdo: fuego, la nota de Dez, los pasos y las casas
+  crepita(sl(I.dez), sl(I.note), .04); cuerno(wt(I.dez, 7), 1.6, .08); cuerno(sl(I.note), .9, .1);
+  for (let k = 0; k < 3; k++) paso(sl(I.eleven) + .15 + k * .6); for (let k = 0; k < 3; k++) { const t = sl(I.nine) + .2 + k * .55; paso(t); crujido(t, .5, .09) }
+  rumble(sl(I.night), 1.4, .07, 40);
+  // la tormenta
+  viento(sl(I.storm), sl(I.eyes) - sl(I.storm), .05); viento(sl(I.today), 1.2, .05); whoosh(sl(I.storm), 1.6, .08, 200, 900); viento(sl(I.scream), 3.4, .05);
+  // la nota del narrador: suena de «blew» a «rolling», y otra vez en «kept blowing»
+  cuerno(sl(I.today), 1, .07); cuerno(sl(I.blew), el(I.rolling) + .4 - sl(I.blew), .11); cuerno(wt(I.stayed, 4), 1.4, .09);
+  // Onetusk baja: arena del lomo, pasos pesados, tazas, estanques
+  rumble(sl(I.turned), 1.3, .08, 36); for (let k = 0; k < 2; k++) paso(sl(I.one) + .15 + k * .7); for (let k = 0; k < 5; k++) clink(wt(I.one, 4) + k * .09, .05);
+  for (let k = 0; k < 2; k++) paso(sl(I.five) + .1 + k * .7); splash(wt(I.five, 4), .1); for (let k = 0; k < 3; k++) paso(sl(I.shadow) + .1 + k * .6);
+  crujido(wt(I.trunk, 6) - .1, 1, .12); thud(wt(I.trunk, 6), .22, 55, .5);
+  // los pernos, el cuerno que se suelta, y el silencio cuando deja de zumbar
+  for (let k = 0; k < 4; k++) { const t = sl(I.pins) + .15 + k * .16; noise(t, .05, filt("bandpass", 2400, 3, envG(t, .08, .002, .04, fx))); thud(t, .08, 160, .08) }
+  creak(wt(I.pins, 4), 1.1, .07); thud(sl(I.caught) + .35, .2, 70, .5); zumbido(sl(I.face), wt(I.eyes, 4), .03);
+  for (let k = 0; k < 3; k++) paso(sl(I.back) + .2 + k * .75); zumbido(wt(I.heard, 5), DUR, .035);
 
   const vc = oc.createDynamicsCompressor(); vc.threshold.value = -20; vc.ratio.value = 3; const vg = oc.createGain(); vg.gain.value = 1.7 * (window.SOLO === "mus" ? 0 : 1); vc.connect(vg); vg.connect(out);
   VOZ.forEach((b, i) => { const x = oc.createBufferSource(); x.buffer = b; x.connect(vc); x.start(S[i]) });
