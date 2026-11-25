@@ -23,7 +23,11 @@ anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.c
   riesgo de reclamo de Content ID en su canal. Rechazado: música sintetizada con senos puros; el piano propio no le gustó.
 - **Personajes**: estilo de bloques «robloxiano» como los de Volze, siempre con `robloxify()`: brazos y piernas de un
   bloque, cara impresa con ojos ovalados grandes, pelo facetado. Nada de estilo propio (mangas por partes, manos).
-- **Calidad (24-nov-2026)**: siempre 1080×1920 a 60 fps y **más detalle** que el mínimo: utilería en cada rincón,
+- **Formato 3:4 como Volze (25-nov-2026, lo decidió el dueño al ver la medición)**: los videos se hacen en
+  **1440×1920 a 60 fps**, igual que los 16 top y recientes del canal (antes 1080×1920). `motor/armar.js` ya lo fija
+  (`?v916` en la URL vuelve a 1080×1920) y las hojas de `render-gpu.mjs` salen en 3:4. El campo vertical es el mismo y
+  se ve un tercio más a los costados: encuadrar pensando en ese ancho.
+- **Calidad (24-nov-2026)**: siempre a 60 fps y **más detalle** que el mínimo: utilería en cada rincón,
   texturas con relieve, nada de superficies lisas ni planos vacíos. Ante la duda, sumar detalle.
 - **Todo dibujado a mano, sin patrones (24-nov-2026)**: nada de texturas repetidas en grilla (escamas en óvalos
   iguales, adoquines clonados, placas en fila). Cada textura se pinta entera: un lienzo grande sin repetir, con
@@ -405,7 +409,7 @@ python -c "import numpy as np,soundfile as sf;db=lambda x:20*np.log10(np.sqrt(np
 - **WebGL por GPU**: Chrome sin ventana con `--use-angle=d3d11 --enable-gpu --ignore-gpu-blocklist`
   (`render-gpu.mjs info` tiene que decir «ANGLE (NVIDIA, NVIDIA GeForce RTX 4060 … D3D11)»). Vulkan no hizo falta.
 - **Concurrencia 3** (3 pestañas en paralelo): 2,9 GB de VRAM como máximo, muy lejos de los 8 GB.
-- **NVENC**: `h264_nvenc -preset p5 -tune hq -rc vbr -cq 19 -b:v 0 -profile:v high`, 1080×1920, 60 fps, AAC 192 k.
+- **NVENC**: `h264_nvenc -preset p5 -tune hq -rc vbr -cq 19 -b:v 0 -profile:v high`, 1440×1920, 60 fps, AAC 192 k.
   **Ojo**: el ffmpeg 9 de winget pide la API 13.1 de NVENC (driver ≥ 610). Con el driver 566 se codifica con el
   ffmpeg 7.1 de Remotion (`FFENC`, ya configurado en `render-gpu.mjs`). Si se actualiza el driver a ≥ 610 sirve el 9.
 - **whisper** `large-v3` en CUDA float16 (faster-whisper + `nvidia-cublas-cu12` + `nvidia-cudnn-cu12`, las DLL se
@@ -438,7 +442,7 @@ node render-gpu.mjs video salida/<nombre>.mp4 --conc=3 --sinmusica
 - [ ] Hay un ser querido con nombre, un estribillo que vuelve 3 veces y 2–4 cambios de luz.
 - [ ] Voz − música ≈ 6 dB (terror/día); música audible > 95 %; pico ≤ 0,97.
 - [ ] `comparar.py` dentro de las metas del modo.
-- [ ] `render-gpu.mjs info` dice RTX 4060; el MP4: h264, 1080×1920, 60 fps, AAC, duración = `DUR`.
+- [ ] `render-gpu.mjs info` dice RTX 4060; el MP4: h264, 1440×1920 (3:4), 60 fps, AAC, duración = `DUR`.
 
 ## Archivos
 - `motor/armar.js`: junta la plantilla de `reel-historias` (personajes, caras, ropa, voz por frases, grabador) con

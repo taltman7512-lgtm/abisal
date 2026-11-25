@@ -19,6 +19,8 @@ head = rep(head, "family=Poppins:wght@800&", "family=Poppins:wght@800&family=Bal
 const FR = require("./frases.json");   // fuente única: [{n: nombre, t: texto, gap: pausa después}] (voz.json sale de acá)
 head = head.replace(/^const GAP = .*$/m, "const GAP = " + JSON.stringify(Object.fromEntries(FR.map((f, i) => [i, f.gap]))) + ";");
 head = rep(head, "let cur = .5", "let cur = .02");
+// formato 3:4 (1440×1920) como los Shorts de Volze (medido 25-nov-2026); ?v916 vuelve a 1080×1920
+head = rep(head, "W = HORIZ ? 1920 : 1080", "W = HORIZ ? 1920 : (new URLSearchParams(location.search).has(\"v916\") ? 1080 : 1440)");
 // la voz de Kokoro viene en .wav
 head = rep(head, '.mp3`).then(r => r.arrayBuffer())', '.mp3`).then(r => r.ok ? r : fetch(`${VOZDIR}/${String(i).padStart(2, "0")}.wav`)).then(r => r.arrayBuffer())');
 // el video termina con la última palabra (+0,35 s): sin cola

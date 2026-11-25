@@ -13,7 +13,7 @@ a 60) en los 22 videos bajados. Completa y corrige `analisis/informe.md`. Los se
 ## 0. Lo que cambia respecto de lo que creíamos
 
 1. **Los videos son 3:4 (1440×1920), no 9:16.** Los 16 top y recientes vienen así; solo los «bajo» son 1080×1920.
-   Nosotros rendereamos 1080×1920 (decisión del dueño; no se cambia sin preguntarle).
+   El dueño decidió pasar a 3:4 (25-nov-2026): desde ahora rendereamos 1440×1920.
 2. **No hay «barridos» sueltos: hay cuatro tipos de transición** (sección 4). Uno de cada cuatro es un **tapado**: la
    cámara se mete en un objeto, la pantalla queda de su color 2–6 cuadros y sale en otro lugar.
 3. **La cámara dentro de cada encuadre se mueve 8 veces más que la nuestra** (24 % del ancho por segundo contra 3 %).
@@ -255,5 +255,4 @@ Medianas del medidor (`movimiento.py`):
 | Primer plano humano en el 4 % de los encuadres | Sin primeros planos | Ninguno; plano medio contrapicado en su lugar |
 | Ropa plana con dibujo pintado, pelo de un color, viejos sin arrugas | Ropa con tela y relieve, pelo con mechones, viejos con arrugas, ultradetalle en todo | Lo del dueño |
 | Subtítulo que a veces tapa caras | (el revisor lo marca como bug) | Mantener al 74,5 % y encuadrar la cabeza por encima |
-| 3:4 (1440×1920) | 1080×1920 | 1080×1920 hasta que el dueño decida |
 | Sin polvo al correr en terror | Corridas con polvo en los pies | Polvo suave (lo pidió el dueño) |

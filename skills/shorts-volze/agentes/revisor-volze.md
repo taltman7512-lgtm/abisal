@@ -29,7 +29,7 @@ revisás y devolvés la lista de problemas. El que te llama los arregla.
   `python <skill>/herramientas/comparar.py <tmp> salida/<video>.mp4`.
   Metas del modo terror: luminancia 0,34–0,41, contraste 0,19–0,20, saturación 0,38–0,41, negros 1,5–2,5 %,
   calidez R−B ≤ 0,15.
-- Verificá con `ffprobe`: 1080×1920, 60 fps, h264 + aac, y que dure lo mismo que `render-gpu.mjs info`.
+- Verificá con `ffprobe`: 1440×1920 (3:4, como Volze), 60 fps, h264 + aac, y que dure lo mismo que `render-gpu.mjs info`.
 
 ## Lista de control (revisá cada cuadro contra esto)
 1. **Personajes estilo Volze** (lo más importante para el dueño):

@@ -15,7 +15,7 @@ import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
-const HORIZ = new URLSearchParams(location.search).has("h"), W = HORIZ ? 1920 : 1080, H = HORIZ ? 1080 : 1920, FPS = 60, SUB = 4, SHUTTER = .5;
+const HORIZ = new URLSearchParams(location.search).has("h"), W = HORIZ ? 1920 : (new URLSearchParams(location.search).has("v916") ? 1080 : 1440), H = HORIZ ? 1080 : 1920, FPS = 60, SUB = 4, SHUTTER = .5;
 const VOZDIR = new URLSearchParams(location.search).get("voz") || "voz";
 let DUR = 60, NF = DUR * FPS;
 const C = document.getElementById("c"); C.width = W; C.height = H; const X = C.getContext("2d"), st = m => document.getElementById("st").textContent = m;

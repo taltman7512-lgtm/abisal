@@ -58,9 +58,9 @@ if (modo === "hoja") {
   const { p } = await abrir(); const tmp = path.join(DIR, "salida", "_hoja"); fs.rmSync(tmp, { recursive: true, force: true }); fs.mkdirSync(tmp, { recursive: true });
   for (let i = 0; i < ts.length; i++) fs.writeFileSync(path.join(tmp, `${String(i).padStart(3, "0")}.jpg`), await jpeg(p, Math.round(ts[i] * 60), .85));
   const cols = Math.min(+(flag("cols", 6)), ts.length), filas = Math.ceil(ts.length / cols);
-  const lab = ts.map((t, i) => `[${i}:v]scale=270:480,drawtext=fontfile='C\\:/Windows/Fonts/arial.ttf':text='${t.toFixed(1)}':x=6:y=6:fontsize=24:fontcolor=yellow:box=1:boxcolor=black@0.6[v${i}]`).join(";");
+  const lab = ts.map((t, i) => `[${i}:v]scale=360:480,drawtext=fontfile='C\\:/Windows/Fonts/arial.ttf':text='${t.toFixed(1)}':x=6:y=6:fontsize=24:fontcolor=yellow:box=1:boxcolor=black@0.6[v${i}]`).join(";");
   const inp = ts.flatMap((_, i) => ["-i", path.join(tmp, `${String(i).padStart(3, "0")}.jpg`)]);
-  const layout = ts.map((_, i) => `${(i % cols) * 270}_${Math.floor(i / cols) * 480}`).join("|");
+  const layout = ts.map((_, i) => `${(i % cols) * 360}_${Math.floor(i / cols) * 480}`).join("|");
   const r = spawn("ffmpeg", ["-v", "error", "-y", ...inp, "-filter_complex", `${lab};${ts.map((_, i) => `[v${i}]`).join("")}xstack=inputs=${ts.length}:layout=${layout}:fill=black`, "-frames:v", "1", "-q:v", "3", out], { stdio: "inherit" });
   await new Promise(ok => r.on("close", ok)); console.log("hoja", out, `(${filas} filas)`);
 }
@@ -72,8 +72,8 @@ if (modo === "tomas") {   // un cuadro del medio de cada toma → hojas de 24 (8
   for (let i = 0; i < lista.length; i++) { const [L, j, a, b] = lista[i]; fs.writeFileSync(path.join(dir, `${String(i).padStart(3, "0")}.jpg`), await jpeg(p, Math.round((a + (b - a) * +(flag("pos", .5))) * 60), .8)) }
   for (let h = 0; h * 24 < lista.length; h++) { const grupo = lista.slice(h * 24, h * 24 + 24), n = grupo.length;
     const inp = grupo.flatMap((_, i) => ["-i", path.join(dir, `${String(h * 24 + i).padStart(3, "0")}.jpg`)]);
-    const lab = grupo.map(([L, j, a], i) => `[${i}:v]scale=270:480,drawtext=fontfile='C\\:/Windows/Fonts/arial.ttf':text='${L}.${j} ${a.toFixed(1)}':x=6:y=6:fontsize=22:fontcolor=yellow:box=1:boxcolor=black@0.6[v${i}]`).join(";");
-    const layout = grupo.map((_, i) => `${(i % 8) * 270}_${Math.floor(i / 8) * 480}`).join("|"), out = path.join(DIR, "salida", `tomas-${String(h).padStart(2, "0")}.jpg`);
+    const lab = grupo.map(([L, j, a], i) => `[${i}:v]scale=360:480,drawtext=fontfile='C\\:/Windows/Fonts/arial.ttf':text='${L}.${j} ${a.toFixed(1)}':x=6:y=6:fontsize=22:fontcolor=yellow:box=1:boxcolor=black@0.6[v${i}]`).join(";");
+    const layout = grupo.map((_, i) => `${(i % 8) * 360}_${Math.floor(i / 8) * 480}`).join("|"), out = path.join(DIR, "salida", `tomas-${String(h).padStart(2, "0")}.jpg`);
     const r = spawn("ffmpeg", ["-v", "error", "-y", ...inp, "-filter_complex", n > 1 ? `${lab};${grupo.map((_, i) => `[v${i}]`).join("")}xstack=inputs=${n}:layout=${layout}:fill=black` : lab.replace("[v0]", ""), "-frames:v", "1", "-q:v", "3", out], { stdio: "inherit" });
     await new Promise(ok => r.on("close", ok)); console.log("hoja", out) }
 }
