@@ -114,6 +114,8 @@ de cocinero?»).
 12. **Caminatas y agua**: quien camina tiene que avanzar (nada de piernas moviéndose en el lugar: comparar dos cuadros
     seguidos de la misma toma). El agua tiene olas que se mueven, refleja el cielo y brilla con el sol sin manchas
     blancas que revienten el cuadro; la espuma es de vetas y burbujas, no círculos repetidos.
+13. **Arranque y ritmo de cámara**: la primera frase cuenta lo que está pasando (primera persona, acción), no el
+    mundo; los barridos duran ≈ 0,3 s y cada encuadre se sostiene (≈ 36 cambios por minuto), sin saltos apurados.
 
 ## Revisión cuadro a cuadro y ultradetalle (pedido del dueño, 24-nov-2026)
 En modo `despues`, primero correr `python <skill>/herramientas/chequeo_cuadros.py salida/<video>.mp4 --hojas salida/revision`.

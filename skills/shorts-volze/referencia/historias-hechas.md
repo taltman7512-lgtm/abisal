@@ -14,3 +14,10 @@ sumergirse. Recuerdo: Pim cava dos palas para un sótano, la tortuga se inclina 
 tortuga gira hacia lo hondo para morir; el chico cava tres palas del lado hondo, toca la piel y la tortuga vuelve a la
 costa. Giro: «My whole life, one shovel kept us safe. Today, three shovels brought us home.»
 (La anterior, «Nobody Lights A Third Lamp», no le gustó al dueño.)
+
+## «Nobody Whistles In Wrenmoor» (pueblo de día, 25-nov-2026), en `videos/anguila/`
+Wrenmoor es un pueblo sobre una roca en un lago frío; bajo el pozo de la plaza vive una anguila gigante que sube si
+alguien silba y se lleva lo que silbó. Recuerdo: la pava del hojalatero silbó y la anguila se llevó la cocina entera.
+Hoy se incendia la panadería; el chico silba a propósito en el pozo y la anguila, siempre mojada, apaga seis casas
+enroscándose en los techos. Primer video con el arranque «como Volze» («I just whistled down the well.»). Giro:
+«My whole life, nobody whistled in Wrenmoor. Today, I whistled, and it saved us.»

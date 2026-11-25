@@ -70,6 +70,14 @@ anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.c
   - **Oficios**: el cocinero con gorro y chaqueta detallados; la vieja sabia (Olga) con barba de **maestro sensei**.
   - **Casas pegadas al piso**: nada flota ni se buguea cuando se mueve el suelo.
   - **Corridas como las de Volze**.
+  - **Arranque como Volze** (25-nov-2026, medido en las 16 transcripciones top y recientes): la primera frase es
+    **lo que está pasando ahora, en primera persona** («I stuck out my foot and tripped the fastest man alive…»,
+    «I grabbed the mic at a stranger's wedding…», «Last night, I jammed their gate.»), y recién después la regla y el
+    contexto. Nunca arrancar con «We live on…» o la descripción del mundo. Ej.: «I just whistled down the well. In
+    Wrenmoor, that's the one thing you never do.» La historia después vuelve atrás y alcanza ese momento.
+  - **Barridos y pasadas de cámara más lentos** (25-nov-2026): los de Volze duran 0,2–0,3 s (≈ 7 cuadros) y el top 10
+    sostiene cada encuadre más (≈ 36 cambios por minuto). En el motor: `WHIP = .3` entre tomas y `WC = .3` al cambiar
+    de lugar (en `_juntar.py`), y recorridos de cámara cortos dentro de cada toma.
   - **Caminatas de verdad** (24-nov-2026): quien camina **avanza** al ritmo de las piernas, con balanceo; nunca piernas
     moviéndose en el lugar. En `crowd()` del ejemplo, `walk` entre 0 y 1,2 avanza a 1,5 × walk por segundo, centrado en
     la marca de la escena (pasa por ahí a mitad de la frase).

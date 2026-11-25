@@ -1,0 +1,10 @@
+node_modules/
+salida/
+voz/
+partes/_check.mjs
+_gpu.html
+voz-eleven/
+voz-chatterbox/
+voz-liam/
+palabras.json
+voz-kokoro-previa/
