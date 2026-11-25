@@ -119,7 +119,7 @@ function setScene(t) {
   CASA_IN.userData.tazas.forEach((c, i) => { const q = L === I.shook ? P(k, .25 + i * .1, .55 + i * .1) : L > I.shook ? 1 : 0; c.position.set(3.6 + i * .5 + q * .3, 3.62 - q * q * 3.5 + (L === I.shook && q === 0 ? Math.abs(Math.sin(t * 30 + i)) * .03 : 0), -4.6 + q * .8); c.rotation.set(q * 2, 0, q * 1.4) });
   // la cría: en el hueco del pino, después en los brazos, después en la cama al lado de Mila
   const cria = (x, y, z, ry = 0, eche = 1, tiembla = 0) => ciervoPose(CRIA, t, { x, y, z, ry, echado: eche, tiembla, baja: .4 });
-  if (L === I.fell && k > .6 || L === I.calf) cria(PINO[0], 1.0, PINO[1] + .2, -2.4, 1, 1);
+  if (L === I.fell && k > .6 || L === I.calf) cria(PINO[0], 1.35, PINO[1] + .2, -2.4, 1, 1);
   if ([I.lit, I.shook, I.window, I.roof, I.saw, I.stopped].includes(L)) { const p = IN([2.9, .95, -.9]); cria(p[0], p[1], p[2], Math.PI, 1, L === I.lit ? .5 : 0) }
 
   switch (L) {

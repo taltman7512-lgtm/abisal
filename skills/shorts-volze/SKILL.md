@@ -109,6 +109,11 @@ anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.c
       entra por la puerta, o mira por la ventana y entra por la ventana abierta. La transición buena es lo que retiene.
     - **Planos**: sin primeros planos (ni el del amanecer); nunca un plano donde solo se vean piernas; **siempre se ve el
       fondo y lo que se está contando**. Si una toma no se entiende (techo oscuro con algo blanco), rehacerla.
+    - **Ningún techo con hueco** (insistió dos veces): toda construcción con techo a dos aguas (casas, iglesia, galpones,
+      el interior) lleva los dos triángulos de las puntas cerrados; mirar cada techo desde abajo y de costado en la hoja.
+    - **Troncos cortados como una rodaja real** (mandó foto): anillos finos e irregulares, madera temprana clara y tardía
+      oscura, grietas radiales, nudos, aserrín, albura clara y corteza alrededor, con relieve (`T_RODAJA` en
+      `videos/pinos/partes/_detalle_pinos.js`). Nunca un disco beige liso.
     - **El revisor revisa también los planos**: que no haya primeros planos, que se lea de qué se habla, que haya fondo,
       que las transiciones no atraviesen nada, y que todo tenga detalle.
   - **Transiciones lentas y que se noten** (25-nov-2026): que se vea que es una transición y no un corte: barrido de

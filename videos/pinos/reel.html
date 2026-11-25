@@ -1457,6 +1457,35 @@ const ASTA_REAL = (() => { const orig = WATCHER.cabeza.children.find(c => c.isGr
 const NIEVE_IN = Array.from({ length: 60 }, () => { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: GLOW, color: "#ffffff", transparent: true, opacity: .9, depthWrite: false })); s.scale.setScalar(.09); s.visible = false; CASA_IN.add(s); return s });
 function techoRoto(t, roto, q = 1) { HUECO_TECHO.forEach(m => m.visible = !roto); CASA_IN.userData.astillas.forEach(m => m.visible = roto);
   NIEVE_IN.forEach((s, i) => { const u = (t * .45 + i / 60) % 1; s.visible = roto && q > .2 && lineAt(t) === I.roof; s.position.set(2.2 + ((i * .618) % 1) * 2.4 + Math.sin(t * 2 + i) * .15, 7 - u * 6, -3 + ((i * .37) % 1) * 2.6) }) }
+// ---------- v4 (pedido del dueño): la iglesia tenía abiertos los triángulos de las puntas del techo; se cierran con piedra,
+// con una ventanita redonda iluminada y una moldura de madera
+{ const tri = new THREE.Shape(); tri.moveTo(-3.95, 0); tri.lineTo(3.95, 0); tri.lineTo(0, 3.35); tri.closePath(); const ms = M_STONE.clone(); ms.side = THREE.DoubleSide;
+  for (const z of [-5.52, 5.52]) { const geo = new THREE.ShapeGeometry(tri), p = geo.attributes.position, uv = geo.attributes.uv; for (let i = 0; i < p.count; i++) uv.setXY(i, (p.getX(i) + 4) / 3, p.getY(i) / 3); const m = new THREE.Mesh(geo, ms); m.position.set(0, 7, z); m.castShadow = m.receiveShadow = true; IGLESIA.add(m);
+    const s = Math.sign(z); const ro = part(new THREE.TorusGeometry(.42, .09, 8, 20), M_BEAM, 0, 8.3, z + s * .06, IGLESIA, 0); const vi = part(new THREE.CircleGeometry(.4, 20), new THREE.MeshStandardMaterial({ color: "#ffe0a0", emissive: "#ffb050", emissiveIntensity: 1.4 }), 0, 8.3, z + s * .04, IGLESIA, 0); if (s < 0) vi.rotation.y = Math.PI;
+    part(new THREE.BoxGeometry(8.2, .22, .3), M_BEAM, 0, 7.05, z + s * .1, IGLESIA, 0) } }
+// ---------- v4: el corte del tronco como una rodaja real (foto del dueño): anillos finos irregulares, madera temprana clara y
+// tardía oscura, grietas radiales, nudos, polvo de aserrín, albura más clara y corteza alrededor, con relieve
+const T_RODAJA = (() => { const [c, z] = pintarDoble(1024, 1024, (c, z, w, h) => { const r = rng(1810), cx = w * .52, cy = h * .48, R = 500;
+  c.fillStyle = "#3a2618"; c.fillRect(0, 0, w, h); z.fillStyle = "#808080"; z.fillRect(0, 0, w, h);
+  const radio = (a, rr) => rr * (1 + Math.sin(a * 3 + 1) * .035 + Math.sin(a * 7 + 2) * .015 + Math.sin(a * 13) * .006) + Math.sin(a * 2) * rr * .04;
+  const anillo = (rr, col, lw, ctx) => { ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.beginPath(); for (let k = 0; k <= 180; k++) { const a = k / 180 * 6.2832, q = radio(a, rr); k ? ctx.lineTo(cx + Math.cos(a) * q, cy + Math.sin(a) * q) : ctx.moveTo(cx + Math.cos(a) * q, cy + Math.sin(a) * q) } ctx.stroke() };
+  // fondo de madera (de afuera hacia adentro): corteza, albura clara, duramen tostado
+  for (let rr = R; rr > 0; rr -= 2) { const q = rr / R, col = q > .96 ? "#2e1e12" : q > .9 ? "#d8b48a" : `rgb(${190 - q * 30 + (r() - .5) * 10 | 0},${140 - q * 25 + (r() - .5) * 8 | 0},${88 - q * 20 | 0})`; anillo(rr, col, 3, c) }
+  // anillos de crecimiento: finos y apretados, cada uno con su madera tardía más oscura
+  let rr = 6; while (rr < R * .95) { const st = 4 + r() * 7 * (1 - rr / R * .6); rr += st; anillo(rr, `rgba(${90 + r() * 30 | 0},${52 + r() * 20 | 0},${24 + r() * 12 | 0},${.55 + r() * .3})`, 1.2 + r() * 1.6, c); anillo(rr, "rgba(40,40,40,.7)", 2, z); anillo(rr + st * .5, "rgba(250,225,190,.18)", st * .4, c) }
+  // marcas de sierra en arcos y aserrín
+  for (let k = 0; k < 60; k++) { c.strokeStyle = `rgba(${r() < .5 ? "255,240,210" : "70,40,20"},${.06 + r() * .08})`; c.lineWidth = 2 + r() * 3; c.beginPath(); c.arc(cx - 900 + r() * 200, cy + (r() - .5) * 900, 900 + r() * 80, -.5, .5); c.stroke() }
+  for (let k = 0; k < 4000; k++) { const a = r() * 6.28, d = Math.sqrt(r()) * R * .93; c.fillStyle = `rgba(${r() < .5 ? "255,235,200" : "60,34,16"},${.15 + r() * .3})`; c.fillRect(cx + Math.cos(a) * d, cy + Math.sin(a) * d, 1.5, 1.5) }
+  // grietas radiales y nudos oscuros
+  for (let k = 0; k < 7; k++) { const a = r() * 6.28, L = R * (.25 + r() * .6), d0 = R * r() * .3; c.strokeStyle = "rgba(20,10,4,.9)"; z.strokeStyle = "rgba(0,0,0,.9)"; for (const ctx of [c, z]) { ctx.lineWidth = 2 + r() * 4; ctx.beginPath(); let x = cx + Math.cos(a) * d0, y = cy + Math.sin(a) * d0; ctx.moveTo(x, y); for (let s = 0; s < 12; s++) { x += Math.cos(a + (r() - .5) * .3) * L / 12; y += Math.sin(a + (r() - .5) * .3) * L / 12; ctx.lineTo(x, y) } ctx.stroke() } }
+  for (let k = 0; k < 3; k++) { const a = r() * 6.28, d = R * (.3 + r() * .5), x = cx + Math.cos(a) * d, y = cy + Math.sin(a) * d; const g = c.createRadialGradient(x, y, 1, x, y, 16); g.addColorStop(0, "#120804"); g.addColorStop(1, "rgba(60,30,10,0)"); c.fillStyle = g; c.beginPath(); c.ellipse(x, y, 16, 9, a, 0, 7); c.fill() }
+  // médula en el centro
+  c.fillStyle = "#5a3418"; c.beginPath(); c.arc(cx, cy, 6, 0, 7); c.fill() }); return { c, z } })();
+const M_RODAJA = new THREE.MeshStandardMaterial({ map: T_RODAJA.c, bumpMap: T_RODAJA.z, bumpScale: 3, roughness: .85 });
+VIEJO.userData.tapa.material = M_RODAJA; VIEJO.userData.tapa.scale.setScalar(1.02);
+// la cara cortada del tronco caído también (antes era un hueco oscuro) y el tocón de Brask en la plaza
+{ const tr = VIEJO.userData.tronco.children[0]; const cara = new THREE.Mesh(new THREE.CircleGeometry(2.55, 48), M_RODAJA); cara.rotation.x = Math.PI / 2; cara.position.set(0, -15 + .02, 0); tr.add(cara);
+  TOCON.children.forEach(o => { if (o.geometry && o.geometry.type === "CircleGeometry") { o.material = M_RODAJA } }) }
 
 // ---------- elenco: diseños propios de bloques (nada del protagonista de Volze ni marcas)
 const ME = kid({ skin: "#e8b48c", shirt: "#d1872e", cloth: "plain", pants: "#3a4a5a", shoes: "#4a3020", hair: "#3a2416", style: "despeinado" });
@@ -1908,7 +1937,7 @@ function setScene(t) {
   CASA_IN.userData.tazas.forEach((c, i) => { const q = L === I.shook ? P(k, .25 + i * .1, .55 + i * .1) : L > I.shook ? 1 : 0; c.position.set(3.6 + i * .5 + q * .3, 3.62 - q * q * 3.5 + (L === I.shook && q === 0 ? Math.abs(Math.sin(t * 30 + i)) * .03 : 0), -4.6 + q * .8); c.rotation.set(q * 2, 0, q * 1.4) });
   // la cría: en el hueco del pino, después en los brazos, después en la cama al lado de Mila
   const cria = (x, y, z, ry = 0, eche = 1, tiembla = 0) => ciervoPose(CRIA, t, { x, y, z, ry, echado: eche, tiembla, baja: .4 });
-  if (L === I.fell && k > .6 || L === I.calf) cria(PINO[0], 1.0, PINO[1] + .2, -2.4, 1, 1);
+  if (L === I.fell && k > .6 || L === I.calf) cria(PINO[0], 1.35, PINO[1] + .2, -2.4, 1, 1);
   if ([I.lit, I.shook, I.window, I.roof, I.saw, I.stopped].includes(L)) { const p = IN([2.9, .95, -.9]); cria(p[0], p[1], p[2], Math.PI, 1, L === I.lit ? .5 : 0) }
 
   switch (L) {

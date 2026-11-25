@@ -124,7 +124,7 @@ de cocinero?»).
     - **Transiciones**: en los cuadros entre tomas, la cámara no puede atravesar paredes, techos, árboles ni personajes;
       se traslada por el pueblo (calles, por encima de las casas) y entra a las casas por la puerta o por una ventana.
     - **El mundo sigue hasta el horizonte**: nada de cúpula, borde del suelo ni cielo con costura.
-15. **Ultradetalle en TODO**: techos (sin huecos, con relieve y nieve con volumen), paredes, arbustos, árboles (ramas,
+15. **Ultradetalle en TODO**: techos (sin huecos: mirá los triángulos de las puntas de cada techo, también la iglesia; cortes de tronco con anillos reales, con relieve y nieve con volumen), paredes, arbustos, árboles (ramas,
     agujas, corteza, nieve), personajes y ropa, herramientas, piso, fondo. Marcá cualquier cosa lisa, plana o de
     pocos polígonos que se vea en cámara.
 
