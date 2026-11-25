@@ -45,5 +45,8 @@ s = s.replace("  if (T.s.shake) { const a = T.s.shake;",
               "  { const Y = new THREE.Vector3(0, 1, 0); if (N && N.corte && N.a - t < WC) { const u = 1 - (N.a - t) / WC; quat.multiply(new THREE.Quaternion().setFromAxisAngle(Y, -u * u * .95)) } if (T.corte && k > 0 && t - T.a < WC) { const u = 1 - (t - T.a) / WC; quat.multiply(new THREE.Quaternion().setFromAxisAngle(Y, u * u * .95)) } }\n  if (T.s.shake) { const a = T.s.shake;", 1)
 # barridos más lentos, como los de Volze (0,2–0,3 s, pedido del dueño): 0,3 s entre tomas y 0,3 s al cambiar de lugar
 s = s.replace("const WHIP = .14,", "const WHIP = .5,", 1).replace("const WC = .18;", "const WC = .5;", 1).replace("-u * u * .95", "-u * u * 1.4", 1).replace("u * u * .95))", "u * u * 1.4))", 1)
+# cámara que viaja entre tomas (reemplaza la función camara y SUBF del motor)
+i0 = s.index("function camara(t) {"); i1 = s.index("updateProjectionMatrix() } }", i0) + len("updateProjectionMatrix() } }")
+s = s[:i0] + open(base + r"\_camara_vuelo.js", encoding="utf-8").read() + s[i1:]
 open(base + r"\historia.js", "w", encoding="utf-8").write(s)
 print("líneas", s.count("\n") + 1, "| restos de la polilla:", [w for w in ["MOTH", "PELL", "WREN", "CAKE", "JAR", "CANDLES", "BRAN", "OURS", " IN."] if w in s])

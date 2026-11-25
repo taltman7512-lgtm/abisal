@@ -15,7 +15,8 @@ rep('enConcha(TAZAS, 2.6, 13.5, -Math.PI / 2, -.1);', 'enConcha(TAZAS, 2.6, 13.5
 # elenco: se reemplaza todo el estilo de personajes del video de la tortuga
 i0 = s.index("robloxify(ME, {"); i1 = s.index("//@@LUGAR")
 s = s[:i0] + open(os.path.join(D, "_elenco_pinos.js"), encoding="utf-8").read() + "\n" + s[i1:]
-rep("\n//@@ELENCO\n", "\n" + open(os.path.join(D, "_mundo_pinos.js"), encoding="utf-8").read() + "\n//@@ELENCO\n")
+NL = chr(10)
+rep(NL + "//@@ELENCO" + NL, NL + open(os.path.join(D, "_mundo_pinos.js"), encoding="utf-8").read() + NL + open(os.path.join(D, "_detalle_pinos.js"), encoding="utf-8").read() + NL + "//@@ELENCO" + NL)
 esc = open(os.path.join(D, "_escenas_pinos.js"), encoding="utf-8").read()
 i0, i1 = s.index("//@@LUGAR"), s.index("//@@TEXTURAS")
 s = s[:i0] + esc.rstrip() + "\n\n" + s[i1:]

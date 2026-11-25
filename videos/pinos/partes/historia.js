@@ -794,6 +794,102 @@ const TRINEO = new THREE.Group(); { for (const s of [-1, 1]) { const pa = part(n
   for (let k = 0; k < 7; k++) part(new THREE.CylinderGeometry(.04, .05, 1.2, 5), M_CORTEZA_P, (k - 3) * .1, .4 + (k % 2) * .08, -.2, TRINEO, 0).rotation.x = Math.PI / 2 }
 const PILA = new THREE.Group(); scene.add(PILA); { const r = rng(1510); for (let k = 0; k < 160; k++) { const L = 2 + r() * 5, m = part(new THREE.CylinderGeometry(.08 + r() * .1, .14 + r() * .12, L, 6), M_CORTEZA_P, (r() - .5) * 5, Math.pow(r(), .6) * 6, (r() - .5) * 4, PILA, 0); m.rotation.set(r() * 3, r() * 3, r() * 3) } } PILA.visible = false;
 
+// ================= ultradetalle (revisión del dueño, 25-nov-2026) =================
+// hastiales de las cabañas visibles de los dos lados (se veía el hueco del techo)
+M_GABLE.forEach(m => { m.side = THREE.DoubleSide; m.needsUpdate = true });
+// ---------- humo de las chimeneas (cálido, sube y se tuerce con el viento)
+function humoP(t, f = 1) { HUMO_PTS.forEach((c, i) => { c.updateMatrixWorld(true); const o = new THREE.Vector3(0, 1.4, 0).applyMatrix4(c.matrixWorld); for (let k = 0; k < 4; k++) { const s = HUMO[i * 4 + k], q = (t * .22 + k / 4 + i * .13) % 1; s.visible = f > 0; s.position.set(o.x + q * 3 + Math.sin(t + k) * .3, o.y + q * 6, o.z + q * 1.2); s.scale.setScalar(1 + q * 4); s.material.opacity = (1 - q) * .32 * f; s.material.color.set("#c8ccd4") } }) }
+// ---------- utilería de pueblo nevado: leña apilada con nieve, barriles con tapa de nieve, cercas de troncos, coronas en las
+// puertas, faroles en las ventanas, un muñeco de nieve, rocas y arbustos nevados, cuervos en los techos, huellas
+{ const r = rng(1700), leña = new THREE.InstancedMesh(new THREE.CylinderGeometry(.13, .13, 1.4, 8), M_CORTEZA_P, 600), tapa = new THREE.InstancedMesh(new THREE.CylinderGeometry(.13, .13, .02, 8), SM("#c9a878", { roughness: .9 }), 1200), nie = new THREE.InstancedMesh(RB(1, .2, 1, .08), M_NIEVE_P, 80);
+  [leña, tapa, nie].forEach(m => { m.castShadow = m.receiveShadow = true; TURT.add(m) }); let nl = 0, nt = 0, nn = 0;
+  [...CASAS, NUESTRA, ESCUELA, PANADERIA].forEach((H, hi) => { H.g.updateMatrix(); const Wd = H.Wd ?? 6.4, Dp = H.Dp ?? 6.2, lado = hi % 2 ? 1 : -1;
+    for (let f = 0; f < 4; f++) for (let c = 0; c < 6; c++) { const lx = lado * (Wd / 2 + .3), lz = -Dp / 2 + .8 + c * .28 + (f % 2) * .14, ly = .15 + f * .25; V3.set(lx, 0, lz).applyMatrix4(H.g.matrix); const y = SY(V3.x, V3.z) + ly; dummy.position.set(V3.x, y, V3.z); dummy.rotation.set(Math.PI / 2, H.g.rotation.y, 0); dummy.scale.set(1, 1, 1); dummy.updateMatrix(); if (nl < 600) leña.setMatrixAt(nl++, dummy.matrix);
+      for (const e of [-.7, .7]) { const v = new THREE.Vector3(lx + lado * 0, 0, lz).applyMatrix4(H.g.matrix); const off = new THREE.Vector3(Math.cos(H.g.rotation.y) * e, 0, -Math.sin(H.g.rotation.y) * e); dummy.position.set(v.x + off.x, y, v.z + off.z); dummy.rotation.set(0, H.g.rotation.y, Math.PI / 2); dummy.updateMatrix(); if (nt < 1200) tapa.setMatrixAt(nt++, dummy.matrix) } }
+    { const v = new THREE.Vector3(lado * (Wd / 2 + .3), 0, -Dp / 2 + 1.5).applyMatrix4(H.g.matrix); dummy.position.set(v.x, SY(v.x, v.z) + 1.15, v.z); dummy.rotation.set(0, H.g.rotation.y, 0); dummy.scale.set(.8, 1, 1.8); dummy.updateMatrix(); nie.setMatrixAt(nn++, dummy.matrix) }
+    // corona de pino con moño rojo en la puerta
+    const co = part(new THREE.TorusGeometry(.32, .1, 8, 20), M_AGUJAS, H.door ?? 0, 2.6, 3.36, H.g, 0); part(new THREE.SphereGeometry(.08, 8, 6), SM("#b8302a"), (H.door ?? 0), 2.32, 3.45, H.g, 0) });
+  leña.count = nl; tapa.count = nt; nie.count = nn;
+  // rocas y arbustos nevados al borde de la loma y en el bosque
+  const roca = new THREE.InstancedMesh(new THREE.DodecahedronGeometry(1, 1), SMt(T_CORTEZA, { color: "#7a7a80", roughness: 1 }), 160), capa = new THREE.InstancedMesh(new THREE.SphereGeometry(1, 12, 6, 0, 6.283, 0, 1.3), M_NIEVE_P, 160), arb = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1, 1), M_AGUJAS, 220), arbn = new THREE.InstancedMesh(new THREE.SphereGeometry(1, 10, 6, 0, 6.283, 0, 1.1), M_NIEVE_P, 220);
+  [roca, capa, arb, arbn].forEach(m => { m.castShadow = m.receiveShadow = true; scene.add(m) });
+  for (let k = 0; k < 160; k++) { const a = r() * 6.283, d = 30 + r() * 60, x = Math.cos(a) * d, z = Math.sin(a) * d * 1.2, s = .5 + r() * 1.6; dummy.position.set(x, s * .3, z); dummy.rotation.set(r(), r() * 6, r()); dummy.scale.set(s * 1.3, s * .8, s); dummy.updateMatrix(); roca.setMatrixAt(k, dummy.matrix); dummy.position.y = s * .75; dummy.rotation.set(0, r() * 6, 0); dummy.scale.set(s * 1.2, s * .4, s * .9); dummy.updateMatrix(); capa.setMatrixAt(k, dummy.matrix) }
+  for (let k = 0; k < 220; k++) { const a = r() * 6.283, d = 32 + r() * 50, x = Math.cos(a) * d, z = Math.sin(a) * d * 1.2, s = .6 + r() * 1.1; dummy.position.set(x, s * .7, z); dummy.rotation.set(0, r() * 6, 0); dummy.scale.set(s, s * .8, s); dummy.updateMatrix(); arb.setMatrixAt(k, dummy.matrix); dummy.position.y = s * 1.1; dummy.scale.set(s * .95, s * .5, s * .95); dummy.updateMatrix(); arbn.setMatrixAt(k, dummy.matrix) }
+  // cerca de troncos con nieve encima alrededor de la plaza
+  const poste = new THREE.InstancedMesh(new THREE.CylinderGeometry(.09, .11, 1.3, 8), M_CORTEZA_P, 90), riel = new THREE.InstancedMesh(new THREE.CylinderGeometry(.06, .06, 1.6, 6), M_CORTEZA_P, 180), pn = new THREE.InstancedMesh(new THREE.SphereGeometry(.13, 8, 4, 0, 6.283, 0, 1.4), M_NIEVE_P, 90);
+  [poste, riel, pn].forEach(m => { m.castShadow = true; TURT.add(m) }); let np = 0, nr = 0;
+  [[-14, 6, -14, 20], [14, 6, 14, -4], [-12, -26, 12, -26]].forEach(([x0, z0, x1, z1]) => { const n = Math.round(Math.hypot(x1 - x0, z1 - z0) / 1.6); for (let k = 0; k <= n && np < 90; k++) { const x = lerp(x0, x1, k / n), z = lerp(z0, z1, k / n), y = SY(x, z); dummy.rotation.set(0, 0, (r() - .5) * .1); dummy.scale.set(1, 1, 1); dummy.position.set(x, y + .6, z); dummy.updateMatrix(); poste.setMatrixAt(np, dummy.matrix); dummy.position.set(x, y + 1.28, z); dummy.updateMatrix(); pn.setMatrixAt(np, dummy.matrix); np++;
+      if (k < n) for (const h of [.45, .95]) { const xm = lerp(x0, x1, (k + .5) / n), zm = lerp(z0, z1, (k + .5) / n); dummy.position.set(xm, SY(xm, zm) + h, zm); dummy.rotation.set(0, -Math.atan2(z1 - z0, x1 - x0), Math.PI / 2); dummy.updateMatrix(); riel.setMatrixAt(nr++, dummy.matrix) } } });
+  poste.count = pn.count = np; riel.count = nr;
+  // muñeco de nieve con bufanda y gorro
+  const mu = new THREE.Group(); enConcha(mu, 4.4, -2.6, -.6); [[.7, .6], [.5, 1.6], [.36, 2.35]].forEach(([rr, y]) => part(new THREE.SphereGeometry(rr, 20, 14), M_NIEVE_P, 0, y, 0, mu, 0)); part(new THREE.ConeGeometry(.06, .35, 8), SM("#e07020"), 0, 2.35, .5, mu, 0).rotation.x = Math.PI / 2; for (const s of [-1, 1]) part(new THREE.SphereGeometry(.04, 8, 6), SM("#111"), s * .12, 2.45, .33, mu, 0); part(new THREE.TorusGeometry(.42, .08, 8, 18), SM("#b8302a", { bumpMap: T_TRAMA, bumpScale: 3 }), 0, 2.05, 0, mu, 0).rotation.x = Math.PI / 2; for (const s of [-1, 1]) part(new THREE.CylinderGeometry(.03, .04, .9, 5), M_CORTEZA_P, s * .7, 1.75, 0, mu, 0).rotation.z = s * 1.0;
+  // cuervos en los techos
+  const neg = SM("#121216", { roughness: .4 }); [[CASAS[2], -1], [CASAS[5], 1], [CASAS[0], .5], [ESCUELA, -.5], [NUESTRA, 1.4]].forEach(([H, x], i) => { const c = new THREE.Group(); H.g.add(c); c.position.set(x, (H.Hh ?? 5) + 2.55, 0); part(RB(.22, .22, .4, .08), neg, 0, 0, 0, c, 0); part(RB(.16, .16, .16, .05), neg, 0, .14, .2, c, 0); part(new THREE.ConeGeometry(.04, .14, 4), SM("#2a2a2a"), 0, .13, .33, c, 0).rotation.x = Math.PI / 2; c.rotation.y = i * 1.3 }) }
+// ---------- árboles pelados con nieve en las ramas (variedad entre los pinos)
+{ const r = rng(1750), M_RAMA = SMt(T_CORTEZA, { color: "#8a8078", roughness: 1 }), geo = new THREE.CylinderGeometry(.5, 1, 1, 6);
+  const ramas = new THREE.InstancedMesh(geo, M_RAMA, 1600), nev = new THREE.InstancedMesh(new THREE.CylinderGeometry(.45, .9, 1, 6, 1, false, 0, Math.PI), M_NIEVE_P, 1600); [ramas, nev].forEach(m => { m.castShadow = true; scene.add(m) }); let n = 0;
+  const rama = (p, dir, L, rad, d) => { if (n >= 1600) return; const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir); dummy.quaternion.copy(q); dummy.position.copy(p).addScaledVector(dir, L / 2); dummy.scale.set(rad, L, rad); dummy.updateMatrix(); ramas.setMatrixAt(n, dummy.matrix); dummy.position.y += rad * .6; dummy.scale.set(rad * 1.05, L * .9, rad * 1.05); dummy.updateMatrix(); nev.setMatrixAt(n, dummy.matrix); n++;
+    if (d < 4) { const e = p.clone().addScaledVector(dir, L); for (let k = 0; k < 2 + (r() < .4 ? 1 : 0); k++) { const nd = dir.clone().add(new THREE.Vector3((r() - .5) * 1.3, r() * .5, (r() - .5) * 1.3)).normalize(); rama(e, nd, L * (.62 + r() * .12), rad * .62, d + 1) } } };
+  for (let k = 0; k < 45; k++) { const a = r() * 6.283, d = 40 + r() * 70; rama(new THREE.Vector3(Math.cos(a) * d, 0, Math.sin(a) * d * 1.2), new THREE.Vector3(0, 1, 0), 5 + r() * 3, .35, 0) } ramas.count = nev.count = n }
+// ---------- la chimenea de verdad: hogar hondo de piedra con fondo ennegrecido, troncos cruzados con brasas, cama de
+// brasas que titila, llamas en varias capas de profundidad, chispas y el resplandor en el piso
+const HOGAR = (() => { const G = new THREE.Group(); CASA_IN.add(G); G.position.set(-3, 0, -4.4);
+  part(new THREE.BoxGeometry(3.4, .4, 2.0), M_STONE, 0, .2, .6, G, 0);
+  for (const s of [-1, 1]) part(new THREE.BoxGeometry(.6, 2.2, 1.4), M_STONE, s * 1.2, 1.3, .3, G, 0);
+  part(new THREE.BoxGeometry(3.2, .5, 1.5), M_STONE, 0, 2.6, .3, G, 0); part(new THREE.BoxGeometry(3.6, .2, 1.8), M_PLANK, 0, 2.95, .4, G, 0);
+  const fondo = part(new THREE.PlaneGeometry(1.8, 1.9), new THREE.MeshStandardMaterial({ color: "#1a0e08", emissive: "#ff5a10", emissiveIntensity: .0, roughness: 1, map: tex(256, 256, (g, w, h) => { const r = rng(1760); g.fillStyle = "#1a120c"; g.fillRect(0, 0, w, h); for (let k = 0; k < 80; k++) { g.fillStyle = `rgba(0,0,0,${.3 + r() * .5})`; g.beginPath(); g.ellipse(r() * w, r() * h * .8, 20 + r() * 40, 10 + r() * 30, 0, 0, 7); g.fill() } }) }), 0, 1.35, -.35, G, 0);
+  const brasa = new THREE.MeshStandardMaterial({ color: "#3a1206", emissive: "#ff4a08", emissiveIntensity: 1.6, roughness: .8 }), troncos = [];
+  [[-.3, .55, .45, .5], [.3, .55, .5, -.45], [0, .75, .35, 1.4], [-.1, .5, .8, -1.2]].forEach(([x, y, z, ry]) => { const t = part(new THREE.CylinderGeometry(.13, .15, 1.3, 10), M_CORTEZA_P, x, y, z, G, 0); t.rotation.set(Math.PI / 2, ry, .2); troncos.push(t); for (const e of [-1, 1]) { const c = part(new THREE.CircleGeometry(.13, 10), brasa, 0, e * .66, 0, t, 0); c.rotation.x = e * Math.PI / 2 } });
+  const cama = new THREE.InstancedMesh(new THREE.DodecahedronGeometry(.07, 0), brasa, 120), r = rng(1761); G.add(cama); for (let k = 0; k < 120; k++) { dummy.position.set((r() - .5) * 1.4, .42, .2 + r() * .8); dummy.rotation.set(r() * 3, r() * 3, r() * 3); dummy.scale.setScalar(.6 + r()); dummy.updateMatrix(); cama.setMatrixAt(k, dummy.matrix) }
+  const brillo = part(new THREE.CircleGeometry(2.4, 32), new THREE.MeshBasicMaterial({ color: "#ff8a30", transparent: true, opacity: .25, blending: THREE.AdditiveBlending, depthWrite: false }), 0, .02, 1.8, G, 0); brillo.rotation.x = -Math.PI / 2;
+  const chispas = Array.from({ length: 16 }, () => { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: GLOW, color: "#ffb040", transparent: true, blending: THREE.AdditiveBlending, depthWrite: false })); s.scale.setScalar(.06); G.add(s); return s });
+  // utensilios: atizador, pala, olla colgando, leñero
+  part(new THREE.CylinderGeometry(.02, .02, 1.2, 6), SM("#222", { metalness: .7 }), 1.7, .6, 1.2, G, 0).rotation.z = .2; const olla = part(new THREE.SphereGeometry(.28, 16, 10, 0, 6.283, 0, 1.9), SM("#1a1a1c", { metalness: .6, roughness: .4 }), -.9, .9, .7, G, 0);
+  part(new THREE.BoxGeometry(.9, .5, .6), M_PLANK, 2.4, .25, 1.4, G, 0);
+  return { G, fondo, brasa, cama, brillo, chispas } })();
+function hogar(t, a) { const h = HOGAR; h.brasa.emissiveIntensity = (.25 + a * 1.4) * (.85 + .15 * Math.sin(t * 9)); h.fondo.material.emissiveIntensity = a * .35 * (.8 + .2 * Math.sin(t * 7)); h.brillo.material.opacity = .28 * a;
+  h.chispas.forEach((s, k) => { const q = (t * .7 + k / 16) % 1; s.visible = a > .3; s.position.set(Math.sin(k * 2.1 + t) * .4, .7 + q * 2.2, .5 + Math.cos(k) * .2); s.material.opacity = (1 - q) * a }) }
+// la chimenea vieja (la caja plana) se esconde: la reemplaza el hogar
+CASA_IN.children.forEach(o => { if (o.isMesh && o.geometry.type === "BoxGeometry" && Math.abs(o.position.x + 3) < .01 && (Math.abs(o.position.z + 4.4) < .01 || Math.abs(o.position.z + 3.75) < .01)) o.visible = false });
+// ---------- paredes de adentro con cosas y luz: faroles de pared, estantes con frascos, hierbas colgadas, abrigos en
+// percheros, un cuadro, cortinas, escoba, vela en la mesa, piel en el piso
+const LUCES_IN = [];
+{ const G = CASA_IN, r = rng(1770), vid = new THREE.MeshStandardMaterial({ color: "#ffe2a8", emissive: "#ffb050", emissiveIntensity: 1.8 });
+  [[-5.75, 3.4, -1], [5.75, 3.4, 1.5], [-1, 3.6, -4.75]].forEach(([x, y, z]) => { const f = new THREE.Group(); f.position.set(x, y, z); G.add(f); part(RB(.3, .42, .3, .03), vid, 0, 0, 0, f, 0); part(new THREE.BoxGeometry(.36, .06, .36), SM("#2a2a2a", { metalness: .5 }), 0, .24, 0, f, 0); LUCES_IN.push(f) });
+  const est = (x, y, z, ry, n) => { const g = new THREE.Group(); g.position.set(x, y, z); g.rotation.y = ry; G.add(g); part(new THREE.BoxGeometry(2, .08, .4), M_PLANK, 0, 0, 0, g, 0); for (let k = 0; k < n; k++) { const c = ["#6a8aa0", "#a86a3a", "#8a9a6a", "#c9b48a", "#7a3a3a"][k % 5]; const j = part(new THREE.CylinderGeometry(.09 + r() * .05, .1, .25 + r() * .2, 12), new THREE.MeshPhysicalMaterial({ color: c, roughness: .2, transmission: .3, transparent: true, opacity: .9 }), -.8 + k * .32, .2, 0, g, 0); part(new THREE.CylinderGeometry(.1, .1, .05, 12), SM("#5a3a20"), -.8 + k * .32, .36 + (j.geometry.parameters.height - .25) / 2, 0, g, 0) } };
+  est(-5.7, 2.4, 1.6, Math.PI / 2, 6); est(1.5, 2.6, -4.75, 0, 5);
+  for (let k = 0; k < 7; k++) { const h = part(new THREE.ConeGeometry(.1, .5, 6), SM(["#5a7a3a", "#7a8a4a", "#8a6a3a"][k % 3], { roughness: 1 }), -1.8 + k * .4, 4.6, 4.6, G, 0); h.rotation.x = Math.PI } part(new THREE.CylinderGeometry(.02, .02, 3, 4), SM("#c9b48a"), -.6, 4.85, 4.6, G, 0).rotation.z = Math.PI / 2;
+  [[4.6, "#2e4a6a"], [5.2, "#6a3a2a"]].forEach(([x, c]) => { part(RB(.7, 1.3, .25, .08), SM(c, { bumpMap: T_TRAMA, bumpScale: 3, roughness: 1 }), x, 2.6, 4.7, G, 0); part(new THREE.CylinderGeometry(.03, .03, .2, 6), M_PLANK, x, 3.3, 4.8, G, 0).rotation.x = Math.PI / 2 });
+  const cuadro = part(new THREE.BoxGeometry(1.2, .9, .06), M_PLANK, 2.6, 3.6, -4.77, G, 0); part(new THREE.PlaneGeometry(1, .7), SMt(tex(256, 192, (g, w, h) => { const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, "#3a4a6a"); gr.addColorStop(1, "#c8d4e8"); g.fillStyle = gr; g.fillRect(0, 0, w, h); g.fillStyle = "#1a2a1a"; for (let k = 0; k < 9; k++) { g.beginPath(); g.moveTo(k * 30 + 10, h); g.lineTo(k * 30 + 25, h * .4); g.lineTo(k * 30 + 40, h); g.fill() } })), 2.6, 3.6, -4.73, G, 0);
+  for (const s of [-1, 1]) { const cu = part(new THREE.PlaneGeometry(.9, 3, 8, 1), new THREE.MeshStandardMaterial({ color: "#8a2a2a", side: THREE.DoubleSide, roughness: 1, bumpMap: T_TRAMA, bumpScale: 2 }), s * 1.9, 3, 4.72, G, 0); const p = cu.geometry.attributes.position; for (let i = 0; i < p.count; i++) p.setZ(i, Math.sin(p.getX(i) * 9) * .06); cu.geometry.computeVertexNormals() }
+  part(new THREE.CylinderGeometry(.03, .03, 1.8, 6), M_PLANK, -5.4, .9, 3.6, G, 0).rotation.z = .2; part(new THREE.ConeGeometry(.25, .5, 10), SM("#c9a860", { roughness: 1 }), -5.25, .2, 3.6, G, 0);
+  const vela = part(new THREE.CylinderGeometry(.06, .06, .3, 10), SM("#efe6d0"), -.5, 1.4, -1, G, 0); const ll = new THREE.Sprite(new THREE.SpriteMaterial({ map: T_LLAMA, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false })); ll.scale.set(.12, .22, 1); ll.position.set(-.5, 1.66, -1); G.add(ll);
+  const piel = part(new THREE.CircleGeometry(1.2, 20), SM("#d8c8a8", { bumpMap: T_PELO_C.z, bumpScale: 4, roughness: 1 }), 1.6, .03, 1.6, G, 0); piel.rotation.x = -Math.PI / 2; piel.scale.set(1.4, 1, 1);
+  // vigas del techo y una mecedora
+  for (let k = 0; k < 4; k++) part(new THREE.BoxGeometry(12, .3, .3), M_BEAM, 0, 5.4, -3.6 + k * 2.4, G, 0);
+  const mec = new THREE.Group(); mec.position.set(-3.6, 0, 1.6); mec.rotation.y = .8; G.add(mec); part(new THREE.BoxGeometry(.9, .08, .8), M_PLANK, 0, .6, 0, mec, 0); part(new THREE.BoxGeometry(.9, 1, .08), M_PLANK, 0, 1.1, -.4, mec, 0); for (const s of [-1, 1]) part(new THREE.TorusGeometry(.6, .04, 6, 16, Math.PI * .6), M_PLANK, s * .42, .55, 0, mec, 0).rotation.set(Math.PI / 2 + Math.PI, Math.PI / 2, 0) }
+// ---------- el ojo enorme ultra detallado (como la referencia del dueño): esclerótica con venitas y grietas, iris ámbar con
+// fibras radiales y anillo oscuro, pupila honda, córnea mojada que refleja, párpados de corteza escamosa con musgo
+const T_IRIS3 = tex(1024, 1024, (g, w, h) => { const r = rng(1780), cx = w / 2, cy = h / 2, R = 430; g.fillStyle = "#d8ccb8"; g.fillRect(0, 0, w, h);
+  for (let k = 0; k < 120; k++) { let x = r() * w, y = r() * h; g.strokeStyle = `rgba(${160 + r() * 60 | 0},40,30,${.25 + r() * .4})`; g.lineWidth = 1 + r() * 3; g.beginPath(); g.moveTo(x, y); for (let s = 0; s < 10; s++) { x += (r() - .5) * 50; y += (r() - .5) * 50; g.lineTo(x, y) } g.stroke() }
+  const gr = g.createRadialGradient(cx, cy, 40, cx, cy, R); gr.addColorStop(0, "#1a0a02"); gr.addColorStop(.22, "#6a2a06"); gr.addColorStop(.45, "#c86a18"); gr.addColorStop(.7, "#e09a40"); gr.addColorStop(.9, "#a85010"); gr.addColorStop(1, "#3a1404"); g.fillStyle = gr; g.beginPath(); g.arc(cx, cy, R, 0, 7); g.fill();
+  for (let k = 0; k < 1600; k++) { const a = r() * 6.283, r0 = R * (.24 + r() * .15), r1 = R * (.55 + r() * .44); g.strokeStyle = r() < .55 ? `rgba(255,${190 + r() * 60 | 0},${100 + r() * 60 | 0},${.12 + r() * .3})` : `rgba(60,${20 + r() * 20 | 0},4,${.15 + r() * .3})`; g.lineWidth = 1 + r() * 2.5; g.beginPath(); g.moveTo(cx + Math.cos(a) * r0, cy + Math.sin(a) * r0); g.quadraticCurveTo(cx + Math.cos(a + .05) * (r0 + r1) / 2, cy + Math.sin(a + .05) * (r0 + r1) / 2, cx + Math.cos(a) * r1, cy + Math.sin(a) * r1); g.stroke() }
+  for (let k = 0; k < 60; k++) { const a = r() * 6.283, rr = R * (.5 + r() * .4); g.fillStyle = "rgba(50,16,2,.45)"; g.beginPath(); g.arc(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr, 4 + r() * 14, 0, 7); g.fill() }
+  g.strokeStyle = "rgba(20,6,0,.9)"; g.lineWidth = 34; g.beginPath(); g.arc(cx, cy, R - 16, 0, 7); g.stroke();
+  g.fillStyle = "#020100"; g.beginPath(); g.ellipse(cx, cy, R * .3, R * .33, 0, 0, 7); g.fill() });
+function construirOjo() { [...OJO.children].forEach(c => OJO.remove(c)); const G = OJO;
+  const T_ESCL = tex(512, 256, (g, w, h) => { const r = rng(1782); g.fillStyle = "#d8ccb4"; g.fillRect(0, 0, w, h); for (let k = 0; k < 40; k++) { let x = r() * w, y = r() * h; g.strokeStyle = `rgba(${150 + r() * 70 | 0},30,24,${.15 + r() * .25})`; g.lineWidth = .8 + r() * 1.5; g.beginPath(); g.moveTo(x, y); for (let q = 0; q < 9; q++) { x += (r() - .5) * 40; y += (r() - .5) * 30; g.lineTo(x, y) } g.stroke() } });
+  const ojo = new THREE.Mesh(new THREE.SphereGeometry(1.7, 64, 48), new THREE.MeshPhysicalMaterial({ map: T_ESCL, roughness: .3, emissive: "#3a1006", emissiveIntensity: .3 })); ojo.position.z = -1.6; G.add(ojo); OJO.userData.ojo = ojo;
+  const iris = new THREE.Mesh(new THREE.CircleGeometry(1.25, 64), new THREE.MeshPhysicalMaterial({ map: T_IRIS3, roughness: .25, emissive: "#ff7020", emissiveMap: T_IRIS3, emissiveIntensity: .45 })); iris.rotation.y = Math.PI; iris.position.z = -3.3; G.add(iris);
+  const dome = new THREE.Mesh(new THREE.SphereGeometry(1.3, 40, 20, 0, 6.283, 0, .75), new THREE.MeshPhysicalMaterial({ color: "#ffffff", transparent: true, opacity: .1, roughness: 0, clearcoat: 1, depthWrite: false })); dome.rotation.x = -Math.PI / 2; dome.position.z = -2.85; G.add(dome);
+  const cornea = part(new THREE.SphereGeometry(1.76, 48, 32), new THREE.MeshPhysicalMaterial({ color: "#ffffff", transparent: true, opacity: .12, roughness: 0, clearcoat: 1, clearcoatRoughness: 0, depthWrite: false }), 0, 0, -1.6, G, 0);
+  const T_ESC = tex(512, 512, (g, w, h) => { const r = rng(1781); g.fillStyle = "#2a2018"; g.fillRect(0, 0, w, h); for (let y = 0; y < h; y += 18) for (let x = (y / 18) % 2 * 14; x < w; x += 28) { const gr = g.createRadialGradient(x - 3, y - 3, 1, x, y, 14); gr.addColorStop(0, rgbj("#7a6448", r, 30)); gr.addColorStop(1, "#1a120a"); g.fillStyle = gr; g.beginPath(); g.ellipse(x, y, 13, 10, 0, 0, 7); g.fill() } for (let k = 0; k < 60; k++) { g.fillStyle = `rgba(${70 + r() * 40 | 0},${110 + r() * 40 | 0},50,.5)`; g.beginPath(); g.arc(r() * w, r() * h, 4 + r() * 14, 0, 7); g.fill() } }, [3, 2]);
+  const M_ESC = SMt(T_ESC, { bumpMap: T_ESC, bumpScale: 5, roughness: .7 });
+  const cara = part(new THREE.SphereGeometry(4.2, 48, 32), M_ESC, 0, 0, 2.4, G, 0); cara.scale.set(1.3, 1, 1);
+  for (const s of [-1, 1]) { const p = part(new THREE.TorusGeometry(1.85, .5, 14, 40, Math.PI), M_ESC, 0, s * .15, -1.5, G, 0); p.rotation.set(0, 0, s > 0 ? 0 : Math.PI); p.scale.set(1.15, .7, 1); OJO.userData[s > 0 ? "sup" : "inf"] = p } }
+// ---------- el cuerno que rompe el techo: astillas de tablas y nieve que entra
+const TABLAS_ROTAS = Array.from({ length: 10 }, (_, k) => { const m = part(new THREE.BoxGeometry(.15, .04, .9), M_PLANK, 0, 0, 0, CASA_IN, 0); m.visible = false; return m });
+
 // ---------- elenco: diseños propios de bloques (nada del protagonista de Volze ni marcas)
 const ME = kid({ skin: "#e8b48c", shirt: "#d1872e", cloth: "plain", pants: "#3a4a5a", shoes: "#4a3020", hair: "#3a2416", style: "despeinado" });
 const ME6 = kid({ skin: "#e8b48c", shirt: "#d1872e", cloth: "plain", pants: "#3a4a5a", shoes: "#4a3020", hair: "#3a2416", style: "despeinado" }); ME6.body.scale.setScalar(.7);
@@ -1026,7 +1122,7 @@ const gorroTejido = (k, col, pom = "#f2ece0") => { const m = SM(col, { roughness
 const gorroPiel = (k, col) => { const m = SM(col, { roughness: 1, bumpMap: T_PELO_C.z, bumpScale: 5 }); [...k.head.children].forEach(c => { if (c.userData.pelo && c.position.y > .55) k.head.remove(c) }); part(new THREE.CylinderGeometry(.46, .46, .42, 24), m, 0, .8, 0, k.head, 0); for (const s of [-1, 1]) { const o = part(RB(.12, .4, .4, .05), m, s * .4, .45, 0, k.head, 0) } };
 const bufanda = (k, col) => { const m = SM(col, { roughness: 1, bumpMap: T_TRAMA, bumpScale: 4 }); part(RB(1.12, .22, .62, .08), m, 0, 2.06, 0, k.body, 0); const c = part(RB(.26, .7, .08, .03), m, .25, 1.75, .3, k.body, 0); c.rotation.z = .12 };
 gorroTejido(ME, "#2a4a8a"); bufanda(ME, "#e8b42a"); gorroTejido(ME6, "#f2ece0", "#d84a6a"); bufanda(ME6, "#d84a6a");
-{ const m = SM("#7a2a3a", { roughness: 1, bumpMap: T_TRAMA, bumpScale: 3 }); [...GARROW.head.children].forEach(c => { if (c.userData.pelo && c.position.y > .5) GARROW.head.remove(c) }); const pa = part(new THREE.SphereGeometry(.44, 24, 16, 0, 6.283, 0, 1.7), m, 0, .45, -.02, GARROW.head, 0); pa.scale.set(1.02, 1.05, 1.05); part(new THREE.ConeGeometry(.12, .3, 6), m, 0, .14, -.38, GARROW.head, 0).rotation.x = 2.6;
+{ const m = SM("#7a2a3a", { roughness: 1, bumpMap: T_TRAMA, bumpScale: 3 }); [...GARROW.head.children].forEach(c => { if (c.userData.pelo && c.position.y > .5) GARROW.head.remove(c) }); const pa = part(new THREE.SphereGeometry(.44, 24, 16, 0, 6.283, 0, 1.45), m, 0, .6, -.07, GARROW.head, 0); pa.scale.set(1.04, 1, 1.06); part(new THREE.ConeGeometry(.12, .3, 6), m, 0, .14, -.38, GARROW.head, 0).rotation.x = 2.6;
   const chal = part(RB(1.2, .5, .7, .15), SM("#c9b48a", { roughness: 1, bumpMap: T_TRAMA, bumpScale: 5 }), 0, 1.95, 0, GARROW.body, 0);
   for (const s of [-1, 1]) part(new THREE.TorusGeometry(.09, .018, 6, 18), SM("#3a2a1a", { metalness: .5 }), s * .14, .44, .34, GARROW.head, 0) }
 barbaSensei(PIM, "#5a3a20"); gorroTejido(PIM, "#2a2a2e", "#2a2a2e");
@@ -1035,6 +1131,13 @@ EXT.forEach((k, i) => i % 2 ? gorroPiel(k, "#5a4030") : gorroTejido(k, ["#c9a040
 // farolito de mano
 const LINTERNA = new THREE.Group(); { part(RB(.26, .34, .26, .03), new THREE.MeshStandardMaterial({ color: "#ffe0a0", emissive: "#ffb050", emissiveIntensity: 2 }), 0, -.4, .1, LINTERNA, 0); part(new THREE.TorusGeometry(.1, .015, 6, 12), SM("#2a2a2a"), 0, -.18, .1, LINTERNA, 0) }
 const LINT_GL = glowSprite("#ffb060", 2); LINT_GL.visible = false;
+
+// la abuela con arrugas (frente, patas de gallo, surcos al lado de la boca) sobre su cara de bloque
+const ARR = {}; const caraArrugas = kind => ARR[kind] ||= tex(512, 384, (g, w, h) => { g.drawImage(caraR6(kind).image, 0, 0, w, h); g.strokeStyle = "rgba(90,50,40,.55)"; g.lineCap = "round"; g.lineWidth = 6;
+  for (const y of [42, 60]) { g.beginPath(); g.moveTo(170, y); g.quadraticCurveTo(256, y - 10, 342, y); g.stroke() }
+  for (const [x, s] of [[118, -1], [394, 1]]) for (let k = 0; k < 3; k++) { g.beginPath(); g.moveTo(x, 150 + k * 16); g.lineTo(x + s * 26, 140 + k * 20); g.stroke() }
+  for (const s of [-1, 1]) { g.beginPath(); g.moveTo(256 + s * 70, 240); g.quadraticCurveTo(256 + s * 86, 280, 256 + s * 70, 318); g.stroke() } });
+{ const sf0 = setFace; setFace = (k, f) => { if (k !== GARROW) return sf0(k, f); const t = caraArrugas(f); if (k.decal.material.map !== t) { k.decal.material.map = t; k.decal.material.needsUpdate = true } } }
 
 
 // ---------- cielo y ambientes (noche ocre, atardecer, mañana gris, interior)
@@ -1068,7 +1171,7 @@ const PINO = [16, 44], MONTE = [-30, 48, -220], LINDE = [0, 0, -78];
 { const geo = new THREE.ConeGeometry(100, 90, 14, 6), p = geo.attributes.position, r = rng(1600); for (let i = 0; i < p.count; i++) { const kk = 1 + (r() - .5) * .2; p.setX(i, p.getX(i) * kk); p.setZ(i, p.getZ(i) * kk) } geo.computeVertexNormals(); part(geo, new THREE.MeshStandardMaterial({ map: T_NIEVE.c, bumpMap: T_NIEVE.z, bumpScale: 6, roughness: .9 }), -30, 45, -262, scene, 0) }
 // el ojo enorme que se asoma por la ventana, y el cuerno que rompe el techo
 const OJO = new THREE.Group(); scene.add(OJO); { part(new THREE.SphereGeometry(3.4, 40, 28), M_PELO_C, 0, 0, 1.6, OJO, 0); const o = part(new THREE.SphereGeometry(1.25, 32, 24), new THREE.MeshStandardMaterial({ color: "#a8bcc8", emissive: "#7fa8c8", emissiveIntensity: .5, roughness: .12 }), 0, 0, -1.9, OJO, 0); OJO.userData.ojo = o; part(new THREE.CircleGeometry(.62, 32), SM("#5a7a8a", { roughness: .2 }), 0, 0, -3.155, OJO, 0).rotation.y = Math.PI; part(new THREE.CircleGeometry(.26, 24), SM("#06090c", { roughness: .1 }), 0, 0, -3.16, OJO, 0).rotation.y = Math.PI;
-  for (const s of [-1, 1]) { const p = part(new THREE.TorusGeometry(1.35, .35, 10, 30, Math.PI), M_PELO_C, 0, s * .1, -1.9, OJO, 0); p.rotation.set(0, Math.PI, s > 0 ? 0 : Math.PI); OJO.userData[s > 0 ? "sup" : "inf"] = p } } OJO.visible = false;
+  for (const s of [-1, 1]) { const p = part(new THREE.TorusGeometry(1.35, .35, 10, 30, Math.PI), M_PELO_C, 0, s * .1, -1.9, OJO, 0); p.rotation.set(0, Math.PI, s > 0 ? 0 : Math.PI); OJO.userData[s > 0 ? "sup" : "inf"] = p } } OJO.visible = false; construirOjo();
 const ASTA_T = new THREE.Group(); CASA_IN.add(ASTA_T); { const cu = new THREE.CatmullRomCurve3([[6, 14, 4], [4, 10, 2.4], [2.6, 7.4, 1], [1.8, 5.6, .2]].map(q => new THREE.Vector3(...q))); part(new THREE.TubeGeometry(cu, 20, .45, 10), M_ASTA, 0, 0, 0, ASTA_T, 0); const c2 = new THREE.CatmullRomCurve3([[3.4, 9.2, 1.8], [2.4, 9.8, 3.2], [1.6, 9.6, 4]].map(q => new THREE.Vector3(...q))); part(new THREE.TubeGeometry(c2, 10, .25, 8), M_ASTA, 0, 0, 0, ASTA_T, 0) } ASTA_T.visible = false;
 // el pino que cortó Brask (en el recuerdo)
 const PINO_B = new THREE.Group(); scene.add(PINO_B); PINO_B.position.set(2, 0, -42.5); { part(new THREE.CylinderGeometry(.5, .8, 16, 12), M_CORTEZA_P, 0, 8, 0, PINO_B, 0); for (let k = 0; k < 4; k++) { const rr = 5 - k * 1, hh = 6 - k * .6, y = 5 + k * 3.4; part(GEO_PISO, M_AGUJAS, 0, y, 0, PINO_B, 0).scale.set(rr, hh, rr); part(GEO_CAPNIEVE, M_NIEVE_P, 0, y + hh * .1, 0, PINO_B, 0).scale.set(rr * .92, hh * .8, rr * .92) } }
@@ -1091,51 +1194,51 @@ const OW = (obj, o) => () => { obj.updateMatrixWorld(true); return obj.localToWo
 const CW = (o = [0, 0, 0]) => () => { WATCHER.G.updateMatrixWorld(true); return WATCHER.cabeza.localToWorld(new THREE.Vector3(...o)).toArray() };
 const INF = o => () => IN(o);
 const SHOTS = {
-  [I.hook]: [sh(0, [-2, 6, 52], [-.5, 5.4, 51], [14, 7, 44], [17, 4, 44.5], 56)],
+  [I.hook]: [sh(0, [9, 3.2, 47], [9.6, 3.0, 46.4], [14.5, 2.4, 42], [16, 5, 44], 56)],
   [I.stood0]: [sh(0, [-40, 20, -60], [-41, 21, -64], CW([0, -8, 0]), CW([0, -6, 0]), 34)],
   [I.rule]: [sh(0, [-72, 56, 72], [-62, 50, 62], TS(0, 4, 0), TS(0, 4, 0), 50)],
   [I.cost]: [sh(0, [2, 7, -50], [2, 8, -53], CW([0, -6, 0]), CW([0, -4, 0]), 56, { shake: .15 })],
   [I.valley]: [sh(0, [120, 64, 150], [104, 58, 132], [0, 10, 0], [0, 10, 0], 46)],
-  [I.burn]: [shF(0, FOLK[2], 2.4, 2.0, .6, .1, 62)],
+  [I.burn]: [shF(0, FOLK[2], 5.0, 4.6, .3, .1, 56)],
   [I.sleds]: [sh(0, TS(1.4, 2.4, 30.5), TS(1.0, 2.5, 29.5), TS(0, 1.2, 21), TS(0, 1.2, 23), 58)],
   [I.watch]: [sh(0, TS(-12, 2.5, -24), TS(-12.4, 2.8, -26), [0, 36, -78], [0, 36, -78], 50)],
   [I.antlers]: [sh(0, [-8, 42, -48], [-5, 44, -51], CW([0, 12, 0]), CW([0, 12, 0]), 54)],
   [I.eyes]: [sh(0, [-8, 24, -28], [-8, 25, -31], CW([0, .7, 2]), CW([0, .7, 2]), 24)],
-  [I.lantern]: [shF(0, FOLK[1], 2.2, 1.9, -.6, .1, 62)],
-  [I.ilse]: [shF(0, GARROW, 2.2, 1.9, .5, .1, 60)],
-  [I.brask]: [sh(0, [12, 4, -32], [11.4, 3.8, -33], [4, 4, -40], [4, 4, -40], 58)],
+  [I.lantern]: [shF(0, FOLK[1], 3.4, 3.0, -.6, .1, 62)],
+  [I.ilse]: [shF(0, GARROW, 3.4, 3.0, .5, .1, 60)],
+  [I.brask]: [sh(0, [9, 3.2, -30], [8.6, 3.0, -31], [6.2, 2, -37.8], [6.2, 2, -37.8], 56)],
   [I.quiet]: [sh(0, [0, 7, -46], [0, 7.5, -50], [0, 9, -95], [0, 9, -95], 50)],
   [I.shaking]: [sh(0, TS(0, 2.4, 3.5), TS(.3, 2.6, 4.5), TS(-6.8, 4.5, 9), TS(-6.8, 4.5, 9), 58, { shake: .25 })],
   [I.taller]: [sh(0, TS(5, 1.6, -28), TS(4.6, 1.4, -27), [0, 40, -50], [0, 44, -48], 60, { shake: .12 })],
   [I.stepped]: [sh(0, [-14, 26, -40], [-12, 24, -38], TS(6.8, 3, -18), TS(6.8, 2, -18), 52, { shake: .2 })],
   [I.back]: [sh(0, TS(9, 3, -27), TS(9.4, 3.4, -25), [5, 28, -52], [4, 26, -62], 54)],
   [I.stump]: [sh(0, TS(-.4, 2.0, 5.0), TS(-.9, 1.8, 4.2), TS(-2.6, .9, 2.2), TS(-2.6, .9, 2.2), 56)],
-  [I.doors]: [sh(0, OW(CASAS[4].g, [1.4, 3.4, 5.6]), OW(CASAS[4].g, [.9, 3.3, 4.8]), OW(CASAS[4].g, [0, 3.3, 3.3]), null, 50)],
+  [I.doors]: [sh(0, OW(CASAS[4].g, [2.6, 2.4, 6.5]), OW(CASAS[4].g, [2.0, 2.4, 5.8]), OW(CASAS[4].g, [0, 2.4, 3.3]), null, 52)],
   [I.winter]: [sh(0, [-40, 30, 52], [-36, 28, 46], TS(0, 6, 0), TS(0, 6, 0), 54)],
-  [I.buried]: [sh(0, [-25.6, 1.7, 26.4], [-26, 1.5, 26.8], [-28, .2, 28.4], null, 56)],
+  [I.buried]: [sh(0, [-24.5, 1.0, 25.6], [-25, 1.0, 26], [-28, .2, 28.4], null, 56)],
   [I.fences]: [sh(0, INF([1.4, 2.2, 1.4]), INF([.8, 2.0, .6]), INF([-3, .9, -3.7]), null, 58)],
-  [I.mila]: [sh(0, INF([1.3, 2.0, -2.0]), INF([1.6, 1.9, -2.4]), INF([3.6, 1.3, -3.0]), null, 52)],
-  [I.badcold]: [shF(0, GARROW, 1.8, 1.6, -.4, 0, 64)],
-  [I.out]: [sh(0, INF([-1.2, 1.4, -1.2]), INF([-1.8, 1.2, -2.0]), INF([-3, .8, -3.8]), null, 56), sh(4, INF([1.4, 2.0, -1.8]), INF([1.7, 1.9, -2.2]), INF([3.6, 1.3, -3.0]), null, 50)],
-  [I.axe]: [shF(0, ME, 2.2, 1.9, .5, .1, 62)],
-  [I.oldest]: [sh(0, [8.8, 3.4, 29], [10.2, 3.2, 33], [16, 10, 44], [16, 8, 44], 56)],
-  [I.swing]: [sh(0, [12.2, 2.3, 39.6], [12.6, 2.2, 40.0], [14.6, 1.6, 42.2], null, 48)],
-  [I.fell]: [sh(0, [7, 4.5, 35], [7.5, 4.0, 36], [16, 10, 44], [22, 2, 46], 56)],
+  [I.mila]: [sh(0, INF([1.0, 2.4, 0.2]), INF([1.3, 2.3, -.2]), INF([3.6, 1.5, -2.2]), null, 54)],
+  [I.badcold]: [sh(0, INF([0.6, 2.5, 0.4]), INF([0.3, 2.4, 0.0]), INF([-1.6, 2.2, -2.2]), null, 58)],
+  [I.out]: [sh(0, INF([-1.2, 1.4, -1.2]), INF([-1.8, 1.2, -2.0]), INF([-3, .8, -3.8]), null, 56), sh(4, INF([0.4, 2.6, 0.8]), INF([0.7, 2.5, 0.4]), INF([3.4, 1.4, -2.4]), null, 52)],
+  [I.axe]: [shF(0, ME, 3.4, 3.0, .5, .1, 62)],
+  [I.oldest]: [sh(0, [6, 3, 34], [6.6, 3, 35], KW(ME, [0, 1.6, 0]), [14, 4, 42], 54)],
+  [I.swing]: [sh(0, [9.8, 2.8, 45.2], [10.2, 2.7, 45.4], [13.6, 1.8, 41.6], null, 54)],
+  [I.fell]: [sh(0, [18.5, 3.6, 35.5], [19, 3.8, 35], [13.5, 2, 41], [19, 3, 46], 58)],
   [I.calf]: [sh(0, [14.2, 2.4, 41.6], [14.7, 2.1, 42.4], [16, 1.3, 44], null, 48)],
-  [I.baby]: [shF(0, ME, 1.6, 1.4, .3, 0, 66)],
+  [I.baby]: [shF(0, ME, 3.4, 3.0, .3, 0, 66)],
   [I.stood]: [sh(0, [-70, 52, -180], [-66, 54, -186], CW([0, -8, 0]), CW([0, -4, 0]), 48)],
-  [I.home]: [sh(0, TS(14, 3, 25), TS(13.4, 3, 24), KW(ME, [0, 1.4, 0]), null, 58)],
-  [I.lit]: [sh(0, INF([0, 2.6, 2.2]), INF([.6, 2.4, 1.2]), INF([2.8, 1.1, -2.2]), null, 58)],
-  [I.shook]: [sh(0, INF([2.4, 3.4, -2.4]), INF([2.6, 3.3, -2.8]), INF([4.4, 3.4, -4.6]), null, 56, { shake: .2 })],
+  [I.home]: [sh(0, TS(-2.6, 3.2, 25.5), TS(-2.2, 3.0, 24), KW(ME, [0, 1.4, 0]), TS(3.4, 1.6, 18), 56)],
+  [I.lit]: [sh(0, INF([0.6, 2.2, 1.6]), INF([0.9, 2.2, 1.2]), INF([3.4, 1.2, -1.8]), null, 58)],
+  [I.shook]: [sh(0, INF([0.5, 2.6, 0.5]), INF([0.7, 2.6, 0.1]), INF([3.8, 3.0, -4.4]), null, 58, { shake: .2 })],
   [I.window]: [sh(0, INF([0, 2.6, -2.4]), INF([0, 2.8, -1.4]), INF([0, 3, 5]), null, 58, { shake: .06 })],
-  [I.roof]: [sh(0, INF([-2.2, 1.6, 1.6]), INF([-1.8, 1.5, 1.2]), INF([2.2, 6.6, 1]), null, 64, { shake: .15 })],
+  [I.roof]: [sh(0, INF([-2.6, 1.4, 3.0]), INF([-2.3, 1.4, 2.6]), INF([2.0, 5.5, 1.0]), null, 64, { shake: .15 })],
   [I.saw]: [sh(0, INF([4.8, 2.4, -3.8]), INF([4.4, 2.3, -3.2]), INF([0, 3, 5]), null, 54)],
-  [I.stopped]: [sh(0, INF([0, 2.7, -1.6]), INF([0, 2.8, -.8]), INF([0, 3, 7]), null, 44)],
+  [I.stopped]: [sh(0, INF([0, 2.4, -.8]), INF([0, 2.5, -.3]), INF([0, 3, 7]), null, 54)],
   [I.lay]: [sh(0, [-12, 34, 40], [-10, 30, 36], TS(10, 4, 19), TS(10, 4, 19), 52)],
-  [I.breath]: [sh(0, [2, 22, 36], [3, 20, 33], CW([0, -1, 6]), CW([0, 1, 9]), 56)],
-  [I.morning]: [sh(0, INF([3.0, 2.2, .6]), INF([3.2, 2.1, .1]), INF([3.6, 1.8, -2.2]), null, 54)],
+  [I.breath]: [sh(0, [-6, 26, 44], [-4, 24, 42], CW([0, -1, 6]), CW([0, 1, 9]), 54)],
+  [I.morning]: [sh(0, INF([3.0, 2.4, 1.8]), INF([3.1, 2.3, 1.4]), INF([3.6, 2.0, -1.4]), null, 60)],
   [I.gone]: [sh(0, [11, 3.4, 37], [11.6, 3.2, 38], [16, 1, 44], [16, 1, 44], 54)],
-  [I.pile]: [sh(0, TS(-4.6, 4, 27.5), TS(-4.2, 4.6, 26.5), TS(2.2, 4, 18), TS(2.2, 6, 18), 58)],
+  [I.pile]: [sh(0, TS(-5.5, 3, 30), TS(-5.2, 3.4, 29), TS(1, 3, 18), TS(1, 4, 18), 58)],
   [I.last]: [sh(0, TS(.4, 2.4, 22.5), [-34, 40, 66], TS(3, 2, 18), TS(3, 2, 18), 54)],
 };
 
@@ -1149,17 +1252,28 @@ const val = (v, q) => typeof v === "function" ? v(q) : v;
 function camAt(T, q) { const s = T.s, p0 = val(s.p, q), p1 = val(s.p1, q), l0 = val(s.l, q), l1 = val(s.l1, q), e = q * q * (3 - 2 * q) * .35 + q * .65;
   return { p: p0.map((v, i) => lerp(v, p1[i], e)), l: l0.map((v, i) => lerp(v, l1[i], e)), f: s.f } }
 const QA = new THREE.Quaternion(), QB = new THREE.Quaternion(), MA = new THREE.Matrix4();
-function camara(t) { const k = tomaAt(t), T = TOMAS[k], N = TOMAS[k + 1], q = cl((t - T.a) / Math.max(.01, T.b - T.a)); let c = camAt(T, q);
-  const look = (c) => { MA.lookAt(new THREE.Vector3(...c.p), new THREE.Vector3(...c.l), new THREE.Vector3(0, 1, 0)); return new THREE.Quaternion().setFromRotationMatrix(MA) };
-  let quat = look(c), pos = new THREE.Vector3(...c.p), fov = c.f;
-  // barrido: los últimos 0,12 s de una toma y los primeros 0,08 s de la siguiente se mezclan con una curva rápida
-  const into = N && !N.corte ? (t - (N.a - WHIP * .6)) / WHIP : -1, from = !T.corte && k > 0 ? (t - T.a + WHIP * .6) / WHIP : 2;
-  if (into > 0 && into < 1 || from > 0 && from < 1) { const A = into > 0 && into < 1 ? T : TOMAS[k - 1], B = into > 0 && into < 1 ? N : T, u = into > 0 && into < 1 ? into : from, e = eIO(u);
-    const ca = camAt(A, 1), cb = camAt(B, 0); pos = new THREE.Vector3(...ca.p).lerp(new THREE.Vector3(...cb.p), e); quat = look(ca).slerp(look(cb), e); fov = lerp(ca.f, cb.f, e) }
-  { const Y = new THREE.Vector3(0, 1, 0); if (N && N.corte && N.a - t < WC) { const u = 1 - (N.a - t) / WC; quat.multiply(new THREE.Quaternion().setFromAxisAngle(Y, -u * u * 1.4)) } if (T.corte && k > 0 && t - T.a < WC) { const u = 1 - (t - T.a) / WC; quat.multiply(new THREE.Quaternion().setFromAxisAngle(Y, u * u * 1.4)) } }
+// transiciones como en el Short de referencia (pedido del dueño, 25-nov-2026): la cámara VIAJA por el mundo de una toma a
+// la otra en ≈ 0,8 s (no hay corte ni barrido abstracto): sube en arco por encima de los techos si están lejos, el punto
+// donde mira se desliza de un lugar al otro y el desenfoque de movimiento hace el resto. Entre lugares distintos (adentro ↔
+// afuera, recuerdo ↔ hoy) la cámara se mete volando hacia adelante en la toma vieja y sale desde atrás en la nueva.
+const TR = .8;
+const enTransicion = t => { const k = tomaAt(t), T = TOMAS[k], N = TOMAS[k + 1]; if (N && N.a - t < TR / 2) return [T, N, .5 - (N.a - t) / TR]; if (k > 0 && t - T.a < TR / 2) return [TOMAS[k - 1], T, .5 + (t - T.a) / TR]; return null };
+window.SUBF = t => enTransicion(t) ? 12 : 3;
+function camara(t) { const k = tomaAt(t), T = TOMAS[k], q = cl((t - T.a) / Math.max(.01, T.b - T.a)); let c = camAt(T, q);
+  const mira = (p, l) => { MA.lookAt(p, l, new THREE.Vector3(0, 1, 0)); return new THREE.Quaternion().setFromRotationMatrix(MA) };
+  let pos = new THREE.Vector3(...c.p), lk = new THREE.Vector3(...c.l), fov = c.f;
+  const tr = enTransicion(t);
+  if (tr) { const [A, B, u] = tr, ca = camAt(A, 1), cb = camAt(B, 0), e = eIO(cl(u));
+    const pa = new THREE.Vector3(...ca.p), pb = new THREE.Vector3(...cb.p), la = new THREE.Vector3(...ca.l), lb = new THREE.Vector3(...cb.l);
+    if (!B.corte && pa.distanceTo(pb) < 160) { const d = pa.distanceTo(pb), mid = pa.clone().add(pb).multiplyScalar(.5); mid.y += cl(d * .22, .5, 14);
+      pos = pa.clone().multiplyScalar((1 - e) ** 2).add(mid.multiplyScalar(2 * (1 - e) * e)).add(pb.clone().multiplyScalar(e * e)); lk = la.clone().lerp(lb, e); fov = lerp(ca.f, cb.f, e) }
+    else if (u < .5) { const w = (u / .5) ** 2, dir = la.clone().sub(pa).normalize(); pos = pa.clone().addScaledVector(dir, w * 7); lk = la.clone().addScaledVector(dir, w * 7); fov = ca.f + w * 10 }
+    else { const w = (1 - (u - .5) / .5) ** 2, dir = lb.clone().sub(pb).normalize(); pos = pb.clone().addScaledVector(dir, -w * 7); lk = lb.clone().addScaledVector(dir, -w * 7); fov = cb.f + w * 10 } }
+  let quat = mira(pos, lk);
   if (T.s.shake) { const a = T.s.shake; pos.x += Math.sin(t * 23) * a + Math.sin(t * 37) * a * .5; pos.y += Math.sin(t * 29 + 1) * a }
   pos.x += Math.sin(t * 1.3) * .015; pos.y += Math.sin(t * 1.7 + 1) * .012;   // cámara en mano, muy suave
   cam.position.copy(pos); cam.quaternion.copy(quat); if (cam.fov !== fov) { cam.fov = fov; cam.updateProjectionMatrix() } }
+
 
 // ---------- la escena en cada instante
 function setScene(t) {
@@ -1190,14 +1304,16 @@ function setScene(t) {
   if (L === I.stepped) ciervoPose(W, t, { x: 6, y: 0, z: -44 + k * 3, paso: .6, baja: .5 });
   if (L === I.back) ciervoPose(W, t, { x: 5, y: 0, z: -46 - k * 14, ry: Math.PI, paso: 1 });
   if (L === I.home) ciervoPose(W, t, { x: -20, y: 20, z: -150 + k * 20, paso: 1.2, ry: .2 });
-  if (L === I.lay || L === I.breath) ciervoPose(W, t, { x: 17, y: ALT(17, 20) - 1, z: 20, ry: -.4, echado: 1, gira: L === I.breath ? .5 : .2, baja: .3, aliento: L === I.breath ? 1 : .4 });
+  if (L === I.lay || L === I.breath) ciervoPose(W, t, { x: 22, y: ALT(22, 24) - 1, z: 24, ry: -.9, echado: 1, gira: L === I.breath ? .5 : .2, baja: .3, aliento: L === I.breath ? 1 : .4 });
   if (L === I.last) ciervoPose(W, t, { x: 6, y: 0, z: 82, ry: Math.PI, baja: .1 });
   // el ojo en la ventana y el cuerno en el techo
-  if ([I.window, I.saw, I.stopped].includes(L)) { OJO.visible = true; OJO.position.set(...IN([0, 3, 7.5 - (L === I.window ? eOut(k) * 1.2 : 1.2)])); const parp = L === I.stopped && k > .5 ? P(k, .5, .8) * .6 : 0; OJO.userData.sup.rotation.x = parp; OJO.userData.ojo.material.emissiveIntensity = L === I.stopped ? .7 - k * .4 : .7 }
+  if ([I.window, I.saw, I.stopped].includes(L)) { OJO.visible = true; OJO.position.set(...IN([0, 3, 8.9 + (L === I.window ? (1 - eOut(k)) * 2 : 0)])); const parp = L === I.stopped && k > .5 ? P(k, .5, .8) * .6 : 0; OJO.userData.sup.rotation.x = parp; OJO.userData.ojo.material.emissiveIntensity = L === I.stopped ? .7 - k * .4 : .7 }
   if (L >= I.roof && L <= I.stopped) { ASTA_T.visible = L !== I.stopped || k < .5; CASA_IN.userData.agujero.visible = true; if (L === I.roof) ASTA_T.position.y = (1 - eOut(P(k, 0, .4))) * 3 } else CASA_IN.userData.agujero.visible = L > I.roof && L < I.gone;
+  TABLAS_ROTAS.forEach((m, i) => { const q = L === I.roof ? P(k, .1 + i * .02, .5 + i * .03) : 0; m.visible = L === I.roof && q > 0; m.position.set(600 + 2.6 + Math.sin(i * 2.3) * 1.4, 200 + 7 - q * q * 6.8, 600 + 1 + Math.cos(i * 1.7) * 1.2); m.rotation.set(q * 6 + i, i, q * 4) });
   // fuego de la chimenea: bajo, apagado, prendido
+  hogar(t, L === I.ilse ? .6 : L === I.fences ? .8 : (L === I.mila || L === I.badcold || L === I.out) ? 0 : (L >= I.lit && L <= I.morning) ? 1 : 0); humoP(t, lugar === "adentro" ? 0 : 1);
   fuegoChimenea(t, L === I.ilse ? .6 : L === I.fences ? .8 : (L === I.mila || L === I.badcold || L === I.out) ? 0 : (L >= I.lit && L <= I.morning) ? 1 : 0);
-  if (lugar === "adentro") { const fa = (L === I.mila || L === I.badcold || L === I.out) ? 0 : 1; LL.push([IN([-3, 1.4, -3]), 3.2 * fa * (.85 + .15 * Math.sin(t * 13)), "#ff9a40", 14]); LL.push([IN([0, 4, 5.6]), L === I.window || L === I.saw || L === I.stopped ? 2.5 : .9, "#bfe6ff", 10]) }
+  if (lugar === "adentro") { LUCES_IN.forEach((f, i) => i < 2 && LL.push([f.getWorldPosition(new THREE.Vector3()).toArray(), 1.6, "#ffc070", 9])); const fa = (L === I.mila || L === I.badcold || L === I.out) ? 0 : 1; LL.push([IN([-3, 1.4, -3]), 3.2 * fa * (.85 + .15 * Math.sin(t * 13)), "#ff9a40", 14]); LL.push([IN([0, 4, 5.6]), L === I.window || L === I.saw || L === I.stopped ? 2.5 : .9, "#bfe6ff", 10]) }
   if ([I.fell, I.calf, I.baby, I.swing].includes(L)) LL.push([[14, 5, 40], 2.4, "#bcd4ff", 16]);
   if (lugar !== "adentro" && !manana) FAROLES.forEach(f => LL.length < 4 && LL.push([f.localToWorld(new THREE.Vector3(0, 3.2, 0)).toArray(), 2.4, "#ffb060", 12]));
   // tazas que se caen del estante
@@ -1205,37 +1321,37 @@ function setScene(t) {
   // la cría: en el hueco del pino, después en los brazos, después en la cama al lado de Mila
   const cria = (x, y, z, ry = 0, eche = 1, tiembla = 0) => ciervoPose(CRIA, t, { x, y, z, ry, echado: eche, tiembla, baja: .4 });
   if (L === I.fell && k > .6 || L === I.calf || L === I.baby) cria(PINO[0], 1.0, PINO[1] + .2, -2.4, 1, 1);
-  if ([I.lit, I.shook, I.window, I.roof, I.saw, I.stopped].includes(L)) { const p = IN([3.2, 1.05, -1.4]); cria(p[0], p[1], p[2], Math.PI, 1, L === I.lit ? .5 : 0) }
+  if ([I.lit, I.shook, I.window, I.roof, I.saw, I.stopped].includes(L)) { const p = IN([2.9, .95, -.9]); cria(p[0], p[1], p[2], Math.PI, 1, L === I.lit ? .5 : 0) }
 
   switch (L) {
-    case I.hook: case I.swing: { placeW(ME, 14.4, 42.0, 1.0); ME.g.visible = true; setFace(ME, L === I.hook ? "terrified" : "determined"); attach(HACHA, ME, "R", [0, -.2, .2]); const sw = Math.sin(t * (L === I.hook ? 3 : 6)); pose(ME, t, { armFwd: 1.2 + sw * .6 }); ME.body.rotation.x = .2 + sw * .12; HACHA.rotation.set(.3 + sw * .5, 0, 0);
+    case I.hook: case I.swing: { placeW(ME, 13.2, 41.0, .75); ME.g.visible = true; setFace(ME, L === I.hook ? "terrified" : "determined"); attach(HACHA, ME, "R", [0, -.2, .2]); const sw = Math.sin(t * (L === I.hook ? 3 : 6)); pose(ME, t, { armFwd: 1.2 + sw * .6 }); ME.body.rotation.x = .2 + sw * .12; HACHA.rotation.set(.3 + sw * .5, 0, 0);
       if (L === I.swing) ASTILLAS.forEach((a, i) => { const q = (t * 1.5 + i / 24) % 1; a.visible = true; a.position.set(15.4 + q * (Math.sin(i) * 2), 1.4 + q * 2 - q * q * 3, 43 + q * Math.cos(i * 1.7) * 2); a.rotation.set(q * 9, i, q * 5) }); break }
-    case I.stood0: placeW(ME, 14.4, 42.0, 1.0); setFace(ME, "horrified"); attach(HACHA, ME, "R", [0, -.2, .2]); break;
+    case I.stood0: placeW(ME, 13.2, 41.0, .75); setFace(ME, "horrified"); attach(HACHA, ME, "R", [0, -.2, .2]); break;
     case I.rule: case I.valley: crowd([[FOLK[0], -1.6, -6, .4, "neutral", .8], [FOLK[3], 1.8, 6, Math.PI, "neutral", .8], [EXT[2], -6, 1.4, 1.6, "neutral", .8]]); break;
     case I.burn: crowd([[FOLK[2], -1.4, 8, Math.PI - .3, "neutral", .6]]); attach(TRINEO, FOLK[2], "R", [0, -.9, .6]); TRINEO.rotation.set(0, Math.PI, 0); pose(FOLK[2], t, { armFwd: .5, walk: .6 }); break;
     case I.sleds: crowd([[ME, -.8, 22, 0, "neutral", .9], [ME6, .8, 21, 0, "happy", .9], [EXT[0], 2.2, 19.5, .1, "happy", .9], [EXT[3], -2.2, 20, -.1, "neutral", .9]]); attach(TRINEO, ME, "R", [0, -1.0, -.8]); TRINEO.rotation.set(0, 0, 0); break;
     case I.watch: case I.antlers: case I.eyes: crowd([[FOLK[0], .6, -12, Math.PI, "worried"], [FOLK[4], -1.2, -13, Math.PI - .2, "scared"]]); break;
     case I.lantern: crowd([[FOLK[1], -1.5, -24.5, Math.PI, k > .55 ? "terrified" : "scared"]]); attach(LINTERNA, FOLK[1], "R", [0, -.2, .3]); pose(FOLK[1], t, { armFwd: .7 }); { const gl = P(k, .55, .75); LINT_GL.visible = gl < 1; LINT_GL.position.copy(LINTERNA.getWorldPosition(V3)); LINT_GL.material.opacity = .7 * (1 - gl); LINTERNA.children[0].material.emissiveIntensity = 2 * (1 - gl) } break;
     case I.buried: TRINEO.visible = true; if (TRINEO.parent !== scene) scene.add(TRINEO); TRINEO.position.set(-28, -.42, 28.4); TRINEO.rotation.set(.25, .6, .1); break;
-    case I.ilse: case I.fences: case I.badcold: placeIn(GARROW, -1.4, 0, -1.6, -2.4); GARROW.g.visible = true; setFace(GARROW, L === I.badcold ? "worried" : L === I.fences ? "sad" : "neutral"); pose(GARROW, t, { sit: L === I.ilse ? .5 : 0, armFwd: L === I.fences ? .8 : 0 }); if (L === I.ilse) GARROW.g.position.y -= .25;
+    case I.ilse: case I.fences: case I.badcold: placeIn(GARROW, -1.8, 0, -2.4, .8); GARROW.g.visible = true; setFace(GARROW, L === I.badcold ? "worried" : L === I.fences ? "sad" : "neutral"); pose(GARROW, t, { sit: L === I.ilse ? .5 : 0, armFwd: L === I.fences ? .8 : 0 }); if (L === I.ilse) GARROW.g.position.y -= .25;
       if (L !== I.ilse) { placeIn(ME6, 3.6, 1.35, -2.2, 0); ME6.body.rotation.x = -Math.PI / 2 + .05; setFace(ME6, "sleepy") } break;
     case I.mila: case I.out: placeIn(ME6, 3.6, 1.35, -2.2, 0); ME6.body.rotation.x = -Math.PI / 2 + .05; setFace(ME6, "sleepy"); placeIn(GARROW, 2.0, 0, -4.1, Math.PI / 2); setFace(GARROW, "worried"); pose(GARROW, t, { armFwd: .5 }); break;
     case I.axe: crowd([[ME, 2.4, 22.4, -2.2, "determined"]]); attach(HACHA, ME, "R", [0, -.2, .2]); pose(ME, t, { lift: .3 }); break;
-    case I.oldest: { const q = eIO(k); placeW(ME, lerp(11, 14.4, q), lerp(34, 42, q), .5); ME.g.visible = true; setFace(ME, "determined"); attach(HACHA, ME, "R", [0, -.2, .2]); pose(ME, t, { walk: 1 }); break }
-    case I.fell: case I.calf: placeW(ME, 14.0, 41.0, .8); setFace(ME, L === I.calf ? "shock" : "scared"); attach(HACHA, ME, "R", [0, -.2, .2]); break;
-    case I.baby: placeW(ME, 14.0, 41.0, .8); setFace(ME, "shock"); break;
+    case I.oldest: { const q = eIO(k); placeW(ME, lerp(10.5, 13.2, q), lerp(34, 41, q), .5); ME.g.visible = true; setFace(ME, "determined"); attach(HACHA, ME, "R", [0, -.2, .2]); pose(ME, t, { walk: 1 }); break }
+    case I.fell: case I.calf: placeW(ME, 13.0, 40.6, .75); setFace(ME, L === I.calf ? "shock" : "scared"); attach(HACHA, ME, "R", [0, -.2, .2]); break;
+    case I.baby: placeW(ME, 13.0, 40.6, .75); setFace(ME, "shock"); break;
     case I.stood: break;
     case I.brask: placeW(PIM, 6.2, -37.8, -2.4); setFace(PIM, "determined"); attach(HACHA, PIM, "R", [0, -.2, .2]); { const sw = Math.sin(t * 6); pose(PIM, t, { armFwd: 1.2 + sw * .6 }); PIM.body.rotation.x = .2 + sw * .12; HACHA.rotation.set(.3 + sw * .5, 0, 0) } break;
     case I.quiet: case I.shaking: crowd([[FOLK[3], 1.4, -8, Math.PI, "scared"], [EXT[1], -1, -10, Math.PI, "terrified"]]); break;
     case I.taller: case I.stepped: crowd([[FOLK[3], .8, -4, 0, "panic", 1.4], [EXT[1], -.8, -6, 0, "panic", 1.4]]); break;
-    case I.home: { const q = eOut(k); placeW(ME, lerp(12, 4.5, q), lerp(30, 20, q), -2.5); ME.g.visible = true; setFace(ME, "panic"); correr(ME, t); const p = KW(ME, [0, 1.6, .5])(); ciervoPose(CRIA, t, { x: p[0], y: p[1] - .5, z: p[2], ry: -2.5, echado: 1 }); break }
+    case I.home: { const q1 = eIO(P(k, 0, .62)), q2 = P(k, .62, .95); if (k < .62) { placeW(ME, lerp(12, 1.0, q1), lerp(30, 18.2, q1), Math.atan2(1 - 12, 18.2 - 30)); correr(ME, t) } else { const ry = lerp(Math.atan2(1 - 12, 18.2 - 30), Math.PI / 2, P(k, .62, .7)); placeW(ME, lerp(1.0, 4.2, q2), 18.2, ry); pose(ME, t, { walk: 1 }); if (q2 > .85) ME.g.visible = false } ME.g.visible = ME.g.visible && k < .95; setFace(ME, "panic"); const p = KW(ME, [Math.sin(ME.g.rotation.y) * 1.0, 1.3, Math.cos(ME.g.rotation.y) * 1.0])(); ciervoPose(CRIA, t, { x: p[0], y: p[1] - .5, z: p[2], ry: ME.g.rotation.y, echado: 1 }); pose(ME, t, { armFwd: 1 }); break }
     case I.lit: case I.shook: case I.window: case I.roof: case I.saw: case I.stopped:
       placeIn(ME6, 3.6, 1.35, -2.2, 0); ME6.body.rotation.x = -Math.PI / 2 + .05; setFace(ME6, L === I.lit ? "sleepy" : "scared"); placeIn(ME, -.6, 0, -2.8, Math.PI); setFace(ME, { [I.lit]: "worried", [I.shook]: "terrified", [I.window]: "horrified", [I.roof]: "terrified", [I.saw]: "scared", [I.stopped]: "shock" }[L]); if (L >= I.window) ME.g.rotation.y = 0;
       placeIn(GARROW, -.6, 0, -2.6, .6); setFace(GARROW, L >= I.shook ? "terrified" : "worried"); pose(GARROW, t, { cover: L >= I.window ? .6 : 0 }); break;
     case I.lay: case I.breath: break;
-    case I.morning: placeIn(ME6, 3.6, 1.0, -2.2, 0); setFace(ME6, "laugh"); pose(ME6, t, { sit: 1, laugh: 1 }); ME6.g.position.y += .55; placeIn(ME, 2.0, 0, -1.4, 1.2); setFace(ME, "happy"); placeIn(GARROW, 1.0, 0, -2.6, 1.4); setFace(GARROW, "relieved"); break;
+    case I.morning: placeIn(ME6, 3.6, 1.0, -1.4, 0); setFace(ME6, "laugh"); pose(ME6, t, { sit: 1, laugh: 1 }); ME6.g.position.y += .55; placeIn(ME, 2.0, 0, -1.4, 1.2); setFace(ME, "happy"); placeIn(GARROW, 1.0, 0, -2.6, 1.4); setFace(GARROW, "relieved"); break;
     case I.gone: break;
-    case I.pile: PILA.visible = true; PILA.position.set(1.6, ALT(1.6, 18), 18); PILA.scale.setScalar(1.25); crowd([[ME, -.4, 19.6, Math.PI / 2 + .4, "shock"], [ME6, -.6, 18.2, Math.PI / 2, "excited"]]); break;
+    case I.pile: PILA.visible = true; PILA.position.set(1.6, ALT(1.6, 18), 18); PILA.scale.setScalar(1.25); crowd([[ME, -1.6, 21.0, Math.PI / 2 + .4, "shock"], [ME6, -1.8, 22.4, Math.PI / 2 + .6, "excited"]]); break;
     case I.last: PILA.visible = true; PILA.position.set(1.6, ALT(1.6, 18), 18); PILA.scale.setScalar(1.25); crowd([[ME, .2, 20.6, .3, "warm"], [ME6, -.8, 20.2, .2, "happy"]]); break;
   }
   if (L === I.stood0) { const p = TS(-6, 0, -24)(); }

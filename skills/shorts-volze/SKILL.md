@@ -82,6 +82,20 @@ anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.c
   - **Tema que le gusta**: un **monstruo que acecha al pueblo y se enoja por algo**; el narrador hace justo eso que lo
     enoja, **con un motivo** (salvar a alguien), y el monstruo también tiene **su motivo** para enojarse, que se revela
     al final.
+  - **Transiciones como el Short de referencia del dueño** (youtube.com/shorts/s2oIgA4z9BY, medido 25-nov-2026): la
+    cámara **viaja por el mundo** de una toma a la siguiente en ≈ 0,7–1,4 s (sube en arco por encima de los techos si
+    está lejos, el punto donde mira se desliza, desenfoque de movimiento); en los cuadros del medio se ve el entorno real,
+    nunca un borrón abstracto ni un corte. Entre lugares distintos, la cámara entra volando hacia adelante y sale desde
+    atrás. Hecho en `videos/pinos/partes/_camara_vuelo.js` (`TR = .8`).
+  - **Sin primeros planos** (25-nov-2026): siempre se ven las cabezas enteras (plano medio mínimo: `shF` con distancia
+    ≥ 3,4 → 3,0).
+  - **Nada superpuesto**: ni personajes metidos en paredes, troncos o muebles, ni el hacha dentro del árbol, ni la
+    cámara adentro de algo, ni un ojo que atraviese la pared. El revisor y yo lo chequeamos en cada hoja de tomas.
+  - **Ultradetalle en todo** (objetos, estructuras, materiales, plantas, árboles, fondo, animales): nada plano ni
+    vacío. Adentro de las casas, paredes con luz y cosas (faroles, estantes, frascos, hierbas, cuadros, cortinas); el
+    fuego con profundidad (hogar, troncos, brasas, chispas); ojos de criaturas ultra detallados (iris con fibras,
+    venitas, córnea mojada, párpados escamosos); los viejos con arrugas y los ojos siempre visibles bajo gorros.
+  - **Entrar a una casa**: el personaje da la vuelta y entra por la puerta (nunca aparece adentro de golpe).
   - **Transiciones lentas y que se noten** (25-nov-2026): que se vea que es una transición y no un corte: barrido de
     ≈ 0,5 s con la cámara girando y desenfoque fuerte (`WHIP = .5`, `WC = .5`, giro ≈ 1,4 rad), también al cambiar de
     lugar. Nunca un corte seco.
