@@ -29,3 +29,7 @@ cortó un pino y el Watcher le pisó la cabaña. Hoy la hermana Mila se congela;
 adentro estaba la cría del Watcher (su motivo para enojarse). El Watcher rompe el techo, ve a su cría al calor junto a
 Mila, se acuesta alrededor de la cabaña y los calienta. Giro: «My whole life, the Watcher watched us. Last night, it
 watched over us.» Primer video con transiciones de 0,5 s.
+v3 (25-nov-2026, pedidos del dueño): pueblo al nivel del valle (antes quedaba sobre el lomo de la tortuga: «una cúpula»),
+pinos y arbustos con ramas, ramitas y nieve en cada rama, techo de adentro tabla por tabla con hastiales cerrados y un
+agujero real por donde entra el cuerno, ropa estampada estilo Volze, transiciones que viajan por encima del pueblo y
+entran/salen de la cabaña por la ventana (`_camara_vuelo.js`), y planos abiertos sin primeros planos.

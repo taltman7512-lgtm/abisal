@@ -209,7 +209,7 @@ const COSTA = new THREE.Group(); scene.add(COSTA); COSTA.position.set(-110, 0, 0
 
 // ---------- la tortuga (todo cuelga de TURT: si se inclina, se hunde o gira, el pueblo va con ella)
 const TURT = new THREE.Group(); scene.add(TURT);
-const SA = 34, SB = 27, SH = 11, RIM = 5;                                   // caparazón: semiejes en z y x, alto, altura del borde sobre el agua
+const SA = 34, SB = 27, SH = .3, RIM = .06;                                   // caparazón: semiejes en z y x, alto, altura del borde sobre el agua
 const SY = (x, z) => { const q = 1 - (x / SB) ** 2 - (z / SA) ** 2; return RIM + SH * Math.pow(Math.max(0, q), .62) };   // altura del caparazón en (x, z)
 // caparazón pintado a mano: escudos irregulares (celdas con borde torcido), anillos de crecimiento, rayones, liquen,
 // algas y percebes hacia el borde; arriba, el pueblo con tierra, matas de pasto y calles de piedras sueltas (cada una distinta)
@@ -640,6 +640,8 @@ NUBE.forEach(s => s.visible = false); ROPA3.forEach(m => m.visible = false);
 // pasto, flores, hiedra y algas no van en invierno (todo lo verde del lomo)
 TURT.traverse(o => { if ((o.isInstancedMesh || o.isMesh) && o.material && o.material.color && !o.material.map) { const c = o.material.color; if (c.g > c.r * 1.15 && c.g > c.b) o.visible = false } if (o.isInstancedMesh && o.material && !o.material.map) o.visible = false });
 GALLINAS.forEach(g => g.visible = false);
+// v3: sin el costado ni el borde del lomo (el pueblo está al nivel del valle); sin percebes
+TURT.children.forEach(o => { if (o.material && o.material.map === T_LADO) o.visible = false; if (o.isInstancedMesh && o.geometry === GEO_PERCEBE) o.visible = false });
 const T_LLAMA = tex(128, 256, (g, w, h) => { const gr = g.createRadialGradient(w / 2, h * .72, 4, w / 2, h * .62, h * .55); gr.addColorStop(0, "rgba(255,250,220,1)"); gr.addColorStop(.25, "rgba(255,200,80,.95)"); gr.addColorStop(.55, "rgba(255,110,20,.6)"); gr.addColorStop(1, "rgba(160,30,0,0)"); g.fillStyle = gr; g.beginPath(); g.moveTo(w / 2, 0); g.bezierCurveTo(w * 1.05, h * .45, w, h, w / 2, h); g.bezierCurveTo(0, h, -w * .05, h * .45, w / 2, 0); g.fill() });
 const T_TRAMA = tex(256, 256, (g, w, h) => { g.fillStyle = "#808080"; g.fillRect(0, 0, w, h); for (let y = 0; y < h; y += 4) { g.fillStyle = y % 8 ? "rgba(255,255,255,.18)" : "rgba(0,0,0,.2)"; g.fillRect(0, y, w, 2) } for (let x = 0; x < w; x += 4) { g.fillStyle = x % 8 ? "rgba(255,255,255,.12)" : "rgba(0,0,0,.15)"; g.fillRect(x, 0, 2, h) } }, [4, 4]);
 // ---------- nieve: el piso del valle, el lomo pintado de nieve con huellas y senderos, y los techos nevados
@@ -684,13 +686,35 @@ const GEO_PISO = (() => { const geo = new THREE.ConeGeometry(1, 1, 18, 4, true),
 const M_AGUJAS = new THREE.MeshStandardMaterial({ color: "#6a9a78", emissive: "#0e1e16", roughness: .9, side: THREE.DoubleSide, map: tex(256, 256, (g, w, h) => { const r = rng(1232); g.fillStyle = "#2a4a34"; g.fillRect(0, 0, w, h); for (let k = 0; k < 1500; k++) { g.strokeStyle = r() < .5 ? "rgba(10,30,20,.6)" : "rgba(80,120,80,.4)"; g.lineWidth = 1.5; const x = r() * w, y = r() * h; g.beginPath(); g.moveTo(x, y); g.lineTo(x + (r() - .5) * 6, y + 10); g.stroke() } }, [4, 2]) });
 const M_NIEVE_P = new THREE.MeshStandardMaterial({ color: "#f2f6fc", roughness: .8, bumpMap: T_NIEVE.z, bumpScale: 2 });
 const GEO_CAPNIEVE = (() => { const geo = new THREE.ConeGeometry(1, 1, 18, 3, true), p = geo.attributes.position; const r = rng(1233); for (let i = 0; i < p.count; i++) { const a = Math.atan2(p.getZ(i), p.getX(i)), k = .9 + Math.sin(a * 5 + 2) * .12 + r() * .05; p.setX(i, p.getX(i) * k); p.setZ(i, p.getZ(i) * k) } geo.computeVertexNormals(); return geo })();
+// v3 (pedido del dueño: ultradetalle en los árboles): cada piso del pino es un abanico de ramas que caen (13 ramas con
+// ramitas a los costados), con un relleno oscuro adentro y un terrón de nieve sobre cada rama. Se unen en una sola malla.
+const mergeG = list => { const gs = list.map(([g, m]) => { const q = g.index ? g.toNonIndexed() : g.clone(); q.applyMatrix4(m); return q }); const n = gs.reduce((a, q) => a + q.attributes.position.count, 0);
+  const pos = new Float32Array(n * 3), nor = new Float32Array(n * 3), uv = new Float32Array(n * 2); let o = 0; gs.forEach(q => { pos.set(q.attributes.position.array, o * 3); nor.set(q.attributes.normal.array, o * 3); if (q.attributes.uv) uv.set(q.attributes.uv.array, o * 2); o += q.attributes.position.count });
+  const G = new THREE.BufferGeometry(); G.setAttribute("position", new THREE.BufferAttribute(pos, 3)); G.setAttribute("normal", new THREE.BufferAttribute(nor, 3)); G.setAttribute("uv", new THREE.BufferAttribute(uv, 2)); return G };
+const MZ = (p, dir, s) => new THREE.Matrix4().compose(p, new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.clone().normalize()), s);
+const [GEO_PISO2, GEO_NIEVE2] = (() => { const r = rng(1235), ver = [], nie = [], cono = new THREE.ConeGeometry(1, 1, 5, 2), bola = new THREE.IcosahedronGeometry(1, 1);
+  { const p = bola.attributes.position; for (let i = 0; i < p.count; i++) { const k = .8 + r() * .35; p.setXYZ(i, p.getX(i) * k, p.getY(i) * k, p.getZ(i) * k) } bola.computeVertexNormals() }
+  ver.push([new THREE.ConeGeometry(.62, 1, 12, 1, true), new THREE.Matrix4().makeTranslation(0, .05, 0)]);
+  const N = 13; for (let i = 0; i < N; i++) { const a = i / N * 6.283 + (r() - .5) * .25, L = .95 + r() * .2, ca = Math.cos(a), sa = Math.sin(a);
+    const s0 = new THREE.Vector3(ca * .08, .42, sa * .08), e = new THREE.Vector3(ca * L, -.42 - r() * .12, sa * L), d = e.clone().sub(s0), len = d.length();
+    // la rama: un cono largo con la punta hacia afuera y un poco hacia abajo (la base gruesa pegada al tronco)
+    ver.push([cono, MZ(s0.clone().addScaledVector(d, .5), d.clone().negate(), new THREE.Vector3(.15, len, .15))]);
+    // ramitas a los costados, en dos alturas
+    for (const q of [.4, .7]) for (const sd of [-1, 1]) { const b = s0.clone().addScaledVector(d, q), tg = new THREE.Vector3(-sa * sd, -.35, ca * sd).add(d.clone().normalize().multiplyScalar(.6)), ll = .32 - q * .12; ver.push([cono, MZ(b.clone().addScaledVector(tg.clone().normalize(), ll / 2), tg.clone().negate(), new THREE.Vector3(.07, ll, .07))]) }
+    // nieve encima de la rama: dos terrones alargados
+    for (const q of [.35, .7]) { const b = s0.clone().addScaledVector(d, q); b.y += .07; nie.push([bola, MZ(b, d, new THREE.Vector3(.11 - q * .04, len * .2, .09))]) } }
+  nie.push([bola, new THREE.Matrix4().compose(new THREE.Vector3(0, .42, 0), new THREE.Quaternion(), new THREE.Vector3(.16, .1, .16))]);
+  return [mergeG(ver), mergeG(nie)] })();
 const PINOS = (() => { const N = 1400, tr = new THREE.InstancedMesh(new THREE.CylinderGeometry(.18, .32, 1, 8), M_CORTEZA_P, N), pi = new THREE.InstancedMesh(GEO_PISO, M_AGUJAS, N * 4), ni = new THREE.InstancedMesh(GEO_CAPNIEVE, M_NIEVE_P, N * 4);
-  [tr, pi, ni].forEach(m => { m.castShadow = true; m.receiveShadow = true; scene.add(m) }); const r = rng(1240), lista = []; let n = 0, np = 0;
+  const pi2 = new THREE.InstancedMesh(GEO_PISO2, M_AGUJAS, 3600), ni2 = new THREE.InstancedMesh(GEO_NIEVE2, M_NIEVE_P, 3600); let n2 = 0; const cc = new THREE.Color();
+  [tr, pi, ni, pi2, ni2].forEach(m => { m.castShadow = true; m.receiveShadow = true; scene.add(m) }); const r = rng(1240), lista = []; let n = 0, np = 0;
   const pon = (x, z, H) => { const y = 0; dummy.rotation.set(0, r() * 6, 0); dummy.position.set(x, y + H * .2, z); dummy.scale.set(H * .05 + .2, H * .4, H * .05 + .2); dummy.updateMatrix(); tr.setMatrixAt(n, dummy.matrix);
+    if (Math.hypot(x, z) < 135 && n2 < 3600 - 7) { const T = 7; for (let k = 0; k < T; k++) { const q = k / (T - 1), rr = H * (.3 - q * .22), hh = H * (.17 - q * .06), yy = y + H * (.2 + q * .62); dummy.rotation.set((r() - .5) * .05, r() * 6, (r() - .5) * .05); dummy.position.set(x, yy, z); dummy.scale.set(rr, hh, rr); dummy.updateMatrix(); pi2.setMatrixAt(n2, dummy.matrix); ni2.setMatrixAt(n2, dummy.matrix); pi2.setColorAt(n2, cc.set("#ffffff").multiplyScalar(.75 + r() * .4)); n2++ }
+      dummy.rotation.set(0, 0, 0); dummy.position.set(x, y + H * .9, z); dummy.scale.set(H * .05, H * .14, H * .05); dummy.updateMatrix(); pi.setMatrixAt(np, dummy.matrix); dummy.position.y += H * .03; dummy.scale.set(H * .04, H * .1, H * .04); dummy.updateMatrix(); ni.setMatrixAt(np, dummy.matrix); np++; lista.push([x, z, H]); n++; return }
     for (let k = 0; k < 4; k++) { const q = k / 4, rr = H * (.26 - q * .055), hh = H * (.34 - q * .04), yy = y + H * (.22 + q * .2) + hh / 2; dummy.rotation.set((r() - .5) * .06, r() * 6, (r() - .5) * .06); dummy.position.set(x, yy, z); dummy.scale.set(rr, hh, rr); dummy.updateMatrix(); pi.setMatrixAt(np, dummy.matrix);
       dummy.position.set(x, yy + hh * .1, z); dummy.scale.set(rr * .92, hh * .8, rr * .92); dummy.updateMatrix(); ni.setMatrixAt(np, dummy.matrix); np++ } lista.push([x, z, H]); n++ };
   for (let k = 0; k < 6000 && n < N; k++) { const a = r() * 6.283, d = 38 + Math.pow(r(), .7) * 260, x = Math.cos(a) * d * 1.05, z = Math.sin(a) * d * 1.2; if ((x - 12) ** 2 + (z - 37) ** 2 < 100 || (x - 16) ** 2 + (z - 44) ** 2 < 49 || (x - 3) ** 2 + (z - 49) ** 2 < 36 || (x - 4) ** 2 + (z + 38) ** 2 < 64 || (x + 28) ** 2 + (z - 28) ** 2 < 36 || (x - 6) ** 2 + (z - 46) ** 2 < 30) continue; pon(x, z, 9 + r() * 12 + (d > 120 ? 6 : 0)) }
-  tr.count = n; pi.count = ni.count = np; return lista })();
+  tr.count = n; pi.count = ni.count = np; pi2.count = ni2.count = n2; return lista })();
 // el pino más viejo: gris, hueco, enorme, en el borde del bosque (del lado de nuestra cabaña)
 const VIEJO = new THREE.Group(); scene.add(VIEJO); VIEJO.position.set(16, 0, 44);
 { const tg = new THREE.CylinderGeometry(1.6, 2.6, 30, 24, 8, true), p = tg.attributes.position; for (let i = 0; i < p.count; i++) { const a = Math.atan2(p.getZ(i), p.getX(i)), k = 1 + Math.sin(a * 7 + p.getY(i) * .3) * .08; p.setX(i, p.getX(i) * k); p.setZ(i, p.getZ(i) * k) } tg.computeVertexNormals();
@@ -698,6 +722,7 @@ const VIEJO = new THREE.Group(); scene.add(VIEJO); VIEJO.position.set(16, 0, 44)
   const hueco = part(new THREE.CircleGeometry(1.5, 20), SM("#120a06"), 0, 1.8, 2.45, VIEJO.userData.tronco, 0); hueco.scale.set(.8, 1.4, 1);
   for (let k = 0; k < 6; k++) { const ra = part(new THREE.CylinderGeometry(.12, .3, 7, 6), mg, 0, 14 + k * 2.4, 0, VIEJO.userData.tronco, 0); ra.rotation.set(0, k * 1.9, 1.1 + (k % 2) * .3); ra.translateY(3) }
   const toc = part(new THREE.CylinderGeometry(2.6, 2.9, 1.2, 24), mg, 0, .6, 0, VIEJO, 0); const tapa = part(new THREE.CircleGeometry(2.55, 24), SM("#c9a878", { roughness: .9 }), 0, 1.22, 0, VIEJO, 0); tapa.rotation.x = -Math.PI / 2; VIEJO.userData.tapa = tapa; tapa.visible = false;
+  { const mv = new THREE.MeshStandardMaterial({ color: "#8a9a88", roughness: .95, map: M_AGUJAS.map, side: THREE.DoubleSide }); for (let k = 0; k < 7; k++) { const q = k / 6, rr = 7.5 - q * 5, hh = 3.4 - q * 1.2, y = 14 + q * 16; const a = part(GEO_PISO2, mv, 0, y, 0, VIEJO.userData.tronco, 0); a.scale.set(rr, hh, rr); a.rotation.y = k * 1.3; const n = part(GEO_NIEVE2, M_NIEVE_P, 0, y, 0, VIEJO.userData.tronco, 0); n.scale.set(rr, hh, rr); n.rotation.y = k * 1.3 } }
   const nidoMusgo = part(new THREE.SphereGeometry(1.2, 16, 10, 0, 6.283, 0, 1.4), SM("#4a6a3a", { roughness: 1 }), 0, 1.2, 1.2, VIEJO.userData.tronco, 0) }
 // el tocón de Brask en la plaza (nadie se sienta)
 const TOCON = new THREE.Group(); enConcha(TOCON, -2.6, 2.2, 0, 0); { const mg = SMt(T_CORTEZA, { bumpMap: T_CORTEZA, bumpScale: 4 }); part(new THREE.CylinderGeometry(.9, 1.1, 1.1, 18), mg, 0, .5, 0, TOCON, 0); const an = part(new THREE.CircleGeometry(.88, 18), SMt(tex(256, 256, (g, w, h) => { g.fillStyle = "#c9a878"; g.fillRect(0, 0, w, h); for (let k = 1; k < 14; k++) { g.strokeStyle = "rgba(110,70,30,.6)"; g.lineWidth = 2; g.beginPath(); g.arc(128, 128, k * 9 + Math.sin(k) * 2, 0, 7); g.stroke() } })), 0, 1.06, 0, TOCON, 0); an.rotation.x = -Math.PI / 2;
@@ -717,7 +742,7 @@ function copos(t, c, fuerza = 1) { const p = COPOS.geometry.attributes.position.
   for (let k = 0; k < b.length / 4; k++) { const v = b[k * 4 + 3]; p[k * 3] = c.x + md(b[k * 4] - c.x + t * 1.2 + Math.sin(t * .7 + k) * 1.5 + 60, 120) - 60; p[k * 3 + 1] = c.y - 25 + md(b[k * 4 + 1] - t * 2.4 * v, 60); p[k * 3 + 2] = c.z + md(b[k * 4 + 2] - c.z + 60, 120) - 60 }
   COPOS.geometry.attributes.position.needsUpdate = true }
 // faroles con vela en las calles y ventanas cálidas (de noche)
-const FAROLES = [[-3.4, 9], [3.4, -6], [-3.4, -16], [3.4, 11.5], [8, 2.2], [-9, 2.2]].map(([x, z]) => { const g = new THREE.Group(); enConcha(g, x, z); part(new THREE.CylinderGeometry(.07, .1, 3, 8), SM("#1a1a1e", { metalness: .5 }), 0, 1.5, 0, g, 0); const vid = part(RB(.4, .5, .4, .05), new THREE.MeshStandardMaterial({ color: "#ffe0a0", emissive: "#ffb050", emissiveIntensity: 2.2 }), 0, 3.2, 0, g, 0); const gl = glowSprite("#ffb060", 2.2); gl.material.opacity = .55; g.userData.gl = gl; return g });
+const FAROLES = [[-3.0, 13.4], [3.4, -6], [-3.4, -16], [3.4, 11.5], [8, 2.2], [-9, 2.2]].map(([x, z]) => { const g = new THREE.Group(); enConcha(g, x, z); part(new THREE.CylinderGeometry(.07, .1, 3, 8), SM("#1a1a1e", { metalness: .5 }), 0, 1.5, 0, g, 0); const vid = part(RB(.4, .5, .4, .05), new THREE.MeshStandardMaterial({ color: "#ffe0a0", emissive: "#ffb050", emissiveIntensity: 2.2 }), 0, 3.2, 0, g, 0); const gl = glowSprite("#ffb060", 2.2); gl.material.opacity = .55; g.userData.gl = gl; return g });
 
 // ---------- el Watcher: ciervo gigante de corteza y musgo, con cuernos más anchos que el río y ojos pálidos
 const T_PELO_C = (() => { const [c, z] = pintarDoble(1024, 1024, (c, z, w, h) => { const r = rng(1300); c.fillStyle = "#3a3026"; c.fillRect(0, 0, w, h); z.fillStyle = "#808080"; z.fillRect(0, 0, w, h);
@@ -799,11 +824,21 @@ const PILA = new THREE.Group(); scene.add(PILA); { const r = rng(1510); for (let
 M_GABLE.forEach(m => { m.side = THREE.DoubleSide; m.needsUpdate = true });
 // ---------- humo de las chimeneas (cálido, sube y se tuerce con el viento)
 function humoP(t, f = 1) { HUMO_PTS.forEach((c, i) => { c.updateMatrixWorld(true); const o = new THREE.Vector3(0, 1.4, 0).applyMatrix4(c.matrixWorld); for (let k = 0; k < 4; k++) { const s = HUMO[i * 4 + k], q = (t * .22 + k / 4 + i * .13) % 1; s.visible = f > 0; s.position.set(o.x + q * 3 + Math.sin(t + k) * .3, o.y + q * 6, o.z + q * 1.2); s.scale.setScalar(1 + q * 4); s.material.opacity = (1 - q) * .32 * f; s.material.color.set("#c8ccd4") } }) }
+// ---------- arbustos ultradetallados (v3): ramitas de madera que salen del piso, racimos de hojitas de pino irregulares y
+// terrones de nieve encima, todo en una sola malla por material
+const LIBRE_PJ = [[6.2, -37.8, 6], [2, -42.5, 6], [12.6, 40.3, 7], [16, 44, 6], [-28, 28.4, 4], [12, 37, 7], [7, 35, 4], [19.5, 39, 4], [10.5, 36.5, 4], [-26, -62, 14], [12, -32, 5]];
+const M_ARB = new THREE.MeshStandardMaterial({ color: "#ffffff", roughness: .9, map: tex(256, 256, (g, w, h) => { const r = rng(1702); g.fillStyle = "#2a4430"; g.fillRect(0, 0, w, h); for (let k = 0; k < 2200; k++) { const x = r() * w, y = r() * h, a = r() * 6.28; g.strokeStyle = r() < .5 ? "rgba(12,30,18,.7)" : `rgba(${70 + r() * 40 | 0},${110 + r() * 40 | 0},${70 + r() * 30 | 0},.55)`; g.lineWidth = 1.4; g.beginPath(); g.moveTo(x, y); g.lineTo(x + Math.cos(a) * 7, y + Math.sin(a) * 7); g.stroke() } }, [2, 2]) });
+const GEO_ARB = (() => { const r = rng(1701), ver = [], nie = [], pal = [], bola = new THREE.IcosahedronGeometry(1, 2), cono = new THREE.ConeGeometry(1, 1, 5, 1);
+  { const p = bola.attributes.position; for (let i = 0; i < p.count; i++) { const x = p.getX(i), y = p.getY(i), z = p.getZ(i), k = .78 + .22 * Math.abs(Math.sin(x * 9 + z * 7)) + (r() - .5) * .12; p.setXYZ(i, x * k, y * k, z * k) } bola.computeVertexNormals() }
+  for (let i = 0; i < 11; i++) { const a = r() * 6.283, d = r() * .55, y = .3 + r() * .45, s = .26 + r() * .2; ver.push([bola, new THREE.Matrix4().compose(new THREE.Vector3(Math.cos(a) * d, y, Math.sin(a) * d), new THREE.Quaternion(), new THREE.Vector3(s, s * .85, s))]);
+    if (y > .5 || i % 3 === 0) nie.push([bola, new THREE.Matrix4().compose(new THREE.Vector3(Math.cos(a) * d, y + s * .55, Math.sin(a) * d), new THREE.Quaternion(), new THREE.Vector3(s * .8, s * .32, s * .8))]) }
+  for (let i = 0; i < 9; i++) { const a = r() * 6.283, dir = new THREE.Vector3(Math.cos(a) * .7, 1, Math.sin(a) * .7), L = .7 + r() * .4; pal.push([cono, MZ(dir.clone().normalize().multiplyScalar(L / 2), dir, new THREE.Vector3(.025, L, .025))]) }
+  return [mergeG(ver), mergeG(nie), mergeG(pal)] })();
 // ---------- utilería de pueblo nevado: leña apilada con nieve, barriles con tapa de nieve, cercas de troncos, coronas en las
 // puertas, faroles en las ventanas, un muñeco de nieve, rocas y arbustos nevados, cuervos en los techos, huellas
 { const r = rng(1700), leña = new THREE.InstancedMesh(new THREE.CylinderGeometry(.13, .13, 1.4, 8), M_CORTEZA_P, 600), tapa = new THREE.InstancedMesh(new THREE.CylinderGeometry(.13, .13, .02, 8), SM("#c9a878", { roughness: .9 }), 1200), nie = new THREE.InstancedMesh(RB(1, .2, 1, .08), M_NIEVE_P, 80);
   [leña, tapa, nie].forEach(m => { m.castShadow = m.receiveShadow = true; TURT.add(m) }); let nl = 0, nt = 0, nn = 0;
-  [...CASAS, NUESTRA, ESCUELA, PANADERIA].forEach((H, hi) => { H.g.updateMatrix(); const Wd = H.Wd ?? 6.4, Dp = H.Dp ?? 6.2, lado = hi % 2 ? 1 : -1;
+  [...CASAS, NUESTRA, ESCUELA, PANADERIA].forEach((H, hi) => { if (!H.g.visible) return; H.g.updateMatrix(); const Wd = H.Wd ?? 6.4, Dp = H.Dp ?? 6.2, lado = hi % 2 ? 1 : -1;
     for (let f = 0; f < 4; f++) for (let c = 0; c < 6; c++) { const lx = lado * (Wd / 2 + .3), lz = -Dp / 2 + .8 + c * .28 + (f % 2) * .14, ly = .15 + f * .25; V3.set(lx, 0, lz).applyMatrix4(H.g.matrix); const y = SY(V3.x, V3.z) + ly; dummy.position.set(V3.x, y, V3.z); dummy.rotation.set(Math.PI / 2, H.g.rotation.y, 0); dummy.scale.set(1, 1, 1); dummy.updateMatrix(); if (nl < 600) leña.setMatrixAt(nl++, dummy.matrix);
       for (const e of [-.7, .7]) { const v = new THREE.Vector3(lx + lado * 0, 0, lz).applyMatrix4(H.g.matrix); const off = new THREE.Vector3(Math.cos(H.g.rotation.y) * e, 0, -Math.sin(H.g.rotation.y) * e); dummy.position.set(v.x + off.x, y, v.z + off.z); dummy.rotation.set(0, H.g.rotation.y, Math.PI / 2); dummy.updateMatrix(); if (nt < 1200) tapa.setMatrixAt(nt++, dummy.matrix) } }
     { const v = new THREE.Vector3(lado * (Wd / 2 + .3), 0, -Dp / 2 + 1.5).applyMatrix4(H.g.matrix); dummy.position.set(v.x, SY(v.x, v.z) + 1.15, v.z); dummy.rotation.set(0, H.g.rotation.y, 0); dummy.scale.set(.8, 1, 1.8); dummy.updateMatrix(); nie.setMatrixAt(nn++, dummy.matrix) }
@@ -811,10 +846,12 @@ function humoP(t, f = 1) { HUMO_PTS.forEach((c, i) => { c.updateMatrixWorld(true
     const co = part(new THREE.TorusGeometry(.32, .1, 8, 20), M_AGUJAS, H.door ?? 0, 2.6, 3.36, H.g, 0); part(new THREE.SphereGeometry(.08, 8, 6), SM("#b8302a"), (H.door ?? 0), 2.32, 3.45, H.g, 0) });
   leña.count = nl; tapa.count = nt; nie.count = nn;
   // rocas y arbustos nevados al borde de la loma y en el bosque
-  const roca = new THREE.InstancedMesh(new THREE.DodecahedronGeometry(1, 1), SMt(T_CORTEZA, { color: "#7a7a80", roughness: 1 }), 160), capa = new THREE.InstancedMesh(new THREE.SphereGeometry(1, 12, 6, 0, 6.283, 0, 1.3), M_NIEVE_P, 160), arb = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1, 1), M_AGUJAS, 220), arbn = new THREE.InstancedMesh(new THREE.SphereGeometry(1, 10, 6, 0, 6.283, 0, 1.1), M_NIEVE_P, 220);
-  [roca, capa, arb, arbn].forEach(m => { m.castShadow = m.receiveShadow = true; scene.add(m) });
-  for (let k = 0; k < 160; k++) { const a = r() * 6.283, d = 30 + r() * 60, x = Math.cos(a) * d, z = Math.sin(a) * d * 1.2, s = .5 + r() * 1.6; dummy.position.set(x, s * .3, z); dummy.rotation.set(r(), r() * 6, r()); dummy.scale.set(s * 1.3, s * .8, s); dummy.updateMatrix(); roca.setMatrixAt(k, dummy.matrix); dummy.position.y = s * .75; dummy.rotation.set(0, r() * 6, 0); dummy.scale.set(s * 1.2, s * .4, s * .9); dummy.updateMatrix(); capa.setMatrixAt(k, dummy.matrix) }
-  for (let k = 0; k < 220; k++) { const a = r() * 6.283, d = 32 + r() * 50, x = Math.cos(a) * d, z = Math.sin(a) * d * 1.2, s = .6 + r() * 1.1; dummy.position.set(x, s * .7, z); dummy.rotation.set(0, r() * 6, 0); dummy.scale.set(s, s * .8, s); dummy.updateMatrix(); arb.setMatrixAt(k, dummy.matrix); dummy.position.y = s * 1.1; dummy.scale.set(s * .95, s * .5, s * .95); dummy.updateMatrix(); arbn.setMatrixAt(k, dummy.matrix) }
+  const roca = new THREE.InstancedMesh(new THREE.DodecahedronGeometry(1, 1), SMt(T_CORTEZA, { color: "#7a7a80", roughness: 1 }), 160), capa = new THREE.InstancedMesh(new THREE.SphereGeometry(1, 12, 6, 0, 6.283, 0, 1.3), M_NIEVE_P, 160), arb = new THREE.InstancedMesh(GEO_ARB[0], M_ARB, 220), arbn = new THREE.InstancedMesh(GEO_ARB[1], M_NIEVE_P, 220), arbr = new THREE.InstancedMesh(GEO_ARB[2], M_CORTEZA_P, 220);
+  // nada de utilería donde se paran los personajes ni donde está la cámara (pedido del dueño: Brask quedaba adentro de un arbusto)
+  const libreP = (x, z) => LIBRE_PJ.every(([a, b, rr]) => (a - x) ** 2 + (b - z) ** 2 > rr * rr);
+  [roca, capa, arb, arbn, arbr].forEach(m => { m.castShadow = m.receiveShadow = true; scene.add(m) });
+  let nro = 0; for (let k = 0; k < 160; k++) { const a = r() * 6.283, d = 30 + r() * 60, x = Math.cos(a) * d, z = Math.sin(a) * d * 1.2, s = .5 + r() * 1.6; if (!libreP(x, z)) continue; const k0 = k; k = nro++; dummy.position.set(x, s * .3, z); dummy.rotation.set(r(), r() * 6, r()); dummy.scale.set(s * 1.3, s * .8, s); dummy.updateMatrix(); roca.setMatrixAt(k, dummy.matrix); dummy.position.y = s * .75; dummy.rotation.set(0, r() * 6, 0); dummy.scale.set(s * 1.2, s * .4, s * .9); dummy.updateMatrix(); capa.setMatrixAt(k, dummy.matrix); k = k0 } roca.count = capa.count = nro;
+  let nb = 0; for (let k = 0; k < 220; k++) { const a = r() * 6.283, d = 32 + r() * 50, x = Math.cos(a) * d, z = Math.sin(a) * d * 1.2, s = .6 + r() * 1.1; if (!libreP(x, z)) continue; dummy.position.set(x, 0, z); dummy.rotation.set(0, r() * 6, 0); dummy.scale.set(s, s * (.8 + r() * .3), s); dummy.updateMatrix(); arb.setMatrixAt(nb, dummy.matrix); arbn.setMatrixAt(nb, dummy.matrix); arbr.setMatrixAt(nb, dummy.matrix); arb.setColorAt(nb, new THREE.Color("#ffffff").multiplyScalar(.7 + r() * .45)); nb++ } arb.count = arbn.count = arbr.count = nb;
   // cerca de troncos con nieve encima alrededor de la plaza
   const poste = new THREE.InstancedMesh(new THREE.CylinderGeometry(.09, .11, 1.3, 8), M_CORTEZA_P, 90), riel = new THREE.InstancedMesh(new THREE.CylinderGeometry(.06, .06, 1.6, 6), M_CORTEZA_P, 180), pn = new THREE.InstancedMesh(new THREE.SphereGeometry(.13, 8, 4, 0, 6.283, 0, 1.4), M_NIEVE_P, 90);
   [poste, riel, pn].forEach(m => { m.castShadow = true; TURT.add(m) }); let np = 0, nr = 0;
@@ -825,6 +862,11 @@ function humoP(t, f = 1) { HUMO_PTS.forEach((c, i) => { c.updateMatrixWorld(true
   const mu = new THREE.Group(); enConcha(mu, 4.4, -2.6, -.6); [[.7, .6], [.5, 1.6], [.36, 2.35]].forEach(([rr, y]) => part(new THREE.SphereGeometry(rr, 20, 14), M_NIEVE_P, 0, y, 0, mu, 0)); part(new THREE.ConeGeometry(.06, .35, 8), SM("#e07020"), 0, 2.35, .5, mu, 0).rotation.x = Math.PI / 2; for (const s of [-1, 1]) part(new THREE.SphereGeometry(.04, 8, 6), SM("#111"), s * .12, 2.45, .33, mu, 0); part(new THREE.TorusGeometry(.42, .08, 8, 18), SM("#b8302a", { bumpMap: T_TRAMA, bumpScale: 3 }), 0, 2.05, 0, mu, 0).rotation.x = Math.PI / 2; for (const s of [-1, 1]) part(new THREE.CylinderGeometry(.03, .04, .9, 5), M_CORTEZA_P, s * .7, 1.75, 0, mu, 0).rotation.z = s * 1.0;
   // cuervos en los techos
   const neg = SM("#121216", { roughness: .4 }); [[CASAS[2], -1], [CASAS[5], 1], [CASAS[0], .5], [ESCUELA, -.5], [NUESTRA, 1.4]].forEach(([H, x], i) => { const c = new THREE.Group(); H.g.add(c); c.position.set(x, (H.Hh ?? 5) + 2.55, 0); part(RB(.22, .22, .4, .08), neg, 0, 0, 0, c, 0); part(RB(.16, .16, .16, .05), neg, 0, .14, .2, c, 0); part(new THREE.ConeGeometry(.04, .14, 4), SM("#2a2a2a"), 0, .13, .33, c, 0).rotation.x = Math.PI / 2; c.rotation.y = i * 1.3 }) }
+{ const r = rng(1799); for (let k = 0; k < 14; k++) { const m = part(new THREE.CylinderGeometry(.05 + r() * .05, .08 + r() * .05, 1.2 + r() * 1.6, 6), M_CORTEZA_P, -28 + (r() - .5) * 6, .15, 28.4 + (r() - .5) * 6, scene, 0); m.rotation.set(1.2 + r() * .5, r() * 6, (r() - .5) * .6); const n = part(new THREE.SphereGeometry(.35 + r() * .4, 10, 6, 0, 6.283, 0, 1.4), M_NIEVE_P, m.position.x + (r() - .5), 0, m.position.z + (r() - .5), scene, 0); n.scale.y = .45 } }
+// afuera de la ventana de adentro: nieve, cerca y pinos (al cruzar la ventana se ve el pueblo, no un vacío)
+{ const G = CASA_IN, r = rng(1798); const pl = part(new THREE.PlaneGeometry(80, 60), M_NIEVE, 0, -.02, 35, G, 0); pl.rotation.x = -Math.PI / 2;
+  for (let k = 0; k < 18; k++) { let x = (r() - .5) * 60; const z = 14 + r() * 40, H = 9 + r() * 10; if (Math.abs(x) < 6 && z < 26) x += x < 0 ? -7 : 7; part(new THREE.CylinderGeometry(.25, .4, H * .4, 8), M_CORTEZA_P, x, H * .2, z, G, 0); for (let j = 0; j < 6; j++) { const q = j / 5, rr = H * (.3 - q * .22), hh = H * (.17 - q * .06), y = H * (.2 + q * .62); part(GEO_PISO2, M_AGUJAS, x, y, z, G, 0).scale.set(rr, hh, rr); part(GEO_NIEVE2, M_NIEVE_P, x, y, z, G, 0).scale.set(rr, hh, rr) } }
+  for (let k = 0; k < 8; k++) part(new THREE.CylinderGeometry(.08, .1, 1.2, 6), M_CORTEZA_P, -6 + k * 1.7, .6, 9, G, 0); part(new THREE.CylinderGeometry(.05, .05, 12, 6), M_CORTEZA_P, 0, .9, 9, G, 0).rotation.z = Math.PI / 2 }
 // ---------- árboles pelados con nieve en las ramas (variedad entre los pinos)
 { const r = rng(1750), M_RAMA = SMt(T_CORTEZA, { color: "#8a8078", roughness: 1 }), geo = new THREE.CylinderGeometry(.5, 1, 1, 6);
   const ramas = new THREE.InstancedMesh(geo, M_RAMA, 1600), nev = new THREE.InstancedMesh(new THREE.CylinderGeometry(.45, .9, 1, 6, 1, false, 0, Math.PI), M_NIEVE_P, 1600); [ramas, nev].forEach(m => { m.castShadow = true; scene.add(m) }); let n = 0;
@@ -889,6 +931,31 @@ function construirOjo() { [...OJO.children].forEach(c => OJO.remove(c)); const G
   for (const s of [-1, 1]) { const p = part(new THREE.TorusGeometry(1.85, .5, 14, 40, Math.PI), M_ESC, 0, s * .15, -1.5, G, 0); p.rotation.set(0, 0, s > 0 ? 0 : Math.PI); p.scale.set(1.15, .7, 1); OJO.userData[s > 0 ? "sup" : "inf"] = p } }
 // ---------- el cuerno que rompe el techo: astillas de tablas y nieve que entra
 const TABLAS_ROTAS = Array.from({ length: 10 }, (_, k) => { const m = part(new THREE.BoxGeometry(.15, .04, .9), M_PLANK, 0, 0, 0, CASA_IN, 0); m.visible = false; return m });
+// ---------- v3: techo de adentro de verdad (pedido del dueño: «rellená la parte que no está rellena»): tablas una por una
+// en tres tramos, los dos hastiales triangulares cerrados con troncos, cumbrera, cabios y un agujero real sobre la cama
+CASA_IN.userData.techo.visible = false; CASA_IN.userData.agujero.visible = false;
+const HUECO_TECHO = [];
+{ const G = CASA_IN, r = rng(1790), mw = SMt(T_TRONCOS(1501), { bumpMap: T_TRONCOS(1501), bumpScale: 4 }), M_TAB = [0, 1, 2].map(i => SMt(tex(512, 128, (g, w, h) => { const rr = rng(1791 + i); vetas(g, rr, 0, 0, w, h, ["#6a4a2e", "#5a3e26", "#74502e"][i], false); g.fillStyle = "rgba(0,0,0,.35)"; g.fillRect(0, 0, w, 4); g.fillRect(0, h - 4, w, 4); for (let k = 0; k < 3; k++) { g.fillStyle = "#1a1410"; g.beginPath(); g.arc(rr() * w, h / 2, 5, 0, 7); g.fill() } }), { bumpScale: 2, roughness: .85 }));
+  const ang = .5, sl = 6.8;
+  for (const s of [-1, 1]) { const lado = new THREE.Group(); lado.position.set(s * 3, 7.6, 0); lado.rotation.z = -s * ang; G.add(lado);
+    for (let i = 0; i < 24; i++) { const z = -5.3 + .22 + i * .4425; for (let j = 0; j < 3; j++) { const x = -sl / 2 + sl / 6 + j * sl / 3, m = part(RB(sl / 3 - .03, .12, .42, .02), M_TAB[(i + j) % 3], x, (r() - .5) * .03, z, lado, 0); m.rotation.y = (r() - .5) * .01;
+      if (s > 0 && z > -3.4 && z < -.3 && j === 1) HUECO_TECHO.push(m) } }
+    // tejas de madera por arriba (para que desde el agujero se vea el espesor) y cabios por abajo
+    part(new THREE.BoxGeometry(sl, .08, 10.6), SM("#2a1c12"), 0, .1, 0, lado, 0).userData.tapa = s;
+    for (const z of [-4.6, -2.3, 0, 2.3, 4.6]) part(new THREE.BoxGeometry(sl, .22, .22), M_BEAM, 0, -.17, z, lado, 0) }
+  // la capa de arriba tiene su propio hueco: se arma en dos tiras cuando el techo se rompe
+  G.children.filter(o => o.isGroup && o.children.some(c => c.userData.tapa === 1)).forEach(lado => { const t = lado.children.find(c => c.userData.tapa === 1); t.visible = false; for (const [z0, z1] of [[-5.3, -3.4], [-.3, 5.3]]) part(new THREE.BoxGeometry(sl, .08, z1 - z0), SM("#2a1c12"), 0, .1, (z0 + z1) / 2, lado, 0); for (const x of [-sl / 2 + sl / 6, sl / 2 - sl / 6]) { const m = part(new THREE.BoxGeometry(sl / 3, .08, 3.1), SM("#2a1c12"), x, .1, -1.85, lado, 0) } const tapaH = part(new THREE.BoxGeometry(sl / 3, .08, 3.1), SM("#2a1c12"), 0, .1, -1.85, lado, 0); HUECO_TECHO.push(tapaH) });
+  // hastiales: triángulo de troncos atrás y adelante (antes se veía el cielo por ahí)
+  const tri = new THREE.Shape(); tri.moveTo(-6.2, 0); tri.lineTo(6.2, 0); tri.lineTo(0, 3.35); tri.closePath();
+  for (const z of [-4.82, 4.82]) { const geo = new THREE.ShapeGeometry(tri); const p = geo.attributes.position, uv = geo.attributes.uv; for (let i = 0; i < p.count; i++) uv.setXY(i, (p.getX(i) + 6.2) / 12.4 * 2, p.getY(i) / 6 * 1); const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ map: mw.map, bumpMap: mw.map, bumpScale: 4, side: THREE.DoubleSide, roughness: .9 })); m.position.set(0, 6, z); m.receiveShadow = true; G.add(m) }
+  part(new THREE.BoxGeometry(.4, .4, 10.6), M_BEAM, 0, 9.15, 0, G, 0);
+  // astillas que cuelgan del borde del agujero (se ven solo cuando está roto)
+  CASA_IN.userData.astillas = Array.from({ length: 12 }, (_, k) => { const m = part(new THREE.BoxGeometry(.06, .7 + r() * .6, .14), M_TAB[k % 3], 0, 0, 0, G, 0); const z = -3.4 + r() * 3.1, x = k % 2 ? 1.9 : 4.1; m.position.set(x + (r() - .5) * .3, 7.6 - (x - 3) * .55 - .4, z); m.rotation.set((r() - .5) * .6, 0, (r() - .5) * .8); m.visible = false; return m }) }
+// el cuerno de verdad (copia del cuerno del Watcher) que entra por el agujero, y la nieve que cae sobre la cama
+const ASTA_REAL = (() => { const orig = WATCHER.cabeza.children.find(c => c.isGroup && c.children.length > 3); const g = orig.clone(); g.scale.setScalar(.9); const piv = new THREE.Group(); piv.add(g); CASA_IN.add(piv); piv.visible = false; g.rotation.set(Math.PI * .85, 0, .3); const v = new THREE.Vector3(-1, .9, -.3).normalize().applyEuler(g.rotation); g.position.copy(v.multiplyScalar(-11 * .9 + 1.9)); piv.position.set(3.1, 7.4, -1.85); return piv })();
+const NIEVE_IN = Array.from({ length: 60 }, () => { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: GLOW, color: "#ffffff", transparent: true, opacity: .9, depthWrite: false })); s.scale.setScalar(.09); s.visible = false; CASA_IN.add(s); return s });
+function techoRoto(t, roto, q = 1) { HUECO_TECHO.forEach(m => m.visible = !roto); CASA_IN.userData.astillas.forEach(m => m.visible = roto);
+  NIEVE_IN.forEach((s, i) => { const u = (t * .45 + i / 60) % 1; s.visible = roto && q > .2 && lineAt(t) === I.roof; s.position.set(2.2 + ((i * .618) % 1) * 2.4 + Math.sin(t * 2 + i) * .15, 7 - u * 6, -3 + ((i * .37) % 1) * 2.6) }) }
 
 // ---------- elenco: diseños propios de bloques (nada del protagonista de Volze ni marcas)
 const ME = kid({ skin: "#e8b48c", shirt: "#d1872e", cloth: "plain", pants: "#3a4a5a", shoes: "#4a3020", hair: "#3a2416", style: "despeinado" });
@@ -1104,17 +1171,22 @@ function cocinero(k) { const bl = SM("#f6f3ec", { roughness: .8, bumpMap: T_TELA
   part(RB(.94, .6, .04, .03), SM("#e9e2d2", { roughness: .85, bumpMap: T_TELA, bumpScale: 1.4 }), 0, 1.3, .285, b, 0);      // delantal
   part(RB(.3, .18, .02, .01), SM("#d9d0bc"), .12, 1.22, .31, b, 0); part(RB(1.08, .05, .56, .01), SM("#d9d0bc"), 0, 1.58, 0, b, 0) }
 
+// v3 (pedido del dueño): ropa como la de Volze: bloques lisos con un estampado claro que se lee de lejos (rayas, lunares,
+// guarda nórdica, cuadros), sin botones ni bolsillos 3D encima
+{ const ct0 = clothTex, CT = {}; clothTex = (kind, base, alt = "#ffffff", back = false) => { if (kind !== "nordico" && kind !== "lunares") return ct0(kind, base, alt, back); const key = [kind, base, alt, back].join(); return CT[key] ||= tex(256, 256, (g, w, h) => { g.fillStyle = base; g.fillRect(0, 0, w, h);
+    if (kind === "lunares") { g.fillStyle = alt; for (let y = 18, f = 0; y < h; y += 42, f++) for (let x = f % 2 ? 40 : 18; x < w; x += 46) { g.beginPath(); g.arc(x, y, 9, 0, 7); g.fill() } }
+    if (kind === "nordico") { g.fillStyle = alt; g.fillRect(0, 64, w, 10); g.fillRect(0, 150, w, 10); for (let x = 0; x < w; x += 32) { g.beginPath(); g.moveTo(x + 16, 84); g.lineTo(x + 30, 112); g.lineTo(x + 16, 140); g.lineTo(x + 2, 112); g.closePath(); g.fill(); g.fillStyle = base; g.fillRect(x + 13, 109, 6, 6); g.fillStyle = alt } for (let x = 8; x < w; x += 16) { g.fillRect(x, 44, 6, 6); g.fillRect(x + 8, 172, 6, 6) } g.fillRect(0, 236, w, 20) } }) } }
 // ---------- elenco nuevo de Hollowpine (diseños propios, ropa de invierno): el narrador (campera roja, gorro tejido azul con
 // pompón, bufanda amarilla), Mila (campera verde, gorro blanco, trenzas), la abuela Ilse (pañuelo en la cabeza, chal violeta,
 // anteojos), Brask el leñador (barba castaña, camisa escocesa roja y negra, gorro oscuro) y vecinos con gorros de piel
-robloxify(ME, { skin: "#f0c8a0", shirt: "#b8302a", pants: "#2e3a4a", shoes: "#3a2418", pelo: ["liso", "#6a4024"] });
-robloxify(ME6, { skin: "#f2d0b0", shirt: "#3f7a4a", pants: "#5a4a6a", shoes: "#5a3018", pelo: ["trenzas", "#c98a3a"] });
-robloxify(GARROW, { skin: "#e8c0a0", shirt: "#6a3a6a", cloth: "sweater", alt: "#c9b48a", pants: "#3a3236", pelo: ["rodete", "#d8d4cc"] });
+robloxify(ME, { skin: "#f0c8a0", shirt: "#b8302a", cloth: "nordico", alt: "#f4ecdc", pants: "#2e3a4a", shoes: "#3a2418", pelo: ["liso", "#6a4024"] });
+robloxify(ME6, { skin: "#f2d0b0", shirt: "#3f7a4a", cloth: "lunares", alt: "#f6f2e6", pants: "#5a4a6a", shoes: "#5a3018", pelo: ["trenzas", "#c98a3a"] });
+robloxify(GARROW, { skin: "#e8c0a0", shirt: "#7a4a8a", cloth: "cardigan", alt: "#c9b48a", pants: "#3a3236", pelo: ["rodete", "#d8d4cc"] });
 robloxify(PIM, { skin: "#d8a880", shirt: "#a8282a", cloth: "plaid", alt: "#1a1a1a", pants: "#3a3a42", pelo: ["corto", "#5a3a20"] });
 robloxify(QUILL, { skin: "#f0c6a0", shirt: "#4a4a5a", pants: "#2e2e3a", pelo: ["corto", "#9a9a9a"] });
-FOLK.forEach((k, i) => robloxify(k, { skin: ["#c98e64", "#f2cfae", "#e8b48c", "#efc8a8", "#8a5a3c", "#f2cfae"][i], shirt: ["#5a4a3a", "#2e5a7a", "#7a3a2a", "#4a5a3a", "#8a6a3a", "#3a3a5a"][i], cloth: ["plain", "sweater", "plaid", "plain", "sweater", "plain"][i], alt: "#d9c7a0", pants: ["#3a3236", "#3a3f4a", "#3a2f28", "#3a3236", "#2e3a59", "#2a2420"][i], pelo: [["corto", "#2b211b"], ["melena", "#6b3f22"], ["liso", "#c9a06a"], ["rodete", "#9a9a9a"], ["rulos", "#1d1a17"], ["puntas", "#7a4a2a"]][i] }));
-EXT.forEach((k, i) => robloxify(k, { skin: ["#efc8a8", "#8a5a3c", "#f2cfae", "#c98e64"][i], shirt: ["#6a2a3a", "#3a6a5a", "#a87a2a", "#3a4a6a"][i], pants: ["#3a3f4a", "#3a2f28", "#2e3a59", "#2a2420"][i], pelo: [["liso", "#3a2416"], ["rulos", "#1d1a17"], ["trenzas", "#8a5a2a"], ["corto", "#5a3a22"]][i] }));
-[ME, ME6, GARROW, PIM, QUILL, ...FOLK, ...EXT].forEach(k => telaReal(k, { shirt: k === ME ? "#b8302a" : k === ME6 ? "#3f7a4a" : k === GARROW ? "#6a3a6a" : k === PIM ? "#a8282a" : "#5a4a3a", pants: "#2e3a4a", botones: true, bolsillo: k !== ME6, cinto: k === PIM }));
+FOLK.forEach((k, i) => robloxify(k, { skin: ["#c98e64", "#f2cfae", "#e8b48c", "#efc8a8", "#8a5a3c", "#f2cfae"][i], shirt: ["#5a4a3a", "#2e5a7a", "#7a3a2a", "#4a5a3a", "#8a6a3a", "#3a3a5a"][i], cloth: ["stripes", "hoodie", "plaid", "jacket", "twotone", "stripes"][i], alt: ["#e8dcc0", "#d9c7a0", "#1a1a1a", "#f2c41e", "#c9a040", "#f4f4f4"][i], pants: ["#3a3236", "#3a3f4a", "#3a2f28", "#3a3236", "#2e3a59", "#2a2420"][i], pelo: [["corto", "#2b211b"], ["melena", "#6b3f22"], ["liso", "#c9a06a"], ["rodete", "#9a9a9a"], ["rulos", "#1d1a17"], ["puntas", "#7a4a2a"]][i] }));
+EXT.forEach((k, i) => robloxify(k, { skin: ["#efc8a8", "#8a5a3c", "#f2cfae", "#c98e64"][i], shirt: ["#6a2a3a", "#3a6a5a", "#a87a2a", "#3a4a6a"][i], cloth: ["lunares", "stripes", "hoodie", "jacket"][i], alt: "#f2ece0", pants: ["#3a3f4a", "#3a2f28", "#2e3a59", "#2a2420"][i], pelo: [["liso", "#3a2416"], ["rulos", "#1d1a17"], ["trenzas", "#8a5a2a"], ["corto", "#5a3a22"]][i] }));
+// (telaReal sacado en v3: los botones y bolsillos 3D recargaban la ropa)
 // gorros tejidos con pompón, de piel, bufandas, pañuelo, chal y anteojos
 const gorroTejido = (k, col, pom = "#f2ece0") => { const m = SM(col, { roughness: 1, bumpMap: T_TRAMA, bumpScale: 4 }); [...k.head.children].forEach(c => { if (c.userData.pelo && c.position.y > .55) k.head.remove(c) });
   part(new THREE.CylinderGeometry(.42, .44, .3, 24), m, 0, .66, 0, k.head, 0); const cop = part(new THREE.SphereGeometry(.42, 24, 12, 0, 6.283, 0, Math.PI / 2), m, 0, .8, 0, k.head, 0); cop.scale.y = .8;
@@ -1166,7 +1238,7 @@ const ALT = (x, z) => ((x / SB) ** 2 + (z / SA) ** 2 < 1) ? SY(x, z) : 0;   // a
 const placeW = (k, x, z, ry = 0) => { k.g.visible = true; k.g.position.set(x, ALT(x, z), z); k.g.rotation.set(0, ry, 0) };
 const IN = o => [600 + o[0], 200 + o[1], 600 + o[2]];
 const placeIn = (k, x, y, z, ry = 0) => { k.g.visible = true; k.g.position.set(600 + x, 200 + y, 600 + z); k.g.rotation.set(0, ry, 0) };
-const PINO = [16, 44], MONTE = [-30, 48, -220], LINDE = [0, 0, -78];
+const PINO = [16, 44], MONTE = [-30, 48, -220], LINDE = [-26, 0, -62];
 // el monte del Watcher (más cerca que la cordillera): un cono nevado donde está su cornisa
 { const geo = new THREE.ConeGeometry(100, 90, 14, 6), p = geo.attributes.position, r = rng(1600); for (let i = 0; i < p.count; i++) { const kk = 1 + (r() - .5) * .2; p.setX(i, p.getX(i) * kk); p.setZ(i, p.getZ(i) * kk) } geo.computeVertexNormals(); part(geo, new THREE.MeshStandardMaterial({ map: T_NIEVE.c, bumpMap: T_NIEVE.z, bumpScale: 6, roughness: .9 }), -30, 45, -262, scene, 0) }
 // el ojo enorme que se asoma por la ventana, y el cuerno que rompe el techo
@@ -1174,7 +1246,7 @@ const OJO = new THREE.Group(); scene.add(OJO); { part(new THREE.SphereGeometry(3
   for (const s of [-1, 1]) { const p = part(new THREE.TorusGeometry(1.35, .35, 10, 30, Math.PI), M_PELO_C, 0, s * .1, -1.9, OJO, 0); p.rotation.set(0, Math.PI, s > 0 ? 0 : Math.PI); OJO.userData[s > 0 ? "sup" : "inf"] = p } } OJO.visible = false; construirOjo();
 const ASTA_T = new THREE.Group(); CASA_IN.add(ASTA_T); { const cu = new THREE.CatmullRomCurve3([[6, 14, 4], [4, 10, 2.4], [2.6, 7.4, 1], [1.8, 5.6, .2]].map(q => new THREE.Vector3(...q))); part(new THREE.TubeGeometry(cu, 20, .45, 10), M_ASTA, 0, 0, 0, ASTA_T, 0); const c2 = new THREE.CatmullRomCurve3([[3.4, 9.2, 1.8], [2.4, 9.8, 3.2], [1.6, 9.6, 4]].map(q => new THREE.Vector3(...q))); part(new THREE.TubeGeometry(c2, 10, .25, 8), M_ASTA, 0, 0, 0, ASTA_T, 0) } ASTA_T.visible = false;
 // el pino que cortó Brask (en el recuerdo)
-const PINO_B = new THREE.Group(); scene.add(PINO_B); PINO_B.position.set(2, 0, -42.5); { part(new THREE.CylinderGeometry(.5, .8, 16, 12), M_CORTEZA_P, 0, 8, 0, PINO_B, 0); for (let k = 0; k < 4; k++) { const rr = 5 - k * 1, hh = 6 - k * .6, y = 5 + k * 3.4; part(GEO_PISO, M_AGUJAS, 0, y, 0, PINO_B, 0).scale.set(rr, hh, rr); part(GEO_CAPNIEVE, M_NIEVE_P, 0, y + hh * .1, 0, PINO_B, 0).scale.set(rr * .92, hh * .8, rr * .92) } }
+const PINO_B = new THREE.Group(); scene.add(PINO_B); PINO_B.position.set(2, 0, -42.5); { part(new THREE.CylinderGeometry(.5, .8, 16, 12), M_CORTEZA_P, 0, 8, 0, PINO_B, 0); for (let k = 0; k < 7; k++) { const q = k / 6, rr = 4.6 - q * 3.4, hh = 2.4 - q * .8, y = 6.5 + q * 10; part(GEO_PISO2, M_AGUJAS, 0, y, 0, PINO_B, 0).scale.set(rr, hh, rr); part(GEO_NIEVE2, M_NIEVE_P, 0, y, 0, PINO_B, 0).scale.set(rr, hh, rr) } }
 const ASTILLAS = Array.from({ length: 24 }, () => { const m = part(new THREE.BoxGeometry(.08, .03, .2), SM("#d8b888"), 0, 0, 0, scene, 0); m.visible = false; return m });
 
 
@@ -1193,53 +1265,53 @@ const KW = (k, o) => () => add(k.g.getWorldPosition(new THREE.Vector3()).toArray
 const OW = (obj, o) => () => { obj.updateMatrixWorld(true); return obj.localToWorld(new THREE.Vector3(...o)).toArray() };
 const CW = (o = [0, 0, 0]) => () => { WATCHER.G.updateMatrixWorld(true); return WATCHER.cabeza.localToWorld(new THREE.Vector3(...o)).toArray() };
 const INF = o => () => IN(o);
-const SHOTS = {
-  [I.hook]: [sh(0, [9, 3.2, 47], [9.6, 3.0, 46.4], [14.5, 2.4, 42], [16, 5, 44], 56)],
+const SHOTS = {   // v3: sin primeros planos, siempre con fondo y con lo que se cuenta a la vista
+  [I.hook]: [sh(0, [4.5, 5, 31.5], [5, 5, 32], [13.5, 4.5, 41.5], [18, 8, 46], 58)],
   [I.stood0]: [sh(0, [-40, 20, -60], [-41, 21, -64], CW([0, -8, 0]), CW([0, -6, 0]), 34)],
   [I.rule]: [sh(0, [-72, 56, 72], [-62, 50, 62], TS(0, 4, 0), TS(0, 4, 0), 50)],
-  [I.cost]: [sh(0, [2, 7, -50], [2, 8, -53], CW([0, -6, 0]), CW([0, -4, 0]), 56, { shake: .15 })],
+  [I.cost]: [sh(0, [8, 4, -38], [8, 4.6, -40], CW([0, -14, 0]), CW([0, -10, 0]), 60, { shake: .15 })],
   [I.valley]: [sh(0, [120, 64, 150], [104, 58, 132], [0, 10, 0], [0, 10, 0], 46)],
-  [I.burn]: [shF(0, FOLK[2], 5.0, 4.6, .3, .1, 56)],
-  [I.sleds]: [sh(0, TS(1.4, 2.4, 30.5), TS(1.0, 2.5, 29.5), TS(0, 1.2, 21), TS(0, 1.2, 23), 58)],
-  [I.watch]: [sh(0, TS(-12, 2.5, -24), TS(-12.4, 2.8, -26), [0, 36, -78], [0, 36, -78], 50)],
-  [I.antlers]: [sh(0, [-8, 42, -48], [-5, 44, -51], CW([0, 12, 0]), CW([0, 12, 0]), 54)],
-  [I.eyes]: [sh(0, [-8, 24, -28], [-8, 25, -31], CW([0, .7, 2]), CW([0, .7, 2]), 24)],
-  [I.lantern]: [shF(0, FOLK[1], 3.4, 3.0, -.6, .1, 62)],
-  [I.ilse]: [shF(0, GARROW, 3.4, 3.0, .5, .1, 60)],
-  [I.brask]: [sh(0, [9, 3.2, -30], [8.6, 3.0, -31], [6.2, 2, -37.8], [6.2, 2, -37.8], 56)],
-  [I.quiet]: [sh(0, [0, 7, -46], [0, 7.5, -50], [0, 9, -95], [0, 9, -95], 50)],
-  [I.shaking]: [sh(0, TS(0, 2.4, 3.5), TS(.3, 2.6, 4.5), TS(-6.8, 4.5, 9), TS(-6.8, 4.5, 9), 58, { shake: .25 })],
-  [I.taller]: [sh(0, TS(5, 1.6, -28), TS(4.6, 1.4, -27), [0, 40, -50], [0, 44, -48], 60, { shake: .12 })],
-  [I.stepped]: [sh(0, [-14, 26, -40], [-12, 24, -38], TS(6.8, 3, -18), TS(6.8, 2, -18), 52, { shake: .2 })],
-  [I.back]: [sh(0, TS(9, 3, -27), TS(9.4, 3.4, -25), [5, 28, -52], [4, 26, -62], 54)],
-  [I.stump]: [sh(0, TS(-.4, 2.0, 5.0), TS(-.9, 1.8, 4.2), TS(-2.6, .9, 2.2), TS(-2.6, .9, 2.2), 56)],
-  [I.doors]: [sh(0, OW(CASAS[4].g, [2.6, 2.4, 6.5]), OW(CASAS[4].g, [2.0, 2.4, 5.8]), OW(CASAS[4].g, [0, 2.4, 3.3]), null, 52)],
+  [I.burn]: [sh(0, TS(2.6, 2.6, 1.5), TS(2.4, 2.6, 2.2), KW(FOLK[2], [0, 1.6, 0]), null, 50)],
+  [I.sleds]: [sh(0, TS(-2.4, 3.4, 11), TS(-2.2, 3.5, 12), TS(0, 1.2, 22), TS(0, 1.4, 26), 54)],
+  [I.watch]: [sh(0, TS(2.6, 3, 6), TS(2.4, 3.2, 5.2), [-18, 20, -46], [-20, 22, -50], 60)],
+  [I.antlers]: [sh(0, TS(-1, 9, -2), TS(-1.4, 9.2, -3), CW([0, 6, 0]), CW([0, 8, 0]), 36)],
+  [I.eyes]: [sh(0, TS(-2, 9.3, -4), TS(-2.3, 9.4, -4.6), CW([0, -6, 2]), CW([0, -6, 2]), 62)],
+  [I.lantern]: [shF(0, FOLK[1], 6, 5.4, 2.7, 1.0, 54)],
+  [I.ilse]: [sh(0, INF([3.5, 2.6, 3.2]), INF([3.0, 2.5, 2.8]), INF([-1.8, 1.6, -2.4]), null, 56)],
+  [I.brask]: [sh(0, [10.5, 3.8, -45], [10.2, 3.7, -44.6], [3.4, 2.8, -41.5], null, 54)],
+  [I.quiet]: [sh(0, [-2, 14, -26], [-2, 14.5, -29], [0, 10, -100], null, 52)],
+  [I.shaking]: [sh(0, TS(2.8, 2.2, 4), TS(2.6, 2.3, 3.4), TS(-1, 2.2, -6), null, 56, { shake: .25 })],
+  [I.taller]: [sh(0, TS(3, 2.5, 6), TS(3, 2.4, 5), [0, 20, -46], [0, 24, -50], 62, { shake: .12 })],
+  [I.stepped]: [sh(0, [-50, 26, 30], [-48, 25, 28], [6, 16, -26], [6, 14, -24], 56, { shake: .2 })],
+  [I.back]: [sh(0, [30, 14, 22], [30.5, 14.4, 21], [5, 22, -50], [4, 22, -58], 58)],
+  [I.stump]: [sh(0, TS(2.5, 2.6, 7.5), TS(2.2, 2.5, 7), TS(-2.6, .8, 2.2), null, 52)],
+  [I.doors]: [sh(0, OW(CASAS[4].g, [2.6, 2.8, 9.2]), OW(CASAS[4].g, [2.0, 2.8, 8.6]), OW(CASAS[4].g, [0, 2.6, 3.3]), null, 50)],
   [I.winter]: [sh(0, [-40, 30, 52], [-36, 28, 46], TS(0, 6, 0), TS(0, 6, 0), 54)],
-  [I.buried]: [sh(0, [-24.5, 1.0, 25.6], [-25, 1.0, 26], [-28, .2, 28.4], null, 56)],
-  [I.fences]: [sh(0, INF([1.4, 2.2, 1.4]), INF([.8, 2.0, .6]), INF([-3, .9, -3.7]), null, 58)],
-  [I.mila]: [sh(0, INF([1.0, 2.4, 0.2]), INF([1.3, 2.3, -.2]), INF([3.6, 1.5, -2.2]), null, 54)],
-  [I.badcold]: [sh(0, INF([0.6, 2.5, 0.4]), INF([0.3, 2.4, 0.0]), INF([-1.6, 2.2, -2.2]), null, 58)],
-  [I.out]: [sh(0, INF([-1.2, 1.4, -1.2]), INF([-1.8, 1.2, -2.0]), INF([-3, .8, -3.8]), null, 56), sh(4, INF([0.4, 2.6, 0.8]), INF([0.7, 2.5, 0.4]), INF([3.4, 1.4, -2.4]), null, 52)],
-  [I.axe]: [shF(0, ME, 3.4, 3.0, .5, .1, 62)],
-  [I.oldest]: [sh(0, [6, 3, 34], [6.6, 3, 35], KW(ME, [0, 1.6, 0]), [14, 4, 42], 54)],
-  [I.swing]: [sh(0, [9.8, 2.8, 45.2], [10.2, 2.7, 45.4], [13.6, 1.8, 41.6], null, 54)],
-  [I.fell]: [sh(0, [18.5, 3.6, 35.5], [19, 3.8, 35], [13.5, 2, 41], [19, 3, 46], 58)],
-  [I.calf]: [sh(0, [14.2, 2.4, 41.6], [14.7, 2.1, 42.4], [16, 1.3, 44], null, 48)],
-  [I.baby]: [shF(0, ME, 3.4, 3.0, .3, 0, 66)],
-  [I.stood]: [sh(0, [-70, 52, -180], [-66, 54, -186], CW([0, -8, 0]), CW([0, -4, 0]), 48)],
+  [I.buried]: [sh(0, [-31, 1.6, 31.5], [-30.6, 1.5, 31.1], [-27, .3, 27.5], null, 56)],
+  [I.fences]: [sh(0, INF([2.6, 2.8, 3.2]), INF([2.2, 2.7, 2.8]), INF([-3, 1.2, -3.6]), null, 56)],
+  [I.mila]: [sh(0, INF([-1.2, 3.0, 1.6]), INF([-.8, 2.9, 1.2]), INF([3.6, 1.2, -2.2]), null, 54)],
+  [I.badcold]: [sh(0, INF([1.6, 2.8, 2.4]), INF([1.2, 2.7, 2.0]), INF([-1.8, 1.9, -2.4]), null, 54)],
+  [I.out]: [sh(0, INF([1.2, 2.4, -1.8]), INF([.9, 2.3, -2.0]), INF([-3, .9, -3.8]), null, 52), sh(4, INF([1.2, 2.8, .8]), INF([1.5, 2.7, .5]), INF([3.6, 1.3, -2.2]), null, 50)],
+  [I.axe]: [shF(0, ME, 6.5, 6, .5, .8, 52)],
+  [I.oldest]: [sh(0, [4, 4, 30], [5, 4, 31], KW(ME, [0, 1.4, 0]), [16, 8, 44], 54)],
+  [I.swing]: [sh(0, [5, 5, 46], [5.3, 5, 45.6], [14, 3, 42], null, 60)],
+  [I.fell]: [sh(0, [8, 5, 33], [8.4, 5, 33.4], [15, 2, 43], [18, 2, 44], 54)],
+  [I.calf]: [sh(0, [12.5, 4.6, 47.5], [12.7, 4.5, 47.3], () => CRIA.cuerpo.getWorldPosition(new THREE.Vector3()).toArray(), null, 42)],
+  [I.baby]: [shF(0, ME, 6, 5.6, .9, .6, 54)],
+  [I.stood]: [sh(0, [-80, 50, -170], [-77, 52, -176], CW([0, -14, 0]), CW([0, -10, 0]), 60)],
   [I.home]: [sh(0, TS(-2.6, 3.2, 25.5), TS(-2.2, 3.0, 24), KW(ME, [0, 1.4, 0]), TS(3.4, 1.6, 18), 56)],
-  [I.lit]: [sh(0, INF([0.6, 2.2, 1.6]), INF([0.9, 2.2, 1.2]), INF([3.4, 1.2, -1.8]), null, 58)],
-  [I.shook]: [sh(0, INF([0.5, 2.6, 0.5]), INF([0.7, 2.6, 0.1]), INF([3.8, 3.0, -4.4]), null, 58, { shake: .2 })],
-  [I.window]: [sh(0, INF([0, 2.6, -2.4]), INF([0, 2.8, -1.4]), INF([0, 3, 5]), null, 58, { shake: .06 })],
-  [I.roof]: [sh(0, INF([-2.6, 1.4, 3.0]), INF([-2.3, 1.4, 2.6]), INF([2.0, 5.5, 1.0]), null, 64, { shake: .15 })],
-  [I.saw]: [sh(0, INF([4.8, 2.4, -3.8]), INF([4.4, 2.3, -3.2]), INF([0, 3, 5]), null, 54)],
-  [I.stopped]: [sh(0, INF([0, 2.4, -.8]), INF([0, 2.5, -.3]), INF([0, 3, 7]), null, 54)],
-  [I.lay]: [sh(0, [-12, 34, 40], [-10, 30, 36], TS(10, 4, 19), TS(10, 4, 19), 52)],
-  [I.breath]: [sh(0, [-6, 26, 44], [-4, 24, 42], CW([0, -1, 6]), CW([0, 1, 9]), 54)],
-  [I.morning]: [sh(0, INF([3.0, 2.4, 1.8]), INF([3.1, 2.3, 1.4]), INF([3.6, 2.0, -1.4]), null, 60)],
-  [I.gone]: [sh(0, [11, 3.4, 37], [11.6, 3.2, 38], [16, 1, 44], [16, 1, 44], 54)],
-  [I.pile]: [sh(0, TS(-5.5, 3, 30), TS(-5.2, 3.4, 29), TS(1, 3, 18), TS(1, 4, 18), 58)],
-  [I.last]: [sh(0, TS(.4, 2.4, 22.5), [-34, 40, 66], TS(3, 2, 18), TS(3, 2, 18), 54)],
+  [I.lit]: [sh(0, INF([-1.6, 3.0, 3.6]), INF([-1.3, 2.9, 3.2]), INF([2.6, 1.4, -2.2]), null, 60)],
+  [I.shook]: [sh(0, INF([-1, 2.8, 1.8]), INF([-.7, 2.8, 1.4]), INF([3.2, 2.6, -4]), null, 54, { shake: .2 })],
+  [I.window]: [sh(0, INF([3.4, 3.2, -2.6]), INF([3.2, 3.2, -2.0]), INF([0, 3, 5]), null, 56, { shake: .06 })],
+  [I.roof]: [sh(0, INF([-4.6, 2.4, 3.8]), INF([-4.2, 2.5, 3.3]), INF([2.6, 4.6, -1.6]), null, 62, { shake: .15 }), sh(6, INF([-3.6, 3.6, 3.6]), INF([-3.3, 3.5, 3.2]), INF([3.4, 1.6, -2]), null, 52)],
+  [I.saw]: [sh(0, INF([4.4, 3.4, -4.4]), INF([4.2, 3.4, -4.1]), INF([1.6, 2.2, 4]), null, 66)],
+  [I.stopped]: [sh(0, INF([2.6, 2.8, -3.4]), INF([2.4, 2.8, -3.0]), INF([0, 3, 5]), null, 56)],
+  [I.lay]: [sh(0, [-24, 40, -4], [-22, 38, -2], [8, 3, 26], null, 50)],
+  [I.breath]: [sh(0, [-2, 8, 4], [-1.6, 8, 4.6], [8, 6, 26], null, 58)],
+  [I.morning]: [sh(0, INF([5.6, 3.4, 3.4]), INF([5.4, 3.4, 3.1]), INF([2.4, 1.8, -1.6]), null, 62)],
+  [I.gone]: [sh(0, [7, 5, 32], [7.5, 5, 32.5], [17, 2, 44], null, 56)],
+  [I.pile]: [sh(0, TS(-4, 5, 34), TS(-3.6, 5.2, 33), TS(-.2, 4, 18), TS(-.2, 5, 18), 56)],
+  [I.last]: [sh(0, TS(-4, 5, 33), [-10, 26, 24], TS(-1, 2, 24.5), [6, 30, 120], 50)],
 };
 
 // tiempos de inicio de cada toma y cortes; window.SUBF: más sub-cuadros (desenfoque) en los barridos
@@ -1252,23 +1324,38 @@ const val = (v, q) => typeof v === "function" ? v(q) : v;
 function camAt(T, q) { const s = T.s, p0 = val(s.p, q), p1 = val(s.p1, q), l0 = val(s.l, q), l1 = val(s.l1, q), e = q * q * (3 - 2 * q) * .35 + q * .65;
   return { p: p0.map((v, i) => lerp(v, p1[i], e)), l: l0.map((v, i) => lerp(v, l1[i], e)), f: s.f } }
 const QA = new THREE.Quaternion(), QB = new THREE.Quaternion(), MA = new THREE.Matrix4();
-// transiciones como en el Short de referencia (pedido del dueño, 25-nov-2026): la cámara VIAJA por el mundo de una toma a
-// la otra en ≈ 0,8 s (no hay corte ni barrido abstracto): sube en arco por encima de los techos si están lejos, el punto
-// donde mira se desliza de un lugar al otro y el desenfoque de movimiento hace el resto. Entre lugares distintos (adentro ↔
-// afuera, recuerdo ↔ hoy) la cámara se mete volando hacia adelante en la toma vieja y sale desde atrás en la nueva.
+// transiciones reales (pedido del dueño, 25-nov-2026, v3): la cámara SE TRASLADA por el pueblo de una toma a la otra en
+// ≈ 0,8 s y nunca atraviesa nada. Afuera sube por encima de los techos (y de los pinos si el viaje es largo), cruza y baja;
+// adentro de la cabaña se desliza bajo el techo. Para entrar a la cabaña va hasta la ventana de afuera y entra por la
+// ventana; para salir, sale por la ventana y se aleja de la casa por la calle.
 const TR = .8;
 const enTransicion = t => { const k = tomaAt(t), T = TOMAS[k], N = TOMAS[k + 1]; if (N && N.a - t < TR / 2) return [T, N, .5 - (N.a - t) / TR]; if (k > 0 && t - T.a < TR / 2) return [TOMAS[k - 1], T, .5 + (t - T.a) / TR]; return null };
 window.SUBF = t => enTransicion(t) ? 12 : 3;
+const V_ = (...a) => new THREE.Vector3(...a);
+const bez3 = (p0, p1, p2, p3, e) => { const u = 1 - e; return p0.clone().multiplyScalar(u * u * u).add(p1.clone().multiplyScalar(3 * u * u * e)).add(p2.clone().multiplyScalar(3 * u * e * e)).add(p3.clone().multiplyScalar(e * e * e)) };
+// la ventana de nuestra cabaña vista desde afuera (la más cercana a la calle) y su normal hacia afuera
+const VENTANA = (() => { let v = null; return () => { if (v) return v; NUESTRA.g.updateMatrixWorld(true); let best = null;
+  const n = V_(0, 0, 1).transformDirection(NUESTRA.g.matrixWorld).setY(0).normalize(); const meshes = []; NUESTRA.g.traverse(o => { if (o.isMesh && NUESTRA.panes.includes(o.material)) meshes.push(o) });
+  meshes.forEach(o => { const p = o.getWorldPosition(V_()); const sc = p.clone().sub(NUESTRA.g.getWorldPosition(V_())).dot(n); if (!best || sc > best.sc) best = { p, sc } });
+  const p = (best ? best.p : NUESTRA.g.localToWorld(V_(1.6, 2.4, 3.2))).add(V_(n.z, 0, -n.x).multiplyScalar(.3)).add(V_(0, .3, 0)); v = { p, n }; return v } })();
+const VENT_IN = { p: V_(...IN([.75, 3.7, 5])), n: V_(0, 0, 1) };
+const altura = (pa, pb, dentro) => { const d = pa.distanceTo(pb); if (dentro) return Math.min(.5, d * .12); if (d < 5) return d * .2; const pico = d < 25 ? 12 : d < 70 ? 20 : 32; return Math.max(d * .1, (pico - Math.min(pa.y, pb.y)) / .75) };
+function viaje(pa, la, pb, lb, e, dentro) { const h = altura(pa, pb, dentro); return { pos: bez3(pa, pa.clone().add(V_(0, h, 0)), pb.clone().add(V_(0, h, 0)), pb, e), lk: la.clone().lerp(lb, e) } }
 function camara(t) { const k = tomaAt(t), T = TOMAS[k], q = cl((t - T.a) / Math.max(.01, T.b - T.a)); let c = camAt(T, q);
-  const mira = (p, l) => { MA.lookAt(p, l, new THREE.Vector3(0, 1, 0)); return new THREE.Quaternion().setFromRotationMatrix(MA) };
-  let pos = new THREE.Vector3(...c.p), lk = new THREE.Vector3(...c.l), fov = c.f;
+  const mira = (p, l) => { MA.lookAt(p, l, V_(0, 1, 0)); return new THREE.Quaternion().setFromRotationMatrix(MA) };
+  let pos = V_(...c.p), lk = V_(...c.l), fov = c.f;
   const tr = enTransicion(t);
   if (tr) { const [A, B, u] = tr, ca = camAt(A, 1), cb = camAt(B, 0), e = eIO(cl(u));
-    const pa = new THREE.Vector3(...ca.p), pb = new THREE.Vector3(...cb.p), la = new THREE.Vector3(...ca.l), lb = new THREE.Vector3(...cb.l);
-    if (!B.corte && pa.distanceTo(pb) < 160) { const d = pa.distanceTo(pb), mid = pa.clone().add(pb).multiplyScalar(.5); mid.y += cl(d * .22, .5, 14);
-      pos = pa.clone().multiplyScalar((1 - e) ** 2).add(mid.multiplyScalar(2 * (1 - e) * e)).add(pb.clone().multiplyScalar(e * e)); lk = la.clone().lerp(lb, e); fov = lerp(ca.f, cb.f, e) }
-    else if (u < .5) { const w = (u / .5) ** 2, dir = la.clone().sub(pa).normalize(); pos = pa.clone().addScaledVector(dir, w * 7); lk = la.clone().addScaledVector(dir, w * 7); fov = ca.f + w * 10 }
-    else { const w = (1 - (u - .5) / .5) ** 2, dir = lb.clone().sub(pb).normalize(); pos = pb.clone().addScaledVector(dir, -w * 7); lk = lb.clone().addScaledVector(dir, -w * 7); fov = cb.f + w * 10 } }
+    const pa = V_(...ca.p), pb = V_(...cb.p), la = V_(...ca.l), lb = V_(...cb.l), dA = LUGAR(A.L) === "adentro", dB = LUGAR(B.L) === "adentro";
+    if (dA === dB) { const v = viaje(pa, la, pb, lb, e, dA); pos = v.pos; lk = v.lk; fov = lerp(ca.f, cb.f, e) }
+    else { const W = VENTANA(), afuera0 = W.p.clone().addScaledVector(W.n, 5).add(V_(0, .6, 0)), afuera1 = W.p.clone().addScaledVector(W.n, .35), dentro1 = VENT_IN.p.clone().addScaledVector(VENT_IN.n, -.4), dentro0 = VENT_IN.p.clone().addScaledVector(VENT_IN.n, -2.6);
+      const adentroDe = W.p.clone().addScaledVector(W.n, -3), haciaAdentro = VENT_IN.p.clone().addScaledVector(VENT_IN.n, -5), haciaAfuera = VENT_IN.p.clone().addScaledVector(VENT_IN.n, 3), afueraDe = W.p.clone().addScaledVector(W.n, 6);
+      if (!dA) { // de afuera hacia adentro: viaja hasta la ventana, se acerca al vidrio y aparece adentro, alejándose de la ventana
+        if (u < .5) { const w = u / .5; if (w < .7) { const v = viaje(pa, la, afuera0, adentroDe, eIO(w / .7), false); pos = v.pos; lk = v.lk } else { const z = eIO((w - .7) / .3); pos = afuera0.clone().lerp(afuera1, z); lk = adentroDe } fov = lerp(ca.f, 56, w) }
+        else { const w = (u - .5) / .5; if (w < .3) { pos = dentro1.clone().lerp(dentro0, eOut(w / .3)); lk = haciaAdentro } else { const v = viaje(dentro0, haciaAdentro, pb, lb, eIO((w - .3) / .7), true); pos = v.pos; lk = v.lk } fov = lerp(56, cb.f, w) } }
+      else { // de adentro hacia afuera: va hasta la ventana de adentro, sale por el vidrio y se aleja de la casa
+        if (u < .5) { const w = u / .5; if (w < .7) { const v = viaje(pa, la, dentro0, haciaAfuera, eIO(w / .7), true); pos = v.pos; lk = v.lk } else { const z = eIO((w - .7) / .3); pos = dentro0.clone().lerp(dentro1, z); lk = haciaAfuera } fov = lerp(ca.f, 56, w) }
+        else { const w = (u - .5) / .5; if (w < .3) { pos = afuera1.clone().lerp(afuera0, eOut(w / .3)); lk = afueraDe } else { const v = viaje(afuera0, afueraDe, pb, lb, eIO((w - .3) / .7), false); pos = v.pos; lk = v.lk } fov = lerp(56, cb.f, w) } } } }
   let quat = mira(pos, lk);
   if (T.s.shake) { const a = T.s.shake; pos.x += Math.sin(t * 23) * a + Math.sin(t * 37) * a * .5; pos.y += Math.sin(t * 29 + 1) * a }
   pos.x += Math.sin(t * 1.3) * .015; pos.y += Math.sin(t * 1.7 + 1) * .012;   // cámara en mano, muy suave
@@ -1282,77 +1369,77 @@ function setScene(t) {
   if (!ENV.nieve) { ENV.nieve = { top: "#0c1630", hor: "#4a5a7c", fog: .0045, hemi: 1.05, hemiG: "#d0dcf0", sun: 1.7, sunCol: "#b0c4f0", exp: 1.55, grade: ["#ffffff", 0] }; ENV.casa = { top: "#0c1630", hor: "#1a1e2a", fog: .002, hemi: .95, hemiG: "#3a2a20", sun: .2, sunCol: "#a8b8e0", exp: 1.9, grade: ["#ffffff", 0] }; ENV.alba = { top: "#7a9ad0", hor: "#f0d8c8", fog: .004, hemi: 1.3, hemiG: "#d8e0f0", sun: 2.4, sunCol: "#ffd8b0", exp: 1.25, grade: ["#ffffff", 0] } }
   ALL.forEach(c => { if (c.polvo) c.polvo.forEach(q => q.visible = false); c.body.rotation.z = 0; c.head.rotation.z = 0; c.g.visible = false; c.g.scale.set(1, 1, 1); c.body.rotation.set(0, 0, 0); c.body.position.y = 0; c.head.rotation.set(0, 0, 0); power(c, null, 0); c.aura.visible = false; setFace(c, "neutral"); pose(c, t, {}) });
   [PALA, REGLA, TELESC, HOYO, HACHA, TRINEO, LINTERNA].forEach(o => o.visible = false); LINT_GL.visible = false; sinCiervos(); OJO.visible = false; ASTA_T.visible = false; PILA.visible = false; ASTILLAS.forEach(a => a.visible = false);
-  const lugar = LUGAR(L), manana = L >= I.morning && L <= I.pile; setEnv(lugar === "adentro" ? "casa" : manana ? "alba" : "nieve"); if (lugar === "recuerdo") POST.sepia = .42;
+  const lugar = LUGAR(L), manana = (L >= I.morning && L <= I.pile) || L === I.sleds; setEnv(lugar === "adentro" && !manana ? "casa" : manana ? "alba" : "nieve"); if (lugar === "recuerdo") POST.sepia = .42;
   HOUSES.forEach(H => { H.panes.forEach(p => p.emissiveIntensity = manana ? 0 : 1.2); H.glows.forEach(g => g.visible = !manana) });
   FAROLES.forEach(f => { f.userData.gl.position.copy(f.localToWorld(new THREE.Vector3(0, 3.2, 0))); f.userData.gl.visible = !manana });
   tortuga(t, { paso: 0 }); noche(t, !manana && lugar !== "adentro"); LUCES.forEach(l => l.visible = false); ESTRELLAS.visible = !manana;
-  CASAS[1].g.visible = true; CASAS[1].g.scale.set(1, 1, 1); CASAS[1].g.position.set(CASAS[1].lx, SY(CASAS[1].lx, CASAS[1].lz) - .3, CASAS[1].lz); CASAS[1].g.rotation.set(0, -Math.PI / 2, 0); if (L > I.stepped && L <= I.back) CASAS[1].g.scale.set(1, .15, 1.2);
+  CASAS[1].g.visible = true; CASAS[1].g.scale.set(1, 1, 1); CASAS[1].g.position.set(CASAS[1].lx, SY(CASAS[1].lx, CASAS[1].lz) - .3, CASAS[1].lz); CASAS[1].g.rotation.set(0, -Math.PI / 2, 0); if (L > I.stepped && L <= I.back) CASAS[1].g.scale.set(1, .15, 1.2); if (L === I.stepped) { const q = eIO(P(k, .45, .7)); CASAS[1].g.scale.set(1, lerp(1, .15, q), lerp(1, 1.2, q)) }
   // el pino viejo: parado hasta el hook; cae en «hook» y en «fell»; después queda acostado
   { const tr = VIEJO.userData.tronco, cae = L === I.hook ? eIO(P(k, .15, .95)) : L === I.fell ? eIO(P(k, 0, .6)) : (L > I.fell || L === I.stood0) ? 1 : (L >= I.oldest && L <= I.swing) ? 0 : 0; tr.rotation.set(0, 0, -cae * 1.5); tr.position.set(cae * 1.2, 1.2 * (1 - cae), 0); VIEJO.userData.tapa.visible = cae > .05; if ((L === I.swing) && Math.sin(t * 7) > .7) tr.rotation.z = -.01 }
   const crowd = list => list.forEach(([c, x, z, ry, f = "neutral", walk = 0]) => { placeW(c, x, z, ry); setFace(c, f); if (walk >= 1.2) { const d = Math.min(lt * 3.2, 9), nx = x + Math.sin(ry) * d, nz = z + Math.cos(ry) * d; placeW(c, nx, nz, ry); correr(c, t + x * 3) } else if (walk > 0) { const d = (lt - len / 2) * 1.5 * walk, nx = x + Math.sin(ry) * d, nz = z + Math.cos(ry) * d; placeW(c, nx, nz, ry); pose(c, t + x, { walk }); c.body.rotation.z = Math.sin((t + x) * 8) * .045 } else pose(c, t + x, { walk }) });
   let LL = [];
   // nieve que cae alrededor de la cámara (más fuerte en «winter», nada en «quiet» ni a la mañana)
-  copos(t, cam.position, L === I.quiet || manana ? 0 : L === I.winter ? 1.6 : 1); COPOS.material.size = L === I.winter ? .7 : .5;
+  copos(t, cam.position, L === I.quiet || manana || lugar === "adentro" ? 0 : L === I.winter ? 1.6 : 1); COPOS.material.size = L === I.winter ? .7 : .5;
   // el Watcher según la frase
   const W = WATCHER, eyeL = []; const enMonte = (subir) => ciervoPose(W, t, { x: MONTE[0], y: MONTE[1], z: MONTE[2], ry: .15, echado: 1 - subir, sube: subir * .6 });
   if (L === I.stood0) enMonte(eIO(k)); if (L === I.stood) enMonte(eIO(P(k, 0, .7)));
   if (L === I.cost) ciervoPose(W, t, { x: 0, y: 0, z: -92 + k * 8, paso: 1, baja: .2 });
-  if (L >= I.watch && L <= I.lantern) ciervoPose(W, t, { x: LINDE[0], y: 0, z: LINDE[2], baja: .1, gira: Math.sin(t * .3) * .2 });
-  if (L === I.quiet) ciervoPose(W, t, { x: 0, y: 0, z: -110, echado: .2 });
+  if (L >= I.watch && L <= I.lantern) ciervoPose(W, t, { x: LINDE[0], y: 0, z: LINDE[2], ry: .4, baja: L === I.eyes ? .9 : .1, echado: L === I.eyes ? .35 : 0, gira: Math.sin(t * .3) * .2 });
+  
   if (L === I.shaking) ciervoPose(W, t, { x: 0, y: 0, z: -70 + k * 4, paso: 1 });
   if (L === I.taller) ciervoPose(W, t, { x: 1, y: 0, z: -62 + k * 10, paso: 1, sube: .2 });
-  if (L === I.stepped) ciervoPose(W, t, { x: 6, y: 0, z: -44 + k * 3, paso: .6, baja: .5 });
-  if (L === I.back) ciervoPose(W, t, { x: 5, y: 0, z: -46 - k * 14, ry: Math.PI, paso: 1 });
+  if (L === I.stepped) ciervoPose(W, t, { x: 6.8, y: 0, z: -29 + k * 2, paso: .6, baja: .5 });
+  if (L === I.back) ciervoPose(W, t, { x: 6.8, y: 0, z: -30 - k * 22, ry: Math.PI, paso: 1 });
   if (L === I.home) ciervoPose(W, t, { x: -20, y: 20, z: -150 + k * 20, paso: 1.2, ry: .2 });
-  if (L === I.lay || L === I.breath) ciervoPose(W, t, { x: 22, y: ALT(22, 24) - 1, z: 24, ry: -.9, echado: 1, gira: L === I.breath ? .5 : .2, baja: .3, aliento: L === I.breath ? 1 : .4 });
-  if (L === I.last) ciervoPose(W, t, { x: 6, y: 0, z: 82, ry: Math.PI, baja: .1 });
+  if (L === I.lay || L === I.breath) ciervoPose(W, t, { x: 8, y: ALT(8, 30) - .9, z: 30.5, ry: Math.PI / 2, echado: 1, gira: L === I.breath ? .5 : .2, baja: .3, aliento: L === I.breath ? 1 : .4 });
+  if (L === I.last) ciervoPose(W, t, { x: 6, y: 0, z: 120, ry: Math.PI, baja: .1 });
   // el ojo en la ventana y el cuerno en el techo
-  if ([I.window, I.saw, I.stopped].includes(L)) { OJO.visible = true; OJO.position.set(...IN([0, 3, 8.9 + (L === I.window ? (1 - eOut(k)) * 2 : 0)])); const parp = L === I.stopped && k > .5 ? P(k, .5, .8) * .6 : 0; OJO.userData.sup.rotation.x = parp; OJO.userData.ojo.material.emissiveIntensity = L === I.stopped ? .7 - k * .4 : .7 }
-  if (L >= I.roof && L <= I.stopped) { ASTA_T.visible = L !== I.stopped || k < .5; CASA_IN.userData.agujero.visible = true; if (L === I.roof) ASTA_T.position.y = (1 - eOut(P(k, 0, .4))) * 3 } else CASA_IN.userData.agujero.visible = L > I.roof && L < I.gone;
+  if ([I.window, I.saw, I.stopped].includes(L) && !(L === I.stopped && k > .35)) { OJO.visible = true; OJO.position.set(...IN([0, 3, 8.9 + (L === I.window ? (1 - eOut(k)) * 2 : 0)])); const parp = L === I.stopped && k > .5 ? P(k, .5, .8) * .6 : 0; OJO.userData.sup.rotation.x = parp; OJO.userData.ojo.material.emissiveIntensity = L === I.stopped ? .7 - k * .4 : .7 }
+  { const roto = (L === I.roof && k > .22) || (L > I.roof && L < I.gone); techoRoto(t, roto, L === I.roof ? P(k, .2, .5) : 1); ASTA_REAL.visible = L === I.roof && k < .5; ASTA_REAL.position.set(3.1, 7.4 + (L === I.roof ? (1 - eOut(P(k, 0, .3))) * 4 : 0) - (L === I.stopped ? P(k, .2, .6) * 3 : 0), -1.85) }
   TABLAS_ROTAS.forEach((m, i) => { const q = L === I.roof ? P(k, .1 + i * .02, .5 + i * .03) : 0; m.visible = L === I.roof && q > 0; m.position.set(600 + 2.6 + Math.sin(i * 2.3) * 1.4, 200 + 7 - q * q * 6.8, 600 + 1 + Math.cos(i * 1.7) * 1.2); m.rotation.set(q * 6 + i, i, q * 4) });
   // fuego de la chimenea: bajo, apagado, prendido
   hogar(t, L === I.ilse ? .6 : L === I.fences ? .8 : (L === I.mila || L === I.badcold || L === I.out) ? 0 : (L >= I.lit && L <= I.morning) ? 1 : 0); humoP(t, lugar === "adentro" ? 0 : 1);
   fuegoChimenea(t, L === I.ilse ? .6 : L === I.fences ? .8 : (L === I.mila || L === I.badcold || L === I.out) ? 0 : (L >= I.lit && L <= I.morning) ? 1 : 0);
-  if (lugar === "adentro") { LUCES_IN.forEach((f, i) => i < 2 && LL.push([f.getWorldPosition(new THREE.Vector3()).toArray(), 1.6, "#ffc070", 9])); const fa = (L === I.mila || L === I.badcold || L === I.out) ? 0 : 1; LL.push([IN([-3, 1.4, -3]), 3.2 * fa * (.85 + .15 * Math.sin(t * 13)), "#ff9a40", 14]); LL.push([IN([0, 4, 5.6]), L === I.window || L === I.saw || L === I.stopped ? 2.5 : .9, "#bfe6ff", 10]) }
-  if ([I.fell, I.calf, I.baby, I.swing].includes(L)) LL.push([[14, 5, 40], 2.4, "#bcd4ff", 16]);
+  if (lugar === "adentro") { LUCES_IN.forEach((f, i) => i < 2 && LL.push([f.getWorldPosition(new THREE.Vector3()).toArray(), 1.6, "#ffc070", 9])); const fa = (L === I.mila || L === I.badcold || L === I.out) ? 0 : 1; LL.push([IN([-3, 1.4, -3]), 3.2 * fa * (.85 + .15 * Math.sin(t * 13)), "#ff9a40", 14]); LL.push([IN([0, 4, 5.6]), L === I.window || L === I.saw || L === I.stopped ? 2.5 : .9, "#bfe6ff", 10]); if (L >= I.roof && L <= I.morning) LL.push([IN([3, 6.4, -1.8]), manana ? 3 : 2.4, manana ? "#fff0d8" : "#bfd8ff", 11]); LL.push([IN([-4, 4.6, 3.5]), 1.2, "#ffc888", 10]) }
+  if ([I.hook, I.stood0, I.oldest, I.fell, I.calf, I.baby, I.swing, I.gone].includes(L)) LL.push([[11, 6, 38], 2.6, "#bcd4ff", 18]); if (L === I.calf) LL.push([[18, 4, 41], 2.2, "#d8e8ff", 8]);
   if (lugar !== "adentro" && !manana) FAROLES.forEach(f => LL.length < 4 && LL.push([f.localToWorld(new THREE.Vector3(0, 3.2, 0)).toArray(), 2.4, "#ffb060", 12]));
   // tazas que se caen del estante
   CASA_IN.userData.tazas.forEach((c, i) => { const q = L === I.shook ? P(k, .25 + i * .1, .55 + i * .1) : L > I.shook ? 1 : 0; c.position.set(3.6 + i * .5 + q * .3, 3.62 - q * q * 3.5 + (L === I.shook && q === 0 ? Math.abs(Math.sin(t * 30 + i)) * .03 : 0), -4.6 + q * .8); c.rotation.set(q * 2, 0, q * 1.4) });
   // la cría: en el hueco del pino, después en los brazos, después en la cama al lado de Mila
   const cria = (x, y, z, ry = 0, eche = 1, tiembla = 0) => ciervoPose(CRIA, t, { x, y, z, ry, echado: eche, tiembla, baja: .4 });
-  if (L === I.fell && k > .6 || L === I.calf || L === I.baby) cria(PINO[0], 1.0, PINO[1] + .2, -2.4, 1, 1);
+  if (L === I.fell && k > .6 || L === I.calf) cria(PINO[0], 1.0, PINO[1] + .2, -2.4, 1, 1);
   if ([I.lit, I.shook, I.window, I.roof, I.saw, I.stopped].includes(L)) { const p = IN([2.9, .95, -.9]); cria(p[0], p[1], p[2], Math.PI, 1, L === I.lit ? .5 : 0) }
 
   switch (L) {
-    case I.hook: case I.swing: { placeW(ME, 13.2, 41.0, .75); ME.g.visible = true; setFace(ME, L === I.hook ? "terrified" : "determined"); attach(HACHA, ME, "R", [0, -.2, .2]); const sw = Math.sin(t * (L === I.hook ? 3 : 6)); pose(ME, t, { armFwd: 1.2 + sw * .6 }); ME.body.rotation.x = .2 + sw * .12; HACHA.rotation.set(.3 + sw * .5, 0, 0);
+    case I.hook: case I.swing: { placeW(ME, 12.6, 40.3, .75); ME.g.visible = true; setFace(ME, L === I.hook ? "terrified" : "determined"); attach(HACHA, ME, "R", [0, -.2, .2]); const sw = Math.sin(t * (L === I.hook ? 3 : 6)); pose(ME, t, { armFwd: 1.2 + sw * .6 }); ME.body.rotation.x = .2 + sw * .12; HACHA.rotation.set(.3 + sw * .5, 0, 0);
       if (L === I.swing) ASTILLAS.forEach((a, i) => { const q = (t * 1.5 + i / 24) % 1; a.visible = true; a.position.set(15.4 + q * (Math.sin(i) * 2), 1.4 + q * 2 - q * q * 3, 43 + q * Math.cos(i * 1.7) * 2); a.rotation.set(q * 9, i, q * 5) }); break }
-    case I.stood0: placeW(ME, 13.2, 41.0, .75); setFace(ME, "horrified"); attach(HACHA, ME, "R", [0, -.2, .2]); break;
+    case I.stood0: placeW(ME, 12.6, 40.3, .75); setFace(ME, "horrified"); attach(HACHA, ME, "R", [0, -.2, .2]); break;
     case I.rule: case I.valley: crowd([[FOLK[0], -1.6, -6, .4, "neutral", .8], [FOLK[3], 1.8, 6, Math.PI, "neutral", .8], [EXT[2], -6, 1.4, 1.6, "neutral", .8]]); break;
     case I.burn: crowd([[FOLK[2], -1.4, 8, Math.PI - .3, "neutral", .6]]); attach(TRINEO, FOLK[2], "R", [0, -.9, .6]); TRINEO.rotation.set(0, Math.PI, 0); pose(FOLK[2], t, { armFwd: .5, walk: .6 }); break;
     case I.sleds: crowd([[ME, -.8, 22, 0, "neutral", .9], [ME6, .8, 21, 0, "happy", .9], [EXT[0], 2.2, 19.5, .1, "happy", .9], [EXT[3], -2.2, 20, -.1, "neutral", .9]]); attach(TRINEO, ME, "R", [0, -1.0, -.8]); TRINEO.rotation.set(0, 0, 0); break;
-    case I.watch: case I.antlers: case I.eyes: crowd([[FOLK[0], .6, -12, Math.PI, "worried"], [FOLK[4], -1.2, -13, Math.PI - .2, "scared"]]); break;
-    case I.lantern: crowd([[FOLK[1], -1.5, -24.5, Math.PI, k > .55 ? "terrified" : "scared"]]); attach(LINTERNA, FOLK[1], "R", [0, -.2, .3]); pose(FOLK[1], t, { armFwd: .7 }); { const gl = P(k, .55, .75); LINT_GL.visible = gl < 1; LINT_GL.position.copy(LINTERNA.getWorldPosition(V3)); LINT_GL.material.opacity = .7 * (1 - gl); LINTERNA.children[0].material.emissiveIntensity = 2 * (1 - gl) } break;
+    case I.watch: case I.antlers: case I.eyes: crowd([[FOLK[0], -2.6, -3.6, -2.75, "worried"], [FOLK[4], -.6, -4.8, -2.6, "scared"]]); break;
+    case I.lantern: crowd([[FOLK[1], -6, -27, -2.62, k > .55 ? "terrified" : "scared"]]); attach(LINTERNA, FOLK[1], "R", [0, -.2, .3]); pose(FOLK[1], t, { armFwd: .7 }); { const gl = P(k, .55, .75); LINT_GL.visible = gl < 1; LINT_GL.position.copy(LINTERNA.getWorldPosition(V3)); LINT_GL.material.opacity = .7 * (1 - gl); LINTERNA.children[0].material.emissiveIntensity = 2 * (1 - gl) } break;
     case I.buried: TRINEO.visible = true; if (TRINEO.parent !== scene) scene.add(TRINEO); TRINEO.position.set(-28, -.42, 28.4); TRINEO.rotation.set(.25, .6, .1); break;
     case I.ilse: case I.fences: case I.badcold: placeIn(GARROW, -1.8, 0, -2.4, .8); GARROW.g.visible = true; setFace(GARROW, L === I.badcold ? "worried" : L === I.fences ? "sad" : "neutral"); pose(GARROW, t, { sit: L === I.ilse ? .5 : 0, armFwd: L === I.fences ? .8 : 0 }); if (L === I.ilse) GARROW.g.position.y -= .25;
       if (L !== I.ilse) { placeIn(ME6, 3.6, 1.35, -2.2, 0); ME6.body.rotation.x = -Math.PI / 2 + .05; setFace(ME6, "sleepy") } break;
     case I.mila: case I.out: placeIn(ME6, 3.6, 1.35, -2.2, 0); ME6.body.rotation.x = -Math.PI / 2 + .05; setFace(ME6, "sleepy"); placeIn(GARROW, 2.0, 0, -4.1, Math.PI / 2); setFace(GARROW, "worried"); pose(GARROW, t, { armFwd: .5 }); break;
     case I.axe: crowd([[ME, 2.4, 22.4, -2.2, "determined"]]); attach(HACHA, ME, "R", [0, -.2, .2]); pose(ME, t, { lift: .3 }); break;
-    case I.oldest: { const q = eIO(k); placeW(ME, lerp(10.5, 13.2, q), lerp(34, 41, q), .5); ME.g.visible = true; setFace(ME, "determined"); attach(HACHA, ME, "R", [0, -.2, .2]); pose(ME, t, { walk: 1 }); break }
-    case I.fell: case I.calf: placeW(ME, 13.0, 40.6, .75); setFace(ME, L === I.calf ? "shock" : "scared"); attach(HACHA, ME, "R", [0, -.2, .2]); break;
-    case I.baby: placeW(ME, 13.0, 40.6, .75); setFace(ME, "shock"); break;
+    case I.oldest: { const q = eIO(k); placeW(ME, lerp(9.8, 12.6, q), lerp(33.6, 40.3, q), .4); ME.g.visible = true; setFace(ME, "determined"); attach(HACHA, ME, "R", [0, -.2, .2]); pose(ME, t, { walk: 1 }); break }
+    case I.fell: case I.calf: placeW(ME, 12.4, 40.0, .75); setFace(ME, L === I.calf ? "shock" : "scared"); attach(HACHA, ME, "R", [0, -.2, .2]); break;
+    case I.baby: { placeW(ME, 12.4, 40.0, .75); setFace(ME, "shock"); pose(ME, t, { armFwd: 1 }); const p = KW(ME, [Math.sin(ME.g.rotation.y) * 1.0, 1.3, Math.cos(ME.g.rotation.y) * 1.0])(); ciervoPose(CRIA, t, { x: p[0], y: p[1] - .5, z: p[2], ry: ME.g.rotation.y, echado: 1 }); break }
     case I.stood: break;
-    case I.brask: placeW(PIM, 6.2, -37.8, -2.4); setFace(PIM, "determined"); attach(HACHA, PIM, "R", [0, -.2, .2]); { const sw = Math.sin(t * 6); pose(PIM, t, { armFwd: 1.2 + sw * .6 }); PIM.body.rotation.x = .2 + sw * .12; HACHA.rotation.set(.3 + sw * .5, 0, 0) } break;
-    case I.quiet: case I.shaking: crowd([[FOLK[3], 1.4, -8, Math.PI, "scared"], [EXT[1], -1, -10, Math.PI, "terrified"]]); break;
+    case I.brask: placeW(PIM, 4.45, -40.45, -2.27); setFace(PIM, "determined"); attach(HACHA, PIM, "R", [0, -.2, .2]); { const sw = Math.sin(t * 6); pose(PIM, t, { armFwd: 1.2 + sw * .6 }); PIM.body.rotation.x = .2 + sw * .12; HACHA.rotation.set(.3 + sw * .5, 0, 0) } break;
+    case I.quiet: case I.shaking: crowd([[FOLK[3], 1.8, -4, Math.PI, "scared"], [EXT[1], -1.2, -5.5, Math.PI, "terrified"]]); break;
     case I.taller: case I.stepped: crowd([[FOLK[3], .8, -4, 0, "panic", 1.4], [EXT[1], -.8, -6, 0, "panic", 1.4]]); break;
     case I.home: { const q1 = eIO(P(k, 0, .62)), q2 = P(k, .62, .95); if (k < .62) { placeW(ME, lerp(12, 1.0, q1), lerp(30, 18.2, q1), Math.atan2(1 - 12, 18.2 - 30)); correr(ME, t) } else { const ry = lerp(Math.atan2(1 - 12, 18.2 - 30), Math.PI / 2, P(k, .62, .7)); placeW(ME, lerp(1.0, 4.2, q2), 18.2, ry); pose(ME, t, { walk: 1 }); if (q2 > .85) ME.g.visible = false } ME.g.visible = ME.g.visible && k < .95; setFace(ME, "panic"); const p = KW(ME, [Math.sin(ME.g.rotation.y) * 1.0, 1.3, Math.cos(ME.g.rotation.y) * 1.0])(); ciervoPose(CRIA, t, { x: p[0], y: p[1] - .5, z: p[2], ry: ME.g.rotation.y, echado: 1 }); pose(ME, t, { armFwd: 1 }); break }
     case I.lit: case I.shook: case I.window: case I.roof: case I.saw: case I.stopped:
-      placeIn(ME6, 3.6, 1.35, -2.2, 0); ME6.body.rotation.x = -Math.PI / 2 + .05; setFace(ME6, L === I.lit ? "sleepy" : "scared"); placeIn(ME, -.6, 0, -2.8, Math.PI); setFace(ME, { [I.lit]: "worried", [I.shook]: "terrified", [I.window]: "horrified", [I.roof]: "terrified", [I.saw]: "scared", [I.stopped]: "shock" }[L]); if (L >= I.window) ME.g.rotation.y = 0;
-      placeIn(GARROW, -.6, 0, -2.6, .6); setFace(GARROW, L >= I.shook ? "terrified" : "worried"); pose(GARROW, t, { cover: L >= I.window ? .6 : 0 }); break;
+      placeIn(ME6, 3.6, 1.35, -2.2, 0); ME6.body.rotation.x = -Math.PI / 2 + .05; setFace(ME6, L === I.lit ? "sleepy" : "scared"); placeIn(ME, .4, 0, -2.6, Math.PI / 2); setFace(ME, { [I.lit]: "worried", [I.shook]: "terrified", [I.window]: "horrified", [I.roof]: "terrified", [I.saw]: "scared", [I.stopped]: "shock" }[L]); if (L >= I.window) ME.g.rotation.y = 0;
+      placeIn(GARROW, -2.2, 0, -1.2, .9); setFace(GARROW, L >= I.shook ? "terrified" : "worried"); pose(GARROW, t, { cover: L >= I.window ? .6 : 0 }); break;
     case I.lay: case I.breath: break;
     case I.morning: placeIn(ME6, 3.6, 1.0, -1.4, 0); setFace(ME6, "laugh"); pose(ME6, t, { sit: 1, laugh: 1 }); ME6.g.position.y += .55; placeIn(ME, 2.0, 0, -1.4, 1.2); setFace(ME, "happy"); placeIn(GARROW, 1.0, 0, -2.6, 1.4); setFace(GARROW, "relieved"); break;
     case I.gone: break;
-    case I.pile: PILA.visible = true; PILA.position.set(1.6, ALT(1.6, 18), 18); PILA.scale.setScalar(1.25); crowd([[ME, -1.6, 21.0, Math.PI / 2 + .4, "shock"], [ME6, -1.8, 22.4, Math.PI / 2 + .6, "excited"]]); break;
-    case I.last: PILA.visible = true; PILA.position.set(1.6, ALT(1.6, 18), 18); PILA.scale.setScalar(1.25); crowd([[ME, .2, 20.6, .3, "warm"], [ME6, -.8, 20.2, .2, "happy"]]); break;
+    case I.pile: PILA.visible = true; PILA.position.set(-.2, ALT(-.2, 18), 18); PILA.scale.setScalar(1.5); crowd([[ME, -2.2, 24.5, 2.79, "shock"], [ME6, -.4, 25.2, 2.95, "excited"]]); break;
+    case I.last: PILA.visible = true; PILA.position.set(-.2, ALT(-.2, 18), 18); PILA.scale.setScalar(1.5); crowd([[ME, -2.2, 24.5, .2, "warm"], [ME6, -.4, 25.2, .1, "happy"]]); break;
   }
   if (L === I.stood0) { const p = TS(-6, 0, -24)(); }
   lights(LL); camara(t);

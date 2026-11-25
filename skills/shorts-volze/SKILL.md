@@ -96,6 +96,21 @@ anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.c
     fuego con profundidad (hogar, troncos, brasas, chispas); ojos de criaturas ultra detallados (iris con fibras,
     venitas, córnea mojada, párpados escamosos); los viejos con arrugas y los ojos siempre visibles bajo gorros.
   - **Entrar a una casa**: el personaje da la vuelta y entra por la puerta (nunca aparece adentro de golpe).
+  - **Revisión del dueño a los pinos v2 (25-nov-2026)**:
+    - **Ultradetalle en TODO, sin excepción**: techos (sin huecos, tejas/tablas con relieve, nieve con volumen), paredes,
+      arbustos (ramitas, hojas, nieve encima), árboles (corteza, ramas en capas, agujas, nieve en cada rama), personajes,
+      herramientas, piso, fondo. No alcanza con el techo y las paredes: todo.
+    - **El pueblo vive en la tierra**: nada de cúpula ni globo ni cielo con borde visible; el terreno sigue hasta el
+      horizonte con montañas, bosque y niebla.
+    - **Atuendos como los de Volze**: ropa de bloques simple y legible (remera/campera de un color con un detalle,
+      pantalón liso, zapatos), accesorios de Roblox (gorro, bufanda) sin recargar.
+    - **Transiciones reales**: la cámara **se traslada por el pueblo** a la velocidad de las tomas (calles, por encima
+      de las casas); nunca atraviesa nada (paredes, techos, árboles, personajes). Para entrar a una casa, rodea y
+      entra por la puerta, o mira por la ventana y entra por la ventana abierta. La transición buena es lo que retiene.
+    - **Planos**: sin primeros planos (ni el del amanecer); nunca un plano donde solo se vean piernas; **siempre se ve el
+      fondo y lo que se está contando**. Si una toma no se entiende (techo oscuro con algo blanco), rehacerla.
+    - **El revisor revisa también los planos**: que no haya primeros planos, que se lea de qué se habla, que haya fondo,
+      que las transiciones no atraviesen nada, y que todo tenga detalle.
   - **Transiciones lentas y que se noten** (25-nov-2026): que se vea que es una transición y no un corte: barrido de
     ≈ 0,5 s con la cámara girando y desenfoque fuerte (`WHIP = .5`, `WC = .5`, giro ≈ 1,4 rad), también al cambiar de
     lugar. Nunca un corte seco.
