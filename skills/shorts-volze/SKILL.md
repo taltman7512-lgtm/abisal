@@ -21,12 +21,20 @@ anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.c
   loop debajo de todo el video, **≈ 6 dB bajo la voz**, y el pico final queda en ≤ 0,9 (`alimiter`). Se renderiza el video
   `--sinmusica` y se mezcla con ffmpeg (receta en «Música»). El dueño sabe que tiene derechos de terceros y asume el
   riesgo de reclamo de Content ID en su canal. Rechazado: música sintetizada con senos puros; el piano propio no le gustó.
-- **Personajes**: estilo de bloques «robloxiano» como los de Volze, siempre con `robloxify()`: brazos y piernas de un
-  bloque, cara impresa con ojos ovalados grandes, pelo facetado. Nada de estilo propio (mangas por partes, manos).
+- **Personajes**: estilo de bloques «robloxiano» como los de Volze, siempre con `volze()` (ver «Personajes y caras como los
+  de Volze»): brazos y piernas de un bloque, ropa pintada, cara de calcomanía de Roblox, pelo facetado. Nada de estilo propio (mangas por partes, manos).
 - **Formato 3:4 como Volze (25-nov-2026, lo decidió el dueño al ver la medición)**: los videos se hacen en
   **1440×1920 a 60 fps**, igual que los 16 top y recientes del canal (antes 1080×1920). `motor/armar.js` ya lo fija
   (`?v916` en la URL vuelve a 1080×1920) y las hojas de `render-gpu.mjs` salen en 3:4. El campo vertical es el mismo y
   se ve un tercio más a los costados: encuadrar pensando en ese ancho.
+- **Personajes y caras como los de Volze (25-nov-2026, reemplaza a «ropa con tela y relieve», «pelo como los accesorios de
+  la tienda de Roblox» con mechones finos y «los viejos con arrugas»)**: el dueño dijo que los nuestros eran «muy
+  Playmobil y no Roblox», con «dos figuras» en cada brazo. Ahora: seis bloques de una sola pieza, la ropa **pintada**
+  (calcomanía plana: mangas, zapatos, ponchos, chalecos, polleras), solo pelo, sombreros, pañuelos, anteojos y barba en
+  3D, de pocos polígonos y color liso; la cara es una calcomanía de Roblox (óvalos negros sin brillo, cejas finas solo
+  cuando expresan, boca fina, zigzag de miedo, dientes apretados de enojo). Descripción completa en
+  `referencia/personajes-volze.md`; código en `videos/cuerno/partes/_volze_personajes.js` (`volze()`, `caraV()`,
+  `peloV()`). Banco de pruebas: `QUERY="provisoria&fila" node render-gpu.mjs hoja …` pone a todo el elenco en fila.
 - **Transiciones sin salto al llegar (25-nov-2026, primera versión de «Nobody Blows The Horn»)**: al dueño le molestó
   que, al terminar cada transición, la cámara hiciera «un movimiento raro, brusco, de golpe». Era un bug: la transición
   llegaba al INICIO de la toma nueva, pero esa toma ya llevaba medio recorrido, y la cámara saltaba. Regla: la
@@ -47,8 +55,9 @@ anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.c
   iguales, adoquines clonados, placas en fila). Cada textura se pinta entera: un lienzo grande sin repetir, con
   trazos irregulares, manchas, desgaste y variación, como un dibujo casero. Vale para el caparazón, las casas, la piel
   y la cara de la criatura y el pelo.
-- **Pelo**: ver «pelo como los accesorios de Roblox» más abajo (24-nov-2026, reemplaza al casco liso): `peloRoblox()` en
-  `ejemplo-dia/_tortuga.js`. Nunca una mezcla de cubos y rectángulos sueltos.
+- **Pelo** (cambiado el 25-nov-2026): pocas piezas facetadas de un color, más grande que la cabeza y encima de ella,
+  como un accesorio de Roblox (`peloV()` en `videos/cuerno/partes/_volze_personajes.js`). Ya no `peloRoblox()` de
+  mechones finos: se veía Playmobil.
 - **Criatura**: ojos con detalle (iris, pupila, brillo húmedo, párpado con arrugas) y cuello con pliegues y arrugas.
 - **Flores y detalles chicos en 3D, no pintados (24-nov-2026)**: flores con tallo, pétalos, centro y hojas, pasto en
   matas y percebes huecos, todos con relieve y sombra. Nada de puntitos blancos pintados que parezcan flores.
@@ -75,9 +84,9 @@ anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.c
 - **Revisión del dueño a la tortuga (24-nov-2026)**: le gustó, pero pidió para este video y los siguientes:
   - **Nunca dibujar cosas planas**, salvo una pintura o un cartel: el piso, la tierra y las piedras llevan relieve de
     verdad (geometría con desplazamiento).
-  - **Ropa con textura y relieve de tela** (costuras, pliegues, bolsillos, botones), con aspecto Roblox. **Nunca
+  - (Reemplazado el 25-nov-2026: la ropa va pintada y plana, ver «Personajes y caras como los de Volze».) **Nunca
     figuras o personas dibujadas sobre la ropa.**
-  - **Pelo como los accesorios de pelo de la tienda de Roblox** (mandó «Pelo de colega», un flequillo rubio en capas y
+  - (Reemplazado el 25-nov-2026 por «Personajes y caras como los de Volze».) **Pelo como los accesorios de pelo de la tienda de Roblox** (mandó «Pelo de colega», un flequillo rubio en capas y
     un pelo castaño de mechones): masa de mechones gruesos y algo facetados, con puntas en pico que salen hacia arriba
     y para los costados, mechones largos que caen sobre la frente y la nuca, degradé de color (más oscuro en la raíz) y
     mechas pintadas a lo largo de cada mechón con brillo. No un casco liso.
@@ -118,7 +127,7 @@ anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.c
   - **Ultradetalle en todo** (objetos, estructuras, materiales, plantas, árboles, fondo, animales): nada plano ni
     vacío. Adentro de las casas, paredes con luz y cosas (faroles, estantes, frascos, hierbas, cuadros, cortinas); el
     fuego con profundidad (hogar, troncos, brasas, chispas); ojos de criaturas ultra detallados (iris con fibras,
-    venitas, córnea mojada, párpados escamosos); los viejos con arrugas y los ojos siempre visibles bajo gorros.
+    venitas, córnea mojada, párpados escamosos); los ojos siempre visibles bajo gorros (los viejos, sin arrugas pintadas desde el 25-nov-2026: pelo blanco, barba, anteojos).
   - **Entrar a una casa**: el personaje da la vuelta y entra por la puerta (nunca aparece adentro de golpe).
   - **Revisión del dueño a los pinos v2 (25-nov-2026)**:
     - **Ultradetalle en TODO, sin excepción**: techos (sin huecos, tejas/tablas con relieve, nieve con volumen), paredes,

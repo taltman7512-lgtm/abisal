@@ -80,7 +80,7 @@ const SHOTS = {
 
 //@@ESCENA
 // ---------- la escena en cada instante
-let ENV_OK = false;
+let ENV_OK = false; const FILA = new URLSearchParams(location.search).has("fila");
 function setScene(t) {
   const L = lineAt(t), lt = t - s(L), len = (S[L + 1] ?? DUR) - s(L), k = P(lt, 0, len), Wd = kk => wt(L, kk), T0 = s(L);
   POST = { flash: 0, sepia: 0 };
@@ -181,5 +181,14 @@ function setScene(t) {
     case I.life: gente([[FOLK[4], -6, 4, .4, "hopeful"], [EXT[1], 5, 6, -.5, "relieved"], [GARROW, 3, 9, Math.PI, "relieved"], [QUILL, -3, 10, Math.PI, "warm"], [FOLK[1], 7, 11, -2.8, "hopeful"]]); attach(BASTON, GARROW, "R", [0, -.2, .1]); break;
     case I.ours: case I.listen3: case I.heard: gente([[ME, -8.6, 2.6, Math.PI + .1, L === I.heard ? "listen" : "warm"], [ME6, -10.2, 2, Math.PI + .05, L === I.ours ? "happy" : "listen"]]); arenaEncima(ME6, .6); if (L !== I.ours) gesto(ME6, t, s(I.listen3) + .05, "escucha", { dur: .3, fin: 999 }); if (L === I.heard) gesto(ME, t, T0 + .4, "escucha", { dur: .4, fin: 999 }); cabraPose(t, { x: -12, z: 3.4, ry: 2.6 }); break;
   }
+  // banco de pruebas de personajes (QUERY="provisoria&fila"): todos en fila en la plaza, cámara fija; t elige el encuadre y la cara
+  if (FILA) { setEnv("desierto"); SOL.z = 0; ambiente(0); tormenta(0, cam.position, 0); estanquesVisibles(true); ALL.forEach(c => c.g.visible = false); sinBestia(); CABRA.visible = false;
+    const L0 = [ME, ME6, QUILL, PIM, GARROW, FOLK[0], FOLK[1], FOLK[2], FOLK[3], FOLK[4], FOLK[5], EXT[0], EXT[1], EXT[2], EXT[3], PESCADOR], caras = ["neutral", "happy", "sad", "worried", "scared", "terrified", "horrified", "shock", "angry", "determined", "laugh", "listen", "sopla", "cerrados", "grito", "relieved"];
+    const modo = Math.floor(t), sub = t - modo, f = caras[Math.floor(sub * 16)] || "neutral";
+    L0.forEach((c, i) => { ponerP(c, -9.1 + (i % 8) * 2.6, 2 - Math.floor(i / 8) * 4, 0); setFace(c, modo >= 2 ? f : "neutral"); quieto(c, 0) });
+    const foco = [null, null, ME, GARROW, FOLK[1], ME6, PIM, QUILL][Math.min(modo, 7)];
+    if (!foco) { if (modo === 0) { cam.position.set(0, 2.4, 19); cam.lookAt(0, 1.6, 0) } else { cam.position.set(9, 3.2, 14); cam.lookAt(-2, 1.4, 0) } cam.fov = 46 }
+    else { const p = foco.g.getWorldPosition(new THREE.Vector3()), hy = foco === ME6 ? 1.95 : foco === PIM ? 2.2 : 2.6; cam.position.set(p.x + .9, p.y + hy + .3, p.z + 4.6); cam.lookAt(p.x, p.y + hy - .25, p.z); cam.fov = 30 }
+    cam.updateProjectionMatrix(); lights([]); return }
   lights(LL); camara(t);
 }

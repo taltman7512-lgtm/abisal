@@ -16,7 +16,7 @@ rep('const CARTEL = new THREE.Group(); enConcha(CARTEL, 3.2, 3.5, -.4);', 'const
 rep('enConcha(TAZAS, 2.6, 13.5, -Math.PI / 2, -.1);', 'enConcha(TAZAS, 2.6, 13.5, -Math.PI / 2, -.1); TAZAS.visible = false;')
 # elenco: se reemplaza todo el estilo de personajes del video de la tortuga
 i0 = s.index("robloxify(ME, {"); i1 = s.index("//@@LUGAR")
-s = s[:i0] + open(os.path.join(D, "_elenco_cuerno.js"), encoding="utf-8").read() + "\n" + s[i1:]
+s = s[:i0] + (open(os.path.join(D, "_elenco_cuerno.js"), encoding="utf-8").read() + chr(10) + open(os.path.join(D, "_volze_personajes.js"), encoding="utf-8").read()) + "\n" + s[i1:]
 NL = chr(10)
 rep(NL + "//@@ELENCO" + NL, NL + NL.join(open(os.path.join(D, f), encoding="utf-8").read() for f in ["_comun_cuerno.js", "_mundo_cuerno.js", "_bestia_cuerno.js", "_detalle_cuerno.js"]) + NL + "//@@ELENCO" + NL)
 esc = open(os.path.join(D, "_escenas_cuerno.js"), encoding="utf-8").read()

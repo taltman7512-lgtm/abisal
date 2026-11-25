@@ -91,10 +91,13 @@ lugar de la historia tiene su propia vara: «¿la zanahoria parece zanahoria de 
 de cocinero?»).
 1. **Nada dibujado plano, salvo una pintura o un cartel**: el piso, la tierra y las piedras con relieve de verdad
    (geometría o desplazamiento, no solo un dibujo). Si algo parece «pintado sobre una superficie lisa», marcalo.
-2. **Ropa con tela**: textura y relieve de tela (costuras, pliegues, trama, bolsillos, botones en 3D), con aspecto
-   Roblox. Nunca figuras ni dibujos impresos encima de la ropa.
-3. **Pelo como los accesorios de pelo de Roblox** (ver «Pelo» en SKILL.md): mechones gruesos, puntas, degradé y
-   mechas pintadas. Marcá el pelo que parezca casco liso, cubos o un bloque sin mechones.
+2. **Ropa pintada como en Roblox** (cambiado el 25-nov-2026): calcomanía plana sobre los bloques (mangas, zapatos,
+   ponchos, polleras pintados), un color por prenda con un estampado simple. Marcá cualquier prenda en 3D encima de los
+   bloques, mangas o manos separadas, telas con relieve. Nunca figuras ni dibujos de personas en la ropa.
+3. **Pelo y cara como Volze** (`skills/shorts-volze/referencia/personajes-volze.md`): pelo de pocas piezas facetadas,
+   más grande que la cabeza y encima de ella, de un color; cara de calcomanía de Roblox (óvalos negros sin brillo, cejas
+   finas solo cuando expresan, boca fina). Marcá todo lo que parezca Playmobil: casco de pelo liso, ojos con brillo,
+   cejas gruesas fijas, arrugas pintadas, rasgos chicos.
 4. **Barbas y vestimenta de cada oficio** bien hechas (barba larga de maestro sensei, gorro y chaqueta de cocinero
    con pliegues, botones y delantal).
 5. **Comida, plantas y utilería con detalle real** (zanahorias con hojas, estrías y tierra; no un cono naranja).
