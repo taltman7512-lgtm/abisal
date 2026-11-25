@@ -1,5 +1,5 @@
 import re
-base = r"C:\Users\123\Documents\abisal-volze\videos\cuerno\partes"
+base = __import__("os").path.dirname(__import__("os").path.abspath(__file__))
 M = open(base + r"\_polilla.js", encoding="utf-8").read().split("\n")   # plantilla original (no se pisa)
 T = open(base + r"\_cuerno.js", encoding="utf-8").read()
 sec = dict(re.findall(r"//@@(\w+)\n(.*?)(?=\n//@@|\Z)", T, re.S))

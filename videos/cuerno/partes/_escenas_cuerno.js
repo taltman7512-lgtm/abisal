@@ -1,78 +1,182 @@
 //@@LUGAR
-const LUGAR = L => (L >= I.dez && L <= I.night) ? "recuerdo" : "pueblo";
+const LUGAR = L => "pueblo";
+// dónde termina Onetusk la bajada: un poco al oeste, para que la torre le quede del lado del muñón (su izquierda)
+const BFIN = { x: -8, z: -33 };
+let BX = CRESTA[0], BZ = CRESTA[1];   // dónde está parada la bestia en este cuadro (para las cámaras relativas a ella)
+const ponerP = (k, x, z, ry = 0) => { k.g.visible = true; k.g.position.set(x, SUELO(x, z), z); k.g.rotation.set(0, ry, 0) };
+const enTorre = (k, p, ry) => { k.g.visible = true; k.g.position.set(p[0], p[1], p[2]); k.g.rotation.set(0, ry, 0) };
 
 //@@SHOTS
-const GW = (x, dy, z) => () => [x, ALT(x, z) + dy, z];
+const G = (x, dy, z) => () => [x, SUELO(x, z) + dy, z];
 const KW = (k, o) => () => add(k.g.getWorldPosition(new THREE.Vector3()).toArray(), o);
 const OW = (obj, o) => () => { obj.updateMatrixWorld(true); return obj.localToWorld(new THREE.Vector3(...o)).toArray() };
+const BR = o => () => [BX + o[0], SUELO(BX, BZ) + o[1], BZ + o[2]];           // relativo a los pies de la bestia
+const CB = (o = [0, 0, 0]) => () => cabezaW(o);
+const OJ = (o = [0, 0, 0], lado = 1) => () => add(ojoW(lado), o);
+const MU = (o = [0, 0, 0]) => () => add(munonW(), o);
+const BO = (o = [0, 0, 0]) => () => add(BOCA_W(), o);
+const BQ = (o = [0, 0, 0]) => () => add(BOQUILLA_W(), o);
+const CBA = (o = [0, 0, 0]) => () => add(CUERNO_BASE_W(), o);
+const ARENA = "#c9925a", MARFIL = "#e8dcc0", NOCHE = "#2a1a14", PIEL = "#8a7458";
 const SHOTS = {
-  [I.rule]: [sh(0, [30, 14, 40], [22, 12, 30], [0, 6, -6], null, 52)],
-  [I.cost]: [sh(0, [31, 14, 40], [23, 12, 30], [0, 6, -6], null, 52)],
-  [I.today]: [sh(0, [32, 14, 40], [24, 12, 30], [0, 6, -6], null, 52)],
-  [I.horn]: [sh(0, [33, 14, 40], [25, 12, 30], [0, 6, -6], null, 52)],
-  [I.wed]: [sh(0, [34, 14, 40], [26, 12, 30], [0, 6, -6], null, 52)],
-  [I.babies]: [sh(0, [35, 14, 40], [27, 12, 30], [0, 6, -6], null, 52)],
-  [I.school]: [sh(0, [36, 14, 40], [28, 12, 30], [0, 6, -6], null, 52)],
-  [I.roost]: [sh(0, [37, 14, 40], [29, 12, 30], [0, 6, -6], null, 52)],
-  [I.ridge]: [sh(0, [38, 14, 40], [30, 12, 30], [0, 6, -6], null, 52)],
-  [I.tall]: [sh(0, [39, 14, 40], [31, 12, 30], [0, 6, -6], null, 52)],
-  [I.tusk]: [sh(0, [40, 14, 40], [32, 12, 30], [0, 6, -6], null, 52)],
-  [I.sixty]: [sh(0, [41, 14, 40], [33, 12, 30], [0, 6, -6], null, 52)],
-  [I.bee]: [sh(0, [42, 14, 40], [34, 12, 30], [0, 6, -6], null, 52)],
-  [I.listen1]: [sh(0, [43, 14, 40], [35, 12, 30], [0, 6, -6], null, 52)],
-  [I.listen2]: [sh(0, [44, 14, 40], [36, 12, 30], [0, 6, -6], null, 52)],
-  [I.nobody]: [sh(0, [45, 14, 40], [37, 12, 30], [0, 6, -6], null, 52)],
-  [I.dez]: [sh(0, [46, 14, 40], [38, 12, 30], [0, 6, -6], null, 52)],
-  [I.note]: [sh(0, [47, 14, 40], [39, 12, 30], [0, 6, -6], null, 52)],
-  [I.eleven]: [sh(0, [48, 14, 40], [40, 12, 30], [0, 6, -6], null, 52)],
-  [I.nine]: [sh(0, [49, 14, 40], [41, 12, 30], [0, 6, -6], null, 52)],
-  [I.night]: [sh(0, [50, 14, 40], [42, 12, 30], [0, 6, -6], null, 52)],
-  [I.ponds]: [sh(0, [51, 14, 40], [43, 12, 30], [0, 6, -6], null, 52)],
-  [I.sign]: [sh(0, [52, 14, 40], [44, 12, 30], [0, 6, -6], null, 52)],
-  [I.storm]: [sh(0, [53, 14, 40], [45, 12, 30], [0, 6, -6], null, 52)],
-  [I.orange]: [sh(0, [54, 14, 40], [46, 12, 30], [0, 6, -6], null, 52)],
-  [I.goat]: [sh(0, [55, 14, 40], [47, 12, 30], [0, 6, -6], null, 52)],
-  [I.scream]: [sh(0, [56, 14, 40], [48, 12, 30], [0, 6, -6], null, 52)],
-  [I.forty]: [sh(0, [57, 14, 40], [49, 12, 30], [0, 6, -6], null, 52)],
-  [I.louder]: [sh(0, [58, 14, 40], [50, 12, 30], [0, 6, -6], null, 52)],
-  [I.climb]: [sh(0, [59, 14, 40], [51, 12, 30], [0, 6, -6], null, 52)],
-  [I.mouth]: [sh(0, [60, 14, 40], [52, 12, 30], [0, 6, -6], null, 52)],
-  [I.blew]: [sh(0, [61, 14, 40], [53, 12, 30], [0, 6, -6], null, 52)],
-  [I.rolling]: [sh(0, [62, 14, 40], [54, 12, 30], [0, 6, -6], null, 52)],
-  [I.turned]: [sh(0, [63, 14, 40], [55, 12, 30], [0, 6, -6], null, 52)],
-  [I.one]: [sh(0, [64, 14, 40], [56, 12, 30], [0, 6, -6], null, 52)],
-  [I.five]: [sh(0, [65, 14, 40], [57, 12, 30], [0, 6, -6], null, 52)],
-  [I.shadow]: [sh(0, [66, 14, 40], [58, 12, 30], [0, 6, -6], null, 52)],
-  [I.stayed]: [sh(0, [67, 14, 40], [59, 12, 30], [0, 6, -6], null, 52)],
-  [I.trunk]: [sh(0, [68, 14, 40], [60, 12, 30], [0, 6, -6], null, 52)],
-  [I.face]: [sh(0, [69, 14, 40], [61, 12, 30], [0, 6, -6], null, 52)],
-  [I.stump]: [sh(0, [70, 14, 40], [62, 12, 30], [0, 6, -6], null, 52)],
-  [I.same]: [sh(0, [71, 14, 40], [63, 12, 30], [0, 6, -6], null, 52)],
-  [I.built]: [sh(0, [72, 14, 40], [64, 12, 30], [0, 6, -6], null, 52)],
-  [I.cut]: [sh(0, [73, 14, 40], [65, 12, 30], [0, 6, -6], null, 52)],
-  [I.pins]: [sh(0, [74, 14, 40], [66, 12, 30], [0, 6, -6], null, 52)],
-  [I.caught]: [sh(0, [75, 14, 40], [67, 12, 30], [0, 6, -6], null, 52)],
-  [I.eyes]: [sh(0, [76, 14, 40], [68, 12, 30], [0, 6, -6], null, 52)],
-  [I.small]: [sh(0, [77, 14, 40], [69, 12, 30], [0, 6, -6], null, 52)],
-  [I.found]: [sh(0, [78, 14, 40], [70, 12, 30], [0, 6, -6], null, 52)],
-  [I.followed]: [sh(0, [79, 14, 40], [71, 12, 30], [0, 6, -6], null, 52)],
-  [I.back]: [sh(0, [80, 14, 40], [72, 12, 30], [0, 6, -6], null, 52)],
-  [I.life]: [sh(0, [81, 14, 40], [73, 12, 30], [0, 6, -6], null, 52)],
-  [I.ours]: [sh(0, [82, 14, 40], [74, 12, 30], [0, 6, -6], null, 52)],
-  [I.listen3]: [sh(0, [83, 14, 40], [75, 12, 30], [0, 6, -6], null, 52)],
-  [I.heard]: [sh(0, [84, 14, 40], [76, 12, 30], [0, 6, -6], null, 52)],
+  [I.rule]: [sh(0, CB([9, -3, 15]), [16, 44, -92], CB([0, -3, 6]), CB([0, -8, 0]), 42), sh(3, [4, 2.2, 21], [1.5, 2.8, 14], [0, 12, -10], [0, 14, -10], 58)],
+  [I.cost]: [sh(0, [10, 23, 3], [5, 20.6, -3], [0, 18, -10], null, 50), sh(3, [-9, 22, 14], [-7, 27, 2], [0, 46, -160], [0, 50, -160], 30)],
+  [I.today]: [sh(0, BO([-5.4, 3, 4.4]), BO([-3.2, 2, 2.6]), BO([0, 1.4, 0]), null, 50, { tr: "tapa", col: ARENA })],
+  [I.horn]: [sh(0, [-24, 27, 12], [-12, 24, 20], [0, 16, -10], null, 50, { tr: "tapa", col: ARENA, dir: -1 }), sh(6, [22, 9, 24], [10, 11, 22], [0, 14, -10], null, 55), sh(10, [-10, 20.2, -6], [3, 19.8, -6.6], [6, 18.4, -10], [12, 18, -10], 45)],
+  [I.wed]: [sh(0, [-3, 4.4, 3], [-7.4, 3.4, 6.6], [-13, 1.8, 12], null, 55), sh(6, [-13.6, 3.2, 18], [-13.2, 2.8, 15.6], [-13, 2, 12], null, 50)],
+  [I.babies]: [sh(0, [-28, 4.4, 34], [-24.6, 3.2, 31], [-20, 1.6, 28], null, 46), sh(6, [-24, 2.6, 30.6], [-22.6, 2.3, 29.6], [-20, 1.6, 28], null, 48)],
+  [I.school]: [sh(0, [20, 5.4, -8], [25, 3.6, -12.2], [29, 2.2, -15], null, 60), sh(5, [22.6, 3, -17.4], [24.4, 2.8, -15.6], KW(QUILL, [0, 1.9, 0]), null, 52)],
+  [I.roost]: [sh(0, [-20, 5, -7], [-24.6, 2.6, -11.4], [-28, .8, -14], null, 55), sh(5, [-20.6, 2.7, -11.4], [-22.2, 2.5, -12.8], KW(FOLK[3], [0, 1.8, 0]), null, 52)],
+  [I.ridge]: [sh(0, [-15, 2.4, 8], [-12.6, 3, 1], [0, 40, -160], [0, 48, -160], 24), sh(5, G(12, 3, -106), G(7, 3.6, -117), [0, 42, -152], [0, 48, -156], 52)],
+  [I.tall]: [sh(0, [112, 30, -66], [92, 26, -78], [0, 24, -104], null, 60), sh(6, G(28, 3, -138), G(18, 3, -146), [-2, 38, -160], [-2, 44, -160], 62)],
+  [I.tusk]: [sh(0, [-27, 45, -98], [-18, 43.4, -106], CB([-3, -9, 14]), null, 36), sh(4, [24, 47, -104], [16, 45, -114], MU(), null, 32)],
+  [I.sixty]: [sh(0, [-44, 76, -124], [-28, 70, -140], [0, 50, -162], null, 46)],
+  [I.bee]: [sh(0, [-2, 2.6, 9], [.8, 2.1, 11.4], KW(ME6, [0, 1.3, 0]), null, 52), sh(6, [7.4, 2.2, 10.4], [5.6, 1.9, 11.8], KW(ME6, [0, 1.3, 0]), null, 50)],
+  [I.listen1]: [sh(0, KW(ME6, [1.8, 1.6, 3.6]), KW(ME6, [.4, 1.5, 3.2]), KW(ME6, [0, 1.3, 0]), null, 50), sh(3, KW(ME6, [-3.6, .7, 3.2]), KW(ME6, [-2.4, .6, 3.8]), KW(ME6, [0, .7, 0]), null, 52), sh(7, KW(ME6, [1.2, .9, 4.6]), KW(ME6, [2.4, .8, 3.6]), KW(ME6, [-1, 5, -6]), null, 60)],
+  [I.listen2]: [sh(0, [-5.6, 3, 13.6], [-6.6, 3.3, 11.4], [0, 30, -160], [0, 40, -160], 30), sh(8, [-12, 30, -56], [-8, 36, -78], CB([0, 0, 4]), null, 30)],
+  [I.nobody]: [sh(0, KW(ME, [3.4, 1.8, -6.4]), KW(ME, [1.6, 1.8, -5.6]), KW(ME, [-.6, 1.4, 0]), null, 52)],
+  [I.dez]: [sh(0, [34, 28, 40], [22, 22, 28], () => FUEGO_POS, null, 50, { tr: "tapa", col: NOCHE }), sh(4, BO([-6, 3.2, 4.6]), BO([-3.4, 2.2, 2.8]), BO([0, 1.3, 0]), null, 50), sh(10, [-5, 24.6, -19], [-2, 23, -16], () => FUEGO_POS, null, 52)],
+  [I.note]: [sh(0, [-18, 24.6, 1], [-14, 23, -3], CBA(), null, 50)],
+  [I.eleven]: [sh(0, BR([26, 4, 52]), BR([20, 3.4, 44]), CB([0, -10, 0]), null, 56, { shake: .2 }), sh(5, BR([-46, 62, 60]), BR([-36, 54, 46]), BR([0, 14, 10]), null, 50)],
+  [I.nine]: [sh(0, BR([32, 6, 46]), BR([22, 5, 36]), BR([6, 8, 14]), null, 60, { shake: .3 }), sh(4, BR([22, 10, 60]), BR([16, 9, 52]), CB([0, -4, 4]), null, 50)],
+  [I.night]: [sh(0, [27, 4, -15], [20, 5.6, -12], [-4, 24, -24], null, 62), sh(8, [-10, 12, -20], [-9, 15.4, -28], BR([0, 20, 0]), null, 50, { tr: "tapa", col: "#d8a070" })],
+  [I.ponds]: [sh(0, [0, 70, 40], [0, 56, 14], [0, 2, -70], [0, 2, -88], 55, { tr: "tapa", col: ARENA }), sh(6, [-1, 5.4, -11], [-3, 3.6, -16.4], [-6, .4, -24], null, 52)],
+  [I.sign]: [sh(0, [0, 3, 23], [0, 3.8, 15], [0, 10, -10], null, 50), sh(7, [1.6, 6, 9], [1, 7.4, 3.6], [0, 10.6, -10], null, 40)],
+  [I.storm]: [sh(0, [64, 42, 92], [46, 33, 72], [0, 10, -34], null, 50), sh(3, [0, 2.6, 41], [0, 2.7, 32], [0, 4.5, 0], null, 55)],
+  [I.orange]: [sh(0, [2.4, 2, 25], [3, 2, 21], [0, 26, -10], [0, 30, -10], 55), sh(4, KW(ME, [-2.6, 1.8, 5.8]), KW(ME, [-1.4, 1.8, 4.6]), KW(ME, [0, 1.4, 0]), null, 50)],
+  [I.goat]: [sh(0, [5, 2.6, -29], [2.6, 2.2, -36], KW(ME6, [0, 1, 0]), null, 54), sh(3, KW(ME6, [1.8, 1.5, -7]), KW(ME6, [1.3, 1.4, -5.6]), KW(ME6, [0, 1, 0]), null, 52)],
+  [I.scream]: [sh(0, [3.8, 2.2, -32.8], [2.6, 2.2, -31], KW(ME, [0, 1.5, 0]), null, 50), sh(4, [2.2, 3.4, -21], [1.6, 3.2, -23.6], [0, 3, -70], null, 52)],
+  [I.forty]: [sh(0, [-13, 2.6, -33], [-4, 2.6, -32], [3, 2, -26], [8, 2, -26], 52), sh(3, [0, 24, -13], [0, 33, -9], [0, 0, -27], null, 52)],
+  [I.louder]: [sh(0, [3.6, 1.9, -33.4], [2.2, 2.3, -31], [0, 9, -10], [0, 12, -10], 55), sh(5, [4, 3, -31], [5.4, 7, -27], [0, 17, -10], [0, 18.4, -10], 50)],
+  [I.climb]: [sh(0, [-17, 8, -22], [-19, 14.4, -11], KW(ME, [0, 1.2, 0]), null, 55), sh(4, [.5, 36, -9], [0, 30, -9.6], [0, 0, -10], null, 50)],
+  [I.mouth]: [sh(0, BO([-4.6, 3, -3.8]), BO([-2.8, 2.2, -2.6]), BQ(), null, 46)],
+  [I.blew]: [sh(0, BO([-5, 2.2, 3.6]), BO([-3.4, 1.9, 2.4]), BO([0, 1.5, 0]), null, 50), sh(3, [15, 24, -9], [20, 28, -8], [0, 18, -10], null, 55)],
+  [I.rolling]: [sh(0, [-12, 22, -13], [-4, 32, -104], [0, 34, -160], [0, 46, -160], 50)],
+  [I.turned]: [sh(0, [-18, 51, -110], [-12, 50.5, -119], CB([0, 0, 4]), null, 30), sh(3, [15, 50.4, -122], [11.4, 50.2, -126.4], OJ(), null, 26)],
+  [I.one]: [sh(0, G(22, 3, -116), G(15, 3.4, -127), [0, 36, -156], [0, 40, -152], 62, { shake: .25 }), sh(2, [-7, 5.2, 15], [-3, 3.6, 15.5], [7, 1.6, 16], null, 60)],
+  [I.five]: [sh(0, BR([44, 10, 58]), BR([34, 8, 40]), BR([0, 18, 6]), null, 54, { shake: .2 }), sh(2, [-1, 5.4, -11], [-3, 3.8, -16.4], [-6, .4, -24], null, 52)],
+  [I.shadow]: [sh(0, [7, 1.9, 12], [5, 2.5, 5], CB([0, -8, 0]), null, 62, { shake: .25 }), sh(3, [2, 30, 26], [0, 22, 17], [0, 6, -14], null, 56)],
+  [I.stayed]: [sh(0, [0, 2.4, 33], [0, 2.4, 41], [0, 2.2, 12], null, 54), sh(2, [16, 19.4, -1.6], [13.6, 18.7, -4.4], BO([0, 1.5, 0]), null, 50)],
+  [I.trunk]: [sh(0, [16, 9, 8], [12, 12, 3], [0, 10, -10], null, 60, { shake: .15 }), sh(6, [11, 6.6, 3], [7.6, 8, -1.6], [2, 9, -8], null, 46)],
+  [I.face]: [sh(0, BO([5.4, 2.6, 3.4]), BO([4.2, 2.3, 2.4]), OJ(), null, 52), sh(5, [10, 20, 4], [8.6, 19, .6], BO([-3, 2.4, -2]), null, 52)],
+  [I.stump]: [sh(0, BO([.6, 2.6, 2.6]), BO([-1.2, 2.3, 1]), MU(), null, 40)],
+  [I.same]: [sh(0, [-4, 21.4, 8], [3, 21, 6], [2, 18.6, -10], null, 50), sh(3, [-4, 19.9, -8], [-1.2, 19.6, -8.2], [0, 18.6, -10], null, 30), sh(6, CBA([-6, 1.4, 4]), CBA([-4, .8, 2.6]), CBA(), null, 36)],
+  [I.built]: [sh(0, BO([-5.6, 2.2, 2.8]), BO([-4.4, 2, 2.1]), BO([0, 1.5, 0]), null, 50)],
+  [I.cut]: [sh(0, BO([-.4, 2.5, 1.6]), BO([-1.6, 2.3, .4]), MU(), null, 32)],
+  [I.pins]: [sh(0, [7, 21.6, -1], [4.4, 20.2, -4.6], OW(PERNOS[0], [0, 0, 0]), null, 40), sh(4, [-22, 18, 12], [-17, 17, 7], [-4, 18, -10], [-6, 16, -10], 56)],
+  [I.caught]: [sh(0, [8, 15, 12], [5, 16.4, 6], CB([0, -9, 6]), null, 56, { tr: "tapa", col: MARFIL }), sh(3, BR([20, 21, 52]), BR([14, 20.6, 44]), MU(), null, 36)],
+  [I.eyes]: [sh(0, OJ([9, .4, 12]), OJ([6.4, .2, 9.4]), OJ(), null, 28)],
+  [I.small]: [sh(0, [7, 9, -10], [3.6, 4, -17], KW(ME6, [0, 1, 0]), null, 54), sh(5, KW(ME6, [4, 1.7, 4.4]), KW(ME6, [2.6, 1.5, 3.2]), KW(ME6, [0, 1.1, 0]), null, 50)],
+  [I.found]: [sh(0, KW(ME6, [-2, 1.5, 3.6]), KW(ME6, [-1, 1.4, 3]), KW(ME6, [0, 1.1, 0]), null, 50), sh(4, KW(ME6, [5, 2.4, 7]), KW(ME6, [3.4, 2, 5.4]), KW(ME6, [0, 1.1, 0]), null, 54)],
+  [I.followed]: [sh(0, KW(ME6, [-3.4, 1.5, 4.2]), KW(ME6, [-2.2, 1.4, 3.2]), KW(ME6, [.6, 1.2, 0]), null, 50)],
+  [I.back]: [sh(0, [4.4, 2.3, -17], [3, 3, -20.4], BR([0, 22, 0]), null, 56), sh(5, BR([54, 16, 14]), BR([44, 14, 4]), CB([0, -6, 6]), null, 32)],
+  [I.life]: [sh(0, [9, 23, 2], [5, 21, -3.4], [0, 18, -10], null, 50), sh(3, [-44, 42, 54], [-30, 34, 40], [0, 10, -10], null, 50)],
+  [I.ours]: [sh(0, KW(ME, [2.8, 1.9, -6]), KW(ME, [1.4, 1.9, -4.8]), KW(ME, [-.7, 1.4, 0]), null, 52)],
+  [I.listen3]: [sh(0, KW(ME6, [-1.8, 1.5, -3.8]), KW(ME6, [-.8, 1.4, -3]), KW(ME6, [0, 1.3, 0]), null, 50)],
+  [I.heard]: [sh(0, [-8.4, 1.9, 13.6], [-9, 2.7, 17.4], [0, 34, -160], [0, 40, -160], 26)],
 };
 
 //@@ESCENA
 // ---------- la escena en cada instante
+let ENV_OK = false;
 function setScene(t) {
-  const L = lineAt(t), lt = t - s(L), len = (S[L + 1] ?? DUR) - s(L), k = P(lt, 0, len), Wd = kk => wt(L, kk);
+  const L = lineAt(t), lt = t - s(L), len = (S[L + 1] ?? DUR) - s(L), k = P(lt, 0, len), Wd = kk => wt(L, kk), T0 = s(L);
   POST = { flash: 0, sepia: 0 };
-  ALL.forEach(c => { if (c.polvo) c.polvo.forEach(q => q.visible = false); c.g.visible = false; c.g.scale.set(1, 1, 1); c.body.rotation.set(0, 0, 0); c.body.position.y = 0; c.head.rotation.set(0, 0, 0); power(c, null, 0); c.aura.visible = false; setFace(c, "neutral"); pose(c, t, {}) });
+  if (!ENV_OK) { Object.assign(ENV, ENV_DUSTMERE); ENV_OK = true }
+  mundoReset(); utileriaReset();
+  ALL.forEach(c => { if (c.polvo) c.polvo.forEach(q => q.visible = false); c.g.visible = false; c.body.rotation.set(0, 0, 0); c.body.position.y = 0; c.head.rotation.set(0, 0, 0); power(c, null, 0); c.aura.visible = false; setFace(c, "neutral"); pose(c, t, {}); quieto(c, t) });
   [PALA, REGLA, TELESC, HOYO].forEach(o => o.visible = false);
-  const lugar = LUGAR(L); setEnv("dia"); if (lugar === "recuerdo") POST.sepia = .42;
-  tortuga(t, { paso: 0 }); LUCES.forEach(l => l.visible = false);
-  let LL = [];
-  placeW(ME, 0, 6, Math.PI); placeW(ME6, 2, 6, Math.PI);
+  // ---- la luz según el momento: mañana clara, recuerdo de noche con incendio, tormenta naranja, y la tormenta que se abre
+  const RECUERDO = L >= I.dez && L <= I.night, ALBA = L === I.night && lt >= Wd(8) - T0 - .06;
+  const TORM = L === I.today || (L >= I.storm && L <= I.eyes), DESPUES = L >= I.small;
+  const fuerza = L === I.today ? .8 : L === I.storm ? .15 + .85 * eIO(k) : (L > I.storm && L <= I.rolling) ? 1 : (L >= I.turned && L <= I.shadow) ? .55 : (L >= I.stayed && L <= I.cut) ? .5 : (L >= I.pins && L <= I.eyes) ? .5 - .3 * ((L - I.pins) + k) / 3 : 0;
+  setEnv(RECUERDO ? (ALBA ? "despues" : "incendio") : TORM ? "tormenta" : DESPUES ? "despues" : "desierto");
+  if (TORM) { const A = ENV.tormenta, B = ENV.desierto, f = cl(fuerza); scene.fog.density = lerp(B.fog * 2.5, A.fog * (L >= I.turned ? .3 : .42), f) }
+  SOL.z = (L === I.ridge || L === I.tall || L === I.tusk || L === I.sixty || L === I.turned || (L === I.one && lt < Wd(2) - T0) || L === I.heard || L === I.listen2) ? -150 : 0;
+  ambiente(t); tormenta(t, cam.position, TORM ? fuerza : 0); tortuga(t, { paso: 0 }); LUCES.forEach(l => l.visible = false);
+  estanquesVisibles(!RECUERDO || ALBA); RUINAS.forEach((r, i) => ruinaEstado(i, !RECUERDO ? 1 : L < I.nine ? 0 : L === I.nine ? eIO(P(k, i * .09, i * .09 + .22)) : 1));
+  fuegoViejo(t, RECUERDO && !ALBA);
+  let LL = []; if (RECUERDO && !ALBA) LL.push([FUEGO_POS, 5, "#ff8a3a", 60], [[0, 20, -6], 2.2, "#ffb070", 40]);
+  TEMBLOR = 0; grietasTorre(L < I.trunk ? 0 : L === I.trunk ? eIO(P(lt, Wd(6) - T0 - .3, Wd(6) - T0 + .5)) : (L <= I.back && !RECUERDO) ? 1 : (L > I.back ? 1 : 0));
+  // ---- el cuerno: en la torre hasta que el narrador saca los pernos; después lo tiene Onetusk
+  const SIN_CUERNO = L > I.pins; pernosFuera(L < I.pins ? 0 : L === I.pins ? eOut(P(k, .05, .42)) : 1); cuernoCae(L < I.pins ? 0 : L === I.pins ? eIO(P(lt, Wd(4) - T0 - .1, len)) : 1); CUERNO.visible = !SIN_CUERNO;
+  // ---- Onetusk según la frase
+  const SEG = BESTIA_SEG_PASO, baj = p => { const pp = Math.min(p, BAJADA.pasos); return { x: BFIN.x * eIO(P(pp, 17, BAJADA.pasos)), z: CRESTA[1] + bestiaAvance(pp, BAJADA.pasos), paso: p, pasoFin: BAJADA.pasos } };
+  let B = { x: CRESTA[0], z: CRESTA[1] };   // por defecto: quieta en la cresta
+  const QUIETA = { gira: Math.sin(t * .23) * .04, orejas: .05 };
+  if (L === I.turned) B = { ...B, gira: -.5 * eIO(P(k, .05, .8)), orejas: .5 * eIO(P(k, .3, .9)) };
+  else if (L === I.one) B = { ...baj(lt / SEG), gira: -.3, orejas: .7 };
+  else if (L === I.five) B = { ...baj(9 + lt / SEG), orejas: .8 };
+  else if (L === I.shadow) B = { ...baj(21.6 + lt / SEG), orejas: 1, baja: .2 };
+  else if (L === I.stayed) B = { ...baj(BAJADA.pasos + 3 + lt / SEG), orejas: 1, baja: .3 * eIO(k) };
+  else if (L === I.trunk) B = { ...baj(99), orejas: 1, baja: .3, trompa: "enrosca", trompaEn: [TORRE[0], 9.5, TORRE[1]], trompaR: 4.4, trompaQ: eIO(P(k, 0, .7)) };
+  else if (L >= I.face && L <= I.pins) B = { ...baj(99), orejas: .7, baja: .55 + .25 * eIO(L === I.face ? k : 1), gira: .32 * eIO(L === I.face ? k : 1), trompa: "enrosca", trompaEn: [TORRE[0], 9.5, TORRE[1]], trompaR: 4.4, trompaQ: 1 };
+  else if (L === I.caught) B = { ...baj(99), orejas: .4, baja: .5, gira: .2, trompa: "sostiene", trompaDe: "enrosca", trompaQ: eIO(P(k, 0, .6)), conColmillo: eIO(P(k, .1, .55)) };
+  else if (L >= I.eyes && L <= I.followed) B = { ...baj(99), orejas: .1, baja: .45, gira: .1, trompa: "sostiene", conColmillo: 1, ojos: L === I.eyes ? eIO(P(k, .1, .45)) : L === I.small ? 1 - eIO(P(k, .3, .6)) : 0 };
+  else if (L === I.back) { const p = 6 + lt / SEG; B = { x: BFIN.x * (1 - eIO(P(p, 0, 14))), z: BFIN.z - 30 - bestiaAvance(p, 99), ry: Math.PI, paso: p, trompa: "sostiene", conColmillo: 1 } }
+  else if (L >= I.life) B = { ...B, trompa: "sostiene", conColmillo: 1, ...QUIETA };
+  else if (L === I.eleven) B = { ...baj(7 + lt / SEG), orejas: .9 };
+  else if (L === I.nine) B = { ...baj(15 + lt / SEG), orejas: 1, baja: lt >= Wd(4) - T0 ? .5 : .1, gira: Math.sin(t * 1.2) * .35 };
+  else if (L === I.night) B = ALBA ? { x: 0, z: -60 - bestiaAvance(4 + (t - Wd(8)) / SEG, 99), ry: Math.PI, paso: 4 + (t - Wd(8)) / SEG } : { ...baj(99), baja: .35, gira: Math.sin(t * .5) * .2, orejas: .6 };
+  else B = { ...B, ...QUIETA };
+  BX = B.x; BZ = B.z; bestiaPose(t, B);
+  { const g = pisadaGolpe(t); if (L === I.one && lt < Wd(2) - T0 || L === I.shadow && lt < Wd(3) - T0 || L === I.nine && lt < Wd(4) - T0) TEMBLOR = g * .22 }
+  if (L === I.shadow && lt >= Wd(3) - T0) R.toneMappingExposure *= lerp(1, .55, eIO(P(t, Wd(3), Wd(3) + .5)));
+  if (L === I.stayed || L === I.trunk) R.toneMappingExposure *= .7;
+  tazasSaltan(L < I.one ? 0 : L === I.one ? eOut(P(lt, Wd(2) - T0 + .1, len)) : 1);
+  if (L === I.five) { const q = P(lt, Wd(2) - T0 + .05, len); salpicar(10, q); salpicar(9, cl(q * 1.2 - .15)) }
+  // ---- la gente: [personaje, x, z, ry, cara, modo] con modo 0 quieto, 1 camina, 2 corre (avanza al ritmo de las piernas)
+  const gente = list => list.forEach(([c, x, z, ry, f = "neutral", modo = 0, ph = 0]) => { let d = 0; if (modo === 1) d = (lt - len / 2) * 2.3; if (modo === 2) d = (lt - len / 2) * 6.4; ponerP(c, x + Math.sin(ry) * d, z + Math.cos(ry) * d, ry); setFace(c, f); if (modo === 1) andar(c, t + ph); else if (modo === 2) correrV(c, t + ph); else quieto(c, t + ph) });
+  const BOCA = BOCA_W(), enCuerno = (c, cara, t0g) => { enTorre(c, BOCA, -Math.PI / 2); setFace(c, cara); if (t0g != null) gesto(c, t, t0g, "sopla", { dur: .3 }) };
+  const VEC = [FOLK[4], FOLK[5], EXT[0], EXT[1], EXT[2], EXT[3], PESCADOR, FOLK[0], FOLK[1], FOLK[2], FOLK[3], QUILL, GARROW];
+  switch (L) {
+    case I.rule: gente([[ME, 1.2, 8.5, Math.PI, "worried"], [FOLK[4], -5, 3, 1.2, "neutral", 1], [EXT[0], 6, 1, -1.8, "neutral", 1, .2]]); break;
+    case I.cost: gente([[FOLK[5], -4, 2, .6, "neutral", 1], [EXT[1], 5, 5, -2.4, "neutral", 1, .3]]); break;
+    case I.today: enCuerno(ME, "sopla", T0 - .3); break;
+    case I.horn: gente([[FOLK[4], -6, 4, .8, "neutral", 1], [EXT[2], 5, 8, 3, "neutral", 1, .2], [EXT[3], -2, 16, 0, "neutral", 1, .4], [GARROW, 8, -2, -2.2, "worried"]]); attach(BASTON, GARROW, "R", [0, -.2, .1]); break;
+    case I.wed: { const [x, z] = PUNTOS.boda; gente([[FOLK[0], x - .9, z, Math.PI / 2 + .2, "happy"], [FOLK[1], x + .9, z, -Math.PI / 2 - .2, "warm"], [EXT[0], x - 2.6, z + 2.4, 2.6, "happy"], [EXT[1], x + 2.4, z + 2.6, -2.5, "laugh"], [FOLK[4], x + 3.4, z - 1.2, -1.4, "happy"], [PESCADOR, x - 3.6, z - .8, 1.3, "warm"]]);
+      [[FOLK[0], 0], [FOLK[1], 1]].forEach(([c, i]) => { attach(TAZA_M[i], c, "L", [0, -.15, .15]); attach(CUCHARA_M[i], c, "R", [0, -.15, .15]); gesto(c, t, T0 + .15 + i * .12 + Math.floor(Math.max(0, lt - .15) / .42) * .42, "golpea", { dur: .2 }) }); break }
+    case I.babies: { const [x, z] = PUNTOS.bebe; gente([[FOLK[2], x + 1.3, z + .4, -1.9, "warm"], [FOLK[3], x - 1.5, z + 1.2, 2.2, "happy"]]); acunar(FOLK[2], BEBE); setFace(FOLK[2], lt > Wd(6) - T0 ? "susurra" : "warm"); FOLK[2].head.rotation.x = .35 * eIO(P(lt, Wd(6) - T0 - .1, Wd(6) - T0 + .25)); CUNA_BEBE.rotation.z = Math.sin(t * 2.2) * .12; break }
+    case I.school: { const [x, z] = PUNTOS.escuela; gente([[QUILL, x - 1.6, z + 2.6, -2.3, "determined"], [EXT[2], x + 2.8, z + 6, -2.6, "happy", 2], [ME6, x + 4.6, z + 7.4, -2.6, "excited", 2, .2], [PIM, x + 1.4, z + 8, -2.7, "happy", 2, .35]]); attach(BANDERA_ROJA, QUILL, "R", [0, -.15, .15]); gesto(QUILL, t, T0 - 1, "agita", { dur: .3, fin: 99 }); banderaFlamea(t); break }
+    case I.roost: { const [x, z] = PUNTOS.gallos; galloPose(0, t, { x: x - .8, z: z + .6, ry: 1.2 }); galloPose(1, t, { x: x + 1, z: z - .4, ry: -2 }); gente([[FOLK[3], x + 2.6, z - 1.6, .9, lt > Wd(5) - T0 ? "happy" : "neutral"]]); if (lt > Wd(5) - T0) gesto(FOLK[3], t, Wd(5), "brazos", { dur: .3 }); break }
+    case I.ridge: gente([[FOLK[4], -12, -7, -2.9, "worried"], [EXT[3], -10, -9, 2.9, "scared"], [EXT[1], -14.5, -10, -2.8, "worried"]]); break;
+    case I.tall: case I.tusk: case I.sixty: break;
+    case I.bee: gente([[ME6, 3.6, 13.6, -1.2, "listen"], [ME, 6.4, 15.6, -1.9, "warm"]]); gesto(ME6, t, T0 + .2, "escucha", { dur: .3, fin: 99 }); cabraPose(t, { x: 1.4, z: 16.4, ry: 2.2 }); break;
+    case I.listen1: { const piso = lt >= Wd(3) - T0 - .06 && lt < Wd(7) - T0 - .06, cielo = lt >= Wd(7) - T0 - .06; gente([[ME6, 3.6, 13.6, .4, cielo ? "excited" : "listen"], [ME, 6, 12.4, -1.2, "curious"]]); if (piso) { ME6.body.rotation.x = .9; ME6.g.position.y -= .25 } if (cielo) gesto(ME6, t, Wd(7) - .1, "senala", { dur: .3, fin: 99, alto: 1 }); else gesto(ME6, t, T0 - 1, "escucha", { dur: .3, fin: 99 }); cabraPose(t, { x: 1.4, z: 16.4, ry: 2.2 }); break }
+    case I.listen2: gente([[ME6, -8.4, 8, Math.PI + .05, lt > Wd(8) - T0 ? "listen" : "curious"], [ME, -6.8, 8.6, Math.PI + .1, "suspicious"]]); gesto(ME6, t, Wd(3) - .15, "senala", { dur: .4, fin: 99, alto: .6 }); break;
+    case I.nobody: gente([[ME6, -8.4, 8, Math.PI + .05, "listen"], [ME, -6.8, 8.6, Math.PI + .1, "worried"], [FOLK[5], -12, 3, 1.5, "neutral", 1], [EXT[0], -2, 4.4, -1.5, "neutral", 1, .25], [EXT[2], -10, -1, 1.6, "neutral", 1, .1]]); gesto(ME6, t, T0 - 1, "escucha", { dur: .3, fin: 99 }); break;
+    case I.dez: enCuerno(PIM, lt > Wd(7) - T0 ? "sopla" : "scared", Wd(7) - .1); gente([[FOLK[4], 14, 20, .6, "panic", 2], [EXT[0], 10, 24, .8, "terrified", 2, .2], [EXT[1], 18, 16, .5, "panic", 2, .4]]); break;
+    case I.note: enCuerno(PIM, "sopla", T0 - 1); break;
+    case I.eleven: case I.nine: enCuerno(PIM, "terrified"); gente([[FOLK[5], -4, -30, Math.PI * 0, "panic", 2], [EXT[2], 3, -36, .1, "terrified", 2, .3]]); break;
+    case I.night: if (!ALBA) { enCuerno(PIM, "horrified"); gesto(PIM, t, T0 - 1, "cubre", { dur: .3, fin: 99 }) } else gente([[PIM, -2, 6, Math.PI, "shock"], [FOLK[5], 2, 7, Math.PI, "scared"], [EXT[2], -5, 8, Math.PI - .2, "worried"]]); break;
+    case I.ponds: if (lt >= Wd(6) - T0 - .06) { gente([[ME, -11.8, -22.6, 1.3, "happy"], [ME6, -10.8, -27, 1.5, "laugh"]]); saltar(ME6, t, Wd(6) + .2) } break;
+    case I.sign: gente([[GARROW, 3.4, 4, Math.PI, "worried"], [FOLK[2], -3, 7, Math.PI - .3, "neutral"], [EXT[3], -6, 2, 1.4, "neutral", 1]]); attach(BASTON, GARROW, "R", [0, -.2, .1]); gesto(GARROW, t, T0 + .3, "senala", { dur: .45, fin: 99, mano: "L", alto: .8 }); break;
+    case I.storm: gente([[FOLK[4], -2, 20, Math.PI, "scared", 2], [EXT[1], 2.4, 14, Math.PI, "panic", 2, .3], [FOLK[1], 0, 26, Math.PI, "terrified", 2, .15], [EXT[0], -2.6, 30, 0, "scared"]]); break;
+    case I.orange: gente([[ME, 2, 19, .2, "scared"]]); gesto(ME, t, Wd(4) - .2, "alza", { dur: .4, fin: 99 }); break;
+    case I.goat: { const d = lt * 5.6; ponerP(ME6, 0, -34 - d, Math.PI); setFace(ME6, "determined"); correrV(ME6, t); cabraPose(t, { x: .8, z: -39 - d * 1.05, ry: Math.PI, corre: 1 }); break }
+    case I.scream: gente([[ME, 1, -27, Math.PI, "grito"]]); gesto(ME, t, T0 + .1, "grita", { dur: .25, fin: Wd(4) - .1 }); break;
+    case I.forty: VEC.forEach((c, i) => { ponerP(c, -10.5 + i * 1.75 + Math.sin(i * 7) * .4, -26 + Math.cos(i * 3.3) * 1.3, Math.PI + Math.sin(i * 2.1) * .2); setFace(c, "grito"); quieto(c, t + i * .13); gesto(c, t, T0 + .05 + (i % 4) * .07, "grita", { dur: .25, fin: Wd(3) - .1 }) }); gente([[ME, 1, -29.6, Math.PI, "grito"]]); break;
+    case I.louder: gente([[ME, 1, -27, lerp(Math.PI, .15, eIO(P(k, 0, .35))), "determined"]]); break;
+    case I.climb: { const q = lerp(8, 86, k), i0 = Math.floor(q), a = ESCALON_W(i0), b = ESCALON_W(Math.min(91, i0 + 1)), f = q - i0; enTorre(ME, [lerp(a[0], b[0], f), lerp(a[1], b[1], f), lerp(a[2], b[2], f)], Math.atan2(b[0] - a[0], b[2] - a[2])); setFace(ME, "determined"); correrV(ME, t); break }
+    case I.mouth: enCuerno(ME, "determined", T0 + .25); break;
+    case I.blew: case I.rolling: enCuerno(ME, "sopla", T0 - 1); break;
+    case I.turned: break;
+    case I.one: enCuerno(ME, "sopla", T0 - 1); break;
+    case I.five: enCuerno(ME, "sopla", T0 - 1); break;
+    case I.shadow: enCuerno(ME, "sopla", T0 - 1); gente([[FOLK[4], -3, -2, 0, "panic", 2], [EXT[1], 2.4, -4, .2, "terrified", 2, .3], [FOLK[1], -6, 0, -.2, "panic", 2, .15], [EXT[0], -8, 3, .1, "terrified", 2, .4], [QUILL, 1, 2, 0, "panic", 2, .2]]); break;
+    case I.stayed: enCuerno(ME, lt > Wd(2) - T0 ? "sopla" : "terrified", Wd(4) - .1); gente([[FOLK[4], -1.6, 22, 0, "panic", 2], [EXT[1], 1.8, 18, 0, "terrified", 2, .3], [FOLK[1], .2, 27, 0, "panic", 2, .15], [EXT[0], -2.2, 30, 0, "terrified", 2, .4], [QUILL, 2.4, 25, 0, "panic", 2, .2], [GARROW, -2.6, 15, 0, "horrified", 1]]); break;
+    case I.trunk: enCuerno(ME, "terrified"); gesto(ME, t, T0 + .1, "brazos", { dur: .3, fin: 99 }); break;
+    case I.face: enCuerno(ME, "horrified"); ME.g.rotation.y = lerp(-Math.PI / 2, -Math.PI * .86, eIO(P(k, 0, .4))); break;
+    case I.stump: case I.same: enCuerno(ME, "shock"); ME.g.rotation.y = -Math.PI * .86; break;
+    case I.built: case I.cut: enCuerno(ME, L === I.cut ? "sad" : "shock"); break;
+    case I.pins: enCuerno(ME, "determined"); gesto(ME, t, T0 + .05, "tira", { dur: .3, fin: Wd(4) }); break;
+    case I.caught: case I.eyes: enCuerno(ME, L === I.eyes ? "relieved" : "shock"); break;
+    case I.small: case I.found: case I.followed: { const p = pieW(0), bx = p[0] + 5.4, bz = p[2] + 3.4, suelta = L === I.small ? eIO(P(lt, Wd(7) - T0 - .1, len)) : 1;
+      ponerP(ME6, lerp(p[0] + 4.3, bx, suelta), lerp(p[2] + 2.2, bz, suelta), lerp(Math.atan2(-1, -.5), .5, suelta)); setFace(ME6, L === I.followed ? "warm" : L === I.found ? "hopeful" : "scared"); arenaEncima(ME6, 1); arenaEncima(CABRA, 1); cabraPose(t, { x: 0, z: 0, enBrazos: ME6 });
+      if (L !== I.small) { const q = L === I.found ? eIO(P(lt, Wd(4) - T0 - .2, len)) : 1; ponerP(ME, lerp(bx + 9, bx + 1.7, q), lerp(bz + 9, bz + 1.2, q), Math.atan2(-1, -1)); setFace(ME, L === I.followed ? "relieved" : "gasp"); if (q < 1 && L === I.found) correrV(ME, t); if (L === I.followed) gesto(ME, t, T0 - 1, "abraza", { dur: .3, fin: 99 }) } break }
+    case I.back: gente([[ME, 2, -25, Math.PI, "warm"], [ME6, .4, -25.6, Math.PI, "happy"]]); arenaEncima(ME6, .8); arenaEncima(CABRA, .8); cabraPose(t, { x: -1.6, z: -24.4, ry: 2.6 }); break;
+    case I.life: gente([[FOLK[4], -6, 4, .4, "hopeful"], [EXT[1], 5, 6, -.5, "relieved"], [GARROW, 3, 9, Math.PI, "relieved"], [QUILL, -3, 10, Math.PI, "warm"], [FOLK[1], 7, 11, -2.8, "hopeful"]]); attach(BASTON, GARROW, "R", [0, -.2, .1]); break;
+    case I.ours: case I.listen3: case I.heard: gente([[ME, -6.8, 8.6, Math.PI + .1, L === I.heard ? "listen" : "warm"], [ME6, -8.4, 8, Math.PI + .05, L === I.ours ? "happy" : "listen"]]); arenaEncima(ME6, .6); if (L !== I.ours) gesto(ME6, t, s(I.listen3) + .05, "escucha", { dur: .3, fin: 999 }); if (L === I.heard) gesto(ME, t, T0 + .4, "escucha", { dur: .4, fin: 999 }); cabraPose(t, { x: -10.6, z: 9.4, ry: 2.6 }); break;
+  }
   lights(LL); camara(t);
 }
