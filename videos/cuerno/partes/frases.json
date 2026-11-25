@@ -255,6 +255,21 @@
   "gap": 0.1
  },
  {
+  "n": "blind",
+  "t": "Onetusk was blind.",
+  "gap": 0.3
+ },
+ {
+  "n": "search",
+  "t": "For sixty years, it wasn't watching us. It was searching.",
+  "gap": 0.1
+ },
+ {
+  "n": "own",
+  "t": "And the only sound loud enough to find it was its own horn.",
+  "gap": 0.4
+ },
+ {
   "n": "life",
   "t": "My whole life, nobody blew the horn.",
   "gap": 0.1

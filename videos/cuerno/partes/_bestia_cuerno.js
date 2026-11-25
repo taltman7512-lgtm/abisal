@@ -212,6 +212,9 @@ const ONETUSK = (() => {
   const M_PARP = new THREE.MeshStandardMaterial({ map: T_PARP, bumpMap: T_PARP, bumpScale: 2.6, roughness: .8, side: THREE.DoubleSide });
   const OJO_R = 1.0;
   function hacerOjo(par, s, pos, nrm) { const G = new THREE.Group(); par.add(G); G.position.copy(pos); const zA = nrm.clone().normalize(), xA = v3(0, 1, 0).cross(zA).normalize(), yA = zA.clone().cross(xA); G.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(xA, yA, zA));
+    // Onetusk es ciego (idea del dueño, 25-nov-2026): cataratas lechosas sobre la pupila y el iris, para que se vea de cerca
+    { const c = T_IRIS_O.image, g = c.getContext("2d"), w = c.width, h = c.height, yI = h * .21, r = rng(2719); const gr = g.createLinearGradient(0, 0, 0, yI * 1.15); gr.addColorStop(0, "rgba(214,222,226,.93)"); gr.addColorStop(.55, "rgba(196,206,212,.82)"); gr.addColorStop(1, "rgba(170,176,176,.25)"); g.fillStyle = gr; g.fillRect(0, 0, w, yI * 1.15);
+      for (let k = 0; k < 260; k++) { const x = r() * w, y = r() * yI * 1.05; g.strokeStyle = `rgba(${r() < .5 ? "255,255,255" : "150,160,168"},${.15 + r() * .3})`; g.lineWidth = 1 + r() * 3; g.beginPath(); g.moveTo(x, y); g.lineTo(x + (r() - .5) * 30, y + 10 + r() * 30); g.stroke() } T_IRIS_O.needsUpdate = true }
     const gb = new THREE.SphereGeometry(OJO_R, 56, 36); gb.rotateX(Math.PI / 2); malla(gb, new THREE.MeshStandardMaterial({ map: T_IRIS_O, roughness: .22 }), G, false);
     const co = new THREE.Mesh(new THREE.SphereGeometry(OJO_R * 1.035, 40, 28), new THREE.MeshPhysicalMaterial({ color: "#ffffff", transparent: true, opacity: .15, roughness: .02, clearcoat: 1, clearcoatRoughness: 0, depthWrite: false })); G.add(co);
     for (const [dx, dy, rr] of [[-.3, .34, .15], [.2, -.12, .055], [-.1, .46, .045]]) { const b = new THREE.Mesh(new THREE.SphereGeometry(rr, 12, 8), new THREE.MeshBasicMaterial({ color: "#fffdf2" })); b.position.set(dx * s, dy, Math.sqrt(Math.max(.01, 1.04 - dx * dx - dy * dy)) * OJO_R); b.scale.z = .35; G.add(b) }
@@ -364,7 +367,7 @@ function bestiaPose(t, { x = CRESTA[0], z = CRESTA[1], y = null, ry = 0, paso = 
   O.cuello.rotation.order = "YXZ"; O.cuello.rotation.set(-.04 + baja * .46 + S2.dipF * .05 + resp2 * .006, gira, S2.bal * .025); O.cabeza.rotation.set(Math.sin(t * .37) * .008, Math.sin(t * .23 + 1) * .012, 0);
   O.orejas.forEach(({ giro, s }, k) => { giro.rotation.y = lerp(1.06, .1, cl(orejas)) + Math.sin(t * .8 + k * 1.7) * .03 * (1 + orejas) + Math.sin(t * 2.3 + k) * .008 - S2.dipF * .13 + S2.bal * s * .06; giro.rotation.x = S2.dipF * .03;
     const w1 = Math.sin(t * .8 + k * 1.7 - .7), w2 = Math.sin(t * .8 + k * 1.7 - 1.5); O.doblarOreja(O.orejas[k], .05 + w1 * .05 * (1 + orejas) + S2.dipF * .22 - orejas * .1, .08 + w2 * .08 * (1 + orejas) + S3.dipF * .34 + S3.bal * s * .12, .1 + S3.dipF * .3 + w2 * .05) });
-  const cierre = Math.max(cl(ojos), ojos > .5 ? 0 : _bParp(t)); O.ojos.forEach(o => { o.sup.rotation.x = lerp(-.42, .47, cierre); o.infP.rotation.x = lerp(.62, .43, cierre) });
+  const cierre = ojos < 0 ? 0 : Math.max(cl(ojos), ojos > .5 ? 0 : _bParp(t)); O.ojos.forEach(o => { o.sup.rotation.x = lerp(-.42, .47, cierre); o.infP.rotation.x = lerp(.62, .43, cierre) });
   O.colaP.rotation.set(.12 + S2.dipH * .1, 0, S2.bal * .35 + Math.sin(t * .6) * .04);
   // --- el colmillo devuelto, contra el muñón
   { const c = cl(conColmillo), e = 1 - c, k2 = O.col2; k2.visible = c > 0; k2.position.copy(O.P_M).addScaledVector(O.TAN_M, .03 + 3.2 * e); k2.position.y -= 1.2 * e; k2.position.x += .8 * e; k2.rotation.set(O.dip(O.TAN_M) - O.dip(O.TAN0) + .22 * e, .25 * e, 0) }

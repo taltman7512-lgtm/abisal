@@ -45,3 +45,9 @@ humming»). Giro: «My whole life, nobody blew the horn. It was never our horn.�
 querido con muletilla, estribillo «Listen» ×3, 104 s, 259 palabras por minuto, 95 tomas (58 cambios por minuto).
 Construido en paralelo por tres agentes (mundo, bestia, elenco) sobre copias de trabajo, con un archivo común de medidas
 (`_comun_cuerno.js`); eso funcionó bien y conviene repetirlo.
+Final ampliado (idea del dueño, 25-nov-2026): Onetusk era **ciego** (ojos con cataratas desde el principio, como pista) y
+en 60 años no vigilaba al pueblo sino que **buscaba su colmillo**; el único sonido tan fuerte como para guiarlo era el
+de su propio cuerno. Frases nuevas antes del giro: «Onetusk was blind. For sixty years, it wasn't watching us. It was
+searching. And the only sound loud enough to find it was its own horn.» Funciona porque la pista ya estaba plantada
+(«looking for the sound», «stands and watches»). Para sumar frases a una voz ya cortada: generar solo esas frases con
+la misma voz, cortarlas con la misma aceleración (×1,45) y renumerar `voz/NN.wav`.

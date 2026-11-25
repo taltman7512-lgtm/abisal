@@ -72,10 +72,13 @@ const SHOTS = {
   [I.found]: [sh(0, KW(ME6, [-3, 1.7, 5.2]), KW(ME6, [-1.8, 1.6, 4.4]), KW(ME6, [0, 1.1, 0]), null, 50, { lat: .6 }), sh(4, KW(ME6, [-4.4, 2.4, 7.6]), KW(ME6, [-3, 2, 5.8]), KW(ME6, [1, 1.1, .4]), null, 56, { tr: "sigue", lat: .6 })],
   [I.followed]: [sh(0, KW(ME6, [-4, 1.6, 5.6]), KW(ME6, [-2.8, 1.5, 4.4]), KW(ME6, [.9, 1.2, 0]), null, 52, { tr: "sigue", lat: .6 })],
   [I.back]: [sh(0, [9, 2.4, -21], [7, 2.9, -23.4], BR([0, 22, 0]), null, 56), sh(5, BR([54, 16, 14]), BR([44, 14, 4]), CB([0, -6, 6]), null, 32)],
+  [I.blind]: [sh(0, OJ([10, .6, 13]), OJ([7, .3, 10]), OJ(), null, 28, { tr: "tapa", col: "#d8dee2" })],
+  [I.search]: [sh(0, [0, 64, 30], [0, 56, -6], [0, 6, -70], [0, 12, -120], 52), sh(7, [26, 46, -96], [18, 40, -110], CB([0, -4, 6]), null, 40)],
+  [I.own]: [sh(0, [-8.4, 4.4, 15], [-8.6, 4.8, 13.4], [-4, 28, -160], [-4, 31, -160], 30, { lat: .4 })],
   [I.life]: [sh(0, [9, 23, 2], [5, 21, -3.4], [0, 18, -10], null, 50), sh(3, [-44, 42, 54], [-30, 34, 40], [0, 10, -10], null, 50)],
   [I.ours]: [sh(0, KW(ME, [2.8, 1.9, -6]), KW(ME, [1.4, 1.9, -4.8]), KW(ME, [-.7, 1.4, 0]), null, 52)],
   [I.listen3]: [sh(0, KW(ME6, [-2.6, 1.7, -5.4]), KW(ME6, [-1.2, 1.6, -4.4]), KW(ME6, [.7, 1.3, 0]), null, 50)],
-  [I.heard]: [sh(0, [-9.4, 3.2, 9.4], [-9.4, 3.8, 11.6], [0, 20, -160], [0, 23, -160], 34, { lat: .4 })],
+  [I.heard]: [sh(0, [-8, 2.0, 10.4], [-8.2, 2.3, 11.8], [-4, 22, -160], [-4, 25, -160], 34, { lat: .3 })],
 };
 
 //@@ESCENA
@@ -95,7 +98,7 @@ function setScene(t) {
   setEnv(RECUERDO ? (ALBA ? "despues" : "incendio") : TORM ? "tormenta" : DESPUES ? "despues" : "desierto");
   if (TORM) { const A = ENV.tormenta, B = ENV.desierto, f = cl(fuerza); scene.fog.density = lerp(B.fog * 2.5, A.fog * (L >= I.trunk ? .16 : L >= I.turned ? .26 : L === I.rolling ? .13 : (L === I.orange || L === I.storm) ? .26 : .42), f) }
   if (L >= I.life) scene.fog.density *= .45;
-  SOL.z = (L === I.ridge || L === I.tall || L === I.tusk || L === I.sixty || L === I.turned || (L === I.one && lt < Wd(2) - T0) || L === I.heard || L === I.listen2) ? -150 : 0;
+  SOL.z = (L === I.blind || L === I.search && lt >= Wd(7) - T0 - .06 || L === I.ridge || L === I.tall || L === I.tusk || L === I.sixty || L === I.turned || (L === I.one && lt < Wd(2) - T0) || L === I.heard || L === I.listen2) ? -150 : 0;
   ambiente(t); tormenta(t, cam.position, TORM ? fuerza : 0); tortuga(t, { paso: 0 }); LUCES.forEach(l => l.visible = false);
   estanquesVisibles(!RECUERDO || ALBA); RUINAS.forEach((r, i) => ruinaEstado(i, !RECUERDO ? 1 : L < I.nine ? 0 : L === I.nine ? eIO(P(k, i * .09, i * .09 + .22)) : 1));
   fuegoViejo(t, RECUERDO && !ALBA);
@@ -117,7 +120,7 @@ function setScene(t) {
   else if (L === I.caught) B = { ...baj(99), orejas: .4, baja: .5, gira: .2, trompa: "sostiene", trompaDe: "enrosca", trompaQ: eIO(P(k, 0, .5)), conColmillo: eIO(P(k, .05, .4)) };
   else if (L >= I.eyes && L <= I.followed) B = { ...baj(99), orejas: .1, baja: .45, gira: .1, trompa: "sostiene", conColmillo: 1, ojos: L === I.eyes ? eIO(P(k, .1, .45)) : L === I.small ? 1 - eIO(P(k, .3, .6)) : 0 };
   else if (L === I.back) { const p = 6 + lt / SEG; B = { x: BFIN.x * (1 - eIO(P(p, 0, 14))), z: BFIN.z - 30 - bestiaAvance(p, 99), ry: Math.PI, paso: p, trompa: "sostiene", conColmillo: 1 } }
-  else if (L >= I.life) B = { ...B, trompa: "sostiene", conColmillo: 1, ...QUIETA };
+  else if (L >= I.blind) B = { ...B, trompa: "sostiene", conColmillo: 1, ...QUIETA, ojos: L === I.blind ? -1 : 0 };
   else if (L === I.eleven) B = { ...baj(7 + lt / SEG), orejas: .9 };
   else if (L === I.nine) B = { ...baj(15 + lt / SEG), orejas: 1, baja: lt >= Wd(4) - T0 ? .5 : .1, gira: Math.sin(t * 1.2) * .35 };
   else if (L === I.night) B = ALBA ? { x: 0, z: -60 - bestiaAvance(4 + (t - Wd(8)) / SEG, 99), ry: Math.PI, paso: 4 + (t - Wd(8)) / SEG } : { ...baj(99), baja: .35, gira: Math.sin(t * .5) * .2, orejas: .6 };
@@ -179,7 +182,7 @@ function setScene(t) {
       if (L !== I.small) { const q = L === I.found ? eIO(P(lt, Wd(4) - T0 - .2, len)) : 1; ponerP(ME, lerp(bx + 9, bx + 2.3, q), lerp(bz + 8, bz + .5, q), Math.atan2(-1, -.6)); setFace(ME, L === I.followed ? "relieved" : "gasp"); if (q < 1 && L === I.found) correrV(ME, t); if (L === I.followed) gesto(ME, t, T0 - 1, "abraza", { dur: .3, fin: 99 }) } break }
     case I.back: gente([[ME, 2, -25, Math.PI, "warm"], [ME6, .4, -25.6, Math.PI, "happy"]]); arenaEncima(ME6, .8); arenaEncima(CABRA, .8); cabraPose(t, { x: -1.6, z: -24.4, ry: 2.6 }); break;
     case I.life: gente([[FOLK[4], -6, 4, .4, "hopeful"], [EXT[1], 5, 6, -.5, "relieved"], [GARROW, 3, 9, Math.PI, "relieved"], [QUILL, -3, 10, Math.PI, "warm"], [FOLK[1], 7, 11, -2.8, "hopeful"]]); attach(BASTON, GARROW, "R", [0, -.2, .1]); break;
-    case I.ours: case I.listen3: case I.heard: gente([[ME, -8.6, 2.6, Math.PI + .1, L === I.heard ? "listen" : "warm"], [ME6, -10.2, 2, Math.PI + .05, L === I.ours ? "happy" : "listen"]]); arenaEncima(ME6, .6); if (L !== I.ours) gesto(ME6, t, s(I.listen3) + .05, "escucha", { dur: .3, fin: 999 }); if (L === I.heard) gesto(ME, t, T0 + .4, "escucha", { dur: .4, fin: 999 }); cabraPose(t, { x: -12, z: 3.4, ry: 2.6 }); break;
+    case I.own: case I.ours: case I.listen3: case I.heard: gente([[ME, -8.9, 4.6, Math.PI + .05, L === I.heard ? "listen" : "warm"], [ME6, -7.3, 4.9, Math.PI - .05, L === I.ours ? "happy" : "listen"]]); arenaEncima(ME6, .6); if (L !== I.ours) gesto(ME6, t, s(I.listen3) + .05, "escucha", { dur: .3, fin: 999 }); if (L === I.heard) gesto(ME, t, T0 + .4, "escucha", { dur: .4, fin: 999 }); cabraPose(t, { x: -5.8, z: 4.2, ry: 2.6 }); break;
   }
   // banco de pruebas de personajes (QUERY="provisoria&fila"): todos en fila en la plaza, cámara fija; t elige el encuadre y la cara
   if (FILA) { setEnv("desierto"); SOL.z = 0; ambiente(0); tormenta(0, cam.position, 0); estanquesVisibles(true); ALL.forEach(c => c.g.visible = false); sinBestia(); CABRA.visible = false;

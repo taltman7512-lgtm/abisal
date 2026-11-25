@@ -1356,6 +1356,9 @@ const ONETUSK = (() => {
   const M_PARP = new THREE.MeshStandardMaterial({ map: T_PARP, bumpMap: T_PARP, bumpScale: 2.6, roughness: .8, side: THREE.DoubleSide });
   const OJO_R = 1.0;
   function hacerOjo(par, s, pos, nrm) { const G = new THREE.Group(); par.add(G); G.position.copy(pos); const zA = nrm.clone().normalize(), xA = v3(0, 1, 0).cross(zA).normalize(), yA = zA.clone().cross(xA); G.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(xA, yA, zA));
+    // Onetusk es ciego (idea del dueño, 25-nov-2026): cataratas lechosas sobre la pupila y el iris, para que se vea de cerca
+    { const c = T_IRIS_O.image, g = c.getContext("2d"), w = c.width, h = c.height, yI = h * .21, r = rng(2719); const gr = g.createLinearGradient(0, 0, 0, yI * 1.15); gr.addColorStop(0, "rgba(214,222,226,.93)"); gr.addColorStop(.55, "rgba(196,206,212,.82)"); gr.addColorStop(1, "rgba(170,176,176,.25)"); g.fillStyle = gr; g.fillRect(0, 0, w, yI * 1.15);
+      for (let k = 0; k < 260; k++) { const x = r() * w, y = r() * yI * 1.05; g.strokeStyle = `rgba(${r() < .5 ? "255,255,255" : "150,160,168"},${.15 + r() * .3})`; g.lineWidth = 1 + r() * 3; g.beginPath(); g.moveTo(x, y); g.lineTo(x + (r() - .5) * 30, y + 10 + r() * 30); g.stroke() } T_IRIS_O.needsUpdate = true }
     const gb = new THREE.SphereGeometry(OJO_R, 56, 36); gb.rotateX(Math.PI / 2); malla(gb, new THREE.MeshStandardMaterial({ map: T_IRIS_O, roughness: .22 }), G, false);
     const co = new THREE.Mesh(new THREE.SphereGeometry(OJO_R * 1.035, 40, 28), new THREE.MeshPhysicalMaterial({ color: "#ffffff", transparent: true, opacity: .15, roughness: .02, clearcoat: 1, clearcoatRoughness: 0, depthWrite: false })); G.add(co);
     for (const [dx, dy, rr] of [[-.3, .34, .15], [.2, -.12, .055], [-.1, .46, .045]]) { const b = new THREE.Mesh(new THREE.SphereGeometry(rr, 12, 8), new THREE.MeshBasicMaterial({ color: "#fffdf2" })); b.position.set(dx * s, dy, Math.sqrt(Math.max(.01, 1.04 - dx * dx - dy * dy)) * OJO_R); b.scale.z = .35; G.add(b) }
@@ -1508,7 +1511,7 @@ function bestiaPose(t, { x = CRESTA[0], z = CRESTA[1], y = null, ry = 0, paso = 
   O.cuello.rotation.order = "YXZ"; O.cuello.rotation.set(-.04 + baja * .46 + S2.dipF * .05 + resp2 * .006, gira, S2.bal * .025); O.cabeza.rotation.set(Math.sin(t * .37) * .008, Math.sin(t * .23 + 1) * .012, 0);
   O.orejas.forEach(({ giro, s }, k) => { giro.rotation.y = lerp(1.06, .1, cl(orejas)) + Math.sin(t * .8 + k * 1.7) * .03 * (1 + orejas) + Math.sin(t * 2.3 + k) * .008 - S2.dipF * .13 + S2.bal * s * .06; giro.rotation.x = S2.dipF * .03;
     const w1 = Math.sin(t * .8 + k * 1.7 - .7), w2 = Math.sin(t * .8 + k * 1.7 - 1.5); O.doblarOreja(O.orejas[k], .05 + w1 * .05 * (1 + orejas) + S2.dipF * .22 - orejas * .1, .08 + w2 * .08 * (1 + orejas) + S3.dipF * .34 + S3.bal * s * .12, .1 + S3.dipF * .3 + w2 * .05) });
-  const cierre = Math.max(cl(ojos), ojos > .5 ? 0 : _bParp(t)); O.ojos.forEach(o => { o.sup.rotation.x = lerp(-.42, .47, cierre); o.infP.rotation.x = lerp(.62, .43, cierre) });
+  const cierre = ojos < 0 ? 0 : Math.max(cl(ojos), ojos > .5 ? 0 : _bParp(t)); O.ojos.forEach(o => { o.sup.rotation.x = lerp(-.42, .47, cierre); o.infP.rotation.x = lerp(.62, .43, cierre) });
   O.colaP.rotation.set(.12 + S2.dipH * .1, 0, S2.bal * .35 + Math.sin(t * .6) * .04);
   // --- el colmillo devuelto, contra el muñón
   { const c = cl(conColmillo), e = 1 - c, k2 = O.col2; k2.visible = c > 0; k2.position.copy(O.P_M).addScaledVector(O.TAN_M, .03 + 3.2 * e); k2.position.y -= 1.2 * e; k2.position.x += .8 * e; k2.rotation.set(O.dip(O.TAN_M) - O.dip(O.TAN0) + .22 * e, .25 * e, 0) }
@@ -2657,10 +2660,13 @@ const SHOTS = {
   [I.found]: [sh(0, KW(ME6, [-3, 1.7, 5.2]), KW(ME6, [-1.8, 1.6, 4.4]), KW(ME6, [0, 1.1, 0]), null, 50, { lat: .6 }), sh(4, KW(ME6, [-4.4, 2.4, 7.6]), KW(ME6, [-3, 2, 5.8]), KW(ME6, [1, 1.1, .4]), null, 56, { tr: "sigue", lat: .6 })],
   [I.followed]: [sh(0, KW(ME6, [-4, 1.6, 5.6]), KW(ME6, [-2.8, 1.5, 4.4]), KW(ME6, [.9, 1.2, 0]), null, 52, { tr: "sigue", lat: .6 })],
   [I.back]: [sh(0, [9, 2.4, -21], [7, 2.9, -23.4], BR([0, 22, 0]), null, 56), sh(5, BR([54, 16, 14]), BR([44, 14, 4]), CB([0, -6, 6]), null, 32)],
+  [I.blind]: [sh(0, OJ([10, .6, 13]), OJ([7, .3, 10]), OJ(), null, 28, { tr: "tapa", col: "#d8dee2" })],
+  [I.search]: [sh(0, [0, 64, 30], [0, 56, -6], [0, 6, -70], [0, 12, -120], 52), sh(7, [26, 46, -96], [18, 40, -110], CB([0, -4, 6]), null, 40)],
+  [I.own]: [sh(0, [-8.4, 4.4, 15], [-8.6, 4.8, 13.4], [-4, 28, -160], [-4, 31, -160], 30, { lat: .4 })],
   [I.life]: [sh(0, [9, 23, 2], [5, 21, -3.4], [0, 18, -10], null, 50), sh(3, [-44, 42, 54], [-30, 34, 40], [0, 10, -10], null, 50)],
   [I.ours]: [sh(0, KW(ME, [2.8, 1.9, -6]), KW(ME, [1.4, 1.9, -4.8]), KW(ME, [-.7, 1.4, 0]), null, 52)],
   [I.listen3]: [sh(0, KW(ME6, [-2.6, 1.7, -5.4]), KW(ME6, [-1.2, 1.6, -4.4]), KW(ME6, [.7, 1.3, 0]), null, 50)],
-  [I.heard]: [sh(0, [-9.4, 3.2, 9.4], [-9.4, 3.8, 11.6], [0, 20, -160], [0, 23, -160], 34, { lat: .4 })],
+  [I.heard]: [sh(0, [-8, 2.0, 10.4], [-8.2, 2.3, 11.8], [-4, 22, -160], [-4, 25, -160], 34, { lat: .3 })],
 };
 
 // tiempos de inicio de cada toma y cortes; window.SUBF: más sub-cuadros (desenfoque) en los barridos
@@ -2734,7 +2740,7 @@ function setScene(t) {
   setEnv(RECUERDO ? (ALBA ? "despues" : "incendio") : TORM ? "tormenta" : DESPUES ? "despues" : "desierto");
   if (TORM) { const A = ENV.tormenta, B = ENV.desierto, f = cl(fuerza); scene.fog.density = lerp(B.fog * 2.5, A.fog * (L >= I.trunk ? .16 : L >= I.turned ? .26 : L === I.rolling ? .13 : (L === I.orange || L === I.storm) ? .26 : .42), f) }
   if (L >= I.life) scene.fog.density *= .45;
-  SOL.z = (L === I.ridge || L === I.tall || L === I.tusk || L === I.sixty || L === I.turned || (L === I.one && lt < Wd(2) - T0) || L === I.heard || L === I.listen2) ? -150 : 0;
+  SOL.z = (L === I.blind || L === I.search && lt >= Wd(7) - T0 - .06 || L === I.ridge || L === I.tall || L === I.tusk || L === I.sixty || L === I.turned || (L === I.one && lt < Wd(2) - T0) || L === I.heard || L === I.listen2) ? -150 : 0;
   ambiente(t); tormenta(t, cam.position, TORM ? fuerza : 0); tortuga(t, { paso: 0 }); LUCES.forEach(l => l.visible = false);
   estanquesVisibles(!RECUERDO || ALBA); RUINAS.forEach((r, i) => ruinaEstado(i, !RECUERDO ? 1 : L < I.nine ? 0 : L === I.nine ? eIO(P(k, i * .09, i * .09 + .22)) : 1));
   fuegoViejo(t, RECUERDO && !ALBA);
@@ -2756,7 +2762,7 @@ function setScene(t) {
   else if (L === I.caught) B = { ...baj(99), orejas: .4, baja: .5, gira: .2, trompa: "sostiene", trompaDe: "enrosca", trompaQ: eIO(P(k, 0, .5)), conColmillo: eIO(P(k, .05, .4)) };
   else if (L >= I.eyes && L <= I.followed) B = { ...baj(99), orejas: .1, baja: .45, gira: .1, trompa: "sostiene", conColmillo: 1, ojos: L === I.eyes ? eIO(P(k, .1, .45)) : L === I.small ? 1 - eIO(P(k, .3, .6)) : 0 };
   else if (L === I.back) { const p = 6 + lt / SEG; B = { x: BFIN.x * (1 - eIO(P(p, 0, 14))), z: BFIN.z - 30 - bestiaAvance(p, 99), ry: Math.PI, paso: p, trompa: "sostiene", conColmillo: 1 } }
-  else if (L >= I.life) B = { ...B, trompa: "sostiene", conColmillo: 1, ...QUIETA };
+  else if (L >= I.blind) B = { ...B, trompa: "sostiene", conColmillo: 1, ...QUIETA, ojos: L === I.blind ? -1 : 0 };
   else if (L === I.eleven) B = { ...baj(7 + lt / SEG), orejas: .9 };
   else if (L === I.nine) B = { ...baj(15 + lt / SEG), orejas: 1, baja: lt >= Wd(4) - T0 ? .5 : .1, gira: Math.sin(t * 1.2) * .35 };
   else if (L === I.night) B = ALBA ? { x: 0, z: -60 - bestiaAvance(4 + (t - Wd(8)) / SEG, 99), ry: Math.PI, paso: 4 + (t - Wd(8)) / SEG } : { ...baj(99), baja: .35, gira: Math.sin(t * .5) * .2, orejas: .6 };
@@ -2818,7 +2824,7 @@ function setScene(t) {
       if (L !== I.small) { const q = L === I.found ? eIO(P(lt, Wd(4) - T0 - .2, len)) : 1; ponerP(ME, lerp(bx + 9, bx + 2.3, q), lerp(bz + 8, bz + .5, q), Math.atan2(-1, -.6)); setFace(ME, L === I.followed ? "relieved" : "gasp"); if (q < 1 && L === I.found) correrV(ME, t); if (L === I.followed) gesto(ME, t, T0 - 1, "abraza", { dur: .3, fin: 99 }) } break }
     case I.back: gente([[ME, 2, -25, Math.PI, "warm"], [ME6, .4, -25.6, Math.PI, "happy"]]); arenaEncima(ME6, .8); arenaEncima(CABRA, .8); cabraPose(t, { x: -1.6, z: -24.4, ry: 2.6 }); break;
     case I.life: gente([[FOLK[4], -6, 4, .4, "hopeful"], [EXT[1], 5, 6, -.5, "relieved"], [GARROW, 3, 9, Math.PI, "relieved"], [QUILL, -3, 10, Math.PI, "warm"], [FOLK[1], 7, 11, -2.8, "hopeful"]]); attach(BASTON, GARROW, "R", [0, -.2, .1]); break;
-    case I.ours: case I.listen3: case I.heard: gente([[ME, -8.6, 2.6, Math.PI + .1, L === I.heard ? "listen" : "warm"], [ME6, -10.2, 2, Math.PI + .05, L === I.ours ? "happy" : "listen"]]); arenaEncima(ME6, .6); if (L !== I.ours) gesto(ME6, t, s(I.listen3) + .05, "escucha", { dur: .3, fin: 999 }); if (L === I.heard) gesto(ME, t, T0 + .4, "escucha", { dur: .4, fin: 999 }); cabraPose(t, { x: -12, z: 3.4, ry: 2.6 }); break;
+    case I.own: case I.ours: case I.listen3: case I.heard: gente([[ME, -8.9, 4.6, Math.PI + .05, L === I.heard ? "listen" : "warm"], [ME6, -7.3, 4.9, Math.PI - .05, L === I.ours ? "happy" : "listen"]]); arenaEncima(ME6, .6); if (L !== I.ours) gesto(ME6, t, s(I.listen3) + .05, "escucha", { dur: .3, fin: 999 }); if (L === I.heard) gesto(ME, t, T0 + .4, "escucha", { dur: .4, fin: 999 }); cabraPose(t, { x: -5.8, z: 4.2, ry: 2.6 }); break;
   }
   // banco de pruebas de personajes (QUERY="provisoria&fila"): todos en fila en la plaza, cámara fija; t elige el encuadre y la cara
   if (FILA) { setEnv("desierto"); SOL.z = 0; ambiente(0); tormenta(0, cam.position, 0); estanquesVisibles(true); ALL.forEach(c => c.g.visible = false); sinBestia(); CABRA.visible = false;
