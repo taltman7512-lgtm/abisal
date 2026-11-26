@@ -14,6 +14,19 @@ Lo único que se aprueba es la historia (paso 1) si la persona quiere verla; si 
 El dueño dio permiso (24-nov-2026) para modificar esta skill cuando haga falta. **Cada vez que pida un cambio de
 gusto** (pelo, aspecto de los personajes, nivel de detalle, voz, música, ritmo, tipo de historia, lo que sea),
 anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.claude/skills/shorts-volze/`.
+- **Historias como las de Volze (26-nov-2026, el dueño aprobó la comparación de 16 guiones de Volze con los nuestros)**:
+  - **Emoción**: intriga y pavor que crece, y un final que pega (agridulce, inquietante o abierto). Nada de «el monstruo
+    era bueno / incomprendido» (ya van cuatro: tortuga, anguila, ciervo, Onetusk) ni de final tierno con todo resuelto.
+  - **Misterio desde el gancho**: la regla tiene un *por qué* oculto («Nobody knows why…») y el video lo destapa con pistas.
+  - **Villano humano**: alguien del pueblo se aprovecha de la regla (bronca, injusticia).
+  - **Narrador con oficio, culpa y costo**: un trabajo que le da un punto de vista único, un error propio, y algo que
+    pierde al final. No el «hermano mayor valiente» genérico.
+  - **Escala grande**: mejor «the whole world / every city» que un pueblito.
+  - **Estructura distinta en cada video** (cuenta regresiva, dilema, investigación, final abierto) y una segunda revelación
+    a mitad. Cierre «My whole life… Today…» prohibido como fórmula fija.
+  - **Duración 125–158 s (≈ 550–650 palabras)**, como el top de Volze; nosotros veníamos en 104–108 s.
+  - **Probar la comedia «I…»** (hazaña absurda que escala, sin monstruo, remate que se muerde la cola; el más visto de
+    Volze, 37,5 M): música juguetona ≈ 16 dB bajo la voz y un golpe de efecto por barrido.
 - **Arranque con el suceso primero (26-nov-2026, «Keep Your Boots On»)**: como en los videos de Volze, la PRIMERA frase
   cuenta el momento fuerte que ya pasó (ej.: «This morning, the ground let go of me.», con la imagen de eso desde 0,0 s)
   y recién después vienen la regla y el contexto («Nobody takes off their boots…»). No arrancar con la regla sola.
@@ -315,16 +328,25 @@ bebés, dormir o la escuela** antes de los 25 s; un **estribillo** que vuelve 3 
 que la criatura no era lo que creíamos o el narrador pasa a serlo. La última frase repite palabras de las dos
 primeras (bucle).
 
+**Plantilla nueva (26-nov-2026, ver «Historias como las de Volze» en Preferencias).** La vieja (regla → antecedente →
+hermanita en peligro → el narrador rompe la regla → la criatura era buena → «My whole life… Today…») quedó prohibida
+como molde fijo: la usamos seis veces seguidas y el final se adivinaba.
 ```
-HOOK (0–4 s)          0. «[el suceso fuerte, ya pasado]» (preferencia del dueño)  1. «[Every/We/Nobody] … [la regla].»  2. «[El costo].»
-MUNDO (≈ 3–20 s)      3–8. cómo se vive con la regla: detalles concretos, un personaje del pueblo con nombre raro
-                      (Wren, Brannock, Garrow), un cartel en el mundo que la recuerda, una cifra («Twelve squares so far»)
-LA CRIATURA (≈ 20–30 s) cómo se anuncia (algo que cae / un ruido / el viento) → revelación a escala → un detalle inquietante
-ANTECEDENTE (≈ 30–55 s) la vez que alguien rompió la regla sin querer (una sola vela) y qué pasó, en 6–9 frases cortas
-LA TENTACIÓN (≈ 55–75 s) alguien cercano al narrador rompe la regla en secreto; la amenaza llega a su casa
-DECISIÓN (≈ 75–100 s) el narrador hace algo físico, en frases de una acción cada una
-GIRO (últimos ≈ 5 s)  la regla del arranque dada vuelta, en primera persona: «My whole life, I counted to two. Tonight, I'm the third lamp.»
+HOOK (0–4 s)          0. «[la crisis de AHORA, en presente o recién pasada]»  1. «[Every/We/Nobody] … [la regla, a escala grande].»
+                      2. «Whoever …» (el costo)  3. «Nobody knows why …» (el misterio que el video va a destapar)
+MUNDO (≈ 4–25 s)      la vida con la regla en chistes de una línea (bodas, bebés, dormir, escuela, una cifra), un cartel;
+                      el OFICIO del narrador que lo pone en un lugar único; el ser querido chico con su muletilla
+EL QUE SE APROVECHA (≈ 20–40 s) un adulto con nombre (Brannock, Tallow, Garrow) que gana con la regla y la defiende
+LA GRIETA (≈ 35–70 s) una pista que no cierra (marcas, agujeros, una pieza escondida); el narrador investiga y tiene la culpa de algo
+SEGUNDA REVELACIÓN (≈ 60–90 s) a mitad del video algo cambia lo que creíamos (no la final)
+DECISIÓN (≈ 80–130 s) uno de estos motores, uno distinto en cada video: cuenta regresiva en voz alta / dilema entre dos males /
+                      investigación que llega a la verdad / persecución; frases de una acción
+GIRO (últimos ≈ 5–10 s) el sentido de la regla dado vuelta (el narrador pasa a ser la amenaza, la regla protegía de otra cosa,
+                      el pueblo elige al que ayuda…). Agridulce, inquietante o abierto («998. 999.»); con costo para el narrador.
+                      La muletilla del ser querido vuelve con otro sentido. Nada de «My whole life… Today…».
 ```
+Antes de escribir, comparar con `referencia/historias-hechas.md`: si el giro es «la criatura no era mala» o la estructura
+es la misma del último video, cambiarla.
 `partes/frases.json`: `[{ "n": "nombre", "t": "texto", "gap": 0.1 }]`. Pausa 0,1–0,15 s por defecto (Volze: 0,14 s de mediana y
 casi ninguna de más de 0,3 s); 0,5–1,2 s solo 2–3 veces, justo antes de una revelación. Medir: palabras ÷ duración × 60 entre 245 y 287.
 
@@ -383,7 +405,7 @@ apaga en silencios de ≥ 0,5 s. El resorte desde 0,55 que usábamos no es de Vo
 - Día: ostinato curioso en mayor (pizzicato + celesta + bajo suave), ≈ 96–110 por minuto, sin batería fuerte.
 
 ## Pasos (con un solo pedido)
-1. **Historia**: proponer 3 premisas originales (no repetir las de `ejemplo-terror/` ni las de Volze: ojo que parpadea,
+1. **Historia**: proponer 3 premisas originales con las reglas de «Historias como las de Volze» (misterio, villano humano, narrador con oficio y culpa, giro que pega) (no repetir las de `ejemplo-terror/` ni las de Volze: ojo que parpadea,
    gigante que trepa, bola, filas, «It said hot», escaleras, fotos, polilla y lámparas), elegir una y justificar en 5
    líneas. Si la persona pidió «hacelo», seguir sin esperar.
 2. **Carpeta** `<repo>/videos/<nombre>/`: copiar `motor/render-gpu.mjs` y `motor/package.json` a la raíz,
