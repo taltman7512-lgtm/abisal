@@ -14,6 +14,21 @@ Lo único que se aprueba es la historia (paso 1) si la persona quiere verla; si 
 El dueño dio permiso (24-nov-2026) para modificar esta skill cuando haga falta. **Cada vez que pida un cambio de
 gusto** (pelo, aspecto de los personajes, nivel de detalle, voz, música, ritmo, tipo de historia, lo que sea),
 anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.claude/skills/shorts-volze/`.
+- **Imagen como la de Volze (26-nov-2026, después de «We Hold Up The Sky»: «no se parece a los de Volze»)**. Comparación de 16
+  cuadros de Volze contra 16 nuestros; el render está bien, lo que cambia es QUÉ hay en cada cuadro y la luz:
+  1. **Lo raro y gigante en cuadro casi siempre, con gente adelante**: un objeto/criatura extraño, orgánico y lleno de
+     detalle (ojo con pestañas, torre de gente, criatura flaca con monedas) que se lee en UN cuadro y aparece detrás de los
+     personajes para dar escala. Si el «monstruo» de la historia se ve como algo común (el cielo-tapa parecía un cielo
+     normal), rediseñarlo para que sea raro a la vista. **Prohibido el plano de un objeto solo contra el cielo vacío**.
+  2. **Caras con emoción fuerte y mucha gente**: en cada frase una cara marcada según lo que pasa (miedo, enojo, asombro,
+     pena; casi nunca «neutral»), grupos de 3–5 en los planos medios y multitudes en los abiertos. Ropa con estampados
+     (floreados, rayas, pasteles), no solo colores lisos.
+  3. **Luz con atmósfera**: 2–3 climas por video según la historia (día, atardecer dorado, noche con luna, interior cálido),
+     bruma en la lejanía y **profundidad de campo marcada** en planos cortos (fondo desenfocado). Saturación ≈ 0,38–0,41
+     y contraste ≈ 0,19–0,20 medidos con `comparar.py` (el cielo veníamos en 0,32 y 0,18). Nada de mediodía plano todo el video.
+  4. **Ángulos**: regla fija «personaje en el tercio de abajo, cara visible, lo gigante detrás», contrapicado gran angular;
+     un aéreo o cenital de escala cada 20–30 s. Nada de nucas ni espaldas en las frases importantes.
+  5. **La premisa nace de una imagen**: primero el «monstruo visual» raro y dibujable, después la regla y la historia.
 - **Historias como las de Volze (26-nov-2026, el dueño aprobó la comparación de 16 guiones de Volze con los nuestros)**:
   - **Emoción**: intriga y pavor que crece, y un final que pega (agridulce, inquietante o abierto). Nada de «el monstruo
     era bueno / incomprendido» (ya van cuatro: tortuga, anguila, ciervo, Onetusk) ni de final tierno con todo resuelto.
@@ -406,7 +421,7 @@ apaga en silencios de ≥ 0,5 s. El resorte desde 0,55 que usábamos no es de Vo
 - Día: ostinato curioso en mayor (pizzicato + celesta + bajo suave), ≈ 96–110 por minuto, sin batería fuerte.
 
 ## Pasos (con un solo pedido)
-1. **Historia**: proponer 3 premisas originales con las reglas de «Historias como las de Volze» (misterio, villano humano, narrador con oficio y culpa, giro que pega) (no repetir las de `ejemplo-terror/` ni las de Volze: ojo que parpadea,
+1. **Historia**: proponer 3 premisas originales que nazcan de una imagen rara y gigante (ver «Imagen como la de Volze»), con las reglas de «Historias como las de Volze» (misterio, villano humano, narrador con oficio y culpa, giro que pega) (no repetir las de `ejemplo-terror/` ni las de Volze: ojo que parpadea,
    gigante que trepa, bola, filas, «It said hot», escaleras, fotos, polilla y lámparas), elegir una y justificar en 5
    líneas. Si la persona pidió «hacelo», seguir sin esperar.
 2. **Carpeta** `<repo>/videos/<nombre>/`: copiar `motor/render-gpu.mjs` y `motor/package.json` a la raíz,
@@ -489,6 +504,9 @@ node render-gpu.mjs video salida/<nombre>.mp4 --conc=3 --sinmusica
 - [ ] La última frase da vuelta la regla del arranque; el video termina 0,2–2 s después de la última palabra.
 - [ ] Ningún personaje, música, logo ni asset de Volze o de Roblox; personajes propios.
 - [ ] Hoja de tomas sin nucas, paredes, cámaras adentro de algo, cosas quemadas (blanco) ni negras.
+- [ ] En casi todos los cuadros: lo raro y gigante + gente con cara de emoción fuerte; ningún objeto solo contra cielo vacío.
+- [ ] 2–3 climas de luz en el video, profundidad de campo en los planos cortos, saturación ≈ 0,38–0,41 (`comparar.py`).
+- [ ] Mapa de ocupación (`render-gpu.mjs mapa`) antes de escribir tomas; transiciones dentro de un lugar = barrido; órbita lateral chica en calles angostas.
 - [ ] Subtítulos: texto del guion (no el de whisper: «Ren», «40»), amarillo, fijo al 74,5 %, sin puntuación,
       entrada 128 % → 100 % en 0,13 s.
 - [ ] `movimiento.py salida/<video>.mp4`: deriva dentro del encuadre ≥ 13 % del ancho por segundo, 0 % de encuadres
