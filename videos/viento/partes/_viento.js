@@ -2965,7 +2965,7 @@ const VP = (u, o = [0, 0, 0]) => () => add(vueloP(u), o);
 const C_SEPIA = "#b08a5a", C_POLVO = "#9a9080", C_NUBE = "#e8eef4";
 const VZ = VECINOS, HD = (k, o) => () => { const h = headW(k); return [h.x + o[0], h.y + o[1], h.z + o[2]] };
 const SHOTS = {
-  [I.rule]: [sh(0, G(-14, 1.1, 7.5), G(-11, 1.3, 7.8), G(-4, 1.5, 4), G(-3, 1.6, 4), 62), sh(4, KW(VZ[0], [-4.5, 1.4, 2.2]), KW(VZ[0], [-4, 1.3, 2.4]), KW(VZ[0], [0, 1, 0]), null, 50, { tr: "barrido" })],
+  [I.rule]: [sh(0, G(-14, 1.1, 7.5), G(-11, 1.3, 7.8), G(-4, 1.5, 4), G(-3, 1.6, 4), 62), sh(4, KW(VZ[0], [-5.6, 1.4, 3]), KW(VZ[0], [-5, 1.3, 3.2]), KW(VZ[0], [0, 1.1, 0]), null, 50, { tr: "barrido" })],
   [I.cost]: [sh(0, KW(VZ[5], [-10, -2, 12]), KW(VZ[5], [-12, -3, 13]), KW(VZ[5], [0, 0, 0]), null, 46), sh(5, KW(VZ[5], [-14, -3, 16]), KW(VZ[5], [-16, -3, 18]), KW(VZ[5], [8, 0, 0]), null, 50, { lat: 2 })],
   [I.today]: [sh(0, KW(ME, [4.2, 1.8, 2.4]), KW(ME, [3.4, 1.6, 2]), KW(ME, [0, 1.2, 0]), null, 54, { tr: "barrido" })],
   [I.never]: [sh(0, [-60, 34, 50], [-40, 30, 46], [0, 4, -4], [6, 4, -6], 52, { tr: "barrido" }), sh(5, G(-20, .5, 30), G(-16, .55, 30.5), G(-6, 1.2, 26), G(-4, 1.4, 26), 64)],
@@ -2975,17 +2975,17 @@ const SHOTS = {
   [I.iron]: [sh(0, KW(ME, [-3.2, 1, 3.6]), KW(ME, [-2.6, .9, 3.4]), KW(ME, [0, .8, 0]), null, 50), sh(4, G(-2, 1.4, 11.5), G(-1, 1.3, 11.6), KW(VZ[2], [0, .9, 0]), null, 56, { tr: "barrido" })],
   [I.babies]: [sh(0, () => [PUNTOS.bebe[0] - 3.6, SUELO(...PUNTOS.bebe) + 1.8, PUNTOS.bebe[1] + 4], () => [PUNTOS.bebe[0] - 3, SUELO(...PUNTOS.bebe) + 1.7, PUNTOS.bebe[1] + 3.4], KW(MAMA, [0, 1.3, 0]), null, 50)],
   [I.wed]: [sh(0, () => [PUNTOS.boda[0] - .6, SUELO(...PUNTOS.boda) + 2.3, PUNTOS.boda[1] + 6.8], () => [PUNTOS.boda[0] + .6, SUELO(...PUNTOS.boda) + 2.1, PUNTOS.boda[1] + 5.6], () => [PUNTOS.boda[0], SUELO(...PUNTOS.boda) + 1.6, PUNTOS.boda[1] - .6], null, 50), sh(9, () => [PUNTOS.boda[0] + 7, SUELO(...PUNTOS.boda) + 4.4, PUNTOS.boda[1] + 9], () => [PUNTOS.boda[0] + 5, SUELO(...PUNTOS.boda) + 4, PUNTOS.boda[1] + 10], () => [PUNTOS.boda[0], SUELO(...PUNTOS.boda) + 1.4, PUNTOS.boda[1] - .6], null, 52)],
-  [I.lean]: [sh(0, KW(VZ[1], [1.4, 1.8, 8.4]), KW(VZ[1], [-.4, 1.8, 8.4]), KW(VZ[1], [0, 1.4, 0]), null, 50, { fijo: 1 }), sh(5, KW(VZ[1], [-9, 1.5, 4]), KW(VZ[1], [-8, 1.5, 3.8]), KW(VZ[1], [0, 1.6, 0]), null, 50)],
+  [I.lean]: [sh(0, KW(VZ[1], [1.4, 2.4, 10]), KW(VZ[1], [-.4, 2.4, 10]), KW(VZ[1], [0, 1.4, 0]), null, 50, { fijo: 1 }), sh(5, KW(VZ[1], [-2, 5, 7]), KW(VZ[1], [-1.4, 4.6, 6.6]), KW(VZ[1], [0, 1.6, 0]), null, 50)],
   [I.soup]: [sh(0, () => [PUNTOS.sopa[0] - 4.6, SUELO(...PUNTOS.sopa) + 2.4, PUNTOS.sopa[1] + 1.2], () => [PUNTOS.sopa[0] - 3.8, SUELO(...PUNTOS.sopa) + 2.2, PUNTOS.sopa[1] + .6], KW(MARTA, [0, 1.9, 0]), null, 50), sh(4, () => [PUNTOS.sopa[0] - 3.4, SUELO(...PUNTOS.sopa) + 1.6, PUNTOS.sopa[1] + 1.8], () => [PUNTOS.sopa[0] - 3, SUELO(...PUNTOS.sopa) + 1.5, PUNTOS.sopa[1] + 1.4], KW(MARTA, [0, 1.6, 0]), null, 48)],
-  [I.sign]: [sh(0, G(-3, 1.6, 14), G(-1, 2.2, 11), TOR(0, 10, 0), TOR(0, 12, 0), 46), sh(7, TOR(-4, 7, 13), TOR(-2, 7.6, 12), TOR(0, 8, 0), null, 42)],
+  [I.sign]: [sh(0, G(-3, 1.6, 14), G(-1, 2.2, 11), TOR(0, 10, 0), TOR(0, 12, 0), 46), sh(7, TOR(-3, 7, 15), TOR(-1.6, 7.4, 14), TOR(0, 8, 0), null, 42)],
   [I.pip]: [sh(0, KW(PIP, [-2.6, 1.6, 3.4]), KW(PIP, [-1.6, 1.5, 2.8]), KW(PIP, [0, 1.3, 0]), null, 52), sh(6, KW(PIP, [3.4, 2.2, 5.2]), KW(PIP, [2.4, 2.2, 4.8]), KW(PIP, [0, 1, 0]), null, 54)],
-  [I.rocks]: [sh(0, KW(PIP, [-1.6, 1.3, 2.6]), KW(PIP, [-1.3, 1.25, 2.4]), KW(PIP, [0, 1, 0]), null, 50), sh(7, KW(PIP, [2.6, 1.6, 3.6]), KW(PIP, [1.8, 1.6, 3.4]), KW(PIP, [0, 1, 0]), null, 54, { tr: "barrido" })],
+  [I.rocks]: [sh(0, KW(PIP, [-2.4, 1.3, 3.8]), KW(PIP, [-2, 1.25, 3.4]), KW(PIP, [0, .9, 0]), null, 50), sh(7, KW(PIP, [2.6, 1.6, 3.6]), KW(PIP, [1.8, 1.6, 3.4]), KW(PIP, [0, 1, 0]), null, 54, { tr: "barrido" })],
   [I.kites]: [sh(0, () => [COLINA[0] - 6, SUELO(...COLINA) + 2.4, COLINA[1] + 6], () => [COLINA[0] - 4.4, SUELO(...COLINA) + 2.2, COLINA[1] + 5], () => [COLINA[0] + 1.6, SUELO(...COLINA) + 2.6, COLINA[1]], null, 54), sh(4, () => add(cometaV(t_), [-4, -1.5, 5]), null, () => cometaV(t_), null, 52, { tr: "sigue" })],
   [I.where]: [sh(0, () => [COLINA[0] + 2.4, SUELO(...COLINA) + 1.8, COLINA[1] + 2.6], () => [COLINA[0] + 2, SUELO(...COLINA) + 1.9, COLINA[1] + 2.2], KW(PIP, [0, 1.4, 0]), null, 50), sh(6, () => [COLINA[0] - 3.2, SUELO(...COLINA) + 2.4, COLINA[1] + 1.2], () => [COLINA[0] - 3.8, SUELO(...COLINA) + 2.8, COLINA[1] + 1.4], [SIERRA_X, 50, 10], null, 48, { lat: .6 })],
-  [I.tobb]: [sh(0, G(-21, 2.6, -11), G(-22, 2.4, -12), KW(TOBB_CHICO, [0, .8, 0]), null, 48, { tr: "tapa", col: C_SEPIA }), sh(7, KW(TOBB_CHICO, [1.4, .8, 3.6]), KW(TOBB_CHICO, [1, .75, 3.2]), KW(TOBB_CHICO, [0, 1, .4]), null, 46)],
+  [I.tobb]: [sh(0, G(-21, 2.6, -11), G(-22, 2.4, -12), KW(TOBB_CHICO, [0, .8, 0]), null, 48, { tr: "tapa", col: C_SEPIA }), sh(7, KW(TOBB_CHICO, [2.2, 1.4, 5.2]), KW(TOBB_CHICO, [1.8, 1.3, 4.8]), KW(TOBB_CHICO, [0, .6, .6]), null, 46)],
   [I.second]: [sh(0, KW(TOBB_CHICO, [3.2, 1, 1.4]), KW(TOBB_CHICO, [2.8, .9, 1.6]), KW(TOBB_CHICO, [0, .4, .8]), null, 46)],
-  [I.leaf]: [sh(0, KW(TOBB_CHICO, [-4, 0, 10]), KW(TOBB_CHICO, [-2.4, -.4, 9]), KW(TOBB_CHICO, [0, 0, 0]), null, 54, { tr: "barrido" })],
-  [I.sock]: [sh(0, G(-6, 1.4, 6), G(-5, 1.3, 6.4), KW(TOBB_CHICO, [0, 0, 0]), null, 50), sh(7, KW(TOBB_CHICO, [2.6, 1, 3]), KW(TOBB_CHICO, [2, .8, 2.6]), KW(TOBB_CHICO, [0, 0, 0]), null, 46)],
+  [I.leaf]: [sh(0, G(-21, 2.6, -11), G(-22, 3.6, -12), KW(TOBB_CHICO, [0, 0, 0]), null, 52, { tr: "barrido" })],
+  [I.sock]: [sh(0, G(-8, 1.6, 10), G(-7, 1.7, 10.4), KW(TOBB_CHICO, [0, 0, 0]), null, 50), sh(7, KW(TOBB_CHICO, [2.6, 1, 3]), KW(TOBB_CHICO, [2, .8, 2.6]), KW(TOBB_CHICO, [0, 0, 0]), null, 46)],
   [I.walked]: [sh(0, () => add(tobbVuelta(), [-5, 2.4, 8]), () => add(tobbVuelta(), [-4.2, 2.2, 7.4]), () => add(tobbVuelta(), [0, 1.3, 0]), null, 46, { tr: "barrido" })],
   [I.green]: [sh(0, G(-4, 2.2, 8), G(-3, 2.1, 7), KW(TOBB_CHICO, [0, 1.6, 0]), null, 54), sh(7, G(4.4, 2.4, 9), G(3.6, 2.3, 8.4), G(1.2, 1.5, 3), null, 54)],
   [I.old]: [sh(0, KW(TOBB, [-3.2, 2.2, 4.6]), KW(TOBB, [-2.6, 2.1, 4]), KW(TOBB, [0, 1.6, 0]), null, 46, { tr: "barrido" }), sh(5, KW(TOBB, [3.4, 1.4, 4.2]), KW(TOBB, [3, 1.3, 3.8]), KW(TOBB, [0, 1.2, 0]), null, 50)],
@@ -2998,10 +2998,10 @@ const SHOTS = {
   [I.vane]: [sh(0, VW([-6, -1.4, 6]), VW([-4.4, -.6, 5]), VW([.6, -.6, 0]), null, 50), sh(8, TOR(-14, 4, 16), TOR(-11, 5, 14), VW([0, -2, 0]), null, 50)],
   [I.climb]: [sh(0, G(-3, .8, 5.5), G(-2.4, .75, 5.2), G(1, .4, 1), null, 56, { shake: .1 }), sh(4, G(8, 5, 6), G(6, 4, 5), G(1, .4, -1), null, 56)],
   [I.bend]: [sh(0, VW([-4.4, 1.2, 4]), VW([-3.4, 1, 3.4]), VW([.6, -.8, 0]), null, 50, { shake: .08 })],
-  [I.oneway]: [sh(0, KW(ME, [-1.8, 1.1, -3.8]), KW(ME, [-1.4, 1, -3.2]), KW(ME, [0, 2, 0]), null, 46)],
-  [I.laces]: [sh(0, KW(ME, [1, 1.2, 4.6]), KW(ME, [.8, 1.1, 4.2]), KW(ME, [0, 1.1, .4]), null, 46), sh(3, KW(ME, [-2.4, .8, 3]), KW(ME, [-2, .75, 2.7]), KW(ME, [0, 1, .4]), null, 46)],
+  [I.oneway]: [sh(0, KW(ME, [-5.4, 1.4, -.4]), KW(ME, [-5, 1.3, 0]), KW(ME, [0, 1.6, 0]), null, 46)],
+  [I.laces]: [sh(0, KW(ME, [1.8, 1.8, 7.2]), KW(ME, [1.6, 1.7, 6.6]), KW(ME, [0, 1, .4]), null, 46), sh(3, KW(ME, [-3.6, 1.2, 4.4]), KW(ME, [-3.2, 1.1, 4]), KW(ME, [0, .9, .4]), null, 46)],
   [I.dont]: [sh(0, () => add(mitad(TOBB, ME), [-.5, 2.6, 7]), () => add(mitad(TOBB, ME), [0, 2.5, 6.4]), () => add(mitad(TOBB, ME), [0, 1.2, 0]), null, 44), sh(5, KW(ME, [.2, 2.4, 4.6]), KW(ME, [.6, 2.4, 4.2]), KW(TOBB, [0, 2, 0]), null, 42)],
-  [I.left]: [sh(0, KW(ME, [1, 1.2, 4.6]), KW(ME, [.8, 1.1, 4.2]), KW(ME, [0, 1, .5]), null, 46), sh(6, KW(ME, [-2.4, .8, 3]), KW(ME, [-2, .75, 2.7]), KW(ME, [0, .9, .5]), null, 46, { tr: "barrido" })],
+  [I.left]: [sh(0, KW(ME, [1.4, 1.6, 6]), KW(ME, [1.2, 1.5, 5.5]), KW(ME, [0, .9, .5]), null, 46), sh(6, KW(ME, [-3.6, 1.2, 4.4]), KW(ME, [-3.2, 1.1, 4]), KW(ME, [0, .8, .5]), null, 46, { tr: "barrido" })],
   [I.letgo]: [sh(0, () => [YO_T[0] - 4, SUELO(...YO_T) + 1, YO_T[1] + 4.5], () => [YO_T[0] - 4.4, SUELO(...YO_T) + 1.6, YO_T[1] + 4.9], KW(ME, [0, .8, 0]), null, 56)],
   [I.flew]: [sh(0, KW(ME, [1.5, 1.6, 4.5]), KW(ME, [1.2, 1.4, 4]), KW(ME, [0, 0, 0]), null, 54, { tr: "sigue" }), sh(2, KW(ME, [-3, 2.4, 9]), KW(ME, [-1, 2.6, 9]), TW_(), null, 54)],
   [I.grab]: [sh(0, VW([-7, 1, 7]), VW([-5.4, 1.2, 6]), VW([-1, -.4, 0]), null, 52, { shake: .12 }), sh(8, VW([-4.4, 2.2, 6]), VW([-3.8, 2, 5.4]), VW([.4, -.8, 0]), null, 50)],
@@ -3018,7 +3018,7 @@ const SHOTS = {
   [I.told]: [sh(0, HD(PIP, [.8, 4.2, 1.6]), HD(PIP, [.6, 3.4, 1.3]), HD(PIP, [0, 0, 0]), null, 50)],
   [I.rightall]: [sh(0, KW(ME, [-4, 3, 5]), KW(ME, [-3.4, 2.8, 4.6]), KW(ME, [1, .3, 0]), null, 46)],
   [I.life]: [sh(0, KW(ME, [-3.4, 4.4, -1.4]), KW(ME, [-3, 4.2, -1.2]), KW(ME, [.4, .4, .4]), null, 48)],
-  [I.tomorrow]: [sh(0, KW(ME, [-3.6, 2.2, 3.6]), KW(ME, [-3, 2.1, 3]), KW(ME, [0, 1.9, 0]), null, 48), sh(4, KW(ME, [2, 2, 4]), KW(ME, [3.4, 2.6, 6]), KW(ME, [-1.5, 1.6, 0]), null, 52)],
+  [I.tomorrow]: [sh(0, KW(ME, [-3.6, 2.2, 3.6]), KW(ME, [-3, 2.1, 3]), KW(ME, [0, 1.9, 0]), null, 48), sh(4, KW(ME, [3, 2.2, 4.4]), KW(ME, [4, 2.8, 6]), KW(ME, [-.4, 1.5, .4]), null, 52)],
 };
 // el vuelo de los hermanos: curva suave por VUELO_PTS (de la veleta al pasto del valle), u = 0..1
 const VUELO_C = new THREE.CatmullRomCurve3(VUELO_PTS.map(q => new THREE.Vector3(...q)), false, "centripetal");
@@ -3056,7 +3056,7 @@ function setScene(t) {
   const RECUERDO = L >= I.tobb && L <= I.green, TORM = (L >= I.doubled && L <= I.over) || L === I.today, VALLE_ = L >= I.then, CUMBRE = L >= I.over && L < I.then;
   setEnv(QS.get("env") || (RECUERDO ? "recuerdo" : VALLE_ ? "valle" : CUMBRE ? "cumbre" : TORM ? "tormenta" : "ventoso")); SOL.z = 0;
   ambiente(t); sinBestia();
-  lejos(t, { nubes: L === I.clouds ? (lt > dW(5) - .1 ? 0 : null) : L === I.then ? eIO(k) : null, jirones: L === I.clouds ? (lt > dW(5) ? .35 : 0) : L === I.then ? .6 : 0, nieve: 1, pajaros: VALLE_ ? 1 : 0 }); tortuga(t, { paso: 0 }); LUCES.forEach(l => l.visible = false);
+  lejos(t, { nubes: L === I.clouds ? (lt > dW(5) - .1 ? 0 : null) : L === I.then ? eIO(k) : null, jirones: L === I.clouds ? (lt > dW(5) ? .15 : 0) : L === I.then ? .6 : 0, nieve: 1, pajaros: VALLE_ ? 1 : 0 }); tortuga(t, { paso: 0 }); LUCES.forEach(l => l.visible = false);
   vientoFuerza(VALLE_ ? 0 : TORM ? 2 : CUMBRE ? 1.4 : 1); humoInclinacion(1);
   if (RECUERDO) POST.sepia = .55;
   TEMBLOR = 0;
@@ -3078,7 +3078,7 @@ function setScene(t) {
     case I.cost: { const f = 6 + lt * 22; enAire(V[5], [f, 8 + lt * 9, -2]); volar(V[5], t, {}); bota0(V[5]); setFace(V[5], "terrified"); vientoPelo(V[5], 1.5, { t }); break }
     case I.today: ponerP(ME, YO_T[0], YO_T[1], Math.PI / 2 + .2); bota0(ME); setFace(ME, "determined"); despega(ME, t, .15 + .3 * k); vientoPelo(ME, 1.5, { t }); botaEnPiso(botaSuelta(ME, "izq"), YO_T[0] - .8, YO_T[1] + .8, { ry: .6, volcada: 1 }); botaEnPiso(botaSuelta(ME, "der"), YO_T[0] - .4, YO_T[1] + 1.3, { ry: -.4 }); break;
     case I.never: case I.sideways: case I.laundry: camina(V[4], -4, 26, -1, "neutral"); break;
-    case I.chains: parado(V[6], CASA_MIA[0] - 4.4, CASA_MIA[1] + 3, -1.2, "neutral"); break;
+    case I.chains: parado(V[6], CASA_MIA[0] - 6, CASA_MIA[1] + 6, -1.2, "neutral"); break;
     case I.iron: parado(ME, -1, 5, .6, "neutral"); camina(V[0], 1, 2.6, -1.2, "aguanta"); camina(V[2], 3, 3, -1.1, "neutral", .4); camina(V[7], -1, 1.8, -1.1, "aguanta", .2); break;
     case I.babies: parado(MAMA, PUNTOS.bebe[0], PUNTOS.bebe[1], -.6, "warm"); acunar(MAMA); break;
     case I.wed: { const [x, z] = PUNTOS.boda, y = SUELO(x, z); parado(NOVIA, x - .7, z, Math.PI * .15, "happy", { lean: .2 }); parado(NOVIO, x + .7, z, -Math.PI * .15, "happy", { lean: .2 }); sogaNovios(NOVIA, NOVIO, t, { viento: 1 });
@@ -3095,7 +3095,7 @@ function setScene(t) {
       else if (lt > dW(10)) { botas(TOBB_CHICO, { izq: 0, der: 1 }); botaEnPiso(botaSuelta(TOBB_CHICO, "izq"), x + .9, z + .4, { ry: .5 }) } break }
     case I.leaf: { const x = -24, z = -19, q = eIO(P(lt, 0, len)); if (q < .3) { ponerP(TOBB_CHICO, x, z, .4); despega(TOBB_CHICO, t, q / .3) } else { enAire(TOBB_CHICO, [x + (q - .3) * 14, SUELO(x, z) + 1.4 + (q - .3) * 9, z]); volar(TOBB_CHICO, t, {}) }
       botas(TOBB_CHICO, { izq: 0, der: 0, descalzo: 1 }); setFace(TOBB_CHICO, "terrified"); enMano(MEDIA_TOBB, TOBB_CHICO, "R", { off: [0, -.1, .1], viento: 1 }); vientoPelo(TOBB_CHICO, 1.5, { t }); botaEnPiso(botaSuelta(TOBB_CHICO, "izq"), x + .9, z + .4, { ry: .5 }); botaEnPiso(botaSuelta(TOBB_CHICO, "der"), x + 1.3, z - .2, { ry: -.3, volcada: 1 }); break }
-    case I.sock: { [[V[0], -3.4, 5.2], [V[3], -4.6, 4.6], [V[8], -2.6, 4.4]].forEach(([c, x, z]) => parado(c, x, z, Math.PI / 2 - .3, "shock")); const p = vueloP(.2 + .25 * k); enAire(TOBB_CHICO, [p[0], p[1] + 10, p[2] + 20]); volar(TOBB_CHICO, t, {}); botas(TOBB_CHICO, { izq: 0, der: 0, descalzo: 1 }); setFace(TOBB_CHICO, lt > dW(7) ? "scared" : "terrified"); enMano(MEDIA_TOBB, TOBB_CHICO, "R", { off: [0, -.1, .1], viento: 1.5 }); vientoPelo(TOBB_CHICO, 1.5, { t }); break }
+    case I.sock: { const q = eIO(k), y0 = SUELO(-14, -19) + 8; enAire(TOBB_CHICO, [lerp(-14, 60, q), lerp(y0, 45, q), lerp(-19, -10, q)]); volar(TOBB_CHICO, t, {}); botas(TOBB_CHICO, { izq: 0, der: 0, descalzo: 1 }); setFace(TOBB_CHICO, lt > dW(7) ? "scared" : "terrified"); enMano(MEDIA_TOBB, TOBB_CHICO, "R", { off: [0, -.1, .1], viento: 1.5 }); vientoPelo(TOBB_CHICO, 1.5, { t }); [[V[0], -3.4, 5.2], [V[3], -4.6, 4.6], [V[8], -2.6, 4.4]].forEach(([c, x, z]) => parado(c, x, z, Math.PI / 2 - .3, "shock")); break }
     case I.walked: { const p = tobbVuelta(); ponerP(TOBB_CHICO, p[0] - lt * .9, p[2], -Math.PI / 2); andarViento(TOBB_CHICO, t); botas(TOBB_CHICO, { izq: 0, der: 0, descalzo: 1 }); setFace(TOBB_CHICO, "determined"); vientoPelo(TOBB_CHICO, 1, { t }); break }
     case I.green: parado(TOBB_CHICO, 0, 4.4, Math.PI * .9, "happy"); gesto(TOBB_CHICO, t, T0 + .2, "brazos", { dur: .3, fin: dW(7) + T0 });
       [[V[0], -2, 1.6, .5], [V[1], 1.6, 1.2, -.3], [V[3], 3.2, 2.6, -.9], [V[7], -3.4, 3, 1]].forEach(([c, x, z, ry]) => { parado(c, x, z, ry, lt > dW(7) ? "laugh" : "suspicious") }); break;
@@ -3108,7 +3108,7 @@ function setScene(t) {
     case I.up: { const a = [COLINA[0], SUELO(...COLINA) + 1, COLINA[1]], q = eIO(k); enAire(PIP, curva(a, add(VELETA_W(), [-3, -1, 2]), 6, q * .7)); volar(PIP, t, {}); bota0(PIP); setFace(PIP, "terrified"); vientoPelo(PIP, 1.5, { t }); break }
     case I.vane: case I.climb: case I.bend: case I.oneway: case I.laces: case I.dont: case I.left: case I.letgo: case I.flew: case I.grab: {
       const pv = VELETA_W(); enAire(PIP, pv); colgado(PIP, t, { fuerza: L >= I.bend ? 1.5 : 1 }); bota0(PIP); setFace(PIP, L === I.vane ? "terrified" : "scared"); vientoPelo(PIP, 1.5, { t });
-      if (L >= I.climb && L <= I.oneway) { [[V[0], -4, 1], [V[2], -1.4, 2.6], [V[3], 4.6, 1.4], [V[7], -6, -1.2], [V[1], 6.6, 3.2], [TOBB, TOBB_T[0] - 1, TOBB_T[1] + 1.6]].forEach(([c, x, z], i) => tirado(c, x, z, i % 2 ? "terrified" : "aguanta", i * .3)); if (L === I.oneway) parado(ME, YO_T[0], YO_T[1], Math.PI - .2, "determined", { lean: .5 }); else tirado(ME, YO_T[0], YO_T[1], "aguanta") }
+      if (L >= I.climb && L <= I.oneway) { [[V[0], -4, 1], [V[2], -1.4, 2.6], [V[3], 4.6, 1.4], [V[7], -6, -1.2], [V[1], 6.6, 3.2], [TOBB, TOBB_T[0] - 1, TOBB_T[1] + 1.6]].forEach(([c, x, z], i) => tirado(c, x, z, i % 2 ? "terrified" : "aguanta", i * .3)); if (L === I.oneway) { parado(ME, YO_T[0], YO_T[1], -Math.PI / 2 - .5, "determined", { lean: .5 }); ME.head.rotation.x = -.35 } else tirado(ME, YO_T[0], YO_T[1], "aguanta") }
       if (L >= I.laces && L <= I.left) { [[V[0], -4, 1], [V[2], -1.4, 2.6], [V[3], 4.6, 1.4], [V[7], -6.4, 3.4]].forEach(([c, x, z], i) => tirado(c, x, z, "aguanta", i * .3));
         ponerP(ME, YO_T[0], YO_T[1], -.3); vientoPelo(ME, 1.5, { t });
         if (L === I.laces) { sentadoDesata(ME, t, { lado: lt > dW(3) ? "der" : "izq" }); ME.head.rotation.x -= .45; setFace(ME, "determined") }
