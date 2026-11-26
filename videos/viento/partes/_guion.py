@@ -2,9 +2,10 @@
 import json, os
 D = os.path.dirname(os.path.abspath(__file__))
 G = [  # nombre, texto, pausa después
+ ("open", "This morning, the ground let go of me.", .12),
  ("rule", "Nobody takes off their boots in Gusthollow.", .1),
  ("cost", "Whoever does, the wind carries them over the mountains.", .12),
- ("today", "This morning, I took mine off.", .2),
+ ("today", "I took mine off.", .2),
  ("never", "The wind here never stops. It has blown the same way for three hundred years.", .1),
  ("sideways", "Our trees grow sideways. Our smoke goes sideways.", .1),
  ("laundry", "Our laundry has never once hung down.", .1),

@@ -2374,17 +2374,12 @@ const piernaV = (o) => ROPAV["p" + JSON.stringify(o)] ||= tex(128, 256, (g, w, h
 const CARAV = {};
 const TINTA = "#111012", BORDO = "#6e1830", LENGUA = "#ef9cb4";
 // trazo de pincel: curva (puntos de control) rellena con un ancho que crece al medio y se afina en las dos puntas
-function pincel(g, pts, W, { ini = .12, fin = .12, col = TINTA } = {}) { const N = 40, P = [];
-  const at = t => { if (pts.length === 3) { const u = 1 - t; return [u * u * pts[0][0] + 2 * u * t * pts[1][0] + t * t * pts[2][0], u * u * pts[0][1] + 2 * u * t * pts[1][1] + t * t * pts[2][1]] }
-    const u = 1 - t; return [u * u * u * pts[0][0] + 3 * u * u * t * pts[1][0] + 3 * u * t * t * pts[2][0] + t * t * t * pts[3][0], u * u * u * pts[0][1] + 3 * u * u * t * pts[1][1] + 3 * u * t * t * pts[2][1] + t * t * t * pts[3][1]] };
-  for (let i = 0; i <= N; i++) P.push(at(i / N)); const L = [], R = [];
-  for (let i = 0; i <= N; i++) { const t = i / N, a = P[Math.max(0, i - 1)], b = P[Math.min(N, i + 1)], dx = b[0] - a[0], dy = b[1] - a[1], d = Math.hypot(dx, dy) || 1, nx = -dy / d, ny = dx / d;
-    const w = W / 2 * Math.max(t < .5 ? ini + (1 - ini) * Math.sin(Math.min(1, t / .5) * Math.PI / 2) : fin + (1 - fin) * Math.sin(Math.min(1, (1 - t) / .5) * Math.PI / 2), .05); L.push([P[i][0] + nx * w, P[i][1] + ny * w]); R.push([P[i][0] - nx * w, P[i][1] - ny * w]) }
-  g.fillStyle = col; g.beginPath(); L.forEach((p, i) => i ? g.lineTo(...p) : g.moveTo(...p)); R.reverse().forEach(p => g.lineTo(...p)); g.closePath(); g.fill() }
-const EX = 86, EY = 150, MY = 292;   // ojos a ±86 del centro, a 39 % del alto; boca a 76 %
+function pincel(g, pts, W, { col = TINTA } = {}) { g.save(); g.strokeStyle = col; g.lineWidth = W * 1.25; g.lineCap = "round"; g.lineJoin = "round"; g.beginPath(); g.moveTo(...pts[0]);
+  if (pts.length === 3) g.quadraticCurveTo(...pts[1], ...pts[2]); else g.bezierCurveTo(...pts[1], ...pts[2], ...pts[3]); g.stroke(); g.restore() }
+const EX = 80, EY = 142, MY = 262;   // ojos a ±80 del centro; boca más arriba para que las bocas abiertas entren enteras
 // --- ojos
-const ojoNegro = (g, x, rx = 30, ry = 42, brillo = true) => { g.fillStyle = TINTA; g.beginPath(); g.ellipse(x, EY, rx, ry, 0, 0, 7); g.fill(); if (brillo) { g.fillStyle = "#ffffff"; g.beginPath(); g.ellipse(x - rx * .32, EY - ry * .42, rx * .26, ry * .2, 0, 0, 7); g.fill() } };
-const ojoGota = (g, x, s) => { g.fillStyle = TINTA; g.beginPath(); g.moveTo(x - s * 4, EY - 46); g.bezierCurveTo(x + s * 34, EY - 30, x + s * 30, EY + 40, x, EY + 40); g.bezierCurveTo(x - s * 30, EY + 40, x - s * 30, EY - 20, x - s * 4, EY - 46); g.fill(); g.fillStyle = "#fff"; g.beginPath(); g.arc(x - s * 8, EY - 14, 7, 0, 7); g.fill() };
+const ojoNegro = (g, x, rx = 24, ry = 44, brillo = false) => { g.fillStyle = TINTA; g.beginPath(); g.ellipse(x, EY, rx, ry, 0, 0, 7); g.fill(); if (brillo) { g.fillStyle = "#ffffff"; g.beginPath(); g.ellipse(x - rx * .32, EY - ry * .42, rx * .26, ry * .2, 0, 0, 7); g.fill() } };
+const ojoGota = (g, x, s) => { g.fillStyle = TINTA; g.beginPath(); g.moveTo(x - s * 4, EY - 46); g.bezierCurveTo(x + s * 34, EY - 30, x + s * 30, EY + 40, x, EY + 40); g.bezierCurveTo(x - s * 30, EY + 40, x - s * 30, EY - 20, x - s * 4, EY - 46); g.fill(); };
 const ojoBlanco = (g, x, r = 40, px = 0, py = 0, rp = 15) => { g.fillStyle = "#ece6dc"; g.beginPath(); g.ellipse(x, EY, r * .86, r, 0, 0, 7); g.fill(); g.lineWidth = 9; g.strokeStyle = TINTA; g.stroke(); g.fillStyle = TINTA; g.beginPath(); g.arc(x + px, EY + py, rp, 0, 7); g.fill() };
 const ojoChill = (g, x, s) => { g.fillStyle = TINTA; g.fillRect(x - 32, EY - 6, 64, 22); pincel(g, [[x - 44, EY - 8], [x, EY - 14], [x + 44, EY - 8]], 10); pincel(g, [[x - 40, EY + 24], [x, EY + 30], [x + 40, EY + 24]], 8); pincel(g, s < 0 ? [[x - 34, EY - 40], [x, EY - 62], [x + 34, EY - 40]] : [[x - 34, EY - 56], [x, EY - 36], [x + 34, EY - 56]], 12) };
 const ojoArco = (g, x, arriba = true) => pincel(g, arriba ? [[x - 34, EY + 12], [x, EY - 30], [x + 34, EY + 12]] : [[x - 34, EY - 6], [x, EY + 30], [x + 34, EY - 6]], 15);
@@ -2397,8 +2392,8 @@ const ceja = (g, x, s, tipo) => { const y = EY - 66;
   if (tipo === "alta") pincel(g, [[x - 36, y - 12], [x, y - 34], [x + 36, y - 12]], 12);
   if (tipo === "duda") pincel(g, s < 0 ? [[x - 36, y - 18], [x - 4, y - 44], [x + 34, y - 26], [x + 44, y - 8]] : [[x - 36, y + 4], [x, y + 2], [x + 36, y - 2]], 13) };
 // --- bocas
-const bocaAbierta = (g, w = 150, h = 110, lengua = true, dientes = false, y0 = MY - 30) => { g.beginPath(); g.moveTo(256 - w / 2, y0); g.lineTo(256 + w / 2, y0); g.bezierCurveTo(256 + w / 2, y0 + h * .75, 256 + w * .3, y0 + h, 256, y0 + h); g.bezierCurveTo(256 - w * .3, y0 + h, 256 - w / 2, y0 + h * .75, 256 - w / 2, y0); g.closePath();
-  g.fillStyle = BORDO; g.fill(); g.save(); g.clip(); if (lengua) { g.fillStyle = LENGUA; g.beginPath(); g.ellipse(256, y0 + h * .98, w * .3, h * .36, 0, 0, 7); g.fill() } if (dientes) { g.fillStyle = "#fff"; g.fillRect(256 - w / 2, y0, w, h * .2) } g.restore(); g.lineWidth = 9; g.strokeStyle = TINTA; g.stroke() };
+const bocaAbierta = (g, w = 150, h = 110, lengua = true, dientes = false, y0 = MY - 30) => { const camino = () => { g.beginPath(); g.moveTo(256 - w / 2, y0); g.lineTo(256 + w / 2, y0); g.bezierCurveTo(256 + w / 2, y0 + h * .75, 256 + w * .3, y0 + h, 256, y0 + h); g.bezierCurveTo(256 - w * .3, y0 + h, 256 - w / 2, y0 + h * .75, 256 - w / 2, y0); g.closePath() };
+  camino(); g.fillStyle = BORDO; g.fill(); g.save(); g.clip(); if (lengua) { g.fillStyle = LENGUA; g.beginPath(); g.ellipse(256, y0 + h * .98, w * .3, h * .36, 0, 0, 7); g.fill() } if (dientes) { g.fillStyle = "#fff"; g.fillRect(256 - w / 2, y0, w, h * .2) } g.restore(); camino(); g.lineWidth = 11; g.strokeStyle = TINTA; g.stroke() };
 const bocaO = (g, rx = 24, ry = 30) => { g.beginPath(); g.ellipse(256, MY, rx, ry, 0, 0, 7); g.fillStyle = BORDO; g.fill(); g.lineWidth = 9; g.strokeStyle = TINTA; g.stroke() };
 const bocaDientes = (g, w = 130, h = 54) => { g.fillStyle = "#fff"; g.beginPath(); g.roundRect(256 - w / 2, MY - h / 2, w, h, 16); g.fill(); g.lineWidth = 9; g.strokeStyle = TINTA; g.stroke(); g.lineWidth = 6; g.beginPath(); g.moveTo(256 - w / 2 + 4, MY); g.lineTo(256 + w / 2 - 4, MY); for (let i = 1; i < 5; i++) { const x = 256 - w / 2 + i * w / 5; g.moveTo(x, MY - h / 2 + 3); g.lineTo(x, MY + h / 2 - 3) } g.stroke() };
 const bocaZig = (g, w = 150) => { g.lineWidth = 11; g.strokeStyle = TINTA; g.lineJoin = "round"; g.lineCap = "round"; g.beginPath(); for (let i = 0; i <= 6; i++) g.lineTo(256 - w / 2 + i * w / 6, MY + (i % 2 ? -14 : 12)); g.stroke() };
@@ -2406,8 +2401,8 @@ const bocaD = g => { g.beginPath(); g.moveTo(206, MY - 34); g.lineTo(306, MY - 3
 // cada cara: ojos, cejas y boca
 const CARAS_CAT = {
   neutral: g => { [-1, 1].forEach(s => ojoNegro(g, 256 + s * EX)); pincel(g, [[218, MY], [256, MY + 4], [296, MY - 2]], 13) },
-  happy: g => { [-1, 1].forEach(s => ojoNegro(g, 256 + s * EX)); pincel(g, [[196, MY - 22], [256, MY + 40], [316, MY - 22]], 16) },
-  warm: g => { [-1, 1].forEach(s => ojoNegro(g, 256 + s * EX, 28, 38)); pincel(g, [[214, MY - 12], [256, MY + 22], [298, MY - 12]], 14) },
+  happy: g => { [-1, 1].forEach(s => ojoNegro(g, 256 + s * EX)); pincel(g, [[180, MY - 20], [256, MY + 50], [332, MY - 20]], 16) },
+  warm: g => { [-1, 1].forEach(s => ojoNegro(g, 256 + s * EX, 22, 40)); pincel(g, [[214, MY - 12], [256, MY + 22], [298, MY - 12]], 14) },
   hopeful: g => { [-1, 1].forEach(s => { ojoNegro(g, 256 + s * EX); ceja(g, 256 + s * EX, s, "pena") }); pincel(g, [[218, MY - 8], [256, MY + 16], [294, MY - 8]], 13) },
   relieved: g => { [-1, 1].forEach(s => { ojoArco(g, 256 + s * EX); ceja(g, 256 + s * EX, s, "pena") }); pincel(g, [[204, MY - 16], [256, MY + 30], [308, MY - 16]], 15) },
   paz: g => { [-1, 1].forEach(s => ojoArco(g, 256 + s * EX)); pincel(g, [[214, MY - 10], [256, MY + 22], [298, MY - 10]], 14) },
@@ -2416,14 +2411,14 @@ const CARAS_CAT = {
   starstruck: g => { [-1, 1].forEach(s => ojoBlanco(g, 256 + s * EX, 42, 0, 0, 20)); bocaAbierta(g, 160, 110, true, true) },
   sad: g => { [-1, 1].forEach(s => { ojoGota(g, 256 + s * EX, s); ceja(g, 256 + s * EX, s, "pena") }); pincel(g, [[206, MY + 18], [232, MY - 6], [270, MY - 14], [306, MY + 14]], 13) },
   worried: g => { [-1, 1].forEach(s => { ojoGota(g, 256 + s * EX, s); ceja(g, 256 + s * EX, s, "pena") }); pincel(g, [[214, MY + 8], [240, MY - 4], [268, MY + 6], [298, MY - 2]], 12) },
-  pleading: g => { [-1, 1].forEach(s => { ojoNegro(g, 256 + s * EX, 34, 46); ceja(g, 256 + s * EX, s, "pena") }); pincel(g, [[220, MY + 12], [256, MY - 10], [292, MY + 12]], 12) },
+  pleading: g => { [-1, 1].forEach(s => { ojoNegro(g, 256 + s * EX, 28, 48); ceja(g, 256 + s * EX, s, "pena") }); pincel(g, [[220, MY + 12], [256, MY - 10], [292, MY + 12]], 12) },
   gloomy: g => { [-1, 1].forEach(s => ojoChill(g, 256 + s * EX, s)); pincel(g, [[220, MY + 6], [256, MY - 2], [292, MY + 8]], 12) },
   squint: g => { [-1, 1].forEach(s => ojoChill(g, 256 + s * EX, s)); pincel(g, [[214, MY], [256, MY + 2], [298, MY - 2]], 13) },
   suspicious: g => { [-1, 1].forEach(s => ojoChill(g, 256 + s * EX, s)); pincel(g, [[214, MY + 2], [262, MY - 8], [300, MY - 2]], 13); pincel(g, [[282, MY + 6], [292, MY + 14], [298, MY + 6]], 6) },
-  determined: g => { [-1, 1].forEach(s => { ojoNegro(g, 256 + s * EX, 28, 36); ceja(g, 256 + s * EX, s, s < 0 ? "duda" : "enojo") }); pincel(g, [[214, MY + 4], [262, MY + 10], [302, MY - 12]], 13) },
-  brave: g => { [-1, 1].forEach(s => { ojoNegro(g, 256 + s * EX, 28, 36); ceja(g, 256 + s * EX, s, "duda") }); pincel(g, [[206, MY - 4], [252, MY + 28], [304, MY - 18]], 14) },
-  angry: g => { [-1, 1].forEach(s => { ojoNegro(g, 256 + s * EX, 28, 34, false); ceja(g, 256 + s * EX, s, "enojo") }); bocaDientes(g) },
-  grito: g => { [-1, 1].forEach(s => { ojoNegro(g, 256 + s * EX, 26, 32, false); ceja(g, 256 + s * EX, s, "enojo") }); bocaAbierta(g, 150, 120, true, true) },
+  determined: g => { [-1, 1].forEach(s => { ojoNegro(g, 256 + s * EX, 22, 40); ceja(g, 256 + s * EX, s, s < 0 ? "duda" : "enojo") }); pincel(g, [[214, MY + 4], [262, MY + 10], [302, MY - 12]], 13) },
+  brave: g => { [-1, 1].forEach(s => { ojoNegro(g, 256 + s * EX, 22, 40); ceja(g, 256 + s * EX, s, "duda") }); pincel(g, [[206, MY - 4], [252, MY + 28], [304, MY - 18]], 14) },
+  angry: g => { [-1, 1].forEach(s => { ojoNegro(g, 256 + s * EX, 22, 38); ceja(g, 256 + s * EX, s, "enojo") }); bocaDientes(g) },
+  grito: g => { [-1, 1].forEach(s => { ojoNegro(g, 256 + s * EX, 20, 36); ceja(g, 256 + s * EX, s, "enojo") }); bocaAbierta(g, 150, 120, true, true) },
   scared: g => { [-1, 1].forEach(s => { ojoBlanco(g, 256 + s * EX, 38, 0, 6, 12); ceja(g, 256 + s * EX, s, "pena") }); bocaZig(g) },
   terrified: g => { [-1, 1].forEach(s => { ojoBlanco(g, 256 + s * EX, 42, 0, 0, 10); ceja(g, 256 + s * EX, s, "pena") }); bocaAbierta(g, 120, 120, false, true) },
   horrified: g => { [-1, 1].forEach(s => { ojoBlanco(g, 256 + s * EX, 44, 0, 0, 9); ceja(g, 256 + s * EX, s, "alta") }); bocaZig(g, 170) },
@@ -2432,17 +2427,17 @@ const CARAS_CAT = {
   gasp: g => { [-1, 1].forEach(s => { ojoBlanco(g, 256 + s * EX, 40, 0, 2, 13); ceja(g, 256 + s * EX, s, "alta") }); bocaO(g, 20, 26) },
   curious: g => { [-1, 1].forEach(s => { ojoNegro(g, 256 + s * EX); ceja(g, 256 + s * EX, s, "duda") }); bocaO(g, 14, 16) },
   listen: g => { [-1, 1].forEach(s => { ojoBlanco(g, 256 + s * EX, 40, s * 12, -4, 15); ceja(g, 256 + s * EX, s, "alta") }); bocaO(g, 13, 15) },
-  susurra: g => { [-1, 1].forEach(s => { ojoNegro(g, 256 + s * EX, 28, 36); ceja(g, 256 + s * EX, s, "pena") }); bocaO(g, 11, 13) },
+  susurra: g => { [-1, 1].forEach(s => { ojoNegro(g, 256 + s * EX, 22, 40); ceja(g, 256 + s * EX, s, "pena") }); bocaO(g, 11, 13) },
   sopla: g => { [-1, 1].forEach(s => ojoApret(g, 256 + s * EX, s)); bocaO(g, 22, 26) },
   cerrados: g => { [-1, 1].forEach(s => ojoArco(g, 256 + s * EX, false)); pincel(g, [[220, MY], [256, MY + 4], [292, MY - 2]], 12) },
   happyD: g => { [-1, 1].forEach(s => ojoPunto(g, 256 + s * EX * .7)); bocaD(g) },
 };
 // el parpadeo: los mismos rasgos con los ojos como un arco cerrado
 function caraV(kind, cerr = false) { const key = kind + (cerr ? "_c" : ""); if (CARAV[key]) return CARAV[key];
-  return CARAV[key] = tex(512, 384, (g, w, h) => { g.lineCap = "round"; g.lineJoin = "round"; const f0 = CARAS_CAT[kind] || CARAS_CAT.neutral, f = gg => { gg.save(); gg.translate(256, 222); gg.scale(1.24, 1.24); gg.translate(-256, -222); f0(gg); gg.restore() };
+  return CARAV[key] = tex(512, 384, (g, w, h) => { g.lineCap = "round"; g.lineJoin = "round"; const f0 = CARAS_CAT[kind] || CARAS_CAT.neutral, f = gg => { gg.save(); gg.translate(256, 222); gg.scale(1.15, 1.15); gg.translate(-256, -222); f0(gg); gg.restore() };
     if (!cerr) return f(g);
     // dibuja la cara en otro lienzo, borra la franja de los ojos y pone los párpados cerrados (las cejas y la boca quedan)
-    const c2 = mk(512, 384), g2 = c2.getContext("2d"); g2.lineCap = "round"; g2.lineJoin = "round"; f(g2); const y0 = 222 + (EY - 222) * 1.24; g2.clearRect(0, y0 - 64, 512, 126); g.drawImage(c2, 0, 0); g.save(); g.translate(256, 222); g.scale(1.24, 1.24); g.translate(-256, -222); [-1, 1].forEach(s => ojoArco(g, 256 + s * EX, false)); g.restore() }) }
+    const c2 = mk(512, 384), g2 = c2.getContext("2d"); g2.lineCap = "round"; g2.lineJoin = "round"; f(g2); const y0 = 222 + (EY - 222) * 1.15; g2.clearRect(0, y0 - 64, 512, 126); g.drawImage(c2, 0, 0); g.save(); g.translate(256, 222); g.scale(1.15, 1.15); g.translate(-256, -222); [-1, 1].forEach(s => ojoArco(g, 256 + s * EX, false)); g.restore() }) }
 caraDz = (kind, cerr = false) => caraV(kind, cerr);
 setFace = (k, f) => { k.cara = f; const t = caraV(f); if (k.decal.material.map !== t) { k.decal.material.map = t; k.decal.material.needsUpdate = true } };
 
@@ -2532,7 +2527,7 @@ function caraDz(kind, cerr = false) { return caraV(kind, cerr) }   // la reasign
 
 // ---------- caras nuevas (mismo trazo de pincel del catálogo): «wow» (asombro feliz), «aguanta» (contra el viento), «esfuerzo» (tirar de la bota)
 CARAS_CAT.wow = g => { [-1, 1].forEach(s => { const x = 256 + s * EX; ojoBlanco(g, x, 44, 0, -6, 19); g.fillStyle = "#fff"; g.beginPath(); g.arc(x - 7, EY - 13, 6, 0, 7); g.fill(); ceja(g, x, s, "alta") }); bocaAbierta(g, 118, 96, true, false) };
-CARAS_CAT.aguanta = g => { [-1, 1].forEach(s => { ojoNegro(g, 256 + s * EX, 26, 30, false); ceja(g, 256 + s * EX, s, "enojo") }); bocaDientes(g, 120, 46) };
+CARAS_CAT.aguanta = g => { [-1, 1].forEach(s => { ojoNegro(g, 256 + s * EX, 20, 34); ceja(g, 256 + s * EX, s, "enojo") }); bocaDientes(g, 120, 46) };
 CARAS_CAT.esfuerzo = g => { [-1, 1].forEach(s => ojoApret(g, 256 + s * EX, s)); bocaDientes(g, 130, 52) };
 const SIN_PARPADEO = new Set(["relieved", "paz", "cerrados", "sopla", "esfuerzo", "happyD"]);
 // UN parpadeo de 4 cuadros (a 30 fps) cada 1,2–1,6 s, desfasado por personaje
@@ -2965,6 +2960,9 @@ const VP = (u, o = [0, 0, 0]) => () => add(vueloP(u), o);
 const C_SEPIA = "#b08a5a", C_POLVO = "#9a9080", C_NUBE = "#e8eef4";
 const VZ = VECINOS, HD = (k, o) => () => { const h = headW(k); return [h.x + o[0], h.y + o[1], h.z + o[2]] };
 const SHOTS = {
+  // arranque como Volze: primero el suceso (el narrador se suelta del piso), después la regla
+  [I.open]: [sh(0, () => [YO_T[0] + 3.2, SUELO(...YO_T) + .5, YO_T[1] + 2.6], () => [YO_T[0] + 2.9, SUELO(...YO_T) + .7, YO_T[1] + 3.0], KW(ME, [0, 1.1, 0]), null, 64),
+    sh(3, () => [YO_T[0] + 5.2, SUELO(...YO_T) + .6, YO_T[1] + 3.6], () => [YO_T[0] + 5.6, SUELO(...YO_T) + 1.0, YO_T[1] + 4.4], KW(ME, [0, 1.3, 0]), KW(ME, [0, 1.6, 0]), 60, { tr: "barrido" })],
   [I.rule]: [sh(0, G(-14, 1.1, 7.5), G(-11, 1.3, 7.8), G(-4, 1.5, 4), G(-3, 1.6, 4), 62), sh(4, KW(VZ[0], [-5.6, 1.4, 3]), KW(VZ[0], [-5, 1.3, 3.2]), KW(VZ[0], [0, 1.1, 0]), null, 50, { tr: "barrido" })],
   [I.cost]: [sh(0, KW(VZ[5], [-10, -2, 12]), KW(VZ[5], [-12, -3, 13]), KW(VZ[5], [0, 0, 0]), null, 46), sh(5, KW(VZ[5], [-14, -3, 16]), KW(VZ[5], [-16, -3, 18]), KW(VZ[5], [8, 0, 0]), null, 50, { lat: 2 })],
   [I.today]: [sh(0, KW(ME, [4.2, 1.8, 2.4]), KW(ME, [3.4, 1.6, 2]), KW(ME, [0, 1.2, 0]), null, 54, { tr: "barrido" })],
@@ -3053,7 +3051,7 @@ function setScene(t) {
   ALL.forEach(c => { if (c.polvo) c.polvo.forEach(q => q.visible = false); c.g.visible = false; c.body.rotation.set(0, 0, 0); c.body.position.y = 0; c.head.rotation.set(0, 0, 0); power(c, null, 0); c.aura.visible = false; setFace(c, "neutral"); pose(c, t, {}); quieto(c, t) });
   [PALA, REGLA, TELESC, HOYO].forEach(o => o.visible = false);
   // ---- ambiente según el tramo
-  const RECUERDO = L >= I.tobb && L <= I.green, TORM = (L >= I.doubled && L <= I.over) || L === I.today, VALLE_ = L >= I.then, CUMBRE = L >= I.over && L < I.then;
+  const RECUERDO = L >= I.tobb && L <= I.green, TORM = (L >= I.doubled && L <= I.over) || L === I.today || L === I.open, VALLE_ = L >= I.then, CUMBRE = L >= I.over && L < I.then;
   setEnv(QS.get("env") || (RECUERDO ? "recuerdo" : VALLE_ ? "valle" : CUMBRE ? "cumbre" : TORM ? "tormenta" : "ventoso")); SOL.z = 0;
   ambiente(t); sinBestia();
   lejos(t, { nubes: L === I.clouds ? (lt > dW(5) - .1 ? 0 : null) : L === I.then ? eIO(k) : null, jirones: L === I.clouds ? (lt > dW(5) ? .15 : 0) : L === I.then ? .6 : 0, nieve: 1, pajaros: VALLE_ ? 1 : 0 }); tortuga(t, { paso: 0 }); LUCES.forEach(l => l.visible = false);
@@ -3061,7 +3059,7 @@ function setScene(t) {
   if (RECUERDO) POST.sepia = .55;
   TEMBLOR = 0;
   // ---- la tormenta: cadenas, techo, veleta
-  cadenasRotas(L < I.snapped ? (L === I.today ? 1 : 0) : L === I.snapped ? eIO(P(lt, 0, dW(2))) : 1);
+  cadenasRotas(L < I.snapped ? (L === I.today || L === I.open ? 1 : 0) : L === I.snapped ? eIO(P(lt, 0, dW(2))) : 1);
   techoPanaderia(L < I.snapped ? 0 : L === I.snapped ? (lt < dW(2) - .1 ? .05 : .1 + .7 * P(lt, dW(2) - .1, len + 1.5)) : L === I.flew ? .18 + .08 * k : 1);
   const vel = L < I.vane ? { doblez: 0 } : L <= I.climb ? { doblez: .15 } : L === I.bend ? { doblez: .15 + .3 * eIO(P(lt, dW(3), len)) } : L < I.broke ? { doblez: .45 + .05 * Math.sin(t * 9) } : L === I.broke ? { doblez: .6, rota: eOut(P(lt, dW(1), dW(2) + .1)) } : L > I.broke && L <= I.over ? { rota: 1, pos: add(VELETA_W(), [99, 0, 0]) } : {};
   if (L >= I.over && typeof VELETA_PIEZA !== "undefined") vel.rota = 1;
@@ -3076,6 +3074,7 @@ function setScene(t) {
   switch (L) {
     case I.rule: camina(V[0], -2, 4, -1.1, "aguanta"); camina(V[1], 1, 4.8, -1, "neutral", .3); camina(V[2], -5, 3.6, -1.05, "aguanta", .5); camina(V[3], 3, 3.2, -1.1, "neutral", .2); parado(ME, -1, 2.4, .9, "neutral"); break;
     case I.cost: { const f = 6 + lt * 22; enAire(V[5], [f, 8 + lt * 9, -2]); volar(V[5], t, {}); bota0(V[5]); setFace(V[5], "terrified"); vientoPelo(V[5], 1.5, { t }); break }
+    case I.open: ponerP(ME, YO_T[0], YO_T[1], Math.PI / 2 + .2); bota0(ME); setFace(ME, lt < dW(3) ? "determined" : "shock"); despega(ME, t, eIO(P(lt, dW(3), len + .2))); vientoPelo(ME, 1.5, { t }); botaEnPiso(botaSuelta(ME, "izq"), YO_T[0] - .8, YO_T[1] + .8, { ry: .6, volcada: 1 }); botaEnPiso(botaSuelta(ME, "der"), YO_T[0] - .4, YO_T[1] + 1.3, { ry: -.4 }); break;
     case I.today: ponerP(ME, YO_T[0], YO_T[1], Math.PI / 2 + .2); bota0(ME); setFace(ME, "determined"); despega(ME, t, .15 + .3 * k); vientoPelo(ME, 1.5, { t }); botaEnPiso(botaSuelta(ME, "izq"), YO_T[0] - .8, YO_T[1] + .8, { ry: .6, volcada: 1 }); botaEnPiso(botaSuelta(ME, "der"), YO_T[0] - .4, YO_T[1] + 1.3, { ry: -.4 }); break;
     case I.never: case I.sideways: case I.laundry: camina(V[4], -4, 26, -1, "neutral"); break;
     case I.chains: parado(V[6], CASA_MIA[0] - 6, CASA_MIA[1] + 6, -1.2, "neutral"); break;

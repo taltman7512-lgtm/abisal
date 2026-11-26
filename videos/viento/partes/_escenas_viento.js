@@ -19,6 +19,9 @@ const VP = (u, o = [0, 0, 0]) => () => add(vueloP(u), o);
 const C_SEPIA = "#b08a5a", C_POLVO = "#9a9080", C_NUBE = "#e8eef4";
 const VZ = VECINOS, HD = (k, o) => () => { const h = headW(k); return [h.x + o[0], h.y + o[1], h.z + o[2]] };
 const SHOTS = {
+  // arranque como Volze: primero el suceso (el narrador se suelta del piso), después la regla
+  [I.open]: [sh(0, () => [YO_T[0] + 3.2, SUELO(...YO_T) + .5, YO_T[1] + 2.6], () => [YO_T[0] + 2.9, SUELO(...YO_T) + .7, YO_T[1] + 3.0], KW(ME, [0, 1.1, 0]), null, 64),
+    sh(3, () => [YO_T[0] + 5.2, SUELO(...YO_T) + .6, YO_T[1] + 3.6], () => [YO_T[0] + 5.6, SUELO(...YO_T) + 1.0, YO_T[1] + 4.4], KW(ME, [0, 1.3, 0]), KW(ME, [0, 1.6, 0]), 60, { tr: "barrido" })],
   [I.rule]: [sh(0, G(-14, 1.1, 7.5), G(-11, 1.3, 7.8), G(-4, 1.5, 4), G(-3, 1.6, 4), 62), sh(4, KW(VZ[0], [-5.6, 1.4, 3]), KW(VZ[0], [-5, 1.3, 3.2]), KW(VZ[0], [0, 1.1, 0]), null, 50, { tr: "barrido" })],
   [I.cost]: [sh(0, KW(VZ[5], [-10, -2, 12]), KW(VZ[5], [-12, -3, 13]), KW(VZ[5], [0, 0, 0]), null, 46), sh(5, KW(VZ[5], [-14, -3, 16]), KW(VZ[5], [-16, -3, 18]), KW(VZ[5], [8, 0, 0]), null, 50, { lat: 2 })],
   [I.today]: [sh(0, KW(ME, [4.2, 1.8, 2.4]), KW(ME, [3.4, 1.6, 2]), KW(ME, [0, 1.2, 0]), null, 54, { tr: "barrido" })],
@@ -107,7 +110,7 @@ function setScene(t) {
   ALL.forEach(c => { if (c.polvo) c.polvo.forEach(q => q.visible = false); c.g.visible = false; c.body.rotation.set(0, 0, 0); c.body.position.y = 0; c.head.rotation.set(0, 0, 0); power(c, null, 0); c.aura.visible = false; setFace(c, "neutral"); pose(c, t, {}); quieto(c, t) });
   [PALA, REGLA, TELESC, HOYO].forEach(o => o.visible = false);
   // ---- ambiente según el tramo
-  const RECUERDO = L >= I.tobb && L <= I.green, TORM = (L >= I.doubled && L <= I.over) || L === I.today, VALLE_ = L >= I.then, CUMBRE = L >= I.over && L < I.then;
+  const RECUERDO = L >= I.tobb && L <= I.green, TORM = (L >= I.doubled && L <= I.over) || L === I.today || L === I.open, VALLE_ = L >= I.then, CUMBRE = L >= I.over && L < I.then;
   setEnv(QS.get("env") || (RECUERDO ? "recuerdo" : VALLE_ ? "valle" : CUMBRE ? "cumbre" : TORM ? "tormenta" : "ventoso")); SOL.z = 0;
   ambiente(t); sinBestia();
   lejos(t, { nubes: L === I.clouds ? (lt > dW(5) - .1 ? 0 : null) : L === I.then ? eIO(k) : null, jirones: L === I.clouds ? (lt > dW(5) ? .15 : 0) : L === I.then ? .6 : 0, nieve: 1, pajaros: VALLE_ ? 1 : 0 }); tortuga(t, { paso: 0 }); LUCES.forEach(l => l.visible = false);
@@ -115,7 +118,7 @@ function setScene(t) {
   if (RECUERDO) POST.sepia = .55;
   TEMBLOR = 0;
   // ---- la tormenta: cadenas, techo, veleta
-  cadenasRotas(L < I.snapped ? (L === I.today ? 1 : 0) : L === I.snapped ? eIO(P(lt, 0, dW(2))) : 1);
+  cadenasRotas(L < I.snapped ? (L === I.today || L === I.open ? 1 : 0) : L === I.snapped ? eIO(P(lt, 0, dW(2))) : 1);
   techoPanaderia(L < I.snapped ? 0 : L === I.snapped ? (lt < dW(2) - .1 ? .05 : .1 + .7 * P(lt, dW(2) - .1, len + 1.5)) : L === I.flew ? .18 + .08 * k : 1);
   const vel = L < I.vane ? { doblez: 0 } : L <= I.climb ? { doblez: .15 } : L === I.bend ? { doblez: .15 + .3 * eIO(P(lt, dW(3), len)) } : L < I.broke ? { doblez: .45 + .05 * Math.sin(t * 9) } : L === I.broke ? { doblez: .6, rota: eOut(P(lt, dW(1), dW(2) + .1)) } : L > I.broke && L <= I.over ? { rota: 1, pos: add(VELETA_W(), [99, 0, 0]) } : {};
   if (L >= I.over && typeof VELETA_PIEZA !== "undefined") vel.rota = 1;
@@ -130,6 +133,7 @@ function setScene(t) {
   switch (L) {
     case I.rule: camina(V[0], -2, 4, -1.1, "aguanta"); camina(V[1], 1, 4.8, -1, "neutral", .3); camina(V[2], -5, 3.6, -1.05, "aguanta", .5); camina(V[3], 3, 3.2, -1.1, "neutral", .2); parado(ME, -1, 2.4, .9, "neutral"); break;
     case I.cost: { const f = 6 + lt * 22; enAire(V[5], [f, 8 + lt * 9, -2]); volar(V[5], t, {}); bota0(V[5]); setFace(V[5], "terrified"); vientoPelo(V[5], 1.5, { t }); break }
+    case I.open: ponerP(ME, YO_T[0], YO_T[1], Math.PI / 2 + .2); bota0(ME); setFace(ME, lt < dW(3) ? "determined" : "shock"); despega(ME, t, eIO(P(lt, dW(3), len + .2))); vientoPelo(ME, 1.5, { t }); botaEnPiso(botaSuelta(ME, "izq"), YO_T[0] - .8, YO_T[1] + .8, { ry: .6, volcada: 1 }); botaEnPiso(botaSuelta(ME, "der"), YO_T[0] - .4, YO_T[1] + 1.3, { ry: -.4 }); break;
     case I.today: ponerP(ME, YO_T[0], YO_T[1], Math.PI / 2 + .2); bota0(ME); setFace(ME, "determined"); despega(ME, t, .15 + .3 * k); vientoPelo(ME, 1.5, { t }); botaEnPiso(botaSuelta(ME, "izq"), YO_T[0] - .8, YO_T[1] + .8, { ry: .6, volcada: 1 }); botaEnPiso(botaSuelta(ME, "der"), YO_T[0] - .4, YO_T[1] + 1.3, { ry: -.4 }); break;
     case I.never: case I.sideways: case I.laundry: camina(V[4], -4, 26, -1, "neutral"); break;
     case I.chains: parado(V[6], CASA_MIA[0] - 6, CASA_MIA[1] + 6, -1.2, "neutral"); break;

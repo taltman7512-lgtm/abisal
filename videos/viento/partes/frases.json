@@ -1,5 +1,10 @@
 [
  {
+  "n": "open",
+  "t": "This morning, the ground let go of me.",
+  "gap": 0.12
+ },
+ {
   "n": "rule",
   "t": "Nobody takes off their boots in Gusthollow.",
   "gap": 0.1
@@ -11,7 +16,7 @@
  },
  {
   "n": "today",
-  "t": "This morning, I took mine off.",
+  "t": "I took mine off.",
   "gap": 0.2
  },
  {

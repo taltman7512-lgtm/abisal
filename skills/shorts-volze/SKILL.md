@@ -14,6 +14,11 @@ Lo único que se aprueba es la historia (paso 1) si la persona quiere verla; si 
 El dueño dio permiso (24-nov-2026) para modificar esta skill cuando haga falta. **Cada vez que pida un cambio de
 gusto** (pelo, aspecto de los personajes, nivel de detalle, voz, música, ritmo, tipo de historia, lo que sea),
 anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.claude/skills/shorts-volze/`.
+- **Arranque con el suceso primero (26-nov-2026, «Keep Your Boots On»)**: como en los videos de Volze, la PRIMERA frase
+  cuenta el momento fuerte que ya pasó (ej.: «This morning, the ground let go of me.», con la imagen de eso desde 0,0 s)
+  y recién después vienen la regla y el contexto («Nobody takes off their boots…»). No arrancar con la regla sola.
+  Si el guion ya está grabado, la frase nueva se puede armar con pedazos de la misma voz (`voz/NN.wav`) y volver a
+  correr `palabras.py`.
 - **Voz**: ElevenLabs «Skylar – Viral Zillennial Voice». Rechazadas: Kokoro, Liam Viral.
 - **Música de fondo (24-nov-2026, reemplaza al piano propio)**: de ahora en más va **el MP3 que dio el dueño**,
   «undertale-fallen down but more comforting.mp3», guardado **fuera del repo** en
@@ -36,7 +41,11 @@ anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.c
   `referencia/personajes-volze.md`; código en `videos/cuerno/partes/_volze_personajes.js` (`volze()`, `caraV()`,
   `peloV()`). **Cabezas rectas** (bisel ≈ 10 % del ancho): las redondeadas el dueño las rechazó («muy redondas»). **Caras con el estilo del catálogo clásico de caras de Roblox** (el dueño mandó capturas del catálogo; reemplaza
   a la cara de óvalos y trazo parejo): trazos de pincel que se afinan, ojos con brillo o blancos con pupila, bocas abiertas
-  bordó con lengua; ver la última sección de `referencia/personajes-volze.md`. Banco de pruebas: `QUERY="provisoria&fila" node render-gpu.mjs hoja …` pone a todo el elenco en fila.
+  bordó con lengua; ver la última sección de `referencia/personajes-volze.md`. **26-nov-2026, «Keep Your Boots On»: el dueño
+  pidió caras «más parecidas a las de Roblox»**: trazo PAREJO y grueso con puntas redondas (el pincel que se afina quedaba
+  de animé), ojos de óvalo negro alto y angosto SIN brillo (como el «Smile» clásico), sonrisa más ancha, bocas abiertas
+  enteras dentro de la calcomanía (boca a 262/384, escala 1,15) con el contorno sobre la boca y no sobre la lengua; los
+  ojos blancos con pupila quedan para sorpresa y miedo. Código en `videos/viento/partes/_volze_personajes.js`. Banco de pruebas: `QUERY="provisoria&fila" node render-gpu.mjs hoja …` pone a todo el elenco en fila.
 - **Transiciones sin salto al llegar (25-nov-2026, primera versión de «Nobody Blows The Horn»)**: al dueño le molestó
   que, al terminar cada transición, la cámara hiciera «un movimiento raro, brusco, de golpe». Era un bug: la transición
   llegaba al INICIO de la toma nueva, pero esa toma ya llevaba medio recorrido, y la cámara saltaba. Regla: la
@@ -307,7 +316,7 @@ que la criatura no era lo que creíamos o el narrador pasa a serlo. La última f
 primeras (bucle).
 
 ```
-HOOK (0–3,5 s)        1. «[Every/We/Nobody] … [la regla].»              2. «[El costo concreto y visual].»
+HOOK (0–4 s)          0. «[el suceso fuerte, ya pasado]» (preferencia del dueño)  1. «[Every/We/Nobody] … [la regla].»  2. «[El costo].»
 MUNDO (≈ 3–20 s)      3–8. cómo se vive con la regla: detalles concretos, un personaje del pueblo con nombre raro
                       (Wren, Brannock, Garrow), un cartel en el mundo que la recuerda, una cifra («Twelve squares so far»)
 LA CRIATURA (≈ 20–30 s) cómo se anuncia (algo que cae / un ruido / el viento) → revelación a escala → un detalle inquietante
