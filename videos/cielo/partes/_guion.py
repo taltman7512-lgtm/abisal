@@ -1,0 +1,66 @@
+# Guion de «We Hold Up The Sky»: escribe partes/frases.json, voz.json y guion.txt
+import json, os
+D = os.path.dirname(os.path.abspath(__file__))
+G = [  # nombre, texto, pausa después
+ ("open", "This morning, the sky touched my roof.", .1),
+ ("rule", "Every street in the world holds up its own piece of sky.", .1),
+ ("cost", "Whoever lets go, it comes down on their street.", .1),
+ ("nobody", "Nobody knows what's on top of it.", .2),
+ ("hard", "Our sky is blue, and hard, and close enough to hit with a rock.", .1),
+ ("forty", "On my street, it's forty feet up.", .1),
+ ("pole", "Every street has one pole, thick as a tower, with a crank at the bottom.", .1),
+ ("bell", "Every hour, a bell rings, and the whole street turns the crank. One turn.", .1),
+ ("wed", "Weddings happen under the pole, so the vows hold too.", .1),
+ ("babies", "Babies sleep in the crank house. It's the last thing to fall.", .1),
+ ("school", "We learn cranking before counting.", .1),
+ ("sun", "Our sun is a white circle on the sky. It never moves. It never sets.", .1),
+ ("sign", "On every pole, we painted the same three words. Hold it up.", .2),
+ ("greaser", "I'm the greaser. I climb every pole on our side of town with a bucket.", .1),
+ ("slip", "A dry screw slips. A slipping screw drops a street.", .1),
+ ("ollie", "My best friend Ollie is eight. He rides on my shoulders while I work.", .1),
+ ("higher", "At every pole, he points straight up. Higher? he asks.", .1),
+ ("oneday", "One day, I say.", .2),
+ ("kell", "Overseer Kell lives on the Hill. Up there, the sky is so high, they fly kites.", .1),
+ ("decides", "Kell decides where the poles stand.", .1),
+ ("sinks", "Every year, the sky sinks a little lower.", .1),
+ ("takes", "And every year, Kell needs one more pole for the Hill. He takes it from a street like mine.", .1),
+ ("three", "Our street had three poles when I was born. Now it has one.", .2),
+ ("skipped", "Last spring, I skipped Pole Nine. Just once. Ollie wanted to race.", .1),
+ ("night", "That night, its screw slipped.", .1),
+ ("tanner", "The sky came down on Tanner Street, slow, like a lid on a pot.", .1),
+ ("flat", "Forty houses. Flat.", .2),
+ ("blame", "Kell walked down from the Hill and looked at the flat street. Somebody didn't grease, he said.", .1),
+ ("looked", "Everyone looked at me.", .2),
+ ("cut", "But I went back to Pole Nine. The screw was still greasy. And there was a fresh cut in it. From a saw.", .1),
+ ("moved", "The next week, Pole Nine was standing on the Hill.", .2),
+ ("spare", "Last night, Kell's men took our last spare pole.", .1),
+ ("chimneys", "This morning, the sky sat down on our chimneys.", .1),
+ ("snap", "We cranked until the crank snapped. The roofs started to crack.", .1),
+ ("climb", "Nobody climbs the pole. It's the one thing you never do. I climbed it.", .1),
+ ("top", "Forty feet. The sky was right above my head.", .1),
+ ("drop", "Then something fell on my face. From above. It was dirt.", .2),
+ ("wood", "I pushed my grease knife into the sky. It isn't stone. It's wood, painted blue.", .1),
+ ("count", "Under me, the street cracked. Eight feet left. Seven.", .1),
+ ("through", "I cut a hole, and pushed my head through.", .3),
+ ("fields", "Sunlight. Real sunlight. And wheat, all the way to the edge of the world.", .1),
+ ("farm", "Our sky is somebody's farm.", .2),
+ ("dirt", "On a ladder from the Hill, Kell's men were spreading more dirt. Right over my street.", .1),
+ ("heavier", "Every year, the sky gets heavier, because every year, they plant more.", .1),
+ ("never", "We were never holding up the sky. We were holding up their fields.", .2),
+ ("told", "I climbed down and told my street. Nobody believed me, until I opened my hand. Wheat.", .1),
+ ("letgo", "So for the first time in history, a street let go on purpose.", .1),
+ ("out", "We carried the babies out first. Then we stepped back.", .1),
+ ("fall", "The sky came down on our houses, and Kell's field came down with it.", .1),
+ ("gold", "Wheat poured into our street like gold rain. And through the hole, the sun. The real one.", .1),
+ ("kellup", "Up on the edge, Kell stared down at the hole in his farm.", .1),
+ ("lost", "We lost every house we had.", .2),
+ ("shoulders", "Ollie climbed onto my shoulders, and pointed at the real sky. Higher? he asked.", .1),
+ ("end", "I lifted him up. That sky, nobody holds up.", .02),
+]
+assert len({n for n, _, _ in G}) == len(G)
+json.dump([{"n": n, "t": t, "gap": g} for n, t, g in G], open(os.path.join(D, "frases.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+R = os.path.dirname(D)
+json.dump([t for _, t, _ in G], open(os.path.join(R, "voz.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+open(os.path.join(R, "guion.txt"), "w", encoding="utf-8").write(" ".join(t for _, t, _ in G))
+w = sum(len(t.split()) for _, t, _ in G)
+print(len(G), "frases,", w, "palabras; a 260 por minuto:", round(w / 260 * 60 + sum(g for _, _, g in G), 1), "s")

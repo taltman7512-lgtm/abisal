@@ -1,0 +1,272 @@
+[
+ {
+  "n": "open",
+  "t": "This morning, the sky touched my roof.",
+  "gap": 0.1
+ },
+ {
+  "n": "rule",
+  "t": "Every street in the world holds up its own piece of sky.",
+  "gap": 0.1
+ },
+ {
+  "n": "cost",
+  "t": "Whoever lets go, it comes down on their street.",
+  "gap": 0.1
+ },
+ {
+  "n": "nobody",
+  "t": "Nobody knows what's on top of it.",
+  "gap": 0.2
+ },
+ {
+  "n": "hard",
+  "t": "Our sky is blue, and hard, and close enough to hit with a rock.",
+  "gap": 0.1
+ },
+ {
+  "n": "forty",
+  "t": "On my street, it's forty feet up.",
+  "gap": 0.1
+ },
+ {
+  "n": "pole",
+  "t": "Every street has one pole, thick as a tower, with a crank at the bottom.",
+  "gap": 0.1
+ },
+ {
+  "n": "bell",
+  "t": "Every hour, a bell rings, and the whole street turns the crank. One turn.",
+  "gap": 0.1
+ },
+ {
+  "n": "wed",
+  "t": "Weddings happen under the pole, so the vows hold too.",
+  "gap": 0.1
+ },
+ {
+  "n": "babies",
+  "t": "Babies sleep in the crank house. It's the last thing to fall.",
+  "gap": 0.1
+ },
+ {
+  "n": "school",
+  "t": "We learn cranking before counting.",
+  "gap": 0.1
+ },
+ {
+  "n": "sun",
+  "t": "Our sun is a white circle on the sky. It never moves. It never sets.",
+  "gap": 0.1
+ },
+ {
+  "n": "sign",
+  "t": "On every pole, we painted the same three words. Hold it up.",
+  "gap": 0.2
+ },
+ {
+  "n": "greaser",
+  "t": "I'm the greaser. I climb every pole on our side of town with a bucket.",
+  "gap": 0.1
+ },
+ {
+  "n": "slip",
+  "t": "A dry screw slips. A slipping screw drops a street.",
+  "gap": 0.1
+ },
+ {
+  "n": "ollie",
+  "t": "My best friend Ollie is eight. He rides on my shoulders while I work.",
+  "gap": 0.1
+ },
+ {
+  "n": "higher",
+  "t": "At every pole, he points straight up. Higher? he asks.",
+  "gap": 0.1
+ },
+ {
+  "n": "oneday",
+  "t": "One day, I say.",
+  "gap": 0.2
+ },
+ {
+  "n": "kell",
+  "t": "Overseer Kell lives on the Hill. Up there, the sky is so high, they fly kites.",
+  "gap": 0.1
+ },
+ {
+  "n": "decides",
+  "t": "Kell decides where the poles stand.",
+  "gap": 0.1
+ },
+ {
+  "n": "sinks",
+  "t": "Every year, the sky sinks a little lower.",
+  "gap": 0.1
+ },
+ {
+  "n": "takes",
+  "t": "And every year, Kell needs one more pole for the Hill. He takes it from a street like mine.",
+  "gap": 0.1
+ },
+ {
+  "n": "three",
+  "t": "Our street had three poles when I was born. Now it has one.",
+  "gap": 0.2
+ },
+ {
+  "n": "skipped",
+  "t": "Last spring, I skipped Pole Nine. Just once. Ollie wanted to race.",
+  "gap": 0.1
+ },
+ {
+  "n": "night",
+  "t": "That night, its screw slipped.",
+  "gap": 0.1
+ },
+ {
+  "n": "tanner",
+  "t": "The sky came down on Tanner Street, slow, like a lid on a pot.",
+  "gap": 0.1
+ },
+ {
+  "n": "flat",
+  "t": "Forty houses. Flat.",
+  "gap": 0.2
+ },
+ {
+  "n": "blame",
+  "t": "Kell walked down from the Hill and looked at the flat street. Somebody didn't grease, he said.",
+  "gap": 0.1
+ },
+ {
+  "n": "looked",
+  "t": "Everyone looked at me.",
+  "gap": 0.2
+ },
+ {
+  "n": "cut",
+  "t": "But I went back to Pole Nine. The screw was still greasy. And there was a fresh cut in it. From a saw.",
+  "gap": 0.1
+ },
+ {
+  "n": "moved",
+  "t": "The next week, Pole Nine was standing on the Hill.",
+  "gap": 0.2
+ },
+ {
+  "n": "spare",
+  "t": "Last night, Kell's men took our last spare pole.",
+  "gap": 0.1
+ },
+ {
+  "n": "chimneys",
+  "t": "This morning, the sky sat down on our chimneys.",
+  "gap": 0.1
+ },
+ {
+  "n": "snap",
+  "t": "We cranked until the crank snapped. The roofs started to crack.",
+  "gap": 0.1
+ },
+ {
+  "n": "climb",
+  "t": "Nobody climbs the pole. It's the one thing you never do. I climbed it.",
+  "gap": 0.1
+ },
+ {
+  "n": "top",
+  "t": "Forty feet. The sky was right above my head.",
+  "gap": 0.1
+ },
+ {
+  "n": "drop",
+  "t": "Then something fell on my face. From above. It was dirt.",
+  "gap": 0.2
+ },
+ {
+  "n": "wood",
+  "t": "I pushed my grease knife into the sky. It isn't stone. It's wood, painted blue.",
+  "gap": 0.1
+ },
+ {
+  "n": "count",
+  "t": "Under me, the street cracked. Eight feet left. Seven.",
+  "gap": 0.1
+ },
+ {
+  "n": "through",
+  "t": "I cut a hole, and pushed my head through.",
+  "gap": 0.3
+ },
+ {
+  "n": "fields",
+  "t": "Sunlight. Real sunlight. And wheat, all the way to the edge of the world.",
+  "gap": 0.1
+ },
+ {
+  "n": "farm",
+  "t": "Our sky is somebody's farm.",
+  "gap": 0.2
+ },
+ {
+  "n": "dirt",
+  "t": "On a ladder from the Hill, Kell's men were spreading more dirt. Right over my street.",
+  "gap": 0.1
+ },
+ {
+  "n": "heavier",
+  "t": "Every year, the sky gets heavier, because every year, they plant more.",
+  "gap": 0.1
+ },
+ {
+  "n": "never",
+  "t": "We were never holding up the sky. We were holding up their fields.",
+  "gap": 0.2
+ },
+ {
+  "n": "told",
+  "t": "I climbed down and told my street. Nobody believed me, until I opened my hand. Wheat.",
+  "gap": 0.1
+ },
+ {
+  "n": "letgo",
+  "t": "So for the first time in history, a street let go on purpose.",
+  "gap": 0.1
+ },
+ {
+  "n": "out",
+  "t": "We carried the babies out first. Then we stepped back.",
+  "gap": 0.1
+ },
+ {
+  "n": "fall",
+  "t": "The sky came down on our houses, and Kell's field came down with it.",
+  "gap": 0.1
+ },
+ {
+  "n": "gold",
+  "t": "Wheat poured into our street like gold rain. And through the hole, the sun. The real one.",
+  "gap": 0.1
+ },
+ {
+  "n": "kellup",
+  "t": "Up on the edge, Kell stared down at the hole in his farm.",
+  "gap": 0.1
+ },
+ {
+  "n": "lost",
+  "t": "We lost every house we had.",
+  "gap": 0.2
+ },
+ {
+  "n": "shoulders",
+  "t": "Ollie climbed onto my shoulders, and pointed at the real sky. Higher? he asked.",
+  "gap": 0.1
+ },
+ {
+  "n": "end",
+  "t": "I lifted him up. That sky, nobody holds up.",
+  "gap": 0.02
+ }
+]

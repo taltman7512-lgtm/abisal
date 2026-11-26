@@ -32,9 +32,9 @@ const browser = await chromium.launch({ executablePath: CHROME, headless: true, 
 
 async function abrir() {
   const p = await browser.newPage({ viewport: { width: 540, height: 960 } });
-  p.on("pageerror", e => console.log("ERROR en la página:", e.message)); p.on("console", m => { if (m.type() === "error") console.log("consola:", m.text()) });
+  p.on("pageerror", e => { console.log("ERROR en la página:", e.message); process.exit(2) }); p.on("console", m => { if (m.type() === "error") console.log("consola:", m.text()) });
   await p.goto(`http://localhost:${PORT}/${PAGINA}?${QUERY}`);
-  await p.waitForFunction(() => window.listo, null, { timeout: 180000 });
+  await p.waitForFunction(() => window.listo, null, { timeout: 420000 });
   const info = await p.evaluate(async () => { const r = await window.listo; return { DUR: r.DUR, NF: window.NFR ?? Math.round(r.DUR * 60) } });
   return { p, ...info };
 }
@@ -49,6 +49,7 @@ const wavB64 = (p, solo = null) => p.evaluate(async (solo) => { window.SOLO = so
 if (modo === "audio") { const { p } = await abrir(); for (const [solo, nom] of [[null, "mezcla"], ["mus", "solo-musica"], ["voz", "solo-voz"], ["sinmusica", "sin-musica"]]) { const f = path.join(DIR, "salida", nom + ".wav"); fs.mkdirSync(path.dirname(f), { recursive: true }); fs.writeFileSync(f, Buffer.from(await wavB64(p, solo), "base64")); console.log("audio", f) } }
 
 if (modo === "tiempos") { const { p } = await abrir(); const T = await p.evaluate(() => window.DBG.TOMAS.map(x => [x.L, x.j, +x.a.toFixed(2), +x.b.toFixed(2), x.corte])); const N = JSON.parse(fs.readFileSync(path.join(DIR, "partes", "frases.json"), "utf8")).map(f => f.n); T.forEach(([L, j, a, b, c]) => console.log(`${a.toFixed(1).padStart(6)}-${b.toFixed(1).padStart(6)}  ${N[L]}.${j}${c ? "  (corte)" : ""}`)) }
+if (modo === "mapa") { const { p } = await abrir(); const R = await p.evaluate(() => window.MAPA()); fs.writeFileSync(path.join(DIR, "salida", "mapa.json"), JSON.stringify(R)); console.log("rects", R.length) }
 if (modo === "info") {
   const { p, DUR, NF } = await abrir(); console.log(JSON.stringify({ placa: await placa(p), DUR, NF }));
 }
@@ -56,11 +57,12 @@ if (modo === "info") {
 if (modo === "hoja") {
   const ts = (pos[1] || "1").split(",").map(Number), out = path.join(DIR, pos[2] || "salida/hoja.jpg"); fs.mkdirSync(path.dirname(out), { recursive: true });
   const { p } = await abrir(); const tmp = path.join(DIR, "salida", "_hoja"); fs.rmSync(tmp, { recursive: true, force: true }); fs.mkdirSync(tmp, { recursive: true });
-  for (let i = 0; i < ts.length; i++) fs.writeFileSync(path.join(tmp, `${String(i).padStart(3, "0")}.jpg`), await jpeg(p, Math.round(ts[i] * 60), .85));
+  for (let i = 0; i < ts.length; i++) { for (let w = 0; w < 3; w++) { await jpeg(p, Math.round(ts[i] * 60), .5); await p.waitForTimeout(400) } fs.writeFileSync(path.join(tmp, `${String(i).padStart(3, "0")}.jpg`), await jpeg(p, Math.round(ts[i] * 60), .85)) }
   const cols = Math.min(+(flag("cols", 6)), ts.length), filas = Math.ceil(ts.length / cols);
-  const lab = ts.map((t, i) => `[${i}:v]scale=360:480,drawtext=fontfile='C\\:/Windows/Fonts/arial.ttf':text='${t.toFixed(1)}':x=6:y=6:fontsize=24:fontcolor=yellow:box=1:boxcolor=black@0.6[v${i}]`).join(";");
+  const TW = +flag("tam", 360), TH = TW * 4 / 3;
+  const lab = ts.map((t, i) => `[${i}:v]scale=${TW}:${TH},drawtext=fontfile='C\\:/Windows/Fonts/arial.ttf':text='${t.toFixed(1)}':x=6:y=6:fontsize=24:fontcolor=yellow:box=1:boxcolor=black@0.6[v${i}]`).join(";");
   const inp = ts.flatMap((_, i) => ["-i", path.join(tmp, `${String(i).padStart(3, "0")}.jpg`)]);
-  const layout = ts.map((_, i) => `${(i % cols) * 360}_${Math.floor(i / cols) * 480}`).join("|");
+  const layout = ts.map((_, i) => `${(i % cols) * TW}_${Math.floor(i / cols) * TH}`).join("|");
   const r = spawn("ffmpeg", ["-v", "error", "-y", ...inp, "-filter_complex", `${lab};${ts.map((_, i) => `[v${i}]`).join("")}xstack=inputs=${ts.length}:layout=${layout}:fill=black`, "-frames:v", "1", "-q:v", "3", out], { stdio: "inherit" });
   await new Promise(ok => r.on("close", ok)); console.log("hoja", out, `(${filas} filas)`);
 }

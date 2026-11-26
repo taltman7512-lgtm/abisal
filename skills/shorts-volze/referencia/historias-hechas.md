@@ -67,3 +67,22 @@ Construido otra vez con tres agentes en paralelo (pueblo, cordillera+valle, elen
 - Nombres que chocan al juntar las partes (`botas`, `PIP`, `NUBE`, `V_`, `MEDIA_TOBB`): pedir prefijos en el brief.
 - En el abrazo pecho con pecho las caras quedan tapadas desde cualquier ángulo: para un plano corto, ponerlos lado a lado.
 - Primeros planos de alguien sentado o agachado muestran la coronilla: cámara baja y levantar la cabeza (`head.rotation.x`).
+
+## «We Hold Up The Sky» (pueblo de día bajo un cielo-tapa, 26-nov-2026), en `videos/cielo/`
+Primer video con la **plantilla nueva** (comparación de 16 guiones de Volze): sin criatura, con misterio desde el gancho,
+villano humano y narrador con oficio y culpa. El cielo es una tapa de tablones pintada de celeste (nubes y un sol blanco
+pintados) que tapa el mundo; cada calle la sostiene con un poste gigante con gato de rosca y manivela («HOLD IT UP»). El
+narrador es el engrasador; Ollie (8) va en sus hombros y pregunta «Higher?». Overseer Kell vive en la Loma, donde el cielo
+está alto, y se lleva postes de las calles pobres. Recuerdo (sepia): el narrador se salteó Pole Nine, la tapa bajó sobre
+Tanner Street y Kell lo culpó; pero el tornillo tenía un corte de serrucho y Pole Nine apareció en la Loma. Hoy la tapa se
+sienta en las chimeneas; el narrador trepa, le cae tierra de arriba, clava el cuchillo: es madera pintada; arriba hay trigo
+y sol de verdad: el cielo es la granja de Kell, que cada año suma tierra. La calle suelta el poste a propósito: el panel
+cae sobre los techos con el campo, llueve trigo dorado y entra el sol real; pierden las casas. Giro: «Higher? he asked. I
+lifted him up. That sky, nobody holds up.» 54 frases, 610 palabras, 133,6 s.
+Construido con tres agentes (pueblo, tapa+campo, elenco) sobre copias en `_taller/` con brief común. Lecciones:
+- **Antes de escribir tomas, sacar el mapa de ocupación** (`node render-gpu.mjs mapa` → `salida/mapa.json` con los
+  rectángulos de las casas): la primera tanda tenía media docena de cámaras dentro de paredes. Calles libres en este mapa:
+  z −2,5..2,5 (nuestra calle), plazoleta, Tanner z 23..29.
+- Al narrador colgado de un poste filmarlo de costado (desplazamiento en z), no desde el lado de los peldaños: de espaldas.
+- Un disco pintado mirado de abajo con bloom se quema en blanco: materiales «pintados» con poco emisivo.
+- Superficies de un solo lado que después quedan dadas vuelta (la tapa caída) se ven transparentes: usar DoubleSide.

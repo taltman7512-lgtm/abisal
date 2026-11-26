@@ -24,7 +24,8 @@ anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.c
   - **Escala grande**: mejor «the whole world / every city» que un pueblito.
   - **Estructura distinta en cada video** (cuenta regresiva, dilema, investigación, final abierto) y una segunda revelación
     a mitad. Cierre «My whole life… Today…» prohibido como fórmula fija.
-  - **Duración 125–158 s (≈ 550–650 palabras)**, como el top de Volze; nosotros veníamos en 104–108 s.
+  - **Sin límite de duración (26-nov-2026, el dueño)**: el video dura lo que haga falta para que la historia se explique bien.
+    Como referencia, el top de Volze va de 125 a 158 s; nosotros veníamos cortos (104–108 s), así que no recortar escenas para achicar.
   - **Probar la comedia «I…»** (hazaña absurda que escala, sin monstruo, remate que se muerde la cola; el más visto de
     Volze, 37,5 M): música juguetona ≈ 16 dB bajo la voz y un golpe de efecto por barrido.
 - **Arranque con el suceso primero (26-nov-2026, «Keep Your Boots On»)**: como en los videos de Volze, la PRIMERA frase
@@ -216,7 +217,7 @@ Partir de acá para videos nuevos, no de la polilla:
    primerísimo plano** (70–90 % del ancho) y el narrador entra en cuadro antes de 1,0 s.
 3. **Un gimmick visual que se entiende en un frame** (algo gigante, altísimo o multitudinario que ilustra la regla).
 4. **Un solo narrador en primera persona, rápido**: 245–287 palabras por minuto (mediana 260), diálogos citados por la
-   misma voz. **Duración 105–178 s** (≈ 430–650 palabras).
+   misma voz. **Sin límite de duración** (pedido del dueño): lo que haga falta para explicar bien la historia (Volze: 105–178 s).
 5. **Giro en los últimos ≈ 5 s que retoma la regla del arranque y la da vuelta.** El video termina 0,2–2 s después de
    la última palabra: sin cierre, sin pantalla final (bucle).
 6. **Contraste de tres niveles**: personajes de bloques propios / mundo con texturas reales / criatura u objeto
@@ -484,7 +485,7 @@ node render-gpu.mjs video salida/<nombre>.mp4 --conc=3 --sinmusica
 ## Checklist antes de exportar
 - [ ] Título ≤ 5 palabras, sin hashtags ni «Roblox».
 - [ ] Primera palabra en 0,0 s; la segunda oración (el costo) empieza antes de 3,5 s.
-- [ ] 105–178 s y 245–287 palabras por minuto (`render-gpu.mjs info` da la duración).
+- [ ] La historia se entiende entera (sin límite de duración) y 245–287 palabras por minuto (`render-gpu.mjs info` da la duración).
 - [ ] La última frase da vuelta la regla del arranque; el video termina 0,2–2 s después de la última palabra.
 - [ ] Ningún personaje, música, logo ni asset de Volze o de Roblox; personajes propios.
 - [ ] Hoja de tomas sin nucas, paredes, cámaras adentro de algo, cosas quemadas (blanco) ni negras.
