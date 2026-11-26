@@ -1,0 +1,66 @@
+# Guion de «Keep Your Boots On»: escribe partes/frases.json, voz.json y guion.txt
+import json, os
+D = os.path.dirname(os.path.abspath(__file__))
+G = [  # nombre, texto, pausa después
+ ("rule", "Nobody takes off their boots in Gusthollow.", .1),
+ ("cost", "Whoever does, the wind carries them over the mountains.", .12),
+ ("today", "This morning, I took mine off.", .2),
+ ("never", "The wind here never stops. It has blown the same way for three hundred years.", .1),
+ ("sideways", "Our trees grow sideways. Our smoke goes sideways.", .1),
+ ("laundry", "Our laundry has never once hung down.", .1),
+ ("chains", "Every house is chained to the ground. Four chains each.", .1),
+ ("iron", "Our boots are iron. Ten pounds each.", .1),
+ ("babies", "Babies get their first pair before their first word.", .1),
+ ("wed", "At weddings, we tie the bride to the groom, so nobody blows away from the altar.", .1),
+ ("lean", "We all walk leaning forward, like we're climbing a hill that isn't there.", .1),
+ ("soup", "Old Marta sells soup. In cups with lids.", .14),
+ ("sign", "On the tower, we painted three words. Boots on. Always.", .2),
+ ("pip", "My little sister Pip is seven. She's the lightest kid in town.", .1),
+ ("rocks", "She has rocks sewn into her pockets. She still wobbles.", .1),
+ ("kites", "And she loves kites. The wind has taken every kite she ever had.", .1),
+ ("where", "One day, she says, I'm going to see where they go.", .16),
+ ("tobb", "Fifty years ago, a boy named Tobb took off his boots to dry his feet.", .1),
+ ("second", "Just for one second.", .1),
+ ("leaf", "The wind picked him up like a leaf.", .1),
+ ("sock", "We watched him go over the mountains, still holding one sock.", .1),
+ ("walked", "He walked back home. It took him three years.", .1),
+ ("green", "He said the other side was green. Nobody believed him.", .1),
+ ("old", "Now he's old Tobb, and his boots are the heaviest in town.", .16),
+ ("doubled", "This morning, the wind doubled.", .1),
+ ("snapped", "Chains snapped. The bakery roof flew off like a hat.", .1),
+ ("hill", "And Pip was up on the hill, with a brand new kite.", .1),
+ ("pulled", "The string pulled. Her boot strap broke.", .1),
+ ("boots2", "One boot came off. Then the other.", .1),
+ ("up", "And my sister went up.", .3),
+ ("vane", "She grabbed the weathervane on top of the tower, and held on.", .1),
+ ("climb", "Nobody could climb up. The wind pushed us flat on the ground.", .1),
+ ("bend", "And the weathervane started to bend.", .2),
+ ("oneway", "There was only one way to get up there.", .1),
+ ("laces", "I sat down. I untied my laces.", .1),
+ ("dont", "Old Tobb grabbed my arm. Don't, he said.", .1),
+ ("left", "I pulled off my left boot. Then my right.", .1),
+ ("letgo", "And the ground let go of me.", .2),
+ ("flew", "I flew. Faster than the bakery roof.", .1),
+ ("grab", "I hit the tower. I grabbed the vane. I grabbed Pip.", .1),
+ ("broke", "The vane broke off.", .1),
+ ("over", "And we both went over the mountains.", .3),
+ ("tight", "I held her as tight as I could.", .1),
+ ("clouds", "Below us, rocks. Then snow. Then clouds.", .2),
+ ("then", "And then, green.", .2),
+ ("calm", "A valley with no wind at all.", .1),
+ ("straight", "Trees growing straight up. Smoke going straight up.", .1),
+ ("fields", "And kites. Hundreds of kites, lying in the grass.", .1),
+ ("hers", "Every kite Pip ever lost.", .1),
+ ("landed", "We landed on our backs in the soft grass.", .1),
+ ("told", "Told you, Pip said. I wanted to see where they go.", .2),
+ ("rightall", "Tobb was right all along.", .1),
+ ("life", "My whole life, I kept my boots on.", .1),
+ ("tomorrow", "Tomorrow, I'm walking home, to tell everyone to take them off.", .02),
+]
+assert len({n for n, _, _ in G}) == len(G)
+json.dump([{"n": n, "t": t, "gap": g} for n, t, g in G], open(os.path.join(D, "frases.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+R = os.path.dirname(D)
+json.dump([t for _, t, _ in G], open(os.path.join(R, "voz.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+open(os.path.join(R, "guion.txt"), "w", encoding="utf-8").write(" ".join(t for _, t, _ in G))
+w = sum(len(t.split()) for _, t, _ in G)
+print(len(G), "frases,", w, "palabras; a 260 por minuto:", round(w / 260 * 60 + sum(g for _, _, g in G), 1), "s")

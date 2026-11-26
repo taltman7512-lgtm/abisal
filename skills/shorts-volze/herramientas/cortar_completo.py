@@ -14,9 +14,10 @@ tmp = os.path.join(P, "voz", "_completa48k.wav"); os.makedirs(os.path.join(P, "v
 subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", a.mp3, "-ac", "1", "-ar", "48000", tmp], check=True)
 x, sr = sf.read(tmp, dtype="float32"); x16 = x[::3]
 m = WhisperModel("large-v3", device="cuda", compute_type="float16")
-W = [(w.word, w.start, w.end) for s in m.transcribe(x16, language="en", word_timestamps=True, initial_prompt=" ".join(L)[:800])[0] for w in s.words]
+# sin initial_prompt: con el guion como prompt, whisper a veces se saltea el primer tramo entero (Gusthollow, 26-nov-2026)
+W = [(w.word, w.start, w.end) for s in m.transcribe(x16, language="en", word_timestamps=True)[0] for w in s.words]
 norm = lambda t: re.sub(r"[^a-z0-9]", "", t.lower())
-num = {"12": "twelve", "40": "forty", "42": "fortytwo", "1": "one", "2": "two", "3": "three"}
+num = {"10": "ten", "300": "threehundred", "12": "twelve", "40": "forty", "42": "fortytwo", "1": "one", "2": "two", "3": "three"}
 hw = [num.get(norm(w), norm(w)) for w, _, _ in W]
 gw, own = [], []
 # nombres inventados que whisper oye en dos palabras («Onetusk» → «on tusk»): voz-alias.json = {"onetusk": ["on", "tusk"]}

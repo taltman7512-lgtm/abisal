@@ -1,0 +1,272 @@
+[
+ {
+  "n": "rule",
+  "t": "Nobody takes off their boots in Gusthollow.",
+  "gap": 0.1
+ },
+ {
+  "n": "cost",
+  "t": "Whoever does, the wind carries them over the mountains.",
+  "gap": 0.12
+ },
+ {
+  "n": "today",
+  "t": "This morning, I took mine off.",
+  "gap": 0.2
+ },
+ {
+  "n": "never",
+  "t": "The wind here never stops. It has blown the same way for three hundred years.",
+  "gap": 0.1
+ },
+ {
+  "n": "sideways",
+  "t": "Our trees grow sideways. Our smoke goes sideways.",
+  "gap": 0.1
+ },
+ {
+  "n": "laundry",
+  "t": "Our laundry has never once hung down.",
+  "gap": 0.1
+ },
+ {
+  "n": "chains",
+  "t": "Every house is chained to the ground. Four chains each.",
+  "gap": 0.1
+ },
+ {
+  "n": "iron",
+  "t": "Our boots are iron. Ten pounds each.",
+  "gap": 0.1
+ },
+ {
+  "n": "babies",
+  "t": "Babies get their first pair before their first word.",
+  "gap": 0.1
+ },
+ {
+  "n": "wed",
+  "t": "At weddings, we tie the bride to the groom, so nobody blows away from the altar.",
+  "gap": 0.1
+ },
+ {
+  "n": "lean",
+  "t": "We all walk leaning forward, like we're climbing a hill that isn't there.",
+  "gap": 0.1
+ },
+ {
+  "n": "soup",
+  "t": "Old Marta sells soup. In cups with lids.",
+  "gap": 0.14
+ },
+ {
+  "n": "sign",
+  "t": "On the tower, we painted three words. Boots on. Always.",
+  "gap": 0.2
+ },
+ {
+  "n": "pip",
+  "t": "My little sister Pip is seven. She's the lightest kid in town.",
+  "gap": 0.1
+ },
+ {
+  "n": "rocks",
+  "t": "She has rocks sewn into her pockets. She still wobbles.",
+  "gap": 0.1
+ },
+ {
+  "n": "kites",
+  "t": "And she loves kites. The wind has taken every kite she ever had.",
+  "gap": 0.1
+ },
+ {
+  "n": "where",
+  "t": "One day, she says, I'm going to see where they go.",
+  "gap": 0.16
+ },
+ {
+  "n": "tobb",
+  "t": "Fifty years ago, a boy named Tobb took off his boots to dry his feet.",
+  "gap": 0.1
+ },
+ {
+  "n": "second",
+  "t": "Just for one second.",
+  "gap": 0.1
+ },
+ {
+  "n": "leaf",
+  "t": "The wind picked him up like a leaf.",
+  "gap": 0.1
+ },
+ {
+  "n": "sock",
+  "t": "We watched him go over the mountains, still holding one sock.",
+  "gap": 0.1
+ },
+ {
+  "n": "walked",
+  "t": "He walked back home. It took him three years.",
+  "gap": 0.1
+ },
+ {
+  "n": "green",
+  "t": "He said the other side was green. Nobody believed him.",
+  "gap": 0.1
+ },
+ {
+  "n": "old",
+  "t": "Now he's old Tobb, and his boots are the heaviest in town.",
+  "gap": 0.16
+ },
+ {
+  "n": "doubled",
+  "t": "This morning, the wind doubled.",
+  "gap": 0.1
+ },
+ {
+  "n": "snapped",
+  "t": "Chains snapped. The bakery roof flew off like a hat.",
+  "gap": 0.1
+ },
+ {
+  "n": "hill",
+  "t": "And Pip was up on the hill, with a brand new kite.",
+  "gap": 0.1
+ },
+ {
+  "n": "pulled",
+  "t": "The string pulled. Her boot strap broke.",
+  "gap": 0.1
+ },
+ {
+  "n": "boots2",
+  "t": "One boot came off. Then the other.",
+  "gap": 0.1
+ },
+ {
+  "n": "up",
+  "t": "And my sister went up.",
+  "gap": 0.3
+ },
+ {
+  "n": "vane",
+  "t": "She grabbed the weathervane on top of the tower, and held on.",
+  "gap": 0.1
+ },
+ {
+  "n": "climb",
+  "t": "Nobody could climb up. The wind pushed us flat on the ground.",
+  "gap": 0.1
+ },
+ {
+  "n": "bend",
+  "t": "And the weathervane started to bend.",
+  "gap": 0.2
+ },
+ {
+  "n": "oneway",
+  "t": "There was only one way to get up there.",
+  "gap": 0.1
+ },
+ {
+  "n": "laces",
+  "t": "I sat down. I untied my laces.",
+  "gap": 0.1
+ },
+ {
+  "n": "dont",
+  "t": "Old Tobb grabbed my arm. Don't, he said.",
+  "gap": 0.1
+ },
+ {
+  "n": "left",
+  "t": "I pulled off my left boot. Then my right.",
+  "gap": 0.1
+ },
+ {
+  "n": "letgo",
+  "t": "And the ground let go of me.",
+  "gap": 0.2
+ },
+ {
+  "n": "flew",
+  "t": "I flew. Faster than the bakery roof.",
+  "gap": 0.1
+ },
+ {
+  "n": "grab",
+  "t": "I hit the tower. I grabbed the vane. I grabbed Pip.",
+  "gap": 0.1
+ },
+ {
+  "n": "broke",
+  "t": "The vane broke off.",
+  "gap": 0.1
+ },
+ {
+  "n": "over",
+  "t": "And we both went over the mountains.",
+  "gap": 0.3
+ },
+ {
+  "n": "tight",
+  "t": "I held her as tight as I could.",
+  "gap": 0.1
+ },
+ {
+  "n": "clouds",
+  "t": "Below us, rocks. Then snow. Then clouds.",
+  "gap": 0.2
+ },
+ {
+  "n": "then",
+  "t": "And then, green.",
+  "gap": 0.2
+ },
+ {
+  "n": "calm",
+  "t": "A valley with no wind at all.",
+  "gap": 0.1
+ },
+ {
+  "n": "straight",
+  "t": "Trees growing straight up. Smoke going straight up.",
+  "gap": 0.1
+ },
+ {
+  "n": "fields",
+  "t": "And kites. Hundreds of kites, lying in the grass.",
+  "gap": 0.1
+ },
+ {
+  "n": "hers",
+  "t": "Every kite Pip ever lost.",
+  "gap": 0.1
+ },
+ {
+  "n": "landed",
+  "t": "We landed on our backs in the soft grass.",
+  "gap": 0.1
+ },
+ {
+  "n": "told",
+  "t": "Told you, Pip said. I wanted to see where they go.",
+  "gap": 0.2
+ },
+ {
+  "n": "rightall",
+  "t": "Tobb was right all along.",
+  "gap": 0.1
+ },
+ {
+  "n": "life",
+  "t": "My whole life, I kept my boots on.",
+  "gap": 0.1
+ },
+ {
+  "n": "tomorrow",
+  "t": "Tomorrow, I'm walking home, to tell everyone to take them off.",
+  "gap": 0.02
+ }
+]

@@ -51,3 +51,19 @@ de su propio cuerno. Frases nuevas antes del giro: «Onetusk was blind. For sixt
 searching. And the only sound loud enough to find it was its own horn.» Funciona porque la pista ya estaba plantada
 («looking for the sound», «stands and watches»). Para sumar frases a una voz ya cortada: generar solo esas frases con
 la misma voz, cortarlas con la misma aceleración (×1,45) y renumerar `voz/NN.wav`.
+
+## «Keep Your Boots On» (pueblo de día ventoso, 26-nov-2026), en `videos/viento/`
+Primer video **sin animal, sin monstruo y sin pueblo paranormal** (pedido del dueño): la amenaza es la naturaleza. Gusthollow,
+pueblo de piedra en un valle alto donde el viento sopla siempre hacia el mismo lado hace 300 años; todos usan botas de hierro
+y el que se las saca vuela por encima de la cordillera. Casas con cuatro cadenas, árboles torcidos, ropa tendida horizontal,
+«BOOTS ON. ALWAYS.» en la torre. Recuerdo (sepia): Tobb de chico se sacó las botas, voló con una media en la mano y volvió a
+pie tres años después diciendo que del otro lado era verde; nadie le creyó. Hoy el viento se duplica: se cortan cadenas, el
+techo de la panadería vuela, Pip (7, piedras en los bolsillos, ama las cometas) pierde las botas y se cuelga de la veleta.
+El narrador se las saca a propósito, la rescata y vuelan los dos a un valle verde sin viento lleno de las cometas que Pip
+perdió (y la otra media de Tobb). Giro: «My whole life, I kept my boots on. Tomorrow, I'm walking home, to tell everyone to
+take them off.» 54 frases, 476 palabras, 106 s, 263 palabras por minuto.
+Construido otra vez con tres agentes en paralelo (pueblo, cordillera+valle, elenco) sobre copias de trabajo en
+`videos/viento/_taller/` y un brief común (`_taller/BRIEF.md`); el integrador escribe las tomas. Lecciones:
+- Nombres que chocan al juntar las partes (`botas`, `PIP`, `NUBE`, `V_`, `MEDIA_TOBB`): pedir prefijos en el brief.
+- En el abrazo pecho con pecho las caras quedan tapadas desde cualquier ángulo: para un plano corto, ponerlos lado a lado.
+- Primeros planos de alguien sentado o agachado muestran la coronilla: cámara baja y levantar la cabeza (`head.rotation.x`).
