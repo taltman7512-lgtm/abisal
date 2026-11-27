@@ -1,0 +1,252 @@
+[
+ {
+  "n": "open",
+  "t": "Tonight, something knocked on our door, with my mother's voice.",
+  "gap": 0.1
+ },
+ {
+  "n": "rule",
+  "t": "In Hollowmere, nobody answers a knock after dark.",
+  "gap": 0.1
+ },
+ {
+  "n": "cost",
+  "t": "If you answer, the Weaver takes your voice.",
+  "gap": 0.1
+ },
+ {
+  "n": "mystery",
+  "t": "Nobody knows how it picks the door.",
+  "gap": 0.2
+ },
+ {
+  "n": "tall",
+  "t": "It's taller than the church. It's made of old coats, sewn together.",
+  "gap": 0.1
+ },
+ {
+  "n": "arms",
+  "t": "Its arms are coat hangers. Its face is one big button.",
+  "gap": 0.1
+ },
+ {
+  "n": "voices",
+  "t": "It knocks with the voices it took. Your neighbor. Your teacher. Your grandpa, asking for soup.",
+  "gap": 0.2
+ },
+ {
+  "n": "handles",
+  "t": "So we pulled the handles off our doors.",
+  "gap": 0.1
+ },
+ {
+  "n": "wardrobe",
+  "t": "We sleep with the wardrobe against the door.",
+  "gap": 0.1
+ },
+ {
+  "n": "wed",
+  "t": "At weddings, nobody says I do. They just nod.",
+  "gap": 0.1
+ },
+ {
+  "n": "choir",
+  "t": "My little brother Tib says it must sing terribly. It took the whole choir.",
+  "gap": 0.2
+ },
+ {
+  "n": "goodnight",
+  "t": "Tib says goodnight five times every night. Just in case.",
+  "gap": 0.2
+ },
+ {
+  "n": "tailor",
+  "t": "I'm the tailor. Every Sunday, the town leaves one coat on the hill.",
+  "gap": 0.1
+ },
+ {
+  "n": "sew",
+  "t": "I sew the holes shut first. It's polite.",
+  "gap": 0.1
+ },
+ {
+  "n": "anyway",
+  "t": "It takes the coat. And it still knocks on one door.",
+  "gap": 0.2
+ },
+ {
+  "n": "marga",
+  "t": "Old Marga answered once, forty years ago. It was her husband's voice.",
+  "gap": 0.1
+ },
+ {
+  "n": "hands",
+  "t": "Now she talks with her hands. She taught me to sew without a sound.",
+  "gap": 0.2
+ },
+ {
+  "n": "crane",
+  "t": "Father Crane picks the coat. He rings the bell, and the Weaver walks.",
+  "gap": 0.1
+ },
+ {
+  "n": "handle",
+  "t": "His door is the only one in town with a handle.",
+  "gap": 0.1
+ },
+ {
+  "n": "sinners",
+  "t": "He says it only knocks on sinners.",
+  "gap": 0.2
+ },
+ {
+  "n": "pocket",
+  "t": "Last Sunday, I was fixing the hill coat. In the pocket, there was a list.",
+  "gap": 0.1
+ },
+ {
+  "n": "names",
+  "t": "Names. In Crane's handwriting. Every door it ever knocked.",
+  "gap": 0.1
+ },
+ {
+  "n": "owed",
+  "t": "Next to every name, a number. Rent. Debts. A cow.",
+  "gap": 0.1
+ },
+ {
+  "n": "collect",
+  "t": "Crane isn't feeding it. He's collecting.",
+  "gap": 0.2
+ },
+ {
+  "n": "smell",
+  "t": "And that's how it picks the door. It follows the coat home.",
+  "gap": 0.2
+ },
+ {
+  "n": "red",
+  "t": "Two years ago, the hill coat was red. It was my mother's.",
+  "gap": 0.1
+ },
+ {
+  "n": "mute",
+  "t": "She hasn't said a word since.",
+  "gap": 0.2
+ },
+ {
+  "n": "small",
+  "t": "This Sunday's coat was small. It was Tib's.",
+  "gap": 0.1
+ },
+ {
+  "n": "medicine",
+  "t": "My father owed Crane money. For Tib's medicine.",
+  "gap": 0.3
+ },
+ {
+  "n": "stole",
+  "t": "So I did what tailors do. I swapped them.",
+  "gap": 0.1
+ },
+ {
+  "n": "hook",
+  "t": "I took Crane's coat off his hook, and left it on the hill.",
+  "gap": 0.1
+ },
+ {
+  "n": "bell",
+  "t": "The bell rang. The Weaver walked.",
+  "gap": 0.1
+ },
+ {
+  "n": "notcrane",
+  "t": "But it didn't go to Crane's door. It came to ours.",
+  "gap": 0.2
+ },
+ {
+  "n": "carried",
+  "t": "The coat smelled like me. I'd carried it all day.",
+  "gap": 0.2
+ },
+ {
+  "n": "three",
+  "t": "Three knocks. Slow.",
+  "gap": 0.1
+ },
+ {
+  "n": "love",
+  "t": "Open the door, love. It's cold out here.",
+  "gap": 0.2
+ },
+ {
+  "n": "beside",
+  "t": "My mother's voice. And my mother, right beside me, crying without a sound.",
+  "gap": 0.1
+ },
+ {
+  "n": "tibup",
+  "t": "Tib got up to answer. I covered his mouth.",
+  "gap": 0.2
+ },
+ {
+  "n": "window",
+  "t": "Then I climbed out the back window, and onto the Weaver.",
+  "gap": 0.1
+ },
+ {
+  "n": "ladder",
+  "t": "Its coats were a ladder. They smelled like every house in town.",
+  "gap": 0.1
+ },
+ {
+  "n": "chest",
+  "t": "In its chest, sewn in tight, there was a red coat.",
+  "gap": 0.1
+ },
+ {
+  "n": "cut",
+  "t": "I cut the stitches. One by one. Without a sound.",
+  "gap": 0.1
+ },
+ {
+  "n": "scream",
+  "t": "It screamed with a hundred voices.",
+  "gap": 0.1
+ },
+ {
+  "n": "fell",
+  "t": "The red coat fell into our street. My mother picked it up, and coughed.",
+  "gap": 0.2
+ },
+ {
+  "n": "walked",
+  "t": "Then the Weaver walked to the only door with a handle.",
+  "gap": 0.1
+ },
+ {
+  "n": "noknock",
+  "t": "It didn't need to knock.",
+  "gap": 0.3
+ },
+ {
+  "n": "morning",
+  "t": "In the morning, Crane's door was open. Nobody went in.",
+  "gap": 0.1
+ },
+ {
+  "n": "readnames",
+  "t": "Now, some nights, it knocks with Crane's voice, reading names.",
+  "gap": 0.2
+ },
+ {
+  "n": "tonightend",
+  "t": "Tonight, Tib said goodnight five times.",
+  "gap": 0.1
+ },
+ {
+  "n": "end",
+  "t": "And for the first time, somebody answered.",
+  "gap": 0.02
+ }
+]
