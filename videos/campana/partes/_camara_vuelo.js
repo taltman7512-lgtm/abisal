@@ -10,7 +10,7 @@ const bez3 = (p0, p1, p2, p3, e) => { const u = 1 - e; return p0.clone().multipl
 // Dentro de cada toma: menos empuje hacia adelante (Volze: ≈ +8 % por segundo) y más desplazamiento de costado (≈ 24 % del ancho
 // por segundo): se recorre el 55 % del camino p → p1 y se suma una órbita lateral proporcional a la distancia al sujeto.
 function camO(T, q) { const c = camAt(T, .45 + .55 * q); if (T.s.fijo) return c; const p = V_(...c.p), l = V_(...c.l), v = l.clone().sub(p), D = v.length(); v.setY(0).normalize();
-  const side = V_(v.z, 0, -v.x), sg = (TOMAS.indexOf(T) % 2 ? 1 : -1) * (T.s.lado ?? 1), dur = Math.max(.3, T.b - T.a), k = (T.s.lat != null ? T.s.lat * dur : Math.min(D * .19 * dur, D * .5)) * (q - .5);
+  const side = V_(v.z, 0, -v.x), sg = (TOMAS.indexOf(T) % 2 ? 1 : -1) * (T.s.lado ?? 1), dur = Math.max(.3, T.b - T.a), k = (T.s.lat != null ? Math.max(T.s.lat * dur, Math.min(D * .13 * dur, D * .35)) : Math.min(D * .19 * dur, D * .5)) * (q - .5);
   p.addScaledVector(side, sg * k); p.y += Math.abs(k) * .06; l.addScaledVector(side, sg * k * .62); return { p: p.toArray(), l: l.toArray(), f: c.f } }
 const TRINFO = new Map();
 const trDe = (A, B) => { let r = TRINFO.get(B); if (r) return r; const ca = camO(A, 1), cb = camO(B, 0), d = V_(...ca.p).distanceTo(V_(...cb.p));
