@@ -29,6 +29,29 @@ anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.c
   4. **Ángulos**: regla fija «personaje en el tercio de abajo, cara visible, lo gigante detrás», contrapicado gran angular;
      un aéreo o cenital de escala cada 20–30 s. Nada de nucas ni espaldas en las frases importantes.
   5. **La premisa nace de una imagen**: primero el «monstruo visual» raro y dibujable, después la regla y la historia.
+  6. **Villano ultraperturbador (26-nov-2026, «Nobody Hears The Bell»)**: el dueño pidió un villano que dé escalofrío
+     (rasgos que no cierran: sin orejas, sonrisa que no mueve los ojos, sabe tu nombre, las velas se inclinan hacia él) y
+     que alrededor de él el ambiente sea sombrío: más oscuro, frío, niebla baja, velas que tiemblan, polvo/moscas, colores
+     apagados. Cada plano con el villano cambia la luz.
+- **Caras, pelo y atuendos estilo Volze (27-nov-2026, el dueño analizó cuadro por cuadro «Winter Ate Autumn» y otros contra
+  los nuestros; REEMPLAZA las reglas anteriores de caras «catálogo de Roblox» y de ropa estampada)**. Código de referencia:
+  `videos/campana/partes/_volze_personajes.js` (`CARAS_CAT`, `pielPastel`).
+  - **Cara**: calcomanía plana negra #111 mate, sin gradientes, brillos, pupilas, dientes ni lengua. Ojos = dos óvalos
+    verticales sólidos (≈ 8 % × 14 % del ancho de la cabeza), separados ≈ 30 %, un poco arriba del centro. Sorpresa/miedo:
+    el óvalo pasa a ANILLO (borde ≈ 2 %). Boca = UNA línea de grosor parejo (≈ 2,5 %): sonrisa en U de ≈ 35 %, tristeza/enojo
+    arco invertido de ≈ 15 %, grito «O» chica. Cejas: ninguna, salvo enojo (V) y preocupación (/\), trazo fino.
+  - **Piel**: blanco roto o beige pastel muy claro, con luz pareja (algo de emisivo en la cabeza): la cara se lee como sticker.
+  - **Cámara y actuación**: al menos un primerísimo plano de cara por cada cambio de emoción y un plano extremo (un ojo
+    llenando la pantalla) en el momento de mayor tensión; la expresión cambia en cada frase, nunca más de ≈ 3 s con la misma
+    cara. (Esto reemplaza la preferencia vieja de «planos abiertos sin primeros planos».)
+  - **Pelo**: accesorio de Roblox: 1–2 piezas grandes tipo casco, máximo 4–6 mechones gruesos, plástico liso (roughness
+    ≈ 0,4–0,5), un solo color plano y saturado (amarillo fuerte, castaño chocolate, gris claro, negro), silueta distinta por
+    personaje (ola rubia, rodete con moño, gorra lisa, flequillo puntiagudo). Nada de mechones finos desordenados.
+  - **Atuendos**: textura plana pintada sobre los bloques, sin piezas 3D encima; detalles impresos (tiradores, rayas,
+    cinturón, parche, corazón); paleta de avatar clásico (azul rey con brazos blancos, rosa, blanco, celeste, crema, rojo),
+    1–2 colores dominantes lisos por personaje, plástico liso; no repetir el color dominante entre personajes de una escena;
+    1–2 accesorios grandes que cuenten algo. Nada de paleta terrosa (mostaza, ocre, verde azulado).
+  - Antes de aplicar a todos: hoja de prueba de una cara en 6 expresiones y de 3 personajes juntos (frente y espalda).
 - **Historias como las de Volze (26-nov-2026, el dueño aprobó la comparación de 16 guiones de Volze con los nuestros)**:
   - **Emoción**: intriga y pavor que crece, y un final que pega (agridulce, inquietante o abierto). Nada de «el monstruo
     era bueno / incomprendido» (ya van cuatro: tortuga, anguila, ciervo, Onetusk) ni de final tierno con todo resuelto.
