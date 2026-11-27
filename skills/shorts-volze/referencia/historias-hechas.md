@@ -86,3 +86,21 @@ Construido con tres agentes (pueblo, tapa+campo, elenco) sobre copias en `_talle
 - Al narrador colgado de un poste filmarlo de costado (desplazamiento en z), no desde el lado de los peldaños: de espaldas.
 - Un disco pintado mirado de abajo con bloom se quema en blanco: materiales «pintados» con poco emisivo.
 - Superficies de un solo lado que después quedan dadas vuelta (la tapa caída) se ven transparentes: usar DoubleSide.
+
+## «Nobody Hears The Bell» (ciudad bajo una campana gigante, terror, 27-nov-2026), en `videos/campana/`
+Una campana más ancha que la ciudad cuelga de cuatro cadenas, una en cada montaña; una vez al año suena y quien la oye
+olvida a la persona que más quiere. En la Noche Larga todos se tapan los oídos con cera («PLUG YOUR EARS. REMEMBER.» en la
+fuente). Mister Sallow (gigante de cera ≈ 4,8 m, sin orejas, sonríe con toda la cara menos los ojos; las velas se inclinan
+hacia él) vende la cera a cambio de un recuerdo susurrado en un frasco. El narrador derrite cera en su trastienda, donde
+trabajan los olvidados, sin cara. Nell (8) lo olvidó el año pasado: los tapones tenían un agujero de aguja. Este año los de
+Nell también; el narrador trepa la cadena este con la olla de cera hirviendo, adentro no hay badajo: Sallow toca con un
+martillo. Llena el labio de cera, el golpe hace «thud», Sallow cae en la oscuridad y a los trabajadores les vuelve la cara.
+Giro: él se queda a mantener el labio lleno; «Say my name, she yells. And I do.» 51 frases, 107 s.
+Primer video con **caras v2** (media luna, ojeras, cejas) y **pelo con textura** (trenzas reales), y con un villano
+realista en vez de bloques. Construido con cuatro agentes (ciudad, campana, elenco, villano). Lecciones:
+- Una función de encuadre que modifica su parámetro (`d *= 1.3`) dentro del cierre se acumula en cada cuadro y deja
+  imágenes fantasma: usar una constante local.
+- Los planos aéreos con la niebla de terror quedan blancos: bajar la densidad de la niebla en esas frases.
+- Un primer plano contra una pared oscura dio 1,2 s de negro: correr `blackdetect` en todo render y girar a los
+  personajes hacia la cámara en los planos de cara.
+- Se llenó el disco en el render (MP4 de ≈ 1 GB por video): borrar los pesados de videos ya subidos (con permiso).

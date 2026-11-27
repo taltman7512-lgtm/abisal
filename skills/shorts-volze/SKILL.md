@@ -40,6 +40,10 @@ anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.c
     verticales sólidos (≈ 8 % × 14 % del ancho de la cabeza), separados ≈ 30 %, un poco arriba del centro. Sorpresa/miedo:
     el óvalo pasa a ANILLO (borde ≈ 2 %). Boca = UNA línea de grosor parejo (≈ 2,5 %): sonrisa en U de ≈ 35 %, tristeza/enojo
     arco invertido de ≈ 15 %, grito «O» chica. Cejas: ninguna, salvo enojo (V) y preocupación (/\), trazo fino.
+  - **27-nov-2026, caras v2 («las de él son más complejas»)**: además de lo de arriba, las caras llevan las capas de Volze:
+    boca de MEDIALUNA rellena (con franja de dientes en risa/grito), cejas y párpados de trazo que se afina en las puntas,
+    rayitas de ojeras bajo los ojos en preocupación/miedo/tristeza, un labio bajo la boca triste, brillo blanco en los ojos
+    asustados y boca de susto abierta (trapecio relleno con dientes). Ver `CARAS_CAT` en `videos/campana/partes/_volze_personajes.js`.
   - **Piel**: blanco roto o beige pastel muy claro, con luz pareja (algo de emisivo en la cabeza): la cara se lee como sticker.
   - **Cámara y actuación**: al menos un primerísimo plano de cara por cada cambio de emoción y un plano extremo (un ojo
     llenando la pantalla) en el momento de mayor tensión; la expresión cambia en cada frase, nunca más de ≈ 3 s con la misma
@@ -52,6 +56,10 @@ anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.c
     1–2 colores dominantes lisos por personaje, plástico liso; no repetir el color dominante entre personajes de una escena;
     1–2 accesorios grandes que cuenten algo. Nada de paleta terrosa (mostaza, ocre, verde azulado).
   - Antes de aplicar a todos: hoja de prueba de una cara en 6 expresiones y de 3 personajes juntos (frente y espalda).
+  - **27-nov-2026, después de la primera prueba («están muy mal»)**: el pelo y la ropa tienen que verse como las MISMAS
+    piezas que usa Volze (estudiarlas en sus cuadros y replicar forma, brillo, paleta y estampado), combinadas en personajes
+    propios (no copiar 1:1 a sus personajes recurrentes). El villano no es de bloques: gigante (≈ 2× un personaje),
+    ultra realista y perturbador, en la línea de Slenderman pero con diseño propio (contraste bloques / monstruo realista).
 - **Historias como las de Volze (26-nov-2026, el dueño aprobó la comparación de 16 guiones de Volze con los nuestros)**:
   - **Emoción**: intriga y pavor que crece, y un final que pega (agridulce, inquietante o abierto). Nada de «el monstruo
     era bueno / incomprendido» (ya van cuatro: tortuga, anguila, ciervo, Onetusk) ni de final tierno con todo resuelto.
