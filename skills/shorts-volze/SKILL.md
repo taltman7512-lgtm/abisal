@@ -14,8 +14,9 @@ Lo único que se aprueba es la historia (paso 1) si la persona quiere verla; si 
 El dueño dio permiso (24-nov-2026) para modificar esta skill cuando haga falta. **Cada vez que pida un cambio de
 gusto** (pelo, aspecto de los personajes, nivel de detalle, voz, música, ritmo, tipo de historia, lo que sea),
 anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.claude/skills/shorts-volze/`.
-- **Sin versión para celular (28-nov-2026)**: no hacer el `-cel.mp4` (720×960). Se entrega solo el MP4 con música
-  (`-fondo.mp4`); para mandarlo con `SendUserFile` usar ese mismo archivo.
+- **Versión para celular (28-nov-2026)**: el dueño dijo primero que no la hiciera y después la pidió igual. Hacer el
+  `-cel.mp4` (720×960, crf 30) y mandar ESE con `SendUserFile`: el `-fondo.mp4` pesa ≈ 660 MB y no llega al celular
+  (límite de 500 MB).
 - **Imagen como la de Volze (26-nov-2026, después de «We Hold Up The Sky»: «no se parece a los de Volze»)**. Comparación de 16
   cuadros de Volze contra 16 nuestros; el render está bien, lo que cambia es QUÉ hay en cada cuadro y la luz:
   1. **Lo raro y gigante en cuadro casi siempre, con gente adelante**: un objeto/criatura extraño, orgánico y lleno de
