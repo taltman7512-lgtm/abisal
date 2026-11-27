@@ -87,6 +87,27 @@ anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.c
   - El villano tiene un **motivo entendible** (miedo, deuda, amor torcido), no solo maldad.
   - Revisar el guion contra esta lista antes de grabar la voz; si suena a «regla + cartel + villano + sube + giro» igual
     que el anterior, cambiar al menos dos piezas.
+- **Cámara con movimientos reales, como Volze (28-nov-2026; manda sobre «barrido por defecto» y sobre la tabla de
+  transiciones)**: el dueño dijo que nuestras transiciones «están buenas, pero no son lo que busco». Mirado cuadro a
+  cuadro (`rec03 @ 20–28`, `rec01 @ 3–11`): la cámara de Volze es **un recorrido físico con motivo**, no una serie de
+  tomas unidas por efectos. Reglas:
+  1. **Acercar y seguir**: cuando la voz nombra algo, la cámara, que ya venía moviéndose, **se acerca hacia eso**
+     (empuje fuerte, llega ≈ 12 cuadros antes de la palabra), se queda cerca 0,4–1 s y **sale de nuevo, sin cortar,
+     hacia lo próximo que se nombra**. Una frase con tres cosas = un solo viaje que pasa por las tres como paradas
+     (ej. Volze: vuela por la calle → baja hasta las piedras con platos → sigue hasta la mesa de adentro).
+  2. **Cada movimiento tiene un motivo que se entiende**: seguir la mirada del personaje (de la cara baja a lo que mira,
+     como un paneo de la cara a la frazada y de ahí al bicho colgado); seguir algo que cae, corre o vuela; viajar por
+     el mundo de un lugar al otro por la calle o por arriba de los techos; alejarse para revelar la escala. Nada de
+     giros o barridos que no sigan algo.
+  3. **Barrido** solo cuando se cambia de tema sin relación de espacio, **como mucho 1 cada ≈ 10 s**. **Tapado** (algo que
+     cruza delante del lente) para pasar de un lugar a otro cercano. **Corte** solo al cambiar de lugar lejano o de época.
+  4. La cámara nunca se queda quieta, pero tampoco flota sin rumbo: entre parada y parada va **a velocidad de viaje**
+     (≈ 20–25 % del ancho por segundo) y frena al acercarse a cada cosa nombrada (empuje), sin rebote.
+  5. **Motor**: escribir las tomas como **rutas** (`ruta(palabra0, [[palabra, posición, mira, fov], …])`) interpoladas
+     con una curva suave (Catmull-Rom) en posición, mira y fov, con frenado (ease) en cada parada; no como tomas
+     sueltas con `tr: "barrido"`. Las rutas no atraviesan paredes (revisar contra el mapa de ocupación).
+  6. Revisión: en la hoja de tomas y en el revisor, marcar como error un barrido sin motivo y una cosa nombrada a la
+     que la cámara no se acerca.
 - **Guardar en GitHub (28-nov-2026)**: el dueño confirmó que siga haciendo commit y push de cada cambio (código, guion,
   skill) a la rama de trabajo; nunca los MP4, la música ni la voz.
 - **Historias como las de Volze (26-nov-2026, el dueño aprobó la comparación de 16 guiones de Volze con los nuestros)**:
@@ -300,6 +321,8 @@ Partir de acá para videos nuevos, no de la polilla:
 7. **Cámara siempre en movimiento, también dentro de cada encuadre**: deriva ≈ 24 % del ancho por segundo con empuje
    hacia adelante, y cambia de encuadre cada ≈ 0,9 s (35 por minuto; 9–14 cambios en los primeros 10 s). Las
    transiciones son de cuatro tipos (vuelo, barrido, tapado y reencuadre; ver «Movimiento, cámara y sincronía»).
+   **Desde el 28-nov manda «Cámara con movimientos reales» (Preferencias)**: un recorrido con motivo que se acerca a lo
+   nombrado y sigue; el barrido queda como excepción.
    Reparto de planos: 30 % general o aéreo, 25 % entero, 20 % medio, 15 % detalle; contrapicado a la amenaza.
 8. **Subtítulo de una palabra** con salto de escala: minúscula, amarillo **#FFF200**, contorno negro grueso,
    **fijo al 74,5 % del alto** (en terror nunca sube; el 22 % es solo de la comedia), sin puntuación, un solo

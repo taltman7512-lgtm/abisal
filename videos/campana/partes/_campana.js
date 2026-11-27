@@ -4122,7 +4122,7 @@ function setScene(t) {
   R.toneMappingExposure *= lug === "dentro" ? 1.85 : (lug === "cadena" || env === "noche") ? 1.6 : 1.3;   // revisor: luminancia 0,27 contra 0,34–0,41 y 18 % de negros
   if (scene.fog && scene.fog.density !== undefined && (L === I.rule || L === I.hangs || L === I.shadow || L === I.below || L === I.nobody)) scene.fog.density = Math.min(scene.fog.density, .0004);
   if (QS.has("caras")) { const L6 = ["happy", "sad", "worried", "angry", "scared", "terrified"], k6 = L6[Math.floor(t) % 6]; ponerP(ME, 7, 6, ryA(7, 6, 7.5, 9.5)); quieto(ME, t); setFace(ME, k6); ME.g.updateMatrixWorld(true);
-    const h = headW(ME), d = new THREE.Vector3(Math.sin(ME.g.rotation.y), 0, Math.cos(ME.g.rotation.y)); lejos(t); cam.position.set(h.x + d.x * 1.5, h.y + .05, h.z + d.z * 1.5); cam.lookAt(h.x, h.y - .05, h.z); cam.fov = 40; cam.updateProjectionMatrix(); lights([]); POST.tapa = null; return }
+    const h = headW(ME), d = new THREE.Vector3(Math.sin(ME.g.rotation.y), 0, Math.cos(ME.g.rotation.y)); lejos(t); const dC = +(QS.get("carasd") || 1.5); cam.position.set(h.x + d.x * dC, h.y + .05, h.z + d.z * dC); cam.lookAt(h.x, h.y - .05 - (dC - 1.5) * .35, h.z); cam.fov = 40; cam.updateProjectionMatrix(); lights([]); POST.tapa = null; return }
   const V = VECINOS;
   const parado = (c, x, z, ry, cara = "neutral") => { ponerP(c, x, z, ry); setFace(c, cara); quieto(c, t) };
   const mirando = (c, x, z, tx, tz, cara = "neutral") => parado(c, x, z, ryA(x, z, tx, tz), cara);
