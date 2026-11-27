@@ -63,6 +63,32 @@ anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.c
     piezas que usa Volze (estudiarlas en sus cuadros y replicar forma, brillo, paleta y estampado), combinadas en personajes
     propios (no copiar 1:1 a sus personajes recurrentes). El villano no es de bloques: gigante (≈ 2× un personaje),
     ultra realista y perturbador, en la línea de Slenderman pero con diseño propio (contraste bloques / monstruo realista).
+- **Historias más ricas, sin el cartel de siempre (28-nov-2026)**: el dueño notó que todas las historias tenían un
+  cartel tallado o pintado con la regla («TWO LAMPS. ALWAYS.», «BOOTS ON. ALWAYS.», «HOLD IT UP», «PLUG YOUR EARS.
+  REMEMBER.»). Eso quedó como muletilla. Desde ahora:
+  - **Cartel escrito con la regla: como mucho 1 de cada 3 videos.** Antes de escribir, mirar en
+    `referencia/historias-hechas.md` si el último lo usó; si lo usó, este no.
+  - **Otras formas de mostrar la regla** (elegir una distinta cada vez): una canción o rima de chicos que todos saben;
+    un ritual diario con gesto (tocar la puerta tres veces, contar en voz alta); una marca en el cuerpo o la ropa (cinta,
+    pintura, cicatriz); objetos que lo cuentan solos (bolsas de arena en cada puerta, sillas vacías en la mesa); un
+    personaje que la repite como muletilla; un castigo visible (la casa del que la rompió, tapiada); una ley que se
+    anuncia (pregonero, campanada); la regla se descubre en acción, sin explicarla, porque todos la cumplen.
+  - **Más capas en la historia** (sumar 2–3 por video, distintas de las del anterior):
+    1. **Un secundario con su propia historia en dos frases** (la panadera que perdió algo, el viejo que se acuerda de
+       antes de la regla) que vuelve más tarde y pesa en la decisión.
+    2. **Un objeto-prueba que pasa de mano en mano** (una llave, un dibujo, un diente) y cambia de sentido al final.
+    3. **Un recuerdo concreto y raro del narrador** (olor, comida, chiste privado) en vez de «I love her».
+    4. **Una mentira o secreto del narrador** que el público sabe antes que los personajes.
+    5. **Una segunda regla menor** que nadie cuestiona y que resulta importante.
+    6. **El pueblo reacciona**: alguien ayuda, alguien traiciona, una multitud que cambia de bando.
+    7. **Humor seco de una línea** en medio del miedo (Volze lo hace casi siempre), sin cortar la tensión.
+    8. **Un detalle del mundo que se planta temprano y paga al final** (Chekhov): se ve en el minuto 0:20 y resuelve el
+       giro.
+  - El villano tiene un **motivo entendible** (miedo, deuda, amor torcido), no solo maldad.
+  - Revisar el guion contra esta lista antes de grabar la voz; si suena a «regla + cartel + villano + sube + giro» igual
+    que el anterior, cambiar al menos dos piezas.
+- **Guardar en GitHub (28-nov-2026)**: el dueño confirmó que siga haciendo commit y push de cada cambio (código, guion,
+  skill) a la rama de trabajo; nunca los MP4, la música ni la voz.
 - **Historias como las de Volze (26-nov-2026, el dueño aprobó la comparación de 16 guiones de Volze con los nuestros)**:
   - **Emoción**: intriga y pavor que crece, y un final que pega (agridulce, inquietante o abierto). Nada de «el monstruo
     era bueno / incomprendido» (ya van cuatro: tortuga, anguila, ciervo, Onetusk) ni de final tierno con todo resuelto.
@@ -279,8 +305,8 @@ Partir de acá para videos nuevos, no de la polilla:
    **fijo al 74,5 % del alto** (en terror nunca sube; el 22 % es solo de la comedia), sin puntuación, un solo
    color, altura de x ≈ 3 % del alto.
 9. **Música debajo de la voz todo el video**, según el modo (tabla de abajo). Nunca la música del canal.
-10. **Luz de una fuente dura, bruma lejana, profundidad de campo y desenfoque de movimiento.** Los carteles del mundo
-    hacen la exposición (ej.: «TWO LAMPS. ALWAYS.» pintado en el pozo).
+10. **Luz de una fuente dura, bruma lejana, profundidad de campo y desenfoque de movimiento.** La regla se muestra con
+    algo del mundo, pero **no siempre con un cartel escrito** (ver «Historias más ricas» en Preferencias).
 
 ## Movimiento, cámara y sincronía (medido a 30 cuadros por segundo, 25-nov-2026)
 Segundo análisis del canal, aspecto por aspecto, con los 22 videos a 30 cuadros por segundo. El detalle, los números
@@ -384,7 +410,8 @@ como molde fijo: la usamos seis veces seguidas y el final se adivinaba.
 ```
 HOOK (0–4 s)          0. «[la crisis de AHORA, en presente o recién pasada]»  1. «[Every/We/Nobody] … [la regla, a escala grande].»
                       2. «Whoever …» (el costo)  3. «Nobody knows why …» (el misterio que el video va a destapar)
-MUNDO (≈ 4–25 s)      la vida con la regla en chistes de una línea (bodas, bebés, dormir, escuela, una cifra), un cartel;
+MUNDO (≈ 4–25 s)      la vida con la regla en chistes de una línea (bodas, bebés, dormir, escuela, una cifra), UNA forma
+                      de recordar la regla que no sea el cartel de los videos anteriores (ver «Historias más ricas»);
                       el OFICIO del narrador que lo pone en un lugar único; el ser querido chico con su muletilla
 EL QUE SE APROVECHA (≈ 20–40 s) un adulto con nombre (Brannock, Tallow, Garrow) que gana con la regla y la defiende
 LA GRIETA (≈ 35–70 s) una pista que no cierra (marcas, agujeros, una pieza escondida); el narrador investiga y tiene la culpa de algo
