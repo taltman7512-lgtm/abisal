@@ -31,7 +31,7 @@ let TEMBLOR = 0;   // lo pone la escena en los 1–2 golpes grandes (en unidades
 // baja al 40 % al llegar, sube en el medio), así se acerca a lo nombrado y sigue de largo sin cortar. Entre rutas: corte.
 let RUTAS_T = null;
 const rutasPrep = () => RUTAS_T ||= (typeof RUTAS === "undefined" ? [] : RUTAS).map(R => R.flatMap((q, i) => { const t = q.t(), h = q.h ?? .4; return [{ t: t - h * .5, q, i, k: 0 }, { t: t + h * .5, q, i, k: 1 }] }).sort((a, b) => a.t - b.t)).filter(R => R.length).sort((a, b) => a[0].t - b[0].t);
-const CR = (a, b, c, d, u) => { const u2 = u * u, u3 = u2 * u; return b.clone().multiplyScalar(2).add(c.clone().sub(a).multiplyScalar(u)).add(a.clone().multiplyScalar(2).sub(b.clone().multiplyScalar(5)).add(c.clone().multiplyScalar(4)).sub(d).multiplyScalar(u2)).add(a.clone().negate().add(b.clone().multiplyScalar(3)).sub(c.clone().multiplyScalar(3)).add(d).multiplyScalar(u3)).multiplyScalar(.5) };
+const CATR = (a, b, c, d, u) => { const u2 = u * u, u3 = u2 * u; return b.clone().multiplyScalar(2).add(c.clone().sub(a).multiplyScalar(u)).add(a.clone().multiplyScalar(2).sub(b.clone().multiplyScalar(5)).add(c.clone().multiplyScalar(4)).sub(d).multiplyScalar(u2)).add(a.clone().negate().add(b.clone().multiplyScalar(3)).sub(c.clone().multiplyScalar(3)).add(d).multiplyScalar(u3)).multiplyScalar(.5) };
 function rutaCam(t) { const RS = rutasPrep(); if (!RS.length) return null; let r = 0; RS.forEach((R, i) => { if (t >= R[0].t) r = i }); const R = RS[r];
   const pt = j => { const P = R[Math.max(0, Math.min(R.length - 1, j))], q = P.q, sig = R.find(x => x.i > q.i); let p = V_(...val(q.p, t)), l = V_(...val(q.l, t));
     if (P.k === 1 && sig) { const pn = V_(...val(sig.q.p, t)); p.lerp(pn, q.deriva ?? .08) } return { p, l, f: q.f ?? 55 } };
@@ -40,8 +40,8 @@ function rutaCam(t) { const RS = rutasPrep(); if (!RS.length) return null; let r
   if (t >= R[R.length - 1].t) { const a = pt(R.length - 1), b = pt(R.length - 2), d = a.p.clone().sub(b.p), dt = Math.max(.2, R[R.length - 1].t - R[R.length - 2].t); return { p: a.p.clone().addScaledVector(d, Math.min(1.5, (t - R[R.length - 1].t) / dt) * .25), l: a.l, f: a.f } }
   const u = (t - R[i].t) / Math.max(1e-3, R[i + 1].t - R[i].t), mismo = R[i].q === R[i + 1].q, e = mismo ? u : u - .6 * Math.sin(2 * Math.PI * u) / (2 * Math.PI);
   const A = pt(i - 1), B = pt(i), C = pt(i + 1), D = pt(i + 2);
-  return { p: CR(A.p, B.p, C.p, D.p, e), l: CR(A.l, B.l, C.l, D.l, e), f: lerp(B.f, C.f, e) } }
-if (typeof RUTAS !== "undefined") window.SUBF = t => 5;
+  return { p: CATR(A.p, B.p, C.p, D.p, e), l: CATR(A.l, B.l, C.l, D.l, e), f: lerp(B.f, C.f, e) } }
+if (typeof RUTAS !== "undefined") window.SUBF = t => { const RS = rutasPrep(); for (const R of RS) if (Math.abs(t - R[0].t) < 1 / 60) return 1; for (let L = 1; L < S.length; L++) if (Math.abs(t - S[L]) < 1 / 60) return 1; return 5 };
 function camara(t) { const RC_ = rutaCam(t);
   const mira = (p, l) => { MA.lookAt(p, l, V_(0, 1, 0)); return new THREE.Quaternion().setFromRotationMatrix(MA) };
   if (RC_) { const pos = RC_.p, quat = mira(pos, RC_.l);

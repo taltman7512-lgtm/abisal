@@ -1,17 +1,15 @@
-// ================= «NOBODY HEARS THE BELL»: UNDERBELL, la ciudad de piedra en terrazas (piso, muros de contención, escaleras, calles,
-// plaza con la fuente, casas apretadas, la tienda de Mister Sallow con su trastienda, la casa de Nell) =================
-// Medidas de _comun_campana.js (PLAZA_B, TIENDA, CASA_NELL, RISCO_E, ALT_B). Norte = −z. La campana, las cadenas y las montañas lejanas
-// NO están acá (las hace otro agente). La utilería, las velas, los climas de luz y la animación van en _detalle_campana.js.
-// Trazado: la plaza (r < 14,5) en el centro; anillos de terrazas que suben hacia afuera (bordes de ALT_B en TERR_B, cada uno un muro de
-// contención de 3,2 m con parapeto arriba); en cada terraza una calle anular junto al muro de abajo y una fila de casas que mira al centro;
-// siete calles radiales que bajan en curva hasta la plaza (con escaleras de piedra en cada muro).
-// Los nombres de ayudantes viejos (TM, lote, uvMuro, M_MADERA, barril, farol, …) se mantienen con la misma firma por compatibilidad.
+// ================= «NOBODY ANSWERS THE KNOCK»: HOLLOWMERE, el pueblo de madera y piedra (piso, empedrado, veredas, casas apretadas de
+// 2–3 pisos con puertas SIN picaporte, la casa de la familia y el taller del sastre por dentro, la casa de Marga, la de Father Crane con
+// el único picaporte, la iglesia con su campanario) =================
+// Medidas de _comun_tej.js (CALLE_T, PLAZA_T, IGLESIA_T, TORRE_T, CASA_FAM, TALLER_T, CASA_MARGA, CASA_CRANE, ALT_T). Norte = −z.
+// La utilería, los muebles, las puertas que se abren, los abrigos, el poste de la colina, las velas y los climas van en _detalle_tej.js;
+// el fondo lejano (bosque, montes, cielo, luna, nubes) en _lejos_tej.js. Técnica del video anterior: texturas pintadas en canvas con relieve,
+// lotes (merge por material), instancing, rectAdd para el mapa de ocupación.
 TURT.children.forEach(o => o.visible = false);
 CABEZA.visible = false; ALETAS.forEach(a => a.piv.visible = false); COLA.visible = false; COSTA.visible = false; FOAM.visible = false; FONDO.visible = false; HONDA.visible = false;
 BOTES.forEach(b => b.visible = false); GAVIOTAS.forEach(g => g.visible = false); LUCES.forEach(l => l.visible = false); ESPUMA.forEach(s => s.visible = false); SALPI.forEach(s => s.visible = false);
 NUBE.forEach(s => s.visible = false); ROPA3.forEach(m => m.visible = false); GALLINAS.forEach(g => g.visible = false); NUBES.forEach(g => g.visible = false);
 HOUSES.forEach(H => H.g.visible = false);
-
 // ---------- ayudantes (mismas firmas que en el video del viento)
 const sst = (a, b, x) => { const q = cl((x - a) / (b - a)); return q * q * (3 - 2 * q) };
 const hash2 = (i, j) => { let n = (Math.imul(i | 0, 374761393) + Math.imul(j | 0, 668265263)) | 0; n = Math.imul(n ^ (n >>> 13), 1274126177); return ((n ^ (n >>> 16)) >>> 0) / 4294967296 };
@@ -48,41 +46,29 @@ const conViento = (m, modo = "tela", amp = .12) => { if (modo === "tela" || modo
   #endif
     wp = modelMatrix * wp; ${cuerpo} }`) }; m.customProgramCacheKey = () => "brisaP" + modo + amp; return m };
 
-// ---------- el piso: ALT_B exacto (los personajes y la campana usan la misma altura). sueloB suma las escaleras de piedra (para pararse en ellas)
-const SUELO = (x, z) => ALT_B(x, z);
+// ---------- el piso de Hollowmere: ALT_T exacto (los personajes y la Tejedora usan la misma altura)
+const SUELO = (x, z) => ALT_T(x, z);
+const sueloT = (x, z) => ALT_T(x, z), sueloB = sueloT;   // sueloB: nombre viejo (lo usan escenas y elenco viejos)
 const sueloN = (x, z, e = .6) => { const nx = SUELO(x - e, z) - SUELO(x + e, z), nz = SUELO(x, z - e) - SUELO(x, z + e), l = Math.hypot(nx, 2 * e, nz); return [nx / l, 2 * e / l, nz / l] };
-const riscoH = (x, z) => 30 * Math.exp(-(((x - RISCO_E[0]) / 22) ** 2 + ((z - RISCO_E[1]) / 30) ** 2));
-// radios de los muros de contención: donde ALT_B salta 3,2 m (≈ 45,8 · 59,0 · 71,0 · 84,2 · 110)
-const TERR_B = [1, 2, 3, 4, 5].map(k => { let a = 20, b = 111; for (let i = 0; i < 44; i++) { const m = (a + b) / 2; if (Math.floor(sstB(20, 110, m) * 5) >= k) b = m; else a = m } return b });
-const nivelB = r => TERR_B.filter(b => r >= b).length;
-const PLAZA_R = 14.5;   // radio del enlosado de la plaza (las casas de la plaza empiezan en 15,6)
-// calles radiales: ángulo en la plaza (grados, atan2(z, x): 0 = este, 90 = sur), ancho; se curvan 0,3 rad hacia afuera.
-// D baja del risco del este (ancha: cámara y gente); F es la avenida del mercado (sur, la más ancha)
-const CALLES_RAD = [{ a0: -165, an: 4.6, n: "A" }, { a0: -120, an: 6.2, n: "B" }, { a0: -55, an: 4.6, n: "C" }, { a0: -12, an: 6.6, n: "D", rMax: 86 }, { a0: 62, an: 4.6, n: "E" }, { a0: 100, an: 7.2, n: "F" }, { a0: 145, an: 4.8, n: "G" }].map((c, i) => ({ rMax: 126, ...c, i }));
-const radAng = (c, r) => c.a0 * Math.PI / 180 + .3 * sstB(15, 120, r);
-const radDist = (c, x, z) => { const r = Math.hypot(x, z), d = angD(Math.atan2(z, x), radAng(c, r)); return Math.abs(d) > Math.PI / 2 || r > c.rMax ? 999 : r * Math.abs(Math.sin(d)) };
-const radPunto = (c, r, lat = 0) => { const a = radAng(c, r); return [Math.cos(a) * r - Math.sin(a) * lat, Math.sin(a) * r + Math.cos(a) * lat] };
-// calles anulares [r0, r1, nombre]: A (la del mercado, alrededor de la plaza), callejones angostos, y una por terraza junto al muro de abajo
-const ANILLOS = [[26.8, 33.3, "A"], [39.9, 42.1, "callejon"], ...TERR_B.slice(0, 4).map((b, i) => [b + .3, b + [6.2, 5.2, 5.4, 5.8][i], "T" + (i + 1)]), [98.4, 101.4, "callejon"], [TERR_B[4] + .3, TERR_B[4] + 5.5, "T5"]];
-// filas de casas (todas miran al centro, la espalda contra el muro o el callejón de atrás)
-const FILAS = [{ r0: 15.6, r1: 24.6, pisos: [3, 4], plaza: 1 }, { r0: 33.7, r1: 39.5, pisos: [2, 3] }, { r0: 42.5, r1: 45.4, pisos: [1, 1], galpon: 1 },
-  { r0: TERR_B[0] + 6.6, r1: TERR_B[1] - .3, pisos: [2, 3] }, { r0: TERR_B[1] + 5.6, r1: TERR_B[2] - .3, pisos: [2, 3] }, { r0: TERR_B[2] + 5.8, r1: TERR_B[3] - .3, pisos: [2, 3] },
-  { r0: TERR_B[3] + 6.2, r1: 98, pisos: [2, 3] }, { r0: 101.8, r1: TERR_B[4] - .3, pisos: [2, 3], simple: 1 }, { r0: TERR_B[4] + 5.9, r1: TERR_B[4] + 13.4, pisos: [1, 2], simple: 1 }];
-const enRadial = (x, z, m = 0) => { if (Math.hypot(x, z) < PLAZA_R - 1) return null; for (const c of CALLES_RAD) if (radDist(c, x, z) < c.an / 2 + m) return c; return null };
-const enAnillo = (x, z, m = 0) => { const r = Math.hypot(x, z); if (riscoH(x, z) > 3) return null; for (const A of ANILLOS) if (r > A[0] - m && r < A[1] + m) return A; return null };
-const enCalle = (x, z, m = 0) => Math.hypot(x, z) < PLAZA_R + m || !!enRadial(x, z, m) || !!enAnillo(x, z, m);
-// cuánto «calle» es el punto (0–1, borde suave): para el color del piso
-const calleKB = (x, z) => { const r = Math.hypot(x, z), n = (fbm2(x * .7, z * .7, 2) - .5) * .3; let k = 1 - sst(PLAZA_R + .6, PLAZA_R + 1.2, r + n);
-  const rk = 1 - sst(2, 4, riscoH(x, z)); for (const A of ANILLOS) k = Math.max(k, rk * sst(A[0] - .3, A[0] + .1, r + n) * (1 - sst(A[1] - .1, A[1] + .3, r + n)));
-  for (const c of CALLES_RAD) { const d = radDist(c, x, z); if (d < 50) k = Math.max(k, 1 - sst(c.an / 2 - .15, c.an / 2 + .3, d + n)) } return k };
-// ---------- ESCALERAS DE PIEDRA: cada calle radial sube cada muro por una escalera de 16 escalones metida en la terraza de abajo
-// (r de b − 5,6 a b). Forma general (también la del risco): { cx, cz, ry (hacia arriba = +z local), L, W, y0, y1, n }
-const ESCALERAS_B = [];
-CALLES_RAD.forEach(c => TERR_B.forEach(b => { if (b > c.rMax + 1) return; const L = 5.6, rc = b - L / 2, [cx, cz] = radPunto(c, rc), a = radAng(c, rc), [xa, za] = radPunto(c, b - L - .2), [xb, zb] = radPunto(c, b + .25);
-  ESCALERAS_B.push({ cx, cz, ry: Math.atan2(Math.cos(a), Math.sin(a)), L, W: c.an - .7, y0: SUELO(xa, za), y1: SUELO(xb, zb), n: 16, b, c }) }));
-const escLocal = (E, x, z) => { const c = Math.cos(E.ry), s = Math.sin(E.ry), dx = x - E.cx, dz = z - E.cz; return [dx * c - dz * s, dx * s + dz * c] };   // [lateral, a lo largo]
-const escAlto = (E, u) => E.y0 + (Math.min(E.n - 1, Math.max(0, Math.floor((u + E.L / 2) / E.L * E.n))) + 1) * (E.y1 - E.y0) / E.n;
-const sueloB = (x, z) => { for (const E of ESCALERAS_B) { if (Math.abs(x - E.cx) > E.L + E.W || Math.abs(z - E.cz) > E.L + E.W) continue; const [v, u] = escLocal(E, x, z); if (Math.abs(v) < E.W / 2 + .35 && Math.abs(u) < E.L / 2) return escAlto(E, u) } return SUELO(x, z) };
+// callejones de atrás (detrás de las filas de la calle principal: ahí da la ventana de atrás de la familia)
+const CALLEJONES_T = [{ x0: -18.6, x1: -15.2, z0: -40, z1: 79 }, { x0: 15.8, x1: 19.2, z0: -37, z1: 79 }];
+// sendero de tierra de la calle transversal a la cima de la colina (polilínea en planta)
+const SENDERO_T = [[64, -20], [70, -19], [75, -22.5], [79, -27], [82.5, -29.2], [86, -30]];
+const distSeg = (x, z, a, b) => { const dx = b[0] - a[0], dz = b[1] - a[1], L2 = dx * dx + dz * dz, u = Math.max(0, Math.min(1, ((x - a[0]) * dx + (z - a[1]) * dz) / L2)); return Math.hypot(x - a[0] - u * dx, z - a[1] - u * dz) };
+const distSendero = (x, z) => { let d = 1e9; for (let i = 0; i < SENDERO_T.length - 1; i++) d = Math.min(d, distSeg(x, z, SENDERO_T[i], SENDERO_T[i + 1])); return d };
+const enCalleP = (x, z, m = 0) => Math.abs(x - CALLE_T.x) < CALLE_T.fachada + m && z > CALLE_T.z0 - m && z < CALLE_T.z1 + m;
+const enEmpedrado = (x, z, m = 0) => Math.abs(x - CALLE_T.x) < CALLE_T.an / 2 + m && z > CALLE_T.z0 - m && z < CALLE_T.z1 + m;
+const enCruce = (x, z, m = 0) => Math.abs(z - CRUCE_T.z) < CRUCE_T.an / 2 + m && x > CRUCE_T.x0 - m && x < CRUCE_T.x1 + m;
+const enPlaza = (x, z, m = 0) => Math.abs(x - PLAZA_T.x) < PLAZA_T.w / 2 + m && Math.abs(z - PLAZA_T.z) < PLAZA_T.d / 2 + m;
+const enCallejon = (x, z, m = 0) => CALLEJONES_T.some(C => x > C.x0 - m && x < C.x1 + m && z > C.z0 - m && z < C.z1 + m);
+const enCalle = (x, z, m = 0) => enCalleP(x, z, m) || enCruce(x, z, m) || enPlaza(x, z, m) || enCallejon(x, z, m);
+// cuánto «empedrado» es el punto (0–1, borde suave con ruido): para el color del piso
+const calleKT = (x, z) => { const n = (fbm2(x * .7, z * .7, 2) - .5) * .5, ax = Math.abs(x);
+  let k = (1 - sst(CALLE_T.fachada - .2, CALLE_T.fachada + .3, ax + n)) * sst(CALLE_T.z0 - 1, CALLE_T.z0 + .2, z + n) * (1 - sst(CALLE_T.z1 - 1, CALLE_T.z1 + 2, z + n));
+  k = Math.max(k, (1 - sst(CRUCE_T.an / 2 - .2, CRUCE_T.an / 2 + .3, Math.abs(z - CRUCE_T.z) + n)) * sst(CRUCE_T.x0 - 1, CRUCE_T.x0 + .5, x) * (1 - sst(CRUCE_T.x1 - 2, CRUCE_T.x1 + 1, x)));
+  k = Math.max(k, (1 - sst(PLAZA_T.w / 2 - .2, PLAZA_T.w / 2 + .4, Math.abs(x - PLAZA_T.x) + n)) * (1 - sst(PLAZA_T.d / 2 - .2, PLAZA_T.d / 2 + .4, Math.abs(z - PLAZA_T.z) + n)));
+  CALLEJONES_T.forEach(C => { k = Math.max(k, .7 * sst(C.x0 - .3, C.x0 + .3, x + n) * (1 - sst(C.x1 - .3, C.x1 + .3, x + n)) * sst(C.z0, C.z0 + 1, z) * (1 - sst(C.z1 - 1, C.z1, z))) }); return k };
+
 // ---------- texturas pintadas: piedra de muro, ladrillo, pizarra, tejas, revoque, madera, roca (las de piedra y techo, como en el video del viento)
 const T_MURO = (seed, pal, o = {}) => repT(pintarDoble(1024, 1024, (c, z, w, h) => { const r = rng(seed), S = o.escala || 1;
   c.fillStyle = o.mortero || "#5c564c"; c.fillRect(0, 0, w, h); z.fillStyle = "#2c2c2c"; z.fillRect(0, 0, w, h);
@@ -152,7 +138,7 @@ const T_TABLA_N = (() => { const [c, z] = pintarDoble(512, 512, (c, z, w, h) => 
       for (let k = 0; k < 5; k++) { const px = x + r() * pw, py = r() * h, s = 6 + r() * 20; c.fillStyle = "rgba(120,96,70,.7)"; c.beginPath(); c.ellipse(px, py, s * .6, s, r(), 0, 7); c.fill(); z.fillStyle = "rgba(40,40,40,.6)"; z.beginPath(); z.ellipse(px, py, s * .6, s, 0, 0, 7); z.fill() }
       for (const yy of [30, h - 30]) { c.fillStyle = "#3a3430"; c.beginPath(); c.arc(x + pw / 2, yy, 4, 0, 7); c.fill() }
       c.fillStyle = "rgba(40,28,20,.8)"; c.fillRect(x + pw - 4, 0, 4, h); z.fillStyle = "#000"; z.fillRect(x + pw - 5, 0, 6, h); x += pw } }); [c, z].forEach(t => { t.wrapS = t.wrapT = THREE.RepeatWrapping }); return { c, z } })();
-const PUERTA_C = ["#4a6a52", "#8a3a2c", "#3e5a78", "#a07a3a", "#5a4a3a", "#6a7a6a", "#7a4a3a", "#2e4e4a", "#9a8a6a"];
+const PUERTA_C = ["#3a4a3c", "#5a2a22", "#2e3e52", "#6a5232", "#3a3028", "#4a524a", "#4e3026", "#22343a", "#5e5446"];
 const M_PUERTA = PUERTA_C.map(c => new THREE.MeshStandardMaterial({ map: T_TABLA_N.c, bumpMap: T_TABLA_N.z, bumpScale: 3, roughness: .8, color: c }));
 const M_MADERA = new THREE.MeshStandardMaterial({ map: T_TABLA_N.c, bumpMap: T_TABLA_N.z, bumpScale: 3.5, roughness: .9, color: "#6e5038" });
 const M_MADERA_V = new THREE.MeshStandardMaterial({ map: T_TABLA_N.c, bumpMap: T_TABLA_N.z, bumpScale: 3.5, roughness: .95, color: "#9a8e7e" });
@@ -245,117 +231,122 @@ const GEO_ADOQ = (() => { const r = rng(4420), pos = [], nor = [], col = [], idx
   const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute("normal", new THREE.Float32BufferAttribute(nor, 3)); g.setAttribute("color", new THREE.Float32BufferAttribute(col, 3)); g.setAttribute("uv", new THREE.Float32BufferAttribute(pos.filter((_, i) => i % 3 !== 1).map(v => v * 1.3), 2)); g.setIndex(idx); return g })();
 const M_ADOQ = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .82, map: T_ROCA.c, bumpMap: T_ROCA.z, bumpScale: 2.5 });
 
-// ---------- color del piso por vértice: tierra y piedra gastada en la ciudad, juntas oscuras bajo el empedrado, pasto ralo en los patios,
-// roca en el risco, y afuera (r > 124) prados y chacras en parches (trigo, pasto, tierra arada)
-const C_TIERRA = linC("#857560"), C_TIERRA2 = linC("#6a5e4c"), C_JUNTA = linC("#3a342e"), C_RALO = linC("#77824c"), C_RALO2 = linC("#97935a"), C_PRADO = linC("#6a8a40"), C_PRADO2 = linC("#8e9c4e"),
-  C_ROCA_S = linC("#7a7266"), C_TRIGO = linC("#c0a058"), C_ARADA = linC("#6a5038");
-function colorSueloB(x, z) { const r = Math.hypot(x, z), n = fbm2(x * .045 + 11, z * .045 + 2, 4), n2 = fbm2(x * .27 + 5, z * .27 + 8, 2), n3 = fbm2(x * .09 - 3, z * .09 + 7, 3);
-  let c = mix3(C_TIERRA, C_TIERRA2, sst(.35, .7, n));
-  c = mix3(c, mix3(C_RALO, C_RALO2, n2), sst(.42, .62, n3) * .8);
-  const af = sst(124, 131, r); if (af > 0) { const a = Math.atan2(z, x), h = hash2(Math.floor((a + 4) * 22 / Math.PI + Math.floor(r / 16) * .5), Math.floor(r / 16)), surco = .5 + .5 * Math.sin((r + a * 30) * 3.1);
-    const campo = h < .35 ? mix3(C_TRIGO, mix3(C_TRIGO, C_ARADA, .2), surco * .4) : h < .55 ? mix3(C_ARADA, C_TIERRA2, surco * .5) : mix3(C_PRADO, C_PRADO2, n2 * .8 + surco * .2); c = mix3(c, campo, af) }
-  c = mix3(c, mix3(C_ROCA_S, C_RALO, sst(.45, .7, n2) * .55), sst(2, 9, riscoH(x, z)));
-  c = mix3(c, C_JUNTA, calleKB(x, z) * .85);
-  const s = .88 + .22 * n2; return [c[0] * s, c[1] * s, c[2] * s] }
-
-// ---------- la malla del piso, POLAR (anillos finos en la ciudad, con un anillo doble en cada muro: el salto de 3,2 m queda vertical y exacto)
-const TERRENO = (() => { const RS = []; for (let r = 0; r < 125; r += .5) if (TERR_B.every(b => Math.abs(r - b) > .2)) RS.push(r); TERR_B.forEach(b => RS.push(b - .002, b + .002));
-  for (let r = 126; r <= 160; r += 2) RS.push(r); for (let r = 165; r <= 250; r += 5) RS.push(r); RS.sort((a, b) => a - b);
-  const NA = 720, nr = RS.length, n = nr * (NA + 1), pos = new Float32Array(n * 3), uv = new Float32Array(n * 2), col = new Float32Array(n * 3), idx = [];
-  for (let i = 0; i < nr; i++) for (let j = 0; j <= NA; j++) { const a = j / NA * Math.PI * 2, r = RS[i], x = Math.cos(a) * r, z = Math.sin(a) * r, k = i * (NA + 1) + j, c = colorSueloB(x, z);
-    pos[k * 3] = x; pos[k * 3 + 1] = SUELO(x, z) - .01; pos[k * 3 + 2] = z; uv[k * 2] = x / 6; uv[k * 2 + 1] = z / 6; col[k * 3] = c[0]; col[k * 3 + 1] = c[1]; col[k * 3 + 2] = c[2] }
-  for (let i = 0; i < nr - 1; i++) for (let j = 0; j < NA; j++) { const a = i * (NA + 1) + j, b = a + NA + 1; idx.push(a, a + 1, b, b, a + 1, b + 1) }
-  const geo = new THREE.BufferGeometry(); geo.setAttribute("position", new THREE.BufferAttribute(pos, 3)); geo.setAttribute("uv", new THREE.BufferAttribute(uv, 2)); geo.setAttribute("color", new THREE.BufferAttribute(col, 3)); geo.setIndex(idx); geo.computeVertexNormals();
-  const nor = geo.attributes.normal; for (let i = 0; i < nr; i++) { const b = TERR_B.find(b => Math.abs(RS[i] - b) < .01); if (b === undefined) continue; const off = RS[i] < b ? -.6 : .6;
-    for (let j = 0; j <= NA; j++) { const a = j / NA * Math.PI * 2, q = sueloN(Math.cos(a) * (b + off), Math.sin(a) * (b + off), .3); nor.setXYZ(i * (NA + 1) + j, q[0], q[1], q[2]) } }
-  const m = new THREE.Mesh(geo, M_TIERRA); m.receiveShadow = true; scene.add(m); return m })();
-AGUA.visible = false;
-
-// ---------- banda polar: perfil [[r, y(a)], …] barrido en ángulo de a0 a a1 (cada tramo del perfil con sus propias normales). Devuelve geometría
-function bandaPolar(prof, a0, a1, paso = .5, uvS = 3.2) { const pos = [], uv = [], idx = []; const rMed = prof.reduce((s, p) => s + p[0], 0) / prof.length, NA = Math.max(2, Math.ceil(Math.abs(a1 - a0) * rMed / paso));
-  for (let s = 0; s < prof.length - 1; s++) { const o = pos.length / 3, [ra, ya] = prof[s], [rb, yb] = prof[s + 1], vert = Math.abs(rb - ra) < .5 * Math.abs(ya(0) - yb(0)) + .05;
-    for (let j = 0; j <= NA; j++) { const a = lerp(a0, a1, j / NA), c = Math.cos(a), sn = Math.sin(a), Ya = ya(a), Yb = yb(a), u = a * rMed / uvS;
-      pos.push(c * ra, Ya, sn * ra, c * rb, Yb, sn * rb); if (vert) uv.push(u, Ya / uvS, u, Yb / uvS); else uv.push(u, ra / uvS, u, rb / uvS) }
-    for (let j = 0; j < NA; j++) { const A = o + j * 2, B = A + 2; idx.push(A, B, A + 1, A + 1, B, B + 1) } }
-  const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2)); g.setIndex(idx); g.computeVertexNormals();
-  // las caras miran hacia afuera del perfil (si quedaron al revés, se dan vuelta)
-  return g }
-const giraCaras = g => { const ix = g.index.array; for (let i = 0; i < ix.length; i += 3) { const t = ix[i + 1]; ix[i + 1] = ix[i + 2]; ix[i + 2] = t } g.computeVertexNormals(); return g };
-const yA = (r, d = 0) => a => SUELO(Math.cos(a) * r, Math.sin(a) * r) + d;
-
 // ---------- piedra de los muros de contención: bloques grandes, oscuros abajo (humedad, musgo), líquenes
 const M_MURO_T = (() => { const [t, z] = T_MURO(4240, ["#8a8276", "#76706a", "#9a9284", "#6a645c", "#a39a88", "#5e5a54", "#847866"], { mortero: "#46423c", escala: 1.7, musgo: 1, liquen: 90 }); return new THREE.MeshStandardMaterial({ map: t, bumpMap: z, bumpScale: 5, roughness: .95 }) })();
 const M_ESCALON = new THREE.MeshStandardMaterial({ map: T_ROCA.c, bumpMap: T_ROCA.z, bumpScale: 3, roughness: .9, color: "#b2a894" });
 const M_CORONA = new THREE.MeshStandardMaterial({ map: T_ROCA.c, bumpMap: T_ROCA.z, bumpScale: 3, roughness: .88, color: "#c8bea8" });
-// ángulos libres (sin calle radial) sobre el radio r: lista de [a0, a1]
-function angLibres(r, margen = .35) { const cort = CALLES_RAD.filter(c => r < c.rMax + 2).map(c => { const a = radAng(c, r), h = (c.an / 2 + margen) / r; return [a - h, a + h] }).sort((p, q) => p[0] - q[0]);
-  const L = []; for (let k = 0; k < cort.length; k++) { const a0 = cort[k][1], a1 = k + 1 < cort.length ? cort[k + 1][0] : cort[0][0] + Math.PI * 2; if (a1 > a0) L.push([a0, a1]) } return L }
-const L_PIEDRA = lote();   // muros, parapetos, escaleras, cordones (se cierra más abajo)
-const CORONAS = [];        // piedras de coronamiento del parapeto (instanciadas): [x, y, z, ry, largo]
-TERR_B.forEach((b, i) => { const lo = yA(b - .7, -.45), hi = yA(b + .08), top = yA(b + .08, .02);
-  // la cara del muro (algo inclinada) y su tapa
-  const enRiscoA = a => riscoH(Math.cos(a) * b, Math.sin(a) * b) > 5;   // sobre el risco el escalón es roca viva, sin muro ni parapeto
-  for (let k = 0; k < 180; k++) { const a0 = k / 180 * Math.PI * 2, a1 = (k + 1) / 180 * Math.PI * 2; L_PIEDRA.add(enRiscoA((a0 + a1) / 2) ? "rocaT" : "muroT", bandaPolar([[b - .36, lo], [b - .17, hi]], a0, a1, .45)) }
-  // parapeto de 0,95 m sobre la terraza de arriba, cortado donde llegan las escaleras
-  angLibres(b + .1).flatMap(([a0, a1]) => { const L = []; let s0 = null; for (let a = a0; a <= a1 + 1e-6; a += .004) { const ok = !enRiscoA(a) && a < a1; if (ok && s0 === null) s0 = a; if (!ok && s0 !== null) { if (a - s0 > .01) L.push([s0, a]); s0 = null } } return L }).forEach(([a0, a1]) => { const pr = [[b - .17, top], [b - .17, yA(b + .08, .95)], [b + .3, yA(b + .08, .95)], [b + .3, top]];
-    L_PIEDRA.add("muroT", bandaPolar(pr, a0, a1, .45));
-    for (const a of [a0, a1]) { const x = Math.cos(a) * (b + .07), z = Math.sin(a) * (b + .07); L_PIEDRA.add("corona", RB1(.62, 1.25, .62, .05), TM(x, hi(a) + .6, z, 0, -a, 0)); L_PIEDRA.add("corona", RB1(.4, .22, .4, .05), TM(x, hi(a) + 1.32, z, 0, -a + .78, 0)) }
-    const n = Math.floor((a1 - a0) * (b + .07) / .92); for (let k = 0; k < n; k++) { const a = lerp(a0, a1, (k + .5) / n); CORONAS.push([Math.cos(a) * (b + .07), hi(a) + .97, Math.sin(a) * (b + .07), -a, (a1 - a0) * (b + .07) / n - .04]) } }) });
-// las escaleras: escalones macizos de piedra gastada (el centro más gastado), muretes a los costados con baranda de hierro
-const BARANDAS = [], rectAddLater = [];   // [[x, y, z] …] tramos de baranda (los pone el detalle en hierro)
-ESCALERAS_B.forEach(E => { const M = TM(E.cx, 0, E.cz, 0, E.ry, 0), base = E.y0 - .5, t = E.L / E.n;
-  for (let k = 0; k < E.n; k++) { const u = -E.L / 2 + (k + .5) * t, y = E.y0 + (k + 1) * (E.y1 - E.y0) / E.n, hh = y - base;
-    L_PIEDRA.add("escalon", RB1(E.W, hh, t + .06, .045), M.clone().multiply(TM((hash2(k, E.cx * 9) - .5) * .04, base + hh / 2, u)));
-    for (const s of [-1, 1]) { const hm = y + .85 - base; L_PIEDRA.add("muroT", uvMuro(new THREE.BoxGeometry(.42, hm, t + .01), 3.2, E.cx * .1, k * .1), M.clone().multiply(TM(s * (E.W / 2 + .21), base + hm / 2, u)));
-      L_PIEDRA.add("corona", RB1(.5, .1, t + .02, .03), M.clone().multiply(TM(s * (E.W / 2 + .21), y + .9, u))) } }
-  for (const s of [-1, 1]) { const P = [], w = s * (E.W / 2 - .12); for (let k = 0; k <= E.n; k += 4) { const u = -E.L / 2 + Math.min(E.n - .5, k + .5) * t, y = E.y0 + (Math.min(E.n - 1, k) + 1) * (E.y1 - E.y0) / E.n; P.push(new THREE.Vector3(w, y, u).applyMatrix4(M).toArray()) } BARANDAS.push(P) }
-  rectAddLater.push({ x: E.cx, z: E.cz, ry: E.ry, w: E.W + .9, d: E.L, esc: 1 }) });
 
-// ---------- calcomanía de adoquines: calles anulares (bandas) y radiales (tiras curvas), y ADOQUINES EN 3D cerca del centro
-const M_ADOQ_R = M_ADOQ_D.clone(); M_ADOQ_R.polygonOffsetFactor = -3; M_ADOQ_R.polygonOffsetUnits = -6;
-ANILLOS.forEach(([r0, r1]) => { const pos = [], uv = [], idx = [], NA = Math.ceil(Math.PI * 2 * r1 / .6), NR = Math.max(2, Math.round((r1 - r0) / 1.2)), rm = (r0 + r1) / 2, fuera = j => riscoH(Math.cos(j / NA * Math.PI * 2) * rm, Math.sin(j / NA * Math.PI * 2) * rm) > 3;
-  for (let j = 0; j <= NA; j++) for (let i = 0; i <= NR; i++) { const a = j / NA * Math.PI * 2, r = lerp(r0, r1, i / NR), x = Math.cos(a) * r, z = Math.sin(a) * r; pos.push(x, SUELO(x, z) + .015, z); uv.push(a * (r0 + r1) / 2 / 3, (r - r0) / 3) }
-  for (let j = 0; j < NA; j++) { if (fuera(j) || fuera(j + 1)) continue; for (let i = 0; i < NR; i++) { const A = j * (NR + 1) + i, B = A + NR + 1; idx.push(A, A + 1, B, B, A + 1, B + 1) } }
-  const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2)); g.setIndex(idx); g.computeVertexNormals();
-  giraCaras(g); const m = new THREE.Mesh(g, M_ADOQ_D); m.receiveShadow = true; m.renderOrder = -.2; scene.add(m) });
-CALLES_RAD.forEach(c => { const pos = [], uv = [], idx = [], NL = 4; let o = 0; const corte = r => TERR_B.some(b => r > b - 5.75 && r < b + .1);
-  let tramo = []; const cerrar = () => { if (tramo.length < 2) { tramo = []; return } const base = pos.length / 3; tramo.forEach(r => { for (let i = 0; i <= NL; i++) { const lat = lerp(-c.an / 2 - .1, c.an / 2 + .1, i / NL), [x, z] = radPunto(c, r, lat); pos.push(x, SUELO(x, z) + .018, z); uv.push(lat / 3, r / 3) } });
-    for (let k = 0; k < tramo.length - 1; k++) for (let i = 0; i < NL; i++) { const A = base + k * (NL + 1) + i, B = A + NL + 1; idx.push(A, B, A + 1, A + 1, B, B + 1) } tramo = [] };
-  for (let r = PLAZA_R + .3; r <= c.rMax; r += .5) { if (corte(r)) cerrar(); else tramo.push(r) } cerrar();
-  const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2)); g.setIndex(idx); g.computeVertexNormals();
-  if (g.attributes.normal.getY(0) < 0) giraCaras(g); const m = new THREE.Mesh(g, M_ADOQ_R); m.receiveShadow = true; m.renderOrder = -.15; scene.add(m) });
-const ADOQUINES = []; { const L = [], cc = new THREE.Color(), enEsc = (x, z) => ESCALERAS_B.some(E => { const [v, u] = escLocal(E, x, z); return Math.abs(v) < E.W / 2 + 1.2 && Math.abs(u) < E.L / 2 + 1.1 });
-  ANILLOS.forEach(([r0, r1, nm]) => { if (r0 > 62) return; for (let r = r0 + 1; r < r1 - .4; r += 2) { const n = Math.round(Math.PI * 2 * r / 2); for (let j = 0; j < n; j++) { const a = j / n * Math.PI * 2; L.push([Math.cos(a) * r, Math.sin(a) * r, -a]) } } });
-  CALLES_RAD.forEach(c => { for (let r = PLAZA_R + 1.6; r < 60; r += 2) for (let lat = -c.an / 2 + 1; lat < c.an / 2 - .3; lat += 2) { const [x, z] = radPunto(c, r, lat); if (!enAnillo(x, z, 1)) L.push([x, z, -radAng(c, r) + Math.PI / 2]) } });
-  const LL = L.filter(([x, z]) => !enEsc(x, z));
-  const m = new THREE.InstancedMesh(GEO_ADOQ, M_ADOQ, LL.length); LL.forEach(([x, z, ry], i) => { const n = sueloN(x, z, 1); dummy.position.set(x, SUELO(x, z), z); dummy.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), new THREE.Vector3(...n)); dummy.rotateY(ry + (i % 2) * Math.PI); dummy.scale.set(1, .9 + hash2(x * 7, z * 3) * .25, 1); dummy.updateMatrix(); m.setMatrixAt(i, dummy.matrix); const v = .86 + hash2(x, z) * .24; m.setColorAt(i, cc.setRGB(v, v * .98, v * .95)) });
+// ================= HOLLOWMERE: texturas nuevas (tablas de madera, puertas sin picaporte, rasguños de percha), reflejo nocturno, el piso
+// ---------- tablas de madera solapadas (paredes de madera): tablas horizontales de ≈ 23 cm, sombra bajo cada solape, clavos, nudos,
+// vetas, pintura descascarada, la parte de abajo podrida y verdosa
+const T_TABLAS_H = (seed, pal, o = {}) => repT(pintarDoble(1024, 1024, (c, z, w, h) => { const r = rng(seed), nb = 14, bh = h / nb;
+  c.fillStyle = "#2a2018"; c.fillRect(0, 0, w, h); z.fillStyle = "#404040"; z.fillRect(0, 0, w, h);
+  for (let b = 0; b < nb; b++) { const y0 = b * bh; let x = -r() * 200; while (x < w) { const L = 260 + r() * 520, col = rgbj(pal[r() * pal.length | 0], r, 22);
+      for (const dx of [-w, 0, w]) { const x0 = x + dx; c.fillStyle = col; c.fillRect(x0, y0, L - 2, bh);
+        const gr = c.createLinearGradient(0, y0, 0, y0 + bh); gr.addColorStop(0, "rgba(0,0,0,.55)"); gr.addColorStop(.16, "rgba(0,0,0,.08)"); gr.addColorStop(.7, "rgba(255,240,220,.06)"); gr.addColorStop(.97, "rgba(255,240,220,.14)"); gr.addColorStop(1, "rgba(0,0,0,.4)"); c.fillStyle = gr; c.fillRect(x0, y0, L - 2, bh);
+        const gz = z.createLinearGradient(0, y0, 0, y0 + bh); gz.addColorStop(0, "#303030"); gz.addColorStop(.2, "#8a8a8a"); gz.addColorStop(1, "#c8c8c8"); z.fillStyle = gz; z.fillRect(x0, y0, L - 2, bh);
+        // vetas largas
+        for (let k = 0; k < 7; k++) { const yy = y0 + 6 + r() * (bh - 10); c.strokeStyle = r() < .5 ? "rgba(30,20,12,.28)" : "rgba(255,235,200,.1)"; c.lineWidth = 1 + r() * 1.6; c.beginPath(); c.moveTo(x0, yy); for (let q = 0; q <= 1; q += .1) c.lineTo(x0 + q * L, yy + Math.sin(q * 9 + k) * 2.5); c.stroke() }
+        if (r() < .35) { const kx = x0 + r() * L, ky = y0 + bh * (.3 + r() * .5); c.fillStyle = "rgba(40,24,14,.7)"; c.beginPath(); c.ellipse(kx, ky, 9 + r() * 8, 5 + r() * 3, 0, 0, 7); c.fill(); z.fillStyle = "#202020"; z.beginPath(); z.ellipse(kx, ky, 8, 4, 0, 0, 7); z.fill() }
+        // clavos a cada extremo y en el medio (con chorrito de óxido)
+        for (const q of [.02, .5, .98]) { const nx = x0 + q * L, ny = y0 + bh * .55; c.fillStyle = "#1a1612"; c.beginPath(); c.arc(nx, ny, 3, 0, 7); c.fill(); const g2 = c.createLinearGradient(0, ny, 0, ny + 40); g2.addColorStop(0, "rgba(110,50,20,.45)"); g2.addColorStop(1, "rgba(110,50,20,0)"); c.fillStyle = g2; c.fillRect(nx - 2, ny, 4, 40) }
+        c.fillStyle = "rgba(10,6,4,.85)"; c.fillRect(x0 + L - 3, y0, 3, bh); z.fillStyle = "#101010"; z.fillRect(x0 + L - 4, y0, 4, bh) } x += L } }
+  // pintura vieja descascarada (manchones de otro color que se salen)
+  if (o.pintura) for (let k = 0; k < 120; k++) { const x = r() * w, y = r() * h, s = 10 + r() * 60; envuelto(c, w, h, () => { c.fillStyle = o.pintura; c.globalAlpha = .55 + r() * .3; c.beginPath(); for (let a = 0; a < 6.28; a += .5) { const d = s * (.5 + r() * .6); a ? c.lineTo(x + Math.cos(a) * d, y + Math.sin(a) * d * .5) : c.moveTo(x + d, y) } c.fill(); c.globalAlpha = 1 }) }
+  for (let k = 0; k < 9000; k++) { c.fillStyle = r() < .5 ? "rgba(20,12,6,.14)" : "rgba(255,240,220,.07)"; c.fillRect(r() * w, r() * h, 1 + r() * 2, 1) }
+  // chorreaduras de agua y hollín desde arriba, musgo abajo
+  for (let k = 0; k < 26; k++) { const x = r() * w, y2 = r() * h * .5, L = 120 + r() * 400, an = 6 + r() * 26, gr = c.createLinearGradient(0, y2, 0, y2 + L); gr.addColorStop(0, "rgba(20,16,12,.32)"); gr.addColorStop(1, "rgba(20,16,12,0)"); c.fillStyle = gr; c.fillRect(x - an / 2, y2, an, L) }
+  for (let k = 0; k < 500; k++) { const x = r() * w, y2 = h - Math.pow(r(), 2) * h * .3; c.fillStyle = `rgba(${50 + r() * 30 | 0},${70 + r() * 30 | 0},${34 + r() * 20 | 0},${.2 + r() * .3})`; c.beginPath(); c.arc(x, y2, 2 + r() * 6, 0, 7); c.fill() } }));
+const TABLAS_P_H = [[["#4a3a2c", "#56442f", "#3e3024", "#5e4a36", "#4e3e30"], "#6a5a48"], [["#3a3a36", "#46443e", "#32302c", "#4e4a42"], "#5a6058"], [["#5a4636", "#6a5440", "#4a3a2c", "#725a44"], "#7a2e22"], [["#2e3436", "#3a4044", "#283034", "#444a4c"], "#4a5a6a"], [["#6a5a48", "#7a6852", "#5a4c3c", "#84705a"], "#8a8270"]];
+const M_TABLAS_H = TABLAS_P_H.map(([p, pin], i) => { const [t, z] = T_TABLAS_H(4600 + i, p, { pintura: pin }); return new THREE.MeshStandardMaterial({ map: t, bumpMap: z, bumpScale: 5, roughness: .92 }) });
+// ---------- la marca del picaporte arrancado (calcomanía transparente del tamaño de la hoja de la puerta): la sombra clara donde estaba la
+// chapa, cuatro agujeros de tornillo (dos tornillos torcidos que quedaron), el agujero del vástago, astillas arrancadas, y a veces los
+// RASGUÑOS largos de las perchas (tres o cuatro surcos paralelos que cruzan la hoja en diagonal, madera cruda adentro)
+const T_MARCA_PUERTA = k => tex(256, 512, (g, w, h) => { const r = rng(4700 + k); g.clearRect(0, 0, w, h);
+  const hx = w * .8, hy = h * .53, pw = 34, ph = 92;
+  // la chapa que ya no está: madera más clara (sin sol ni mugre) con borde de mugre
+  g.fillStyle = "rgba(190,160,120,.55)"; g.fillRect(hx - pw / 2, hy - ph / 2, pw, ph); g.strokeStyle = "rgba(20,12,6,.6)"; g.lineWidth = 3; g.strokeRect(hx - pw / 2, hy - ph / 2, pw, ph);
+  for (const [dx, dy] of [[-.32, -.4], [.32, -.4], [-.32, .4], [.32, .4]]) { g.fillStyle = "#0a0604"; g.beginPath(); g.arc(hx + dx * pw, hy + dy * ph, 3.2, 0, 7); g.fill(); g.strokeStyle = "rgba(230,200,150,.6)"; g.lineWidth = 1.2; g.beginPath(); g.arc(hx + dx * pw, hy + dy * ph, 5, 0, 7); g.stroke() }
+  // astillas arrancadas alrededor del agujero (madera cruda)
+  for (let q = 0; q < 9; q++) { const a = r() * 6.283, L = 10 + r() * 22; g.fillStyle = "rgba(220,186,130,.85)"; g.beginPath(); g.moveTo(hx + Math.cos(a) * 9, hy + Math.sin(a) * 9); g.lineTo(hx + Math.cos(a + .18) * (9 + L), hy + Math.sin(a + .18) * (9 + L)); g.lineTo(hx + Math.cos(a - .1) * (8 + L * .7), hy + Math.sin(a - .1) * (8 + L * .7)); g.fill() }
+  g.fillStyle = "#000"; g.beginPath(); for (let a = 0; a <= 6.3; a += .5) { const d = 8 + r() * 3; a ? g.lineTo(hx + Math.cos(a) * d, hy + Math.sin(a) * d) : g.moveTo(hx + d, hy) } g.fill();
+  // el ojo de la cerradura (vacío) más abajo
+  g.fillStyle = "#050302"; g.beginPath(); g.arc(hx, hy + 30, 3.5, 0, 7); g.fill(); g.fillRect(hx - 1.5, hy + 30, 3, 9);
+  // golpes de martillo y marcas de palanca
+  for (let q = 0; q < 6; q++) { g.strokeStyle = "rgba(30,18,10,.6)"; g.lineWidth = 2; const x = hx + (r() - .5) * 60, y = hy + (r() - .5) * 120; g.beginPath(); g.moveTo(x, y); g.lineTo(x + (r() - .5) * 14, y + (r() - .5) * 6); g.stroke() }
+  // rasguños de percha (tres de cada cuatro puertas)
+  if (k % 4 !== 3) { const n = 3 + (k % 2), x0 = w * (.12 + r() * .25), y0 = h * (.12 + r() * .2), L = h * (.55 + r() * .3);
+    for (let q = 0; q < n; q++) { const ox = q * 13, oy = q * 5; g.lineCap = "round";
+      const P = t => [x0 + ox + t * L * (.1 + (k % 3) * .06), y0 + oy + t * L];
+      g.strokeStyle = "rgba(10,6,3,.9)"; g.lineWidth = 6; g.beginPath(); for (let t = 0; t <= 1; t += .05) { const [x, y] = P(t); const jit = Math.sin(t * 40 + q) * 1.2; t ? g.lineTo(x + jit, y) : g.moveTo(x, y) } g.stroke();
+      g.strokeStyle = "rgba(226,196,150,.9)"; g.lineWidth = 2.2; g.beginPath(); for (let t = .03; t <= .97; t += .05) { const [x, y] = P(t); t > .04 ? g.lineTo(x + .6, y - .6) : g.moveTo(x + .6, y - .6) } g.stroke() } } });
+const M_MARCA_PUERTA = [0, 1, 2, 3, 4, 5].map(k => new THREE.MeshStandardMaterial({ map: T_MARCA_PUERTA(k), transparent: true, alphaTest: .02, roughness: .85, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }));
+// ---------- reflejo nocturno (charcos, adoquines mojados, vidrios): cielo azul oscuro, la luna (oeste-noroeste) y puntitos cálidos de ventanas abajo
+const LUNA_DIR = new THREE.Vector3(-.6, .38, -.25).normalize();
+const ENV_NOCHE_P = (() => { const es = new THREE.Scene(); es.add(new THREE.Mesh(new THREE.SphereGeometry(50, 64, 32), new THREE.ShaderMaterial({ side: THREE.BackSide, uniforms: { uL: { value: LUNA_DIR } },
+    vertexShader: "varying vec3 vD; void main(){ vD = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.); }",
+    fragmentShader: `uniform vec3 uL; varying vec3 vD; float h(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+      void main(){ float y = vD.y; vec3 c = mix(vec3(.16,.2,.32), vec3(.012,.02,.05), smoothstep(0., .5, y)); c = mix(c, vec3(.02,.018,.016), smoothstep(.0, -.25, y));
+        float m = max(dot(vD, uL), 0.); c += vec3(.75,.82,1.) * (pow(m, 900.) * 18. + pow(m, 40.) * .35 + pow(m, 6.) * .05);
+        vec2 q = vec2(atan(vD.z, vD.x) * 40., y * 90.); float w = step(.86, h(floor(q))) * smoothstep(.14, .0, abs(y - .03)); c += vec3(1., .55, .18) * w * 3.; gl_FragColor = vec4(c, 1.); }` })));
+  const pm = new THREE.PMREMGenerator(R), rt = pm.fromScene(es, 0, .1, 100); pm.dispose(); return rt.texture })();
+M_VIDRIO.envMap = ENV_NOCHE_P; M_VIDRIO.envMapIntensity = 1.2; M_VENTANA.envMap = ENV_NOCHE_P; M_VENTANA.envMapIntensity = .8;
+// ---------- color del piso por vértice: barro oscuro y tierra apisonada en el pueblo, pasto ralo en los patios, pasto alto y oscuro afuera y en
+// la colina, el sendero pelado, juntas oscuras bajo el empedrado
+const C_BARRO = linC("#4a3e30"), C_BARRO2 = linC("#3a3026"), C_JUNTA = linC("#2a2622"), C_RALO = linC("#55603a"), C_RALO2 = linC("#6c6c44"), C_PASTO = linC("#3e5430"), C_PASTO2 = linC("#56683a"),
+  C_SECO = linC("#7a7048"), C_SENDERO = linC("#6a5a44"), C_MUSGO = linC("#38482a");
+function colorSueloT(x, z) { const n = fbm2(x * .045 + 11, z * .045 + 2, 4), n2 = fbm2(x * .27 + 5, z * .27 + 8, 2), n3 = fbm2(x * .09 - 3, z * .09 + 7, 3), r = Math.hypot(x * .92, (z + 12) * 1.05);
+  let c = mix3(C_BARRO, C_BARRO2, sst(.35, .7, n));
+  c = mix3(c, mix3(C_RALO, C_RALO2, n2), sst(.42, .62, n3) * .85);
+  const af = Math.max(sst(34, 62, r), 1 - sst(30, 48, Math.hypot(x - COLINA_T[0], z - COLINA_T[1]))); if (af > 0) c = mix3(c, mix3(mix3(C_PASTO, C_PASTO2, n2), C_SECO, sst(.55, .8, n3) * .6), af);
+  const ds = distSendero(x, z); c = mix3(c, C_SENDERO, (1 - sst(.8, 1.8, ds + (n2 - .5) * .8)) * .9);
+  c = mix3(c, C_JUNTA, calleKT(x, z) * .9);
+  const s = .86 + .24 * n2; return [c[0] * s, c[1] * s, c[2] * s] }
+// ---------- la malla del piso: grilla de 1 m en el pueblo y la colina, más gruesa afuera (lejos sigue con _lejos_tej.js desde r ≈ 240)
+const TERRENO = (() => { const xs = [], zs = []; for (let x = -250; x < -84; x += 4) xs.push(x); for (let x = -84; x <= 128; x += 1) xs.push(x); for (let x = 132; x <= 250; x += 4) xs.push(x);
+  for (let z = -250; z < -122; z += 4) zs.push(z); for (let z = -122; z <= 96; z += 1) zs.push(z); for (let z = 100; z <= 250; z += 4) zs.push(z);
+  const nx = xs.length, nz = zs.length, n = nx * nz, pos = new Float32Array(n * 3), uv = new Float32Array(n * 2), col = new Float32Array(n * 3), idx = [];
+  for (let j = 0; j < nz; j++) for (let i = 0; i < nx; i++) { const x = xs[i], z = zs[j], k = j * nx + i, c = colorSueloT(x, z); pos[k * 3] = x; pos[k * 3 + 1] = SUELO(x, z) - .01; pos[k * 3 + 2] = z; uv[k * 2] = x / 6; uv[k * 2 + 1] = z / 6; col[k * 3] = c[0]; col[k * 3 + 1] = c[1]; col[k * 3 + 2] = c[2] }
+  for (let j = 0; j < nz - 1; j++) for (let i = 0; i < nx - 1; i++) { const a = j * nx + i, b = a + nx; idx.push(a, b, a + 1, a + 1, b, b + 1) }
+  const geo = new THREE.BufferGeometry(); geo.setAttribute("position", new THREE.BufferAttribute(pos, 3)); geo.setAttribute("uv", new THREE.BufferAttribute(uv, 2)); geo.setAttribute("color", new THREE.BufferAttribute(col, 3)); geo.setIndex(idx); geo.computeVertexNormals();
+  const m = new THREE.Mesh(geo, M_TIERRA); m.receiveShadow = true; scene.add(m); return m })();
+if (typeof AGUA !== "undefined") AGUA.visible = false;
+// ---------- el empedrado: calcomanía (calle principal, calle transversal, plaza) + ADOQUINES EN 3D (parches de 2 × 2 m instanciados), mojados
+M_ADOQ.envMap = ENV_NOCHE_P; M_ADOQ.envMapIntensity = .55; M_ADOQ.roughness = .42; M_ADOQ_D.envMap = ENV_NOCHE_P; M_ADOQ_D.envMapIntensity = .35; M_ADOQ_D.roughness = .55;
+const planoSuelo = (x0, x1, z0, z1, paso, dy, mat, ro = -.2, uvS = 3) => { const nx = Math.max(1, Math.round((x1 - x0) / paso)), nz = Math.max(1, Math.round((z1 - z0) / paso)), g = new THREE.PlaneGeometry(x1 - x0, z1 - z0, nx, nz); g.rotateX(-Math.PI / 2); g.translate((x0 + x1) / 2, 0, (z0 + z1) / 2);
+  const p = g.attributes.position, u = g.attributes.uv; for (let i = 0; i < p.count; i++) { const x = p.getX(i), z = p.getZ(i); p.setY(i, SUELO(x, z) + dy); u.setXY(i, x / uvS, z / uvS) } g.computeVertexNormals(); const m = new THREE.Mesh(g, mat); m.receiveShadow = true; m.renderOrder = ro; scene.add(m); return m };
+planoSuelo(-CALLE_T.an / 2, CALLE_T.an / 2, CALLE_T.z0, CALLE_T.z1, 1, .015, M_ADOQ_D);
+planoSuelo(CRUCE_T.x0, -CALLE_T.fachada, CRUCE_T.z - CRUCE_T.an / 2, CRUCE_T.z + CRUCE_T.an / 2, 1, .016, M_ADOQ_D); planoSuelo(CALLE_T.fachada, CRUCE_T.x1, CRUCE_T.z - CRUCE_T.an / 2, CRUCE_T.z + CRUCE_T.an / 2, 1, .016, M_ADOQ_D);
+planoSuelo(PLAZA_T.x - PLAZA_T.w / 2, PLAZA_T.x + PLAZA_T.w / 2, PLAZA_T.z - PLAZA_T.d / 2, PLAZA_T.z + PLAZA_T.d / 2, 1, .017, M_ADOQ_D);
+// veredas de losas de piedra entre el cordón y las fachadas
+const T_LOSAS = (() => { const [c, z] = pintarDoble(512, 512, (c, z, w, h) => { const r = rng(4720); c.fillStyle = "#2a2622"; c.fillRect(0, 0, w, h); z.fillStyle = "#101010"; z.fillRect(0, 0, w, h); let y = 0;
+    while (y < h) { const fh = 110 + r() * 60; let x = -r() * 80; while (x < w + 80) { const sw = 120 + r() * 140, col = rgbj(["#6e685e", "#5e5850", "#7a746a", "#66605a", "#58534c"][r() * 5 | 0], r, 18), v = 150 + r() * 70 | 0, P = [[x + 3, y + 3], [x + sw - 3, y + 2 + (r() - .5) * 4], [x + sw - 3, y + fh - 3], [x + 4, y + fh - 3]];
+        for (const dx of [-w, 0, w]) { const Q = P.map(([a, b]) => [a + dx, b]); redondo(c, Q, 8); c.fillStyle = col; c.fill(); redondo(z, Q, 8); z.fillStyle = `rgb(${v},${v},${v})`; z.fill() }
+        if (r() < .25) { c.strokeStyle = "rgba(20,16,12,.7)"; c.lineWidth = 2; c.beginPath(); c.moveTo(x + r() * sw, y); c.lineTo(x + r() * sw, y + fh); c.stroke() } x += sw } y += fh }
+    for (let k = 0; k < 5000; k++) { c.fillStyle = r() < .5 ? "rgba(20,16,12,.18)" : "rgba(230,220,200,.08)"; c.fillRect(r() * w, r() * h, 2, 2) }
+    for (let k = 0; k < 80; k++) { c.fillStyle = `rgba(${60 + r() * 20 | 0},${80 + r() * 20 | 0},40,.35)`; c.beginPath(); c.arc(r() * w, r() * h, 2 + r() * 5, 0, 7); c.fill() } });
+  [c, z].forEach(t => { t.wrapS = t.wrapT = THREE.RepeatWrapping }); return { c, z } })();
+const M_LOSAS = new THREE.MeshStandardMaterial({ map: T_LOSAS.c, bumpMap: T_LOSAS.z, bumpScale: 4, roughness: .6, envMap: ENV_NOCHE_P, envMapIntensity: .35, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -4 });
+for (const s of [-1, 1]) { const a = s * CALLE_T.an / 2 + s * .28, b = s * (CALLE_T.fachada + .2); planoSuelo(Math.min(a, b), Math.max(a, b), CALLE_T.z0 + 1, CALLE_T.z1, 1, .1, M_LOSAS, -.2, 2.2) }
+const ADOQUINES = []; { const L = [], cc = new THREE.Color();
+  for (let z = CALLE_T.z0 + 1; z < CALLE_T.z1 - .5; z += 2) for (let x = -CALLE_T.an / 2 + 1.25; x < CALLE_T.an / 2 - .6; x += 2) L.push([x, z, Math.PI / 2]);
+  for (let x = PLAZA_T.x - PLAZA_T.w / 2 + 1; x < PLAZA_T.x + PLAZA_T.w / 2 - .5; x += 2) for (let z = PLAZA_T.z - PLAZA_T.d / 2 + 1; z < PLAZA_T.z + PLAZA_T.d / 2 - .5; z += 2) { if (enEmpedrado(x, z, .5)) continue; L.push([x, z, 0]) }
+  for (let x = CRUCE_T.x0 + 1; x < CRUCE_T.x1 - 2; x += 2) { if (Math.abs(x) < CALLE_T.fachada + .9) continue; for (let z = CRUCE_T.z - CRUCE_T.an / 2 + 1; z < CRUCE_T.z + CRUCE_T.an / 2 - .5; z += 2) L.push([x, z, 0]) }
+  const m = new THREE.InstancedMesh(GEO_ADOQ, M_ADOQ, L.length); L.forEach(([x, z, ry], i) => { const n = sueloN(x, z, 1); dummy.position.set(x, SUELO(x, z) + .005, z); dummy.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), new THREE.Vector3(...n)); dummy.rotateY(ry + (i % 2) * Math.PI); dummy.scale.set(1, .9 + hash2(x * 7, z * 3) * .25, 1); dummy.updateMatrix(); m.setMatrixAt(i, dummy.matrix); const v = .62 + hash2(x, z) * .22; m.setColorAt(i, cc.setRGB(v, v * .98, v * .97)) });
   m.receiveShadow = true; m.castShadow = false; scene.add(m); ADOQUINES.push(m) }
+// cordones de piedra a lo largo de la calle (bloques largos irregulares) y canaleta
+const L_PIEDRA = lote();
+{ const r = rng(4730); for (const s of [-1, 1]) { let z = CALLE_T.z0 + 1; while (z < CALLE_T.z1 - .3) { const L = .8 + r() * .9; if (!(Math.abs(z + L / 2 - CRUCE_T.z) < CRUCE_T.an / 2)) L_PIEDRA.add("corona", RB1(.3, .26, L - .03, .04), TM(s * (CALLE_T.an / 2 + .14), SUELO(s * 5.1, z) + .02, z + L / 2, 0, (r() - .5) * .03, (r() - .5) * .04)); z += L } } }
 
-// ---------- LA PLAZA: losas en anillos alrededor de la fuente (doce losas de basalto marcan las horas: la sombra de la campana es la aguja),
-// vereda de losas hasta las casas y cordón de piedra larga
-const LOSAS_PLAZA = (() => { const r = rng(4460), L = []; let rr = 5.45;
-  while (rr < 15.45) { const an = .62 + r() * .2, r1 = Math.min(15.45, rr + an), rm = (rr + r1) / 2; let a = r() * 6.283; const fin = a + 6.283;
-    while (a < fin - .01) { const la = .55 + r() * .55, da = Math.min(fin - a, la / rm), am = a + da / 2, x = Math.cos(am) * rm, z = Math.sin(am) * rm;
-      const hora = rm > 12.4 && rm < 14.3 && Math.abs(angD(am, Math.round(am * 6 / Math.PI) * Math.PI / 6)) * rm < .5;
-      if (!(rm > PLAZA_R && enRadial(x, z, .2))) L.push({ x, z, ry: -am, w: da * rm - .03, d: (r1 - rr) - .03, k: hora ? 2 : rm > PLAZA_R ? 1 : 0, v: r() });
-      a += da } rr = r1 }
-  const g = RB(1, 1, 1, .06, 1), m = new THREE.InstancedMesh(g, new THREE.MeshStandardMaterial({ map: T_ROCA.c, bumpMap: T_ROCA.z, bumpScale: 3, roughness: .86 }), L.length), cc = new THREE.Color();
-  const P = ["#a8a090", "#9a9284", "#b4ac9a", "#8e877a", "#a49a86", "#bcb2a0", "#968c7a"];
-  L.forEach((q, i) => { const hh = .16 + q.v * .03, y = SUELO(q.x, q.z) + .055 - hh / 2 + (hash2(i, 3) - .5) * .02; dummy.position.set(q.x, y, q.z); dummy.rotation.set((hash2(i, 5) - .5) * .02, q.ry, (hash2(i, 7) - .5) * .02); dummy.scale.set(q.d, hh, q.w); dummy.updateMatrix(); m.setMatrixAt(i, dummy.matrix);
-    m.setColorAt(i, q.k === 2 ? cc.set("#3a3836") : cc.set(P[(q.v * P.length) | 0]).multiplyScalar(q.k === 1 ? .86 : 1)) });
-  m.castShadow = false; m.receiveShadow = true; scene.add(m); return m })();
-// cordón de la plaza (piedras largas, un poco más altas)
-angLibres(PLAZA_R + .1, .1).forEach(([a0, a1]) => { const n = Math.ceil((a1 - a0) * PLAZA_R / 1.1); for (let k = 0; k < n; k++) { const a = lerp(a0, a1, (k + .5) / n), x = Math.cos(a) * (PLAZA_R + .1), z = Math.sin(a) * (PLAZA_R + .1); L_PIEDRA.add("corona", RB1(.32, .26, (a1 - a0) * PLAZA_R / n - .03, .04), TM(x, SUELO(x, z) + .1, z, 0, -a, 0)) } });
 // ---------- registro de lo ocupado (para que la utilería no se pise con las casas)
 const OCUP = [], RECTS = [], GRILLA_O = new Map(), CELDA_O = 6, PAD_O = 2.5;   // grilla espacial (las búsquedas miran solo su celda)
 const enRect = (R, x, z, m = 0) => { const c = Math.cos(R.ry), s = Math.sin(R.ry), dx = x - R.x, dz = z - R.z, lx = dx * c - dz * s, lz = dx * s + dz * c; return Math.abs(lx) < R.w / 2 + m && Math.abs(lz) < R.d / 2 + m };
 const enGrilla = (it, x, z, rr) => { const a = Math.floor((x - rr) / CELDA_O), b = Math.floor((x + rr) / CELDA_O), c = Math.floor((z - rr) / CELDA_O), d = Math.floor((z + rr) / CELDA_O); for (let i = a; i <= b; i++) for (let j = c; j <= d; j++) { const k = i * 100003 + j; (GRILLA_O.get(k) || GRILLA_O.set(k, []).get(k)).push(it) } };
 const rectAdd = R => { RECTS.push(R); R.rect = 1; enGrilla(R, R.x, R.z, Math.hypot(R.w, R.d) / 2 + PAD_O) };
-const zonaLibre = (x, z, r = 0) => enCalle(x, z, r - .3) || Math.hypot(x, z) < 5.6 + r;   // calles, plaza y fuente (la utilería suelta no va ahí salvo o.zona)
+const zonaLibre = (x, z, r = 0) => enCalle(x, z, r - .3);   // calles, plaza y fuente (la utilería suelta no va ahí salvo o.zona)
 const libreEn = (x, z, r = .5, o = {}) => { if (!o.zona && zonaLibre(x, z, r)) return false; const L = GRILLA_O.get(Math.floor(x / CELDA_O) * 100003 + Math.floor(z / CELDA_O)); if (!L) return true;
   for (const q of L) { if (q.rect) { if (q !== o.salvo && enRect(q, x, z, r + (o.mc ?? .1))) return false } else if (Math.hypot(x - q.x, z - q.z) < r + q.r) return false } return true };
 const ocupa = (x, z, r) => { const q = { x, z, r }; OCUP.push(q); enGrilla(q, x, z, r + PAD_O); return true };
-rectAddLater.forEach(rectAdd);
 // ---------- LAS CASAS: piedra, ladrillo o revoque (a veces piso de arriba con entramado), techo a dos aguas de pizarra o tejas (cumbrera a lo largo
 // de la calle o con el frontón a la calle), chimenea con cañones de barro, canaletas y caños de lata, puerta con escalón, ventanas con postigos.
 // `simple`: casas lejanas (solo volúmenes, techo, chimenea, huecos oscuros). Todo va a lotes (pocas llamadas de dibujo).
@@ -379,20 +370,21 @@ const ventanaPiezas = (add, M, an, al, r, col, o = {}) => {   // M = matriz en l
 function casaP(x, z, ry, w, d, h, seed, o = {}) { const r = rng(seed), cs = Math.cos(ry), sn = Math.sin(ry), simple = !!o.simple, L = o.L || (simple ? L_LEJOS : L_CASA);
   const y0 = o.y0 ?? Math.min(SUELO(x, z), ...[[1, 1], [1, -1], [-1, 1], [-1, -1]].map(([a, b]) => SUELO(x + (a * w / 2) * cs + (b * d / 2) * sn, z - (a * w / 2) * sn + (b * d / 2) * cs))) - .06;
   const HM = o.HM || TM(x, y0, z, 0, ry, 0), add = (k, g, m) => L.add(k, g, m ? HM.clone().multiply(m) : HM.clone()), W = (lx, ly, lz) => new THREE.Vector3(lx, ly, lz).applyMatrix4(HM);
-  const mu = o.muro ?? (r() < .45 ? "muro" + (r() * M_MURO.length | 0) : r() < .6 ? "lad" + (r() * M_LAD.length | 0) : "rev" + (r() * M_REV.length | 0)), dos = !simple && (o.dos ?? (mu.startsWith("muro") && r() < .3)), hs = dos ? 2.9 : h;
-  const techo = o.techo ?? (r() < .5 ? "piz" + (r() * 3 | 0) : "teja" + (r() * 3 | 0)), col = "col" + (o.color ?? (r() * M_PUERTA.length | 0)), frontal = !!o.frontal;
+  const mu = o.muro ?? (r() < .42 ? "muro" + (r() * M_MURO.length | 0) : r() < .72 ? "tabla" + (r() * M_TABLAS_H.length | 0) : r() < .6 ? "lad" + (r() * M_LAD.length | 0) : "rev" + (r() * M_REV.length | 0)), dos = !simple && (o.dos ?? (mu.startsWith("muro") && r() < .6)), hs = dos ? 2.9 : h;
+  const techo = o.techo ?? (r() < .78 ? "piz" + (r() * 3 | 0) : "teja" + (r() * 3 | 0)), col = "col" + (o.color ?? (r() * M_PUERTA.length | 0)), frontal = !!o.frontal;
   // zócalo y muros
   if (!o.sinZocalo) add("zocalo", uvMuro(new THREE.BoxGeometry(w + .2, 1.4, d + .2), 3.2), TM(0, -.45, 0));
-  if (o.hueco) add(mu, uvMuro(new THREE.BoxGeometry(w, hs - o.hueco, d), 3.2, r(), r()), TM(0, o.hueco + (hs - o.hueco) / 2, 0));
+  if (o.hueco) { if (hs - o.hueco > .01) add(mu, uvMuro(new THREE.BoxGeometry(w, hs - o.hueco, d), 3.2, r(), r()), TM(0, o.hueco + (hs - o.hueco) / 2, 0)) }
   else add(mu, uvMuro(new THREE.BoxGeometry(w, hs, d), 3.2, r(), r()), TM(0, hs / 2, 0));
-  if (dos) { const hu = h - hs, rv = "rev" + (r() * M_REV.length | 0); add(rv, uvMuro(new THREE.BoxGeometry(w + .2, hu, d + .2), 3.4, r(), r()), TM(0, hs + hu / 2, 0));
+  if (dos) { const hu = h - hs, rv = r() < .65 ? "tabla" + (r() * M_TABLAS_H.length | 0) : "rev" + (r() * M_REV.length | 0); add(rv, uvMuro(new THREE.BoxGeometry(w + .2, hu, d + .2), 3.4, r(), r()), TM(0, hs + hu / 2, 0));
     const cara = (L2, M) => { add("viga", new THREE.BoxGeometry(L2 + .1, .16, .1), M.clone().multiply(TM(0, .08, 0))); add("viga", new THREE.BoxGeometry(L2 + .1, .16, .1), M.clone().multiply(TM(0, hu - .08, 0))); const n = Math.max(2, Math.round(L2 / 1.25));
       for (let k = 0; k <= n; k++) { const xx = lerp(-L2 / 2 + .06, L2 / 2 - .06, k / n); add("viga", new THREE.BoxGeometry(.15, hu, .1), M.clone().multiply(TM(xx, hu / 2, 0))); if (k < n && k % 2 === 0) { const x2 = lerp(-L2 / 2 + .06, L2 / 2 - .06, (k + 1) / n), [g, m] = cilEntre([xx, .1, 0], [x2, hu - .1, 0], .06, 4); add("viga", g, M.clone().multiply(m)) } } };
     cara(w + .2, TM(0, hs, d / 2 + .15)); cara(w + .2, TM(0, hs, -d / 2 - .15, 0, Math.PI, 0)); cara(d + .2, TM(w / 2 + .15, hs, 0, 0, Math.PI / 2, 0)); cara(d + .2, TM(-w / 2 - .15, hs, 0, 0, -Math.PI / 2, 0)) }
   if (!simple) {
     // esquineras (piedra clara) y cornisa entre pisos
-    if ((!mu.startsWith("rev") || o.mansion) && !o.sinEsquinas) for (const [sx, sz] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) for (let yy = .25, k = 0; yy < hs - .2; yy += .44, k++) { const la = k % 2 ? .62 : .38; add(o.mansion ? "blanco" : "piedraC", RB1(.1 + la * (k % 2 ? 1 : .1), .38, .1 + la * (k % 2 ? .1 : 1), .04), TM(sx * (w / 2 + .015) - sx * la * (k % 2 ? .5 : 0), yy, sz * (d / 2 + .015) - sz * la * (k % 2 ? 0 : .5))) }
-    for (let yy = 2.95; yy < h - 1; yy += 2.9) add(o.mansion ? "blanco" : o.sinEsquinas ? "viga" : "piedraC", RB1(w + .16, .16, d + .16, .03), TM(0, yy, 0));
+    if (mu.startsWith("tabla") && !o.sinEsquinas) for (const [sx, sz] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) add("viga", new THREE.BoxGeometry(.16, hs, .16), TM(sx * (w / 2 + .02), hs / 2, sz * (d / 2 + .02)));
+    if ((!mu.startsWith("rev") && !mu.startsWith("tabla") || o.mansion) && !o.sinEsquinas) for (const [sx, sz] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) for (let yy = .25, k = 0; yy < hs - .2; yy += .44, k++) { const la = k % 2 ? .62 : .38; add(o.mansion ? "blanco" : "piedraC", RB1(.1 + la * (k % 2 ? 1 : .1), .38, .1 + la * (k % 2 ? .1 : 1), .04), TM(sx * (w / 2 + .015) - sx * la * (k % 2 ? .5 : 0), yy, sz * (d / 2 + .015) - sz * la * (k % 2 ? 0 : .5))) }
+    for (let yy = 2.95; yy < h - 1; yy += 2.9) add(o.mansion ? "blanco" : (o.sinEsquinas || mu.startsWith("tabla")) ? "viga" : "piedraC", RB1(w + .16, .16, d + .16, .03), TM(0, yy, 0));
   }
   // ---- el techo (en el «marco del techo» la cumbrera va a lo largo de X y el ancho a lo largo de Z; frontal: girado 90°)
   const span = frontal ? w : d, len = frontal ? d : w, RM = frontal ? TM(0, 0, 0, 0, Math.PI / 2, 0) : new THREE.Matrix4(), addR = (k, g, m) => add(k, g, RM.clone().multiply(m || new THREE.Matrix4()));
@@ -414,7 +406,7 @@ function casaP(x, z, ry, w, d, h, seed, o = {}) { const r = rng(seed), cs = Math
       for (const s2 of [-1, 1]) addR(techo, new THREE.BoxGeometry(.95, .08, 1.75), TM(xx + s2 * .38, yb + 1.33, zz + .15, 0, 0, s2 * -.62)) } }
   // ---- la chimenea (en un extremo de la cumbrera); chimSep = va aparte para poder inclinarla (techosRajan)
   const sxc = o.chimX ?? (r() < .5 ? 1 : -1), cxr = sxc * (len / 2 - .6), czr = (r() - .5) * span * .15, ytop0 = h + rh + .9 + r() * .7, chMax = o.chimMax ?? 99, ctop = Math.min(ytop0, chMax), chW = .72 + r() * .2;
-  const chimeneaPartes = (A, M0) => { A(mu.startsWith("rev") ? "lad" + (seed % 3) : mu, uvMuro(new THREE.BoxGeometry(chW, ctop - h + .3, chW * .9), 2.4), M0.clone().multiply(TM(0, (ctop - h + .3) / 2, 0)));
+  const chimeneaPartes = (A, M0) => { A(mu.startsWith("rev") || mu.startsWith("tabla") ? "muro" + (seed % M_MURO.length) : mu, uvMuro(new THREE.BoxGeometry(chW, ctop - h + .3, chW * .9), 2.4), M0.clone().multiply(TM(0, (ctop - h + .3) / 2, 0)));
     if (simple) return; A("piedraC", RB1(chW + .18, .12, chW * .9 + .18, .03), M0.clone().multiply(TM(0, ctop - h + .36, 0)));
     for (const s of [-1, 1]) { A("terracota", new THREE.CylinderGeometry(.1, .12, .36, 10, 1, true), M0.clone().multiply(TM(s * chW * .24, ctop - h + .6, 0))); A("oscuro", new THREE.CircleGeometry(.09, 10), M0.clone().multiply(TM(s * chW * .24, ctop - h + .77, 0, -Math.PI / 2))) } };
   const chM = RM.clone().multiply(TM(cxr, h - .3, czr));   // base de la chimenea (dentro del ático), en coordenadas de la casa
@@ -429,10 +421,11 @@ function casaP(x, z, ry, w, d, h, seed, o = {}) { const r = rng(seed), cs = Math
   else if (simple) add("oscuro", new THREE.PlaneGeometry(dw, dh), F.clone().multiply(TM(0, dh / 2, .02)));
   else { add("piedraC", RB1(dw + .5, .26, .2, .03), F.clone().multiply(TM(0, dh + .13, .06))); for (const s of [-1, 1]) add("piedraC", RB1(.22, dh, .16, .03), F.clone().multiply(TM(s * (dw / 2 + .11), dh / 2, .05)));
     add("oscuro", new THREE.PlaneGeometry(dw, dh), F.clone().multiply(TM(0, dh / 2, .01)));
-    if (o.mansion) for (const s of [-1, 1]) add(col, new THREE.BoxGeometry(dw / 2 - .03, dh - .03, .07), F.clone().multiply(TM(s * dw / 4, dh / 2, .04)));
-    else add(col, new THREE.BoxGeometry(dw - .04, dh - .03, .06), F.clone().multiply(TM(0, dh / 2, .04)));
-    for (const yy of [.35, dh - .4]) add("hierro", new THREE.BoxGeometry(dw * .75, .06, .02), F.clone().multiply(TM(-dw * .1, yy, .08)));
-    add(o.mansion ? "laton" : "hierro", new THREE.TorusGeometry(.07, .015, 6, 12), F.clone().multiply(TM(dw / 2 - .2, dh * .48, .1))); add("piedraC", RB1(dw + .7, .16, .62, .05), F.clone().multiply(TM(0, .02, .3)));
+    // la hoja: SIN picaporte (marca de la chapa arrancada, tornillos, agujero, rasguños de percha; a veces tablas clavadas); o.picaporte = la de Crane; o.sinHoja = la pone el detalle (se abre)
+    if (!o.sinHoja) { if (o.mansion) for (const s of [-1, 1]) add(col, new THREE.BoxGeometry(dw / 2 - .03, dh - .03, .07), F.clone().multiply(TM(s * dw / 4, dh / 2, .04)));
+      else hojaSinPicaporte({ add: (k, g, m) => add(k, g, m) }, F.clone().multiply(TM(0, 0, .04)), dw, dh, col, seed, { tablas: o.tablas ?? r() < .12 });
+      if (o.picaporte) picaportePiezas(add, F.clone().multiply(TM(dw / 2 - .2, dh * .47, .08))) }
+    add("piedraC", RB1(dw + .7, .16, .62, .05), F.clone().multiply(TM(0, .02, .3)));
     if (o.mansion) { for (let k = 0; k < 3; k++) add("blanco", RB1(dw + 2.4 - k * .4, .18, 1.6 - k * .4, .03), F.clone().multiply(TM(0, .09 + k * .18 - .1, 1.1 - k * .2)));
       for (const s of [-1, 1]) for (const s2 of [.6, 1.4]) { add("blanco", new THREE.CylinderGeometry(.16, .19, dh + .9, 14), F.clone().multiply(TM(s * (dw / 2 + s2), (dh + .9) / 2 + .2, 1.25))); add("blanco", RB1(.5, .18, .5, .03), F.clone().multiply(TM(s * (dw / 2 + s2), dh + 1.15, 1.25))) }
       add("blanco", RB1(dw + 4, .35, 1.9, .04), F.clone().multiply(TM(0, dh + 1.42, .95))); const sh = new THREE.Shape(); sh.moveTo(-(dw / 2 + 2.05), 0); sh.lineTo(dw / 2 + 2.05, 0); sh.lineTo(0, 1.1); sh.closePath(); const gp = new THREE.ExtrudeGeometry(sh, { depth: 1.9, bevelEnabled: false }); add("blanco", gp, F.clone().multiply(TM(0, dh + 1.6, 0))) } }
@@ -459,11 +452,11 @@ function casaP(x, z, ry, w, d, h, seed, o = {}) { const r = rng(seed), cs = Math
     const Wm = HM.clone().multiply(M), zs = simple ? .07 : .14, nv = simple ? 1 : 1 + (r() < .45) + (r() < .15);
     for (let q = 0; q < nv; q++) { const p = new THREE.Vector3((q - (nv - 1) / 2) * .2 + (r() - .5) * .06, simple ? 0 : -.01, zs + (r() - .5) * .04).applyMatrix4(Wm); VELAS_B.push({ p: p.toArray(), h: .1 + r() * .16, g: 0 }) }
     if (!simple && !balcon && r() < .22) { const p = new THREE.Vector3((r() < .5 ? -1 : 1) * (an / 2 - .02), -.01, .14).applyMatrix4(Wm); MACETAS_B.push([p.x, p.y, p.z, .7 + r() * .3, r() * 6]) } });
-  if (o.puertaAtras && !simple) { const B = TM(-px * .6, 0, -d / 2, 0, Math.PI, 0); add("oscuro", new THREE.PlaneGeometry(dw, dh), B.clone().multiply(TM(0, dh / 2, .01))); add(col, new THREE.BoxGeometry(dw - .04, dh - .03, .06), B.clone().multiply(TM(0, dh / 2, .04))); add("piedraC", RB1(dw + .5, .26, .2, .03), B.clone().multiply(TM(0, dh + .13, .06))); add("piedraC", RB1(dw + .7, .16, .62, .05), B.clone().multiply(TM(0, .02, .3))) }
+  if (o.puertaAtras && !simple) { const B = TM(-px * .6, 0, -d / 2, 0, Math.PI, 0); add("oscuro", new THREE.PlaneGeometry(dw, dh), B.clone().multiply(TM(0, dh / 2, .01))); hojaSinPicaporte({ add: (k, g, m) => add(k, g, m) }, B.clone().multiply(TM(0, 0, .04)), dw, dh, col, seed + 3, { tablas: r() < .2 }); add("piedraC", RB1(dw + .5, .26, .2, .03), B.clone().multiply(TM(0, dh + .13, .06))); add("piedraC", RB1(dw + .7, .16, .62, .05), B.clone().multiply(TM(0, .02, .3))) }
   // ---- farolito de pared junto a la puerta (algunas casas)
   if (!simple && (o.farol ?? r() < .3)) { const lx = px + (px > 0 ? -1 : 1) * (dw / 2 + .45); add("hierro", new THREE.BoxGeometry(.04, .04, .32), F.clone().multiply(TM(lx, 2.55, .16))); add("hierro", new THREE.CylinderGeometry(.13, .1, .05, 6), F.clone().multiply(TM(lx, 2.66, .34)));
     add("luz", new THREE.CylinderGeometry(.09, .07, .22, 6), F.clone().multiply(TM(lx, 2.52, .34))); add("hierro", new THREE.ConeGeometry(.14, .14, 6), F.clone().multiply(TM(lx, 2.75, .34))) }
-  const C = { x, z, ry, w, d, h, y0, HM, px, rh, ye, dos, hs, col, techo, mu, frontal, span, len, ang, chimTop, ctop, chimG, r, seed, F, dw, dh, ridge: h + rh + .15 };
+  const C = { x, z, ry, w, d, h, y0, HM, px, mu, o, rh, ye, dos, hs, col, techo, mu, frontal, span, len, ang, chimTop, ctop, chimG, r, seed, F, dw, dh, ridge: h + rh + .15 };
   CASAS_P.push(C); rectAdd({ x, z, ry, w: w + .6, d: d + .6, casa: C }); return C }
 
 // ---------- ayudantes de obra: muro con huecos (puertas/ventanas) y prisma (relleno entre casas)
@@ -479,183 +472,204 @@ function prisma(P, y0, y1) { let A = 0; for (let i = 0; i < P.length; i++) { con
   return g }
 const esquinaW = (C, lx, lz) => [C.x + lx * Math.cos(C.ry) + lz * Math.sin(C.ry), C.z - lx * Math.sin(C.ry) + lz * Math.cos(C.ry)];
 
-// ---------- lugares reservados en la fila de la plaza: la tienda (norte), la casa de Nell, la escuela
-const A_TIENDA = Math.atan2(TIENDA[1], TIENDA[0]), A_NELL = Math.atan2(CASA_NELL[1], CASA_NELL[0]), A_ESCUELA = -142.5 * Math.PI / 180;
-const RESERVA_PLAZA = [[A_TIENDA, .31], [A_NELL, .205], [A_ESCUELA, .215]];
-const ryHacia = a => Math.atan2(-Math.cos(a), -Math.sin(a));   // ry de una casa en el ángulo a que mira al centro
+// ================= HOLLOWMERE: las casas =================
+M_TEJA.forEach(m => m.color.set("#8e8078"));
+const M_PICAPORTE = new THREE.MeshStandardMaterial({ color: "#f0c060", roughness: .14, metalness: 1, envMap: ENV_METAL_P, envMapIntensity: 2.4, emissive: "#5a3608", emissiveIntensity: .55 });
+Object.assign(CASA_MATS, { picaporte: M_PICAPORTE, losas: M_LOSAS, cortina: M_CORTINA });
+M_TABLAS_H.forEach((m, i) => CASA_MATS["tabla" + i] = m); M_MARCA_PUERTA.forEach((m, i) => CASA_MATS["marca" + i] = m);
+// el picaporte de bronce (la ÚNICA puerta del pueblo que tiene): roseta, cuello, pomo, bocallave. M en la cara de la hoja (+z afuera), origen en el pomo
+function picaportePiezas(add, M) {
+  add("picaporte", new THREE.CylinderGeometry(.075, .085, .025, 24), M.clone().multiply(TM(0, 0, .012, Math.PI / 2)));
+  add("picaporte", new THREE.TorusGeometry(.07, .008, 6, 24), M.clone().multiply(TM(0, 0, .024)));
+  add("picaporte", new THREE.CylinderGeometry(.018, .024, .07, 12), M.clone().multiply(TM(0, 0, .058, Math.PI / 2)));
+  add("picaporte", new THREE.SphereGeometry(.056, 20, 14), M.clone().multiply(TM(0, 0, .11, 0, 0, 0, 1, 1, .8)));
+  add("picaporte", RB1(.075, .22, .016, .01), M.clone().multiply(TM(0, -.21, .008)));
+  add("oscuro", new THREE.CircleGeometry(.013, 12), M.clone().multiply(TM(0, -.19, .018))); add("oscuro", new THREE.PlaneGeometry(.009, .035), M.clone().multiply(TM(0, -.215, .018))) }
+// la hoja de una puerta SIN picaporte (para las puertas sueltas que abre la escena): tablas, bisagras de hierro, la marca del picaporte
+// arrancado (y rasguños), el agujero del vástago. L = lote, M = matriz en el centro de abajo de la hoja (+z afuera), k = variante 0–5
+function hojaSinPicaporte(L, M, dw, dh, col, k, o = {}) {
+  L.add(col, new THREE.BoxGeometry(dw - .04, dh - .03, .06), M.clone().multiply(TM(0, dh / 2, 0)));
+  for (let q = 0; q < Math.round(dw / .16); q++) L.add("viga", new THREE.BoxGeometry(.012, dh - .05, .02), M.clone().multiply(TM(-dw / 2 + .02 + (q + 1) * (dw - .04) / (Math.round(dw / .16) + 1), dh / 2, .03)));
+  for (const yy of [.35, dh - .4]) { L.add("hierro", new THREE.BoxGeometry(dw * .75, .06, .02), M.clone().multiply(TM(-dw * .12, yy, .035))); L.add("hierro", new THREE.CylinderGeometry(.028, .028, .14, 8), M.clone().multiply(TM(-dw / 2 + .01, yy, .02))) }
+  L.add("marca" + (k % 6), new THREE.PlaneGeometry(dw - .04, dh - .03), M.clone().multiply(TM(0, dh / 2, .032)));
+  L.add("oscuro", new THREE.CylinderGeometry(.024, .024, .02, 10), M.clone().multiply(TM(.3 * (dw - .04), dh / 2 - .03 * (dh - .03), .03, Math.PI / 2)));
+  if (o.tablas) { const r = rng(9100 + k); for (let q = 0; q < 3; q++) { const y = dh * (.22 + q * .3) + (r() - .5) * .1, a = (r() - .5) * .35; L.add("maderaV", RB1(dw + .34, .19 + r() * .05, .05, .01), M.clone().multiply(TM((r() - .5) * .06, y, .075, 0, 0, a)));
+      for (const s of [-1, 1]) for (const dy of [-.05, .05]) L.add("hierro", new THREE.CylinderGeometry(.012, .012, .03, 5), M.clone().multiply(TM(s * (dw / 2 + .08) * Math.cos(a), y + s * (dw / 2 + .08) * Math.sin(a) + dy, .105, Math.PI / 2))) } } }
+// filas de casas a lo largo de z: xFrente = x de la fachada; lado −1 = la casa queda al oeste (mira al este), +1 al este (mira al oeste)
+const tramosLibres = (z0, z1, res) => { let L = [[z0, z1]]; res.forEach(([a, b]) => { L = L.flatMap(([u, v]) => b <= u || a >= v ? [[u, v]] : [[u, a], [b, v]].filter(([p, q]) => q - p > .5)) }); return L };
+function filaCasas(xFrente, lado, z0, z1, res, seed, o = {}) { const r = rng(seed), ry = lado < 0 ? Math.PI / 2 : -Math.PI / 2, out = [];
+  tramosLibres(z0, z1, res).forEach(([a, b]) => { let z = a; while (b - z > 2.8) { let w = (o.wMin ?? 4.4) + r() * (o.wVar ?? 2.4); if (b - z - w < 3.2) w = b - z;
+      const d = (o.dMin ?? 7.2) + r() * (o.dVar ?? 1.4), pisos = (o.pisos ?? 2) + (r() < (o.p3 ?? .45) ? 1 : 0), h = pisos * 2.9 + .25 + r() * .4, zc = z + w / 2, xc = xFrente + lado * d / 2;
+      const C = casaP(xc, zc, ry, w - .04, d, h, seed + 7 + out.length * 13, { frontal: w < 5.4 && r() < .55, pendiente: 46 + r() * 12, parches: r() < .3, puertaAtras: r() < .4, balcones: .2, farol: r() < .3, tablas: r() < .15, ...(o.casa || {}) });
+      C.fila = o.nombre; out.push(C); z += w } }); return out }
+const CRUCE_R = [CRUCE_T.z - CRUCE_T.an / 2, CRUCE_T.z + CRUCE_T.an / 2];
+const resDe = (B, m = .02) => [B.z - B.w / 2 - m, B.z + B.w / 2 + m];
+const FILAS_T = {
+  oeste: filaCasas(-CALLE_T.fachada, -1, CALLE_T.z0 + .5, CALLE_T.z1 - .5, [CRUCE_R, resDe(CASA_FAM), resDe(CASA_MARGA)], 5100, { nombre: "oeste" }),
+  este: filaCasas(CALLE_T.fachada, 1, CALLE_T.z0 + .5, CALLE_T.z1 - .5, [CRUCE_R, resDe(TALLER_T)], 5300, { nombre: "este" }),
+  oesteAtras: filaCasas(CALLEJONES_T[0].x0, -1, -38, 78, [CRUCE_R], 5500, { nombre: "oesteAtras", p3: .2, dMin: 6.4, dVar: 1.6 }),
+  esteAtras: filaCasas(CALLEJONES_T[1].x1, 1, -35.5, 78, [CRUCE_R], 5700, { nombre: "esteAtras", p3: .2, dMin: 6.4, dVar: 1.6 }),
+  plazaO: filaCasas(PLAZA_T.x - PLAZA_T.w / 2, -1, -71.5, -42, [], 5900, { nombre: "plazaO", p3: .6, wMin: 5, dMin: 7.5 }),
+  plazaE: filaCasas(PLAZA_T.x + PLAZA_T.w / 2, 1, -71.5, -42, [], 6100, { nombre: "plazaE", p3: .6, wMin: 5, dMin: 7.5 }) };
+// casas sueltas en las afueras (miran al pueblo), con sus galpones
+const AFUERAS_T = [[-38, 12, Math.PI / 2, 7, 6, 1], [-36, 44, Math.PI / 2, 6, 6.5, 2], [-41, -12, Math.PI / 2, 6.5, 6, 1], [-35, 64, Math.PI / 2, 7.5, 6, 2], [-33, -52, Math.PI / 2, 6, 7, 2],
+  [36, 32, -Math.PI / 2, 7, 6, 2], [40, 6, -Math.PI / 2, 6, 6, 1], [33, 58, -Math.PI / 2, 7, 6.5, 2], [38, -50, -Math.PI / 2, 6.5, 6, 1], [-18, 95, Math.PI, 7, 6, 2], [16, 96, Math.PI, 6.5, 6, 1], [50, -6, -Math.PI / 2, 6, 5.5, 1]]
+  .map(([x, z, ry, w, d, p], i) => casaP(x, z, ry, w, d, p * 2.9 + .3, 6200 + i * 11, { pendiente: 50 + (i % 3) * 4, parches: true, exenta: true, muro: i % 3 ? "tabla" + (i % 5) : "muro" + (i % 6), tablas: i % 4 === 1, farol: i % 2 === 0 }));
+// la casa del sacristán, al oeste de la iglesia (mira a la plaza)
+const CASA_SACRISTAN = casaP(-14.5, -81, 0, 9, 8, 6.2, 6290, { muro: "muro1", techo: "piz0", pendiente: 52, exenta: true, farol: true });
 
-// ---------- LAS FILAS DE CASAS: apretadas, de 2 a 4 pisos, todas mirando al centro; los huecos de atrás (por la curva) se rellenan con muro
-{ const r = rng(4510);
-  FILAS.forEach((F, fi) => { const rm = (F.r0 + F.r1) / 2; let tramos = angLibres(rm, .45);
-    if (F.plaza) tramos = tramos.flatMap(([a0, a1]) => { let L = [[a0, a1]]; RESERVA_PLAZA.forEach(([ac, h]) => { L = L.flatMap(([b0, b1]) => { let c = ac; while (c < b0) c += Math.PI * 2; while (c > b1 + Math.PI) c -= Math.PI * 2; return c + h <= b0 || c - h >= b1 ? [[b0, b1]] : [[b0, c - h], [c + h, b1]].filter(([u, v]) => v - u > .01) }) }); return L });
-    tramos.forEach(([a0, a1]) => { let a = a0, prev = null, prim = null, ult = null;
-      while ((a1 - a) * F.r0 > 2.6) { let w = (F.galpon ? 3.4 : F.plaza ? 5.0 : 4.3) + r() * (F.galpon ? 2 : 2.6); const rest = (a1 - a) * F.r0 - w; if (rest < 3) w += rest; if (w < 2.6) break;
-        const am = a + w / 2 / F.r0, retiro = F.plaza ? 0 : r() * .3, d = F.r1 - F.r0 - retiro, rc = F.r0 + retiro + d / 2, cx = Math.cos(am) * rc, cz = Math.sin(am) * rc;
-        const enRisco = Math.max(riscoH(cx, cz), riscoH(Math.cos(am) * F.r1, Math.sin(am) * F.r1)) > 1.3;
-        if (enRisco) { a += w / F.r0; prev = null; continue }
-        const pisos = F.pisos[0] + Math.floor(r() * (F.pisos[1] - F.pisos[0] + 1)), frontal = w < 5.6 && r() < .5, h = F.galpon ? 2.9 + r() * .5 : pisos * 2.9 + .25 + r() * .5;
-        const C = casaP(cx, cz, ryHacia(am), w - .05, d, h, 4520 + fi * 1000 + CASAS_P.length * 7, { frontal, pendiente: frontal ? 48 + r() * 8 : 40 + r() * 12, simple: !!F.simple, parches: F.galpon || r() < .2, puertaAtras: F.plaza || r() < .3,
-          techo: F.galpon ? (r() < .5 ? "teja" + (r() * 3 | 0) : "piz" + (r() * 3 | 0)) : undefined, balcones: F.plaza ? .45 : .28, farol: F.plaza ? r() < .6 : undefined });
-        C.fila = fi; C.am = am;
-        // relleno del hueco de atrás con la casa anterior (la curva abre una cuña)
-        if (prev) { // la esquina de atrás de cada casa del lado de la otra (probamos los dos lados y nos quedamos con la más cercana)
-          const cand = Q => [esquinaW(Q, Q.w / 2, -Q.d / 2), esquinaW(Q, -Q.w / 2, -Q.d / 2)], [pa, pb] = cand(prev), [ca, cb] = cand(C);
-          const dist = (u, v) => Math.hypot(u[0] - v[0], u[1] - v[1]), P1 = dist(pa, [C.x, C.z]) < dist(pb, [C.x, C.z]) ? pa : pb, P2 = dist(ca, [prev.x, prev.z]) < dist(cb, [prev.x, prev.z]) ? ca : cb;
-          const fa = [esquinaW(prev, prev.w / 2, prev.d / 2), esquinaW(prev, -prev.w / 2, prev.d / 2)], fb = [esquinaW(C, C.w / 2, C.d / 2), esquinaW(C, -C.w / 2, C.d / 2)];
-          const F1 = dist(fa[0], [C.x, C.z]) < dist(fa[1], [C.x, C.z]) ? fa[0] : fa[1], F2 = dist(fb[0], [prev.x, prev.z]) < dist(fb[1], [prev.x, prev.z]) ? fb[0] : fb[1], FM = [(F1[0] + F2[0]) / 2, (F1[1] + F2[1]) / 2];
-          if (dist(P1, P2) > .08) { const y0 = Math.min(prev.y0, C.y0), y1 = y0 + Math.min(prev.h, C.h) - .2; (F.simple ? L_LEJOS : L_CASA).add(prev.mu.startsWith("rev") ? "muro0" : prev.mu, uvMuro(prisma([FM, P1, P2], y0, y1), 3.2)) } }
-        if (!prim) prim = C; ult = C; prev = C; a += w / F.r0 + (r() < .08 && !F.plaza ? (prev = null, 1.3 / F.r0) : 0) }
-      // las puntas del tramo: del costado de la primera y la última casa hasta el borde de la calle radial (la fila llega a la línea de la calle)
-      for (const [C, ab, sg] of [[prim, a0, -1], [ult, a1, 1]]) { if (!C) continue; const cs = [[1, 1], [1, -1], [-1, 1], [-1, -1]].map(([sx, sz]) => esquinaW(C, sx * C.w / 2, sz * C.d / 2)), lado = cs.filter(p => Math.sign(angD(Math.atan2(p[1], p[0]), C.am)) === sg);
-        if (lado.length !== 2) continue; const [Fr, Bk] = Math.hypot(...lado[0]) < Math.hypot(...lado[1]) ? lado : [lado[1], lado[0]], E0 = [Math.cos(ab) * F.r0, Math.sin(ab) * F.r0], E1 = [Math.cos(ab) * (F.r1 - .05), Math.sin(ab) * (F.r1 - .05)];
-        if (Math.hypot(E1[0] - Bk[0], E1[1] - Bk[1]) < .2 || Math.max(riscoH(...E1), riscoH(...E0)) > 1.3) continue; (F.simple ? L_LEJOS : L_CASA).add(C.mu.startsWith("rev") ? "muro0" : C.mu, uvMuro(prisma([E0, E1, Bk, Fr], C.y0, C.y0 + C.h - .2), 3.2)) } }) }) }
+// ---------- LA CASA DE LA FAMILIA (la del narrador y Tib), lado oeste de la calle: planta baja = UN cuarto de verdad (6,4 × 7,4 × 3 m):
+// la puerta al frente (sin picaporte; el ropero contra ella), la ventana del frente, la VENTANA DE ATRÁS (al callejón, se abre), la mesa,
+// las camas, el hogar. Coordenadas locales: x a lo largo de la calle (+x = norte), z hacia la calle (+z = frente). Los muebles van en el detalle.
+const CASA_FAM_B = (() => { const { x, z, ry, w, d } = CASA_FAM, H = 3.0, t = .3, mu = "muro2", fz = d / 2;
+  const C = casaP(x, z, ry, w, d, 6.4, 6301, { muro: mu, techo: "piz0", dos: true, pendiente: 52, sinPuerta: true, sinPiso0: true, hueco: H, farol: false, balcones: 0, puertaX: 1.15 });
+  const M = C.HM, at = (...a) => M.clone().multiply(TM(...a)), L = L_CASA;
+  const PUE = [.6, 1.7, .26, 2.36], VEN = [-2.7, -1.3, 1.0, 2.1], VAT = [-.65, .65, 1.0, 2.1];
+  muroHuecos(L, mu, at(0, 0, fz - t / 2), w, H, t, [VEN, PUE]);
+  for (const s of [-1, 1]) L.add(mu, uvMuro(new THREE.BoxGeometry(t, H, d - 2 * t), 3.2), at(s * (w / 2 - t / 2), H / 2, 0));
+  muroHuecos(L, mu, at(0, 0, -fz + t / 2), w, H, t, [VAT]);
+  // forro de tablas por dentro (con los mismos huecos), piso de tablas, vigas del techo
+  muroHuecos(L, "tabla4", at(0, 0, fz - t - .02), w - 2 * t, H, .04, [VEN, PUE]); muroHuecos(L, "tabla4", at(0, 0, -fz + t + .02), w - 2 * t, H, .04, [VAT]);
+  for (const s of [-1, 1]) L.add("tabla4", uvMuro(new THREE.BoxGeometry(.04, H, d - 2 * t - .08), 3.2), at(s * (w / 2 - t - .02), H / 2, 0));
+  L.add("madera", uvMuro(new THREE.BoxGeometry(w - .5, .1, d - .5), 1.4), at(0, .22, 0));
+  for (let k = 0; k < 6; k++) L.add("viga", new THREE.BoxGeometry(w - .5, .2, .2), at(0, H - .12, fz - .75 - k * 1.3));
+  L.add("viga", new THREE.BoxGeometry(.24, .26, d - .6), at(0, H - .26, 0)); for (const s of [-1, 1]) L.add("viga", new THREE.BoxGeometry(.2, H - .3, .2), at(s * 1.6, (H - .3) / 2 + .27, -.4));
+  // la ventana del frente (vidrio, marco, parteluz, alféizar) y el marco de la puerta
+  const marcoVentana = (V, zf, sale) => { const [x0, x1, y0, y1] = V, vw = x1 - x0, vh = y1 - y0, vc = (x0 + x1) / 2;
+    for (const xx of [x0, x1]) L.add("madera", new THREE.BoxGeometry(.1, vh + .1, t + .06), at(xx + (xx === x0 ? .05 : -.05), y0 + vh / 2, zf)); for (const yy of [y0, y1]) L.add("madera", new THREE.BoxGeometry(vw, .1, t + .06), at(vc, yy + (yy === y0 ? .05 : -.05), zf));
+    L.add("piedraC", RB1(vw + .36, .1, .34, .03), at(vc, y0 - .05, zf + sale * (t / 2 + .08))); L.add("piedraC", RB1(vw + .4, .2, .16, .03), at(vc, y1 + .12, zf + sale * (t / 2 + .02))) };
+  marcoVentana(VEN, fz - t / 2, 1); { const [x0, x1, y0, y1] = VEN, vc = (x0 + x1) / 2; L.add("vidrioC", new THREE.PlaneGeometry(x1 - x0, y1 - y0), at(vc, (y0 + y1) / 2, fz - .1)); L.add("madera", new THREE.BoxGeometry(.05, y1 - y0, .06), at(vc, (y0 + y1) / 2, fz - .1)); L.add("madera", new THREE.BoxGeometry(x1 - x0, .05, .06), at(vc, (y0 + y1) / 2 + .1, fz - .1));
+    for (const s of [-1, 1]) L.add("cortina", new THREE.BoxGeometry(.3, y1 - y0 + .3, .05), at(vc + s * ((x1 - x0) / 2 - .1), (y0 + y1) / 2 + .1, fz - t - .1)) }
+  marcoVentana(VAT, -fz + t / 2, -1);
+  { const [x0, x1, y0, y1] = PUE; L.add("piedraC", RB1(x1 - x0 + .5, .26, .2, .03), at((x0 + x1) / 2, y1 + .13, fz + .04)); for (const xx of [x0 - .06, x1 + .06]) L.add("madera", new THREE.BoxGeometry(.12, y1 - y0 + .06, t + .08), at(xx, (y0 + y1) / 2, fz - t / 2));
+    L.add("piedraC", RB1(x1 - x0 + .7, .16, .62, .05), at((x0 + x1) / 2, .02, fz + .3)) }
+  return { C, M, at, fz, t, H, PUE, VEN, VAT, w, d } })();
 
-// ---------- LA ESCUELA_B (fila de la plaza, al oeste): casa baja y ancha con un soportal; bajo el soportal, el pizarrón con labios dibujados
-const ESCUELA_B = (() => { const rc = 15.6 + 3.6, x = Math.cos(A_ESCUELA) * rc, z = Math.sin(A_ESCUELA) * rc, ry = ryHacia(A_ESCUELA);
-  const C = casaP(x, z, ry, 6.4, 7.2, 6.3, 4588, { muro: "muro3", techo: "teja1", color: 3, frontal: false, puertaX: 2.1, farol: false, balcones: 0, pendiente: 38, sinPiso0: true });
-  const M = C.HM, at = (...a) => M.clone().multiply(TM(...a)), fz = C.d / 2;
-  // soportal: cuatro postes de madera, viga y techito de tejas
-  for (const xx of [-3, -1, 1, 3]) { L_CASA.add("piedraC", RB1(.34, .3, .34, .04), at(xx, .15, fz + 1.75)); L_CASA.add("viga", new THREE.BoxGeometry(.2, 2.75, .2), at(xx, 1.6, fz + 1.75)); L_CASA.add("viga", new THREE.BoxGeometry(.12, .7, .12), at(xx + .25, 2.75, fz + 1.5, .78, 0, 0)) }
-  L_CASA.add("viga", new THREE.BoxGeometry(6.8, .24, .24), at(0, 3.0, fz + 1.75)); L_CASA.add("teja1", geoUV(new THREE.BoxGeometry(7.2, .12, 2.3), q => q / 3.4, (a, b, c) => c / 3.4), at(0, 3.32, fz + 1.05, .3, 0, 0));
-  for (let k = 0; k < 7; k++) L_CASA.add("viga", new THREE.BoxGeometry(.1, .12, 2.1), at(-3.3 + k * 1.1, 3.15, fz + 1, .3, 0, 0));
-  L_CASA.add("piedraC", RB1(7, .14, 2, .03), at(0, .07, fz + 1));
-  C.pizarra = at(-1.2, 0, fz + .02); C.soportal = new THREE.Vector3(0, 0, fz + 1.2).applyMatrix4(M); rectAdd({ x: C.soportal.x, z: C.soportal.z, ry: C.ry, w: 7.2, d: 2.4, soportal: 1 }); return C })();
+// ---------- EL TALLER DEL SASTRE (lado este, frente al oeste): planta baja = el taller (8,4 × 8,4 × 3,4 m): vidriera grande a la calle, puerta,
+// ventanita atrás y una al costado. Coordenadas locales como la casa de la familia (+z = hacia la calle). Los muebles van en el detalle.
+const TALLER_B = (() => { const { x, z, ry, w, d } = TALLER_T, H = 3.4, t = .3, mu = "tabla2", fz = d / 2;
+  const C = casaP(x, z, ry, w, d, 9.2, 6401, { muro: mu, techo: "piz2", dos: false, pendiente: 50, frontal: true, sinPuerta: true, sinPiso0: true, hueco: H, farol: false, balcones: .5, puertaX: 1.3 });
+  const M = C.HM, at = (...a) => M.clone().multiply(TM(...a)), L = L_CASA;
+  const VID = [-3.8, -.5, .7, 2.8], PUE = [.7, 1.9, .26, 2.62], VAT = [-1.4, .2, 1.3, 2.4], VCO = [-1.6, -.2, 1.2, 2.4];
+  muroHuecos(L, "muro3", at(0, 0, fz - t / 2), w, H, t, [VID, PUE]);   // el frente: piedra (la vidriera con marco de madera pintada)
+  L.add(mu, uvMuro(new THREE.BoxGeometry(t, H, d - 2 * t), 3.2), at(-(w / 2 - t / 2), H / 2, 0));
+  { const M2 = at(w / 2 - t / 2, 0, 0).multiply(TM(0, 0, 0, 0, Math.PI / 2, 0)); muroHuecos(L, mu, M2, d - 2 * t, H, t, [VCO]) }
+  muroHuecos(L, mu, at(0, 0, -fz + t / 2), w, H, t, [VAT]);
+  muroHuecos(L, "tabla4", at(0, 0, fz - t - .02), w - 2 * t, H, .04, [VID, PUE]); muroHuecos(L, "tabla4", at(0, 0, -fz + t + .02), w - 2 * t, H, .04, [VAT]);
+  L.add("tabla4", uvMuro(new THREE.BoxGeometry(.04, H, d - 2 * t - .08), 3.2), at(-(w / 2 - t - .02), H / 2, 0)); { const M2 = at(w / 2 - t - .02, 0, 0).multiply(TM(0, 0, 0, 0, Math.PI / 2, 0)); muroHuecos(L, "tabla4", M2, d - 2 * t - .08, H, .04, [VCO]) }
+  L.add("madera", uvMuro(new THREE.BoxGeometry(w - .5, .1, d - .5), 1.4), at(0, .22, 0));
+  for (let k = 0; k < 7; k++) L.add("viga", new THREE.BoxGeometry(w - .5, .2, .2), at(0, H - .12, fz - .7 - k * 1.25)); L.add("viga", new THREE.BoxGeometry(.26, .28, d - .6), at(0, H - .3, 0));
+  // la vidriera: marco grueso pintado de verde oscuro, vidrios chicos (grilla), zócalo de madera, alero/cornisa con el nombre
+  { const [x0, x1, y0, y1] = VID, vw = x1 - x0, vh = y1 - y0, vc = (x0 + x1) / 2, zf = fz - t / 2; L.add("vidrioC", new THREE.PlaneGeometry(vw, vh), at(vc, y0 + vh / 2, fz - .12));
+    for (let k = 0; k <= 5; k++) L.add("col0", new THREE.BoxGeometry(.06, vh, .08), at(x0 + k * vw / 5, y0 + vh / 2, fz - .12)); for (let k = 0; k <= 3; k++) L.add("col0", new THREE.BoxGeometry(vw, .06, .08), at(vc, y0 + k * vh / 3, fz - .12));
+    for (const xx of [x0 - .08, x1 + .08]) L.add("col0", new THREE.BoxGeometry(.18, vh + .3, t + .12), at(xx, y0 + vh / 2, zf)); L.add("col0", new THREE.BoxGeometry(vw + .5, .2, t + .16), at(vc, y1 + .1, zf)); L.add("col0", new THREE.BoxGeometry(vw + .5, .14, t + .26), at(vc, y0 - .07, zf));
+    L.add("col0", new THREE.BoxGeometry(vw + .4, .5, .08), at(vc, .45, fz + .02)); L.add("col0", new THREE.BoxGeometry(w + .1, .5, .22), at(0, H - .1, fz + .12)) }
+  { const [x0, x1, y0, y1] = PUE; for (const xx of [x0 - .07, x1 + .07]) L.add("col0", new THREE.BoxGeometry(.14, y1 - y0 + .1, t + .1), at(xx, (y0 + y1) / 2, fz - t / 2)); L.add("col0", new THREE.BoxGeometry(x1 - x0 + .3, .16, t + .1), at((x0 + x1) / 2, y1 + .08, fz - t / 2));
+    L.add("vidrioC", new THREE.PlaneGeometry(x1 - x0 - .1, .5), at((x0 + x1) / 2, y1 + .45, fz - .1)); L.add("piedraC", RB1(x1 - x0 + .7, .16, .62, .05), at((x0 + x1) / 2, .02, fz + .3)) }
+  for (const [V, Mv] of [[VAT, at(0, 0, -fz + t / 2, 0, Math.PI, 0)], [VCO, at(w / 2 - t / 2, 0, 0, 0, Math.PI / 2, 0)]]) { const [x0, x1, y0, y1] = V, vc = (x0 + x1) / 2, xx = Mv === undefined ? 0 : 1;
+    L.add("vidrioC", new THREE.PlaneGeometry(x1 - x0, y1 - y0), Mv.clone().multiply(TM(V === VAT ? -vc : vc, (y0 + y1) / 2, 0))); L.add("piedraC", RB1(x1 - x0 + .3, .1, .3, .03), Mv.clone().multiply(TM(V === VAT ? -vc : vc, y0 - .05, .2))) }
+  return { C, M, at, fz, t, H, VID, PUE, VAT, VCO, w, d } })();
 
-// ---------- LA CASA DE NELL (en la fila de la plaza, al sudeste): la planta baja es un cuarto de verdad con la ventana grande a la plaza,
-// la mesa con velas debajo de la ventana; la puerta al lado. CASA_NELL_V = { ventana, mesa, puerta } en coordenadas de mundo
-const CASA_NELL_B = (() => { const am = A_NELL, rc = 15.6 + 4.4, x = Math.cos(am) * rc, z = Math.sin(am) * rc, ry = ryHacia(am), w = 6.0, d = 8.8;
-  const C = casaP(x, z, ry, w, d, 6.1, 4590, { muro: "lad1", techo: "teja0", color: 1, frontal: true, pendiente: 50, sinPuerta: true, sinPiso0: true, hueco: 3.0, farol: false, balcones: 0 });
-  const M = C.HM, at = (...a) => M.clone().multiply(TM(...a)), fz = d / 2, L = L_CASA, H = 3.0, t = .3;
-  const VEN = [-2.25, -.35, .95, 2.35], PUE = [.75, 1.8, .26, 2.35];
-  muroHuecos(L, "lad1", at(0, 0, fz - t / 2), w, H, t, [VEN, PUE]);                                  // frente
-  for (const s of [-1, 1]) L.add("lad1", uvMuro(new THREE.BoxGeometry(t, H, d - 2 * t), 3.2), at(s * (w / 2 - t / 2), H / 2, 0));   // costados
-  L.add("lad1", uvMuro(new THREE.BoxGeometry(w, H, t), 3.2), at(0, H / 2, -fz + t / 2));                                           // atrás
-  muroHuecos(L, "lad1", at(0, 0, fz - 4.4), w - 2 * t, H, .16, [[-.5, .5, .26, 2.2]]);                                              // tabique del cuarto
-  L.add("madera", new THREE.BoxGeometry(w - .5, .1, d - .5), at(0, .27, 0)); L.add("viga", new THREE.BoxGeometry(w - .4, .14, d - .4), at(0, H - .07, 0));
-  for (let k = 0; k < 4; k++) L.add("viga", new THREE.BoxGeometry(w - .5, .16, .16), at(0, H - .2, fz - .9 - k * 1.1));
-  // papel de pared adentro del cuarto y zócalo de madera
-  for (const s of [-1, 1]) { L.add("papel", new THREE.BoxGeometry(.02, H - .5, 4.0), at(s * (w / 2 - t - .015), .3 + (H - .5) / 2, fz - 2.3)); L.add("madera", new THREE.BoxGeometry(.04, .2, 4.0), at(s * (w / 2 - t - .03), .4, fz - 2.3)) }
-  L.add("papel", new THREE.BoxGeometry(w - 2 * t - .02, H - .5, .02), at(0, .3 + (H - .5) / 2, fz - 4.3));
-  // la ventana grande (vidrio claro, marco blanco, parteluces) y la puerta
-  const [vx0, vx1, vy0, vy1] = VEN, vw = vx1 - vx0, vh = vy1 - vy0, vc = (vx0 + vx1) / 2;
-  L.add("vidrioC", new THREE.PlaneGeometry(vw, vh), at(vc, vy0 + vh / 2, fz - .1));
-  for (const xx of [vx0, vc - vw / 6, vc + vw / 6, vx1]) L.add("blanco", new THREE.BoxGeometry(.07, vh, .1), at(xx, vy0 + vh / 2, fz - .1)); for (const yy of [vy0, vy0 + vh / 2, vy1]) L.add("blanco", new THREE.BoxGeometry(vw + .07, .07, .1), at(vc, yy, fz - .1));
-  L.add("piedraC", RB1(vw + .4, .1, .36, .03), at(vc, vy0 - .05, fz + .1)); L.add("piedraC", RB1(vw + .44, .2, .16, .03), at(vc, vy1 + .14, fz + .04));
-  L.add("oscuro", new THREE.PlaneGeometry(1.05, 2.09), at(1.275, .26 + 1.045, fz - .2)); L.add("col1", new THREE.BoxGeometry(1.0, 2.05, .06), at(1.275, .26 + 1.03, fz - .12)); L.add("hierro", new THREE.TorusGeometry(.07, .015, 6, 12), at(.95, 1.3, fz - .06));
-  L.add("piedraC", RB1(1.6, .16, .62, .05), at(1.275, .02, fz + .3)); L.add("piedraC", RB1(1.5, .26, .2, .03), at(1.275, 2.48, fz + .04));
-  // cortinas (tela floreada) recogidas a los lados de la ventana, por dentro
-  for (const s of [-1, 1]) L.add("cortina", new THREE.BoxGeometry(.32, vh + .3, .06), at(vc + s * (vw / 2 - .05), vy0 + vh / 2 + .1, fz - .45));
-  return { C, M, at, fz, vc, VEN } })();
+// ---------- LA CASA DE MARGA (vieja, torcida, de tablas grises): la ventana de abajo al frente es la de los hilos y los ovillos (en el detalle)
+const CASA_MARGA_B = (() => { const { x, z, ry, w, d } = CASA_MARGA, y0 = SUELO(x, z) - .06;
+  const C = casaP(x, z, ry, w, d, 5.9, 6450, { muro: "tabla1", techo: "piz2", pendiente: 56, puertaX: 1.45, sinHoja: true, sinPiso0: true, parches: true, farol: false, balcones: 0, HM: TM(x, y0, z, 0, ry, .025), y0 });
+  const M = C.HM, at = (...a) => M.clone().multiply(TM(...a)), L = L_CASA, fz = d / 2, V = [-1.15, 1.05, 1.35, 1.2];   // [x, y, ancho, alto]
+  ventanaPiezas((k, g, m) => L.add(k, g, M.clone().multiply(m)), TM(V[0], V[1], fz), V[2], V[3], rng(6451), "col4", { cerrado: false });
+  L.add("madera", new THREE.BoxGeometry(V[2] + .5, .07, .42), at(V[0], V[1] - .1, fz + .26)); for (const s of [-1, 1]) L.add("madera", new THREE.BoxGeometry(.05, .3, .34), at(V[0] + s * (V[2] / 2 + .15), V[1] - .28, fz + .22, -.6, 0, 0));
+  // ventana atrás y una de costado, chiquitas
+  ventanaPiezas((k, g, m) => L.add(k, g, M.clone().multiply(m)), TM(.8, 1.1, -fz, 0, Math.PI, 0), .8, .9, rng(6452), "col4", { cerrado: true });
+  return { C, M, at, fz, V, w, d } })();
 
-// ---------- LA TIENDA DE MISTER SALLOW (al norte de la plaza, bajo el centro de la campana): angosta, alta, ennegrecida y torcida.
-// Planta baja: el local (vidriera llena de frascos, mostrador, estantes de tapones) y atrás la TRASTIENDA (8,6 × 6,3 × 4,6 m, navegable):
-// ollas de cera hirviendo bajo una campana de humo, mesas largas, moldes, el escritorio con el cajón abierto (el libro y los tapones agujereados).
-// Coordenadas locales: origen en el medio del frente, al piso; +z hacia la plaza (sur). El frente está en z = −16,5 del mundo.
-const L_TIENDA = lote();
-const TI = (() => { const z0 = -16.5, y0 = SUELO(TIENDA[0], z0), MT = TM(TIENDA[0], y0, z0), at = (...a) => MT.clone().multiply(TM(...a)), L = L_TIENDA, W = (x, y, z) => new THREE.Vector3(x, y, z).applyMatrix4(MT).toArray();
-  const ZB = -10.5, HT = 4.6, HS = 3.6;   // fondo de la trastienda, alto de la trastienda y del local
-  // frente del local: vidriera grande a la izquierda, puerta a la derecha
-  const VID = [-2.3, .6, .75, 2.75], PUE = [1.0, 2.1, .22, 2.5];
-  muroHuecos(L, "hollin", at(0, 0, -.15), 5.6, HS, .3, [VID, PUE]);
-  for (const s of [-1, 1]) L.add("hollin", uvMuro(new THREE.BoxGeometry(.3, HS, 3.45), 3.2), at(s * 2.65, HS / 2, -1.875));
-  // tabique local/trastienda (puerta al medio) y la trastienda
-  muroHuecos(L, "hollin", at(0, 0, -3.75), 9.2, HT, .3, [[-.6, .6, .22, 2.4]]);
-  L.add("hollin", uvMuro(new THREE.BoxGeometry(9.2, HT, .3), 3.2), at(0, HT / 2, ZB + .15));
-  muroHuecos(L, "hollin", at(-4.45, 0, (ZB - 3.6) / 2, 0, Math.PI / 2, 0), -ZB - 3.6 - .6, HT, .3, [[-.2, .8, 2.9, 3.8]]);   // costado oeste con ventanita alta
-  L.add("hollin", uvMuro(new THREE.BoxGeometry(.3, HT, -ZB - 3.6 - .6), 3.2), at(4.45, HT / 2, (ZB - 3.6) / 2));
-  // pisos de tablas oscuras, cielorrasos y vigas
-  L.add("maderaN", new THREE.BoxGeometry(5.0, .2, 3.3), at(0, .1, -1.9)); L.add("maderaN", new THREE.BoxGeometry(8.7, .2, -ZB - 4.1), at(0, .1, (ZB - 3.6) / 2 - .1));
-  L.add("maderaN", new THREE.BoxGeometry(5.1, .22, 3.4), at(0, HS + .11, -1.9)); L.add("maderaN", new THREE.BoxGeometry(9.2, .22, -ZB - 3.3), at(0, HT + .11, (ZB - 3.6) / 2));
-  for (let k = 0; k < 6; k++) L.add("viga", new THREE.BoxGeometry(8.7, .24, .22), at(0, HT - .14, -4.5 - k * 1.1));
-  for (let k = 0; k < 3; k++) L.add("viga", new THREE.BoxGeometry(5.0, .2, .2), at(0, HS - .12, -.7 - k * 1.1));
-  // techo de pizarra de la trastienda (a un agua, hacia atrás) con alero
-  { const g = new THREE.BoxGeometry(10.0, .16, -ZB - 2.6); geoUV(g, q => q / 4.4, (a, b, c) => -c / 4.4); L.add("piz1", g, at(0, HT + .5, (ZB - 3.6) / 2 - .3, -.13, 0, 0)) }
-  L.add("hollin", uvMuro(new THREE.BoxGeometry(9.2, .9, .3), 3.2), at(0, HT + .45, -3.75));
-  for (const s of [-1, 1]) { const sh = new THREE.Shape(); sh.moveTo(0, 0); sh.lineTo(-ZB - 3.6, 0); sh.lineTo(0, .9); sh.closePath(); const g = new THREE.ExtrudeGeometry(sh, { depth: .3, bevelEnabled: false }); g.rotateY(Math.PI / 2); L.add("hollin", uvMuro(g, 3.2), at(s * 4.45 - .15, HT, -3.6)) }
-  // los pisos de arriba (torcidos: se inclinan hacia la plaza y hacia el este) con casaP
-  const MU = MT.clone().multiply(TM(0, HS + .22, -1.95)).multiply(TM(0, 0, 0, -.035, .04, .045));
-  const C = casaP(TIENDA[0], z0 - 1.95, 0, 5.6, 3.9, 9.4, 4599, { HM: MU, frontal: true, pendiente: 62, muro: "hollin", techo: "piz1", sinPuerta: true, sinZocalo: true, vidrio: "vidrio", sinBalcon: true, chimX: 1, farol: false, sinEsquinas: true, color: 4 });
-  // la vidriera: vidrio claro, marco de madera negra en paños, zócalo; adentro, gradas con frascos (los recuerdos) y tapones en platitos
-  const [vx0, vx1, vy0, vy1] = VID, vw = vx1 - vx0, vh = vy1 - vy0, vc = (vx0 + vx1) / 2;
-  L.add("vidrioC", new THREE.PlaneGeometry(vw, vh), at(vc, vy0 + vh / 2, -.12));
-  for (const xx of [vx0, vc - vw / 6, vc + vw / 6, vx1]) L.add("maderaN", new THREE.BoxGeometry(.08, vh, .12), at(xx, vy0 + vh / 2, -.1)); for (const yy of [vy0, vy0 + vh * .62, vy1]) L.add("maderaN", new THREE.BoxGeometry(vw + .08, .08, .12), at(vc, yy, -.1));
-  L.add("maderaN", new THREE.BoxGeometry(vw + .5, .14, .34), at(vc, vy0 - .07, .05)); L.add("maderaN", new THREE.BoxGeometry(vw + .6, .34, .18), at(vc, vy1 + .2, .02));
-  for (let k = 0; k < 3; k++) L.add("maderaN", new THREE.BoxGeometry(vw - .1, .05, .32 - k * .02), at(vc, vy0 + .05 + k * .52, -.45 - k * .12));
-  // puerta: hoja de madera negra con ventanita, campanita de la tienda arriba, escalón gastado
-  L.add("oscuro", new THREE.PlaneGeometry(1.1, 2.28), at(1.55, .22 + 1.14, -.25)); L.add("maderaN", new THREE.BoxGeometry(1.04, 2.24, .07), at(1.55, .22 + 1.12, -.2));
-  L.add("vidrio", new THREE.PlaneGeometry(.5, .5), at(1.55, 1.75, -.16)); for (const yy of [.6, 1.25]) L.add("maderaN", new THREE.BoxGeometry(.8, .1, .04), at(1.55, yy, -.15));
-  L.add("hierro", new THREE.TorusGeometry(.08, .016, 6, 12), at(1.22, 1.25, -.14)); L.add("piedraC", RB1(1.5, .18, .7, .06), at(1.55, .05, .3));
-  L.add("hierro", new THREE.BoxGeometry(.03, .03, .35), at(1.55, 2.6, -.0)); L.add("laton", new THREE.LatheGeometry([[0, .12], [.05, .12], [.08, .06], [.1, -.02], [.12, -.05], [0, -.05]].map(q => new THREE.Vector2(q[0], q[1])), 12), at(1.55, 2.5, .17));
-  // el cartel colgante «SALLOW · WAX»: ménsula de hierro con volutas, dos cadenitas, tabla vieja
-  L.add("hierro", new THREE.BoxGeometry(.05, .05, 1.4), at(-2.55, 4.3, .7)); L.add("hierro", new THREE.TorusGeometry(.22, .02, 5, 14, Math.PI * 1.5), at(-2.55, 4.05, .3, 0, Math.PI / 2, 0)); { const [g, m] = cilEntre([-2.55, 3.7, 0], [-2.55, 4.28, 1.0], .02, 5); L.add("hierro", g, MT.clone().multiply(m)) }
-  for (const zz of [.95, 1.25]) { for (let k = 0; k < 5; k++) L.add("hierro", new THREE.TorusGeometry(.03, .006, 4, 8), at(-2.55, 4.24 - k * .055, zz, 0, k % 2 ? Math.PI / 2 : 0, 0)) }
-  const CARTEL = at(-2.55, 3.62, 1.1, 0, Math.PI / 2, .05);
-  // la vela del cartel y velas derretidas en el alféizar de la vidriera y en el escalón (grupo 1: se inclinan hacia Sallow)
-  const vel = (x, y, z, h = .2) => VELAS_B.push({ p: W(x, y, z), h, g: 1 });
-  for (let k = 0; k < 9; k++) vel(vx0 + .15 + k * (vw - .3) / 8 + (hash2(k, 3) - .5) * .08, vy0, .12 + (hash2(k, 5) - .5) * .06, .06 + hash2(k, 9) * .2);
-  for (let k = 0; k < 7; k++) vel(.85 + (k % 2) * 1.35 + (hash2(k, 1) - .5) * .2, .14, .45 + (hash2(k, 2) - .5) * .3, .08 + hash2(k, 4) * .22);
-  // puntos útiles (mundo)
-  const P = { puerta: W(1.55, 0, .9), vidriera: W(vc, 1.6, .9), local: W(0, .3, -1.9), interior: W(0, .3, -7), olla: W(-1.3, 1.6, ZB + 1.0), cajon: W(-3.55, .78, -5.0), libro: W(-3.5, .84, -5.0), mesa: W(-.8, .95, -6.3), frascos: W(4.05, 1.7, -7.2), cartel: CARTEL.clone().multiply(TM(0, 0, 0)).elements.slice(12, 15) };
-  rectAdd({ x: TIENDA[0], z: z0 - 1.8, ry: 0, w: 6.0, d: 3.9, tienda: 1, hueco: 1 }); rectAdd({ x: TIENDA[0], z: (z0 - 3.6 + z0 + ZB) / 2, ry: 0, w: 9.6, d: -ZB - 3.3, tienda: 1, hueco: 1 });
-  return { MT, at, W, ZB, HT, HS, VID, P, C, CARTEL, vel } })();
+// ---------- LA CASA DE FATHER CRANE (junto a la iglesia, al este): piedra clara de sillares, tres pisos, balcones, la puerta al sur con
+// escalinata, la ÚNICA puerta con picaporte (la hoja va en el detalle) y al lado el gancho con su abrigo negro
+const CASA_CRANE_B = (() => { const { x, z, ry, w, d } = CASA_CRANE;
+  const C = casaP(x, z, ry, w, d, 9.1, 6501, { muro: "sillarC", techo: "piz1", puertaX: 0, sinHoja: true, farol: false, balcones: .75, pendiente: 50, exenta: true, color: 2 });
+  const M = C.HM, at = (...a) => M.clone().multiply(TM(...a)), L = L_CASA, fz = d / 2;
+  // escalinata de tres escalones, dos faroles de pared, molduras de la puerta más ricas (frontón chico de piedra)
+  for (let k = 0; k < 3; k++) L.add("sillarC", RB1(2.6 - k * .3, .17, 1.4 - k * .35, .02), at(0, .08 + k * .17 - .1, fz + .75 - k * .17));
+  L.add("sillarC", RB1(1.9, .14, .34, .02), at(0, C.dh + .38, fz + .12)); { const sh = new THREE.Shape(); sh.moveTo(-1.05, 0); sh.lineTo(1.05, 0); sh.lineTo(0, .55); sh.closePath(); L.add("sillarC", new THREE.ExtrudeGeometry(sh, { depth: .26, bevelEnabled: false }), at(0, C.dh + .45, fz)) }
+  for (const s of [-1, 1]) { L.add("sillarC", RB1(.26, C.dh + .2, .2, .02), at(s * (C.dw / 2 + .3), (C.dh + .2) / 2, fz + .08)) }
+  return { C, M, at, fz, w, d } })();
 
-// ---------- LA FUENTE de la plaza: pileta octogonal de piedra tallada (Ø 9,2 m) con escalón, borde moldurado; en el frente y en el fondo la
-// inscripción tallada en relieve hundido «PLUG YOUR EARS.» / «REMEMBER.» (geometría de verdad, no solo textura); fuste central con una
-// taza alta y arriba una estatua de piedra: una mujer que se tapa los oídos. Agua con chorros desde la taza.
-const FUENTE = (() => { const R = 4.6, ap = R * Math.cos(Math.PI / 8), lado = 2 * R * Math.sin(Math.PI / 8), HB = 1.0, L = L_PIEDRA, G = new THREE.Group(); scene.add(G);
-  const oct = (rr, h, y, key = "fuente") => { const g = new THREE.CylinderGeometry(rr, rr, h, 8); g.rotateY(Math.PI / 8); L.add(key, uvMuro(g, 2.4), TM(0, y + h / 2, 0)) };
-  oct(5.3, .22, -.05, "corona"); oct(5.0, .18, .17, "corona");                          // escalones
-  // pared de la pileta: anillo octogonal con espesor .45
-  { const sh = new THREE.Shape(), ho = new THREE.Path(); for (let k = 0; k <= 8; k++) { const a = k / 8 * Math.PI * 2 + Math.PI / 8, a2 = a; (k ? sh.lineTo.bind(sh) : sh.moveTo.bind(sh))(Math.cos(a) * R, Math.sin(a) * R); (k ? ho.lineTo.bind(ho) : ho.moveTo.bind(ho))(Math.cos(a2) * (R - .5), Math.sin(a2) * (R - .5)) } sh.holes.push(ho);
-    const g = new THREE.ExtrudeGeometry(sh, { depth: HB, bevelEnabled: false }); g.rotateX(-Math.PI / 2); L.add("fuente", uvMuro(g, 2.4), TM(0, .3, 0)) }
-  // molduras: borde de arriba que sobresale y bocel abajo (anillos octogonales)
-  for (const [rr, h, y] of [[R + .14, .16, .3 + HB - .02], [R + .05, .06, .3 + HB - .1], [R + .08, .12, .3]]) { const sh = new THREE.Shape(), ho = new THREE.Path(); for (let k = 0; k <= 8; k++) { const a = k / 8 * Math.PI * 2 + Math.PI / 8; (k ? sh.lineTo.bind(sh) : sh.moveTo.bind(sh))(Math.cos(a) * rr, Math.sin(a) * rr); (k ? ho.lineTo.bind(ho) : ho.moveTo.bind(ho))(Math.cos(a) * (R - .56), Math.sin(a) * (R - .56)) } sh.holes.push(ho);
-    const g = new THREE.ExtrudeGeometry(sh, { depth: h, bevelEnabled: true, bevelThickness: .03, bevelSize: .03, bevelSegments: 2 }); g.rotateX(-Math.PI / 2); L.add("corona", uvMuro(g, 2.4), TM(0, y, 0)) }
-  // pilastras en las esquinas del octógono
-  for (let k = 0; k < 8; k++) { const a = k / 8 * Math.PI * 2 + Math.PI / 8; L.add("corona", RB1(.36, HB - .1, .36, .04), TM(Math.cos(a) * (R + .06), .3 + HB / 2, Math.sin(a) * (R + .06), 0, -a, 0)) }
-  // las inscripciones: placa con relieve hundido (malla desplazada por la máscara de las letras), en la cara sur (+z) y la norte (−z)
-  const T_INSC = (() => { const c = mk(2048, 560), g = c.getContext("2d"); g.fillStyle = "#000"; g.fillRect(0, 0, 2048, 560); g.fillStyle = "#fff"; g.textAlign = "center"; g.textBaseline = "middle";
-    g.font = "bold 190px Georgia, 'Times New Roman', serif"; g.fillText("PLUG YOUR EARS.", 1024, 158, 1960); g.font = "bold 200px Georgia, 'Times New Roman', serif"; g.fillText("REMEMBER.", 1024, 400, 1900);
-    g.strokeStyle = "#fff"; g.lineWidth = 7; g.strokeRect(22, 18, 2004, 524); return g.getImageData(0, 0, 2048, 560).data })();
-  const muestra = (u, v) => { const X = Math.min(2047, Math.max(0, u * 2047)), Y = Math.min(559, Math.max(0, (1 - v) * 559)), x0 = X | 0, y0 = Y | 0, fx = X - x0, fy = Y - y0, at_ = (x, y) => T_INSC[(Math.min(559, y) * 2048 + Math.min(2047, x)) * 4] / 255;
-    return lerp(lerp(at_(x0, y0), at_(x0 + 1, y0), fx), lerp(at_(x0, y0 + 1), at_(x0 + 1, y0 + 1), fx), fy) };
-  const placa = (() => { const PW = lado - .5, PH = .76, NX = 420, NY = 110, pos = [], uv = [], col = [], idx = [];
-    for (let j = 0; j <= NY; j++) for (let i = 0; i <= NX; i++) { const u = i / NX, v = j / NY, m = sst(.25, .75, muestra(u, v)), x = (u - .5) * PW, y = (v - .5) * PH; pos.push(x, y, -.04 * m); uv.push(u * PW / 2.4, v * PH / 2.4); const k = 1 - .8 * m; col.push(k, k * .97, k * .92) }
-    for (let j = 0; j < NY; j++) for (let i = 0; i < NX; i++) { const a = j * (NX + 1) + i, b = a + NX + 1; idx.push(a, a + 1, b, b, a + 1, b + 1) }
-    const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2)); g.setAttribute("color", new THREE.Float32BufferAttribute(col, 3)); g.setIndex(idx); g.computeVertexNormals(); return g })();
-  const M_INSC = new THREE.MeshStandardMaterial({ map: T_ROCA.c, bumpMap: T_ROCA.z, bumpScale: 2, roughness: .9, vertexColors: true, color: "#d2c8b2" });
-  for (const a of [Math.PI / 2, -Math.PI / 2]) { const m = new THREE.Mesh(placa, M_INSC); m.position.set(Math.cos(a) * (ap + .035), .3 + HB / 2 + .02, Math.sin(a) * (ap + .035)); m.rotation.y = Math.atan2(Math.cos(a), Math.sin(a)); m.castShadow = false; m.receiveShadow = true; G.add(m) }
-  // adentro: fuste, taza alta, estatua
-  oct(.95, 2.0, .3, "fuente"); oct(1.15, .2, .3, "corona"); oct(1.1, .16, 2.18, "corona");
-  { const g = new THREE.LatheGeometry([[0, 0], [.7, .02], [1.6, .22], [2.05, .42], [2.1, .58], [1.95, .6], [1.5, .46], [0, .44]].map(q => new THREE.Vector2(q[0], q[1])), 32); L.add("fuente", g, TM(0, 2.3, 0)) }
-  { const g = new THREE.LatheGeometry([[0, 0], [.55, 0], [.62, .1], [.42, .3], [.38, .55], [.5, .7], [.52, .8], [0, .8]].map(q => new THREE.Vector2(q[0], q[1])), 16); L.add("corona", g, TM(0, 2.74, 0)) }
-  // la estatua (1,9 m): túnica larga, la cabeza un poco gacha, las dos manos tapando las orejas, los codos para afuera
-  { const B = TM(0, 3.54, 0, 0, 0, 0), at = (...a) => B.clone().multiply(TM(...a)), K = "estatua";
-    L.add(K, new THREE.CylinderGeometry(.28, .5, 1.15, 12), at(0, .58, 0)); L.add(K, new THREE.CylinderGeometry(.3, .3, .5, 12), at(0, 1.38, 0, 0, 0, 0, 1, 1, .78)); L.add(K, new THREE.SphereGeometry(.31, 12, 8), at(0, 1.6, 0, 0, 0, 0, 1.05, .7, .8));
-    L.add(K, new THREE.CylinderGeometry(.08, .1, .14, 8), at(0, 1.72, 0)); L.add(K, RB(.36, .4, .38, .1, 2), at(0, 1.96, .02, .25, 0, 0));
-    L.add(K, new THREE.SphereGeometry(.2, 10, 8), at(0, 2.02, -.08, 0, 0, 0, 1.05, 1.1, 1.1));   // pelo atado
-    for (const s of [-1, 1]) { const hom = [s * .32, 1.62, 0], codo = [s * .55, 1.74, .12], mano = [s * .2, 1.98, .04]; for (const [a, b] of [[hom, codo], [codo, mano]]) { const [g, m] = cilEntre(a, b, .075, 8, .065); L.add(K, g, B.clone().multiply(m)) }
-      L.add(K, RB(.08, .2, .16, .04, 2), at(s * .2, 1.97, .03, 0, 0, s * .15)); L.add(K, new THREE.SphereGeometry(.08, 8, 6), at(s * .55, 1.74, .12)) }
-    for (let k = 0; k < 7; k++) { const a = k / 7 * Math.PI * 2; L.add(K, new THREE.CylinderGeometry(.04, .07, 1.0, 5), at(Math.cos(a) * .4, .55, Math.sin(a) * .4, 0, 0, -Math.cos(a) * .12)) } }
-  // agua: pileta grande y taza (planos con brillo), chorros que caen de la taza
-  const M_AGUA_F = new THREE.MeshStandardMaterial({ color: "#2e4a4a", roughness: .06, metalness: .4, envMap: ENV_METAL_P, envMapIntensity: .9, transparent: true, opacity: .9 });
-  { const g = new THREE.CircleGeometry(R - .5, 8); g.rotateX(-Math.PI / 2); g.rotateY(Math.PI / 8); const m = new THREE.Mesh(g, M_AGUA_F); m.position.y = .3 + HB - .22; m.receiveShadow = true; G.add(m) }
-  { const g = new THREE.CircleGeometry(1.92, 32); g.rotateX(-Math.PI / 2); const m = new THREE.Mesh(g, M_AGUA_F); m.position.y = 2.3 + .55; G.add(m) }
-  const M_CHORRO = new THREE.MeshStandardMaterial({ color: "#a8c8c8", roughness: .1, metalness: .2, transparent: true, opacity: .55, envMap: ENV_METAL_P, envMapIntensity: 1, depthWrite: false });
-  for (let k = 0; k < 8; k++) { const a = k / 8 * Math.PI * 2 + .2, P = [[Math.cos(a) * 2.08, 2.86, Math.sin(a) * 2.08], [Math.cos(a) * 2.35, 2.5, Math.sin(a) * 2.35], [Math.cos(a) * 2.5, 1.9, Math.sin(a) * 2.5], [Math.cos(a) * 2.55, 1.06, Math.sin(a) * 2.55]];
-    const m = new THREE.Mesh(tubo(P, .045, .07, 6, 12), M_CHORRO); G.add(m) }
-  // velas alrededor: en el borde de la pileta y en los escalones (grupo 2)
-  { const r = rng(4470); for (let k = 0; k < 64; k++) { const a = r() * Math.PI * 2, rr = r() < .55 ? R + (r() - .5) * .3 : 5.1 + r() * .15, y = rr > 4.95 ? .35 : .3 + HB + .14; if (Math.abs(Math.cos(a) * rr) < 2.1) continue;
-    VELAS_B.push({ p: [Math.cos(a) * rr, y, Math.sin(a) * rr], h: .08 + r() * .3, g: 2, gorda: r() < .4 }) } }
-  rectAdd({ x: 0, z: 0, ry: 0, w: 10.6, d: 10.6, fuente: 1 });
-  return { G, R, M_AGUA_F } })();
+
+// ================= LA IGLESIA: nave de piedra gris (hueca, se puede entrar), contrafuertes, ventanas ojivales con vitrales que brillan,
+// techo de pizarra empinado, y al frente el CAMPANARIO: base hueca con la puerta a la plaza (adentro cuelga la cuerda), el campanario con
+// arcos abiertos (la campana se ve), cornisa, y la aguja octogonal de pizarra con la cruz de hierro (punta a 21 m, más baja que la Tejedora)
+const M_SILLAR = new THREE.MeshStandardMaterial({ map: T_SILLAR[0], bumpMap: T_SILLAR[1], bumpScale: 4, roughness: .9, color: "#a8a49c" });
+const M_SILLAR_O = new THREE.MeshStandardMaterial({ map: T_SILLAR[0], bumpMap: T_SILLAR[1], bumpScale: 4, roughness: .9, color: "#77736c" });
+// vitral: una ojiva con plomos y vidrios de colores (afuera: oscuro con reflejo; la luz de las velas de adentro lo hace brillar);
+// las esquinas fuera del arco van pintadas de piedra
+const T_VITRAL = (seed, ancho = 1) => tex(256, 512, (g, w, h) => { const r = rng(seed); g.fillStyle = "#5a5650"; g.fillRect(0, 0, w, h);
+  for (let k = 0; k < 2000; k++) { g.fillStyle = r() < .5 ? "rgba(30,28,24,.3)" : "rgba(200,195,185,.15)"; g.fillRect(r() * w, r() * h, 2, 2) }
+  g.save(); g.beginPath(); g.moveTo(8, h); g.lineTo(8, h * .3); g.quadraticCurveTo(8, 10, w / 2, 6); g.quadraticCurveTo(w - 8, 10, w - 8, h * .3); g.lineTo(w - 8, h); g.closePath(); g.clip();
+  const C = ["#8a1a1a", "#1a3a8a", "#c8a020", "#2a6a3a", "#6a2a7a", "#c86a1a", "#2a5a9a", "#a02a2a"]; for (let y = 0; y < h; y += 34 + r() * 20) for (let x = 0; x < w; x += 30 + r() * 26) { g.fillStyle = C[r() * C.length | 0]; g.fillRect(x, y, 60, 60) }
+  g.strokeStyle = "#0e0c0a"; g.lineWidth = 4; for (let k = 0; k < 40; k++) { g.beginPath(); const x = r() * w, y = r() * h; g.moveTo(x, y); g.lineTo(x + (r() - .5) * 140, y + (r() - .5) * 140); g.stroke() }
+  for (let y = 0; y < h; y += 46) { g.beginPath(); g.moveTo(0, y); g.lineTo(w, y + (r() - .5) * 10); g.stroke() } g.lineWidth = 6; g.beginPath(); g.moveTo(w / 2, 0); g.lineTo(w / 2, h); g.stroke();
+  // una figura (un santo con aureola) en el medio, en siluetas de color
+  g.fillStyle = "#e8d090"; g.beginPath(); g.arc(w / 2, h * .3, 26, 0, 7); g.fill(); g.fillStyle = "#d8b080"; g.beginPath(); g.arc(w / 2, h * .3, 14, 0, 7); g.fill(); g.fillStyle = "#3a2a6a"; g.beginPath(); g.moveTo(w / 2 - 30, h * .9); g.lineTo(w / 2 - 16, h * .36); g.lineTo(w / 2 + 16, h * .36); g.lineTo(w / 2 + 30, h * .9); g.fill(); g.stroke();
+  const gr = g.createRadialGradient(w / 2, h * .5, 10, w / 2, h * .5, h * .7); gr.addColorStop(0, "rgba(255,230,180,.2)"); gr.addColorStop(1, "rgba(0,0,0,.35)"); g.fillStyle = gr; g.fillRect(0, 0, w, h); g.restore();
+  g.strokeStyle = "#2a2622"; g.lineWidth = 10; g.beginPath(); g.moveTo(8, h); g.lineTo(8, h * .3); g.quadraticCurveTo(8, 10, w / 2, 6); g.quadraticCurveTo(w - 8, 10, w - 8, h * .3); g.lineTo(w - 8, h); g.stroke() });
+const M_VITRAL = [1, 2, 3].map(k => { const t = T_VITRAL(4800 + k); return new THREE.MeshStandardMaterial({ map: t, emissive: "#ffffff", emissiveMap: t, emissiveIntensity: .55, roughness: .2, metalness: .2, envMap: ENV_NOCHE_P, envMapIntensity: .6 }) });
+const IGLESIA_B = (() => { const L = L_PIEDRA, { x: cx, z: cz, w, d, alto: Hn } = IGLESIA_T, z0 = cz + d / 2, z1 = cz - d / 2, t = .8, y0 = SUELO(cx, cz) - .05, at = (...a) => TM(cx, y0, 0).multiply(TM(...a));
+  const VENT_Z = [-79.5, -84.5, -89.5, -94.5], VW = .9, VY = [1.9, 4.6];
+  // muros de la nave (huecos de las ventanas ojivales); el frente: hueco grande que da a la base de la torre; el fondo: la ventana del altar
+  for (const s of [-1, 1]) { const M = at(s * (w / 2 - t / 2), 0, cz, 0, s * Math.PI / 2, 0); muroHuecos(L, "sillar", M, d, Hn, t, VENT_Z.map(vz => { const lx = s > 0 ? -(vz - cz) : (vz - cz); return [lx - VW / 2, lx + VW / 2, VY[0], VY[1]] }), 3.2) }
+  muroHuecos(L, "sillar", at(0, 0, z0 - t / 2), w - 2 * t + .02, Hn, t, [[-1.1, 1.1, 0, 3.0]], 3.2);
+  muroHuecos(L, "sillar", at(0, 0, z1 + t / 2, 0, Math.PI, 0), w - 2 * t + .02, Hn, t, [[-.85, .85, 2.0, 5.0]], 3.2);
+  // zócalo más oscuro (humedad) y cornisa
+  L.add("sillarO", uvMuro(new THREE.BoxGeometry(w + .3, .8, d + .3), 3.2), at(0, .2, cz)); L.add("corona", RB1(w + .5, .25, d + .5, .04), at(0, Hn + .05, cz));
+  // contrafuertes escalonados entre las ventanas
+  for (const s of [-1, 1]) for (const bz of [-77, -82, -87, -92, -97, -100.4]) { L.add("sillar", uvMuro(new THREE.BoxGeometry(.9, Hn - 1.2, 1), 3.2), at(s * (w / 2 + .4), (Hn - 1.2) / 2, bz)); L.add("sillar", uvMuro(new THREE.BoxGeometry(.55, 1.6, .9), 3.2), at(s * (w / 2 + .3), Hn - .4, bz));
+    L.add("corona", RB1(1.0, .14, 1.1, .03), at(s * (w / 2 + .42), Hn - 1.18, bz, 0, 0, s * .5)); L.add("corona", RB1(.66, .12, 1.0, .03), at(s * (w / 2 + .3), Hn + .42, bz, 0, 0, s * .5)) }
+  // vitrales (por afuera y por adentro) con su marco de piedra
+  const vit = (M, vw, vh, k) => { L.add("vitral" + k, new THREE.PlaneGeometry(vw, vh), M.clone().multiply(TM(0, vh / 2, 0))); L.add("vitral" + k, new THREE.PlaneGeometry(vw, vh), M.clone().multiply(TM(0, vh / 2, -t + .02, 0, Math.PI, 0)));
+    for (const sx of [-1, 1]) L.add("corona", RB1(.14, vh + .1, .2, .03), M.clone().multiply(TM(sx * (vw / 2 + .05), vh / 2, .06))); L.add("corona", RB1(vw + .3, .12, .3, .03), M.clone().multiply(TM(0, -.06, .1))) };
+  for (const s of [-1, 1]) VENT_Z.forEach((vz, i) => vit(at(s * (w / 2 + .01), VY[0], vz, 0, s * Math.PI / 2, 0), VW, VY[1] - VY[0], i % 3));
+  vit(at(0, 2.0, z1 - .01, 0, Math.PI, 0), 1.7, 3.0, 0);
+  // el techo de pizarra (empinado) y los hastiales de piedra
+  { const ang = 50 * Math.PI / 180, span = w, rh = span / 2 * Math.tan(ang), ovz = .5, S = (span / 2 + ovz) / Math.cos(ang), Lt = d + .8;
+    for (const s of [1, -1]) { const g = new THREE.BoxGeometry(S, .2, Lt); geoUV(g, (px, py, pz) => px / 4.4, (px, py, pz) => pz / 4.4); const ym = Hn + rh - (span / 2 + ovz) * Math.tan(ang) / 2 + .12, xm = s * (span / 2 + ovz) / 2; L.add("piz", g, at(xm, ym, cz, 0, 0, -s * ang)) }
+    const sh = new THREE.Shape(); sh.moveTo(-span / 2, 0); sh.lineTo(span / 2, 0); sh.lineTo(0, rh); sh.closePath(); for (const zz of [z0 - t, z1]) L.add("sillar", uvMuro(new THREE.ExtrudeGeometry(sh, { depth: t, bevelEnabled: false }), 3.2), at(0, Hn, zz));
+    L.add("corona", new THREE.CylinderGeometry(.16, .16, Lt + .1, 8), at(0, Hn + rh + .14, cz, Math.PI / 2, 0, 0));
+    // cruz de piedra en la punta del hastial de atrás
+    L.add("corona", RB1(.2, 1.2, .2, .03), at(0, Hn + rh + .7, z1 + .3)); L.add("corona", RB1(.8, .2, .2, .03), at(0, Hn + rh + .95, z1 + .3)) }
+  // piso de losas y adentro: el techo de madera (vigas y tablas a la vista)
+  L.add("losas", new THREE.BoxGeometry(w - 2 * t, .1, d - 2 * t), at(0, .05, cz)); for (let k = 0; k < 12; k++) L.add("madera", new THREE.BoxGeometry(w - 2 * t, .22, .22), at(0, Hn - .2, z0 - 1.6 - k * 2));
+  L.add("madera", new THREE.BoxGeometry(w - 2 * t, .06, d - 2 * t), at(0, Hn + .02, cz));
+  // ---- el campanario
+  const T = TORRE_T, tl = T.lado, tt = .7, tz = T.z, TB = 3.6, CB0 = 10.6, CB1 = 13.6, AT = (...a) => TM(T.x, y0, 0).multiply(TM(...a));
+  // base hueca: puerta al sur (a la plaza), abertura al norte (a la nave)
+  muroHuecos(L, "sillar", AT(0, 0, tz + tl / 2 - tt / 2), tl, TB, tt, [[-.9, .9, 0, 2.9]], 3.2); muroHuecos(L, "sillar", AT(0, 0, tz - tl / 2 + tt / 2), tl, TB, tt, [[-1.1, 1.1, 0, 3.0]], 3.2);
+  for (const s of [-1, 1]) L.add("sillar", uvMuro(new THREE.BoxGeometry(tt, TB, tl - 2 * tt), 3.2), AT(s * (tl / 2 - tt / 2), TB / 2, tz));
+  L.add("sillar", uvMuro(new THREE.BoxGeometry(tl, CB0 - TB, tl), 3.2), AT(0, TB + (CB0 - TB) / 2, tz)); L.add("losas", new THREE.BoxGeometry(tl - 2 * tt, .1, tl - 2 * tt), AT(0, .05, tz));
+  L.add("sillarO", uvMuro(new THREE.BoxGeometry(tl + .3, .9, tl + .3), 3.2), AT(0, .25, tz));
+  for (const yy of [TB, 7.2, CB0]) L.add("corona", RB1(tl + .3, .22, tl + .3, .04), AT(0, yy, tz));
+  // ventanitas (saeteras) de la torre y un óculo con reloj parado
+  for (const yy of [5.0, 8.4]) L.add("oscuro", new THREE.PlaneGeometry(.22, .9), AT(0, yy, tz + tl / 2 + .01));
+  L.add("corona", new THREE.TorusGeometry(.62, .1, 8, 24), AT(0, 9.3, tz + tl / 2 + .04)); L.add("blanco", new THREE.CircleGeometry(.56, 24), AT(0, 9.3, tz + tl / 2 + .02)); L.add("hierro", new THREE.BoxGeometry(.04, .42, .02), AT(0, 9.44, tz + tl / 2 + .05, 0, 0, .9)); L.add("hierro", new THREE.BoxGeometry(.04, .3, .02), AT(0, 9.38, tz + tl / 2 + .06, 0, 0, -.4));
+  // el campanario abierto: pilares en las esquinas y un parteluz en cada cara, arcos arriba
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) L.add("sillar", uvMuro(new THREE.BoxGeometry(.9, CB1 - CB0, .9), 3.2), AT(sx * (tl / 2 - .45), CB0 + (CB1 - CB0) / 2, tz + sz * (tl / 2 - .45)));
+  for (const [ax, az, ry] of [[0, tl / 2, 0], [0, -tl / 2, Math.PI], [tl / 2, 0, Math.PI / 2], [-tl / 2, 0, -Math.PI / 2]]) { const M = AT(ax, 0, tz + az, 0, ry, 0);
+    L.add("sillar", uvMuro(new THREE.BoxGeometry(.4, CB1 - CB0, .5), 3.2), M.clone().multiply(TM(0, CB0 + (CB1 - CB0) / 2, -.25))); L.add("corona", RB1(tl - 1.6, .3, .6, .03), M.clone().multiply(TM(0, CB0 + .15, -.25)));
+    for (const s of [-1, 1]) { const sh = new THREE.Shape(), aw = (tl - 2.2) / 2; sh.moveTo(-aw / 2, 0); sh.lineTo(-aw / 2, .9); sh.lineTo(aw / 2, .9); sh.lineTo(aw / 2, 0); sh.quadraticCurveTo(aw / 2, .62, 0, .84); sh.quadraticCurveTo(-aw / 2, .62, -aw / 2, 0); sh.closePath();
+      L.add("sillar", new THREE.ExtrudeGeometry(sh, { depth: .5, bevelEnabled: false }), M.clone().multiply(TM(s * (aw / 2 + .2), CB1 - .9, -.5))) }
+    // barandita de hierro en cada arco
+    for (let q = 0; q < 9; q++) L.add("hierro", new THREE.CylinderGeometry(.02, .02, .8, 5), M.clone().multiply(TM(-tl / 2 + 1.1 + q * (tl - 2.2) / 8, CB0 + .7, -.1))); L.add("hierro", new THREE.BoxGeometry(tl - 2.2, .04, .04), M.clone().multiply(TM(0, CB0 + 1.1, -.1))) }
+  L.add("sillar", uvMuro(new THREE.BoxGeometry(tl + .2, .45, tl + .2), 3.2), AT(0, CB1 + .22, tz)); L.add("corona", RB1(tl + .6, .2, tl + .6, .04), AT(0, CB1 + .5, tz));
+  // pináculos en las esquinas y la aguja octogonal de pizarra con la cruz y el gallo de hierro
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) { L.add("corona", RB1(.4, .8, .4, .03), AT(sx * (tl / 2), CB1 + 1, tz + sz * (tl / 2))); L.add("piz", new THREE.ConeGeometry(.3, 1.3, 4), AT(sx * (tl / 2), CB1 + 2.05, tz + sz * (tl / 2), 0, Math.PI / 4, 0)) }
+  { const hA = T.punta - 1.1 - (CB1 + .6), g = new THREE.ConeGeometry(tl / 2 - .15, hA, 8, 6); geoUV(g, (px, py, pz) => (Math.atan2(pz, px) + Math.PI) * 1.2, (px, py) => py / 2.2); L.add("piz", g, AT(0, CB1 + .6 + hA / 2, tz, 0, Math.PI / 8, 0));
+    L.add("hierro", new THREE.CylinderGeometry(.05, .06, 1.3, 6), AT(0, T.punta - .65, tz)); L.add("hierro", new THREE.BoxGeometry(.7, .07, .07), AT(0, T.punta - .35, tz)); L.add("hierro", new THREE.SphereGeometry(.1, 8, 6), AT(0, T.punta - 1.05, tz));
+    // gallo de la veleta (silueta de chapa)
+    const sg = new THREE.Shape(); [[0, 0], [.25, .05], [.32, .2], [.28, .35], [.18, .32], [.12, .18], [-.1, .16], [-.28, .32], [-.3, .12], [-.15, 0]].forEach(([a, b], i) => i ? sg.lineTo(a, b) : sg.moveTo(a, b)); sg.closePath();
+    L.add("hierro", new THREE.ExtrudeGeometry(sg, { depth: .02, bevelEnabled: false }), AT(0, T.punta - .2, tz, 0, .6, 0)) }
+  rectAdd({ x: cx, z: cz, w: w + 1.8, d: d + .4, ry: 0, iglesia: 1 }); rectAdd({ x: T.x, z: tz, w: tl + .3, d: tl + .3, ry: 0, torre: 1 });
+  const W = (x, y, z) => [x, y0 + y, z];
+  return { y0, Hn, t, TB, CB0, CB1, puerta: W(0, 0, tz + tl / 2 + .6), puertaAdentro: W(0, 0, tz), nave: W(0, 0, cz), altar: W(0, 0, z1 + 2.4), cuerda: W(.7, 0, tz), VENT_Z } })();
+
 
 // ---------- se cierran los lotes de casas y de piedra
-CASA_MATS.papel = M_PAPEL; CASA_MATS.cortina = M_CORTINA;
-const CASAS_M = L_CASA.fin(scene, CASA_MATS); ["oscuro", "vidrio", "ventana", "vidrioC", "luz"].forEach(k => { if (CASAS_M[k]) CASAS_M[k].castShadow = false });
+const CASAS_M = L_CASA.fin(scene, CASA_MATS); ["oscuro", "vidrio", "ventana", "vidrioC", "luz", "marca0", "marca1", "marca2", "marca3", "marca4", "marca5"].forEach(k => { if (CASAS_M[k]) CASAS_M[k].castShadow = false });
 const CASAS_LEJOS_M = L_LEJOS.fin(scene, CASA_MATS); ["oscuro", "ventana"].forEach(k => { if (CASAS_LEJOS_M[k]) CASAS_LEJOS_M[k].castShadow = false });
-const M_FUENTE = new THREE.MeshStandardMaterial({ map: T_SILLAR[0], bumpMap: T_SILLAR[1], bumpScale: 3, roughness: .85, color: "#e0d6c2" });
-const M_ESTATUA = new THREE.MeshStandardMaterial({ map: T_ROCA.c, bumpMap: T_ROCA.z, bumpScale: 2.5, roughness: .8, color: "#c8c0b0" });
-const PIEDRA_M = L_PIEDRA.fin(scene, { rocaT: M_ROCA_G, muroT: M_MURO_T, corona: M_CORONA, escalon: M_ESCALON, fuente: M_FUENTE, estatua: M_ESTATUA });
-// piedras de coronamiento del parapeto (instanciadas, cada una un poco distinta)
-{ const m = new THREE.InstancedMesh(RB(1, 1, 1, .05, 1), M_CORONA, CORONAS.length), cc = new THREE.Color(); CORONAS.forEach(([x, y, z, ry, la], i) => { dummy.position.set(x, y + .02 + (hash2(i, 1) - .5) * .02, z); dummy.rotation.set(0, ry, (hash2(i, 2) - .5) * .02); dummy.scale.set(.58, .16, la); dummy.updateMatrix(); m.setMatrixAt(i, dummy.matrix); const v = .82 + hash2(i, 3) * .26; m.setColorAt(i, cc.setRGB(v, v * .98, v * .94)) }); m.castShadow = true; m.receiveShadow = true; scene.add(m) }
+const PIEDRA_M = L_PIEDRA.fin(scene, { corona: M_CORONA, sillar: M_SILLAR, sillarO: M_SILLAR_O, piz: M_PIZ[0], vitral0: M_VITRAL[0], vitral1: M_VITRAL[1], vitral2: M_VITRAL[2], oscuro: M_OSCURO, hierro: M_HIERRO, madera: M_MADERA, losas: M_LOSAS, blanco: M_BLANCO_P });
+["vitral0", "vitral1", "vitral2", "oscuro"].forEach(k => { if (PIEDRA_M[k]) PIEDRA_M[k].castShadow = false });
