@@ -34,7 +34,7 @@ const SHOTS = {
   // ---- la ciudad al mediodía: la campana, las cadenas, la sombra
   [I.rule]: [sh(0, CC("aereaDia"), () => add(CAMS_CAMPANA.aereaDia.p, [20, -10, -20]), CC("aereaDia", "l"), null, 50)],
   [I.cost]: [sh(0, [7.5, 1.7, 9.5], [7, 1.8, 9], [0, 3, -2], null, 56), sh(3, FR(VECINOS[0], 1.3, .1), FR(VECINOS[0], 1.15, .05), HDc(VECINOS[0]), null, 46, { tr: "barrido" })],
-  [I.nobody]: [sh(0, [0, 1.7, 15], [0, 1.6, 14], [0, 120, 80], null, 62)],
+  [I.nobody]: [sh(0, [0, 1.7, 19], [0, 1.8, 18], [0, 60, 40], null, 64)],
   [I.hangs]: [sh(0, CC("aerea"), () => add(CAMS_CAMPANA.aerea.p, [-30, 10, -10]), CC("aerea", "l"), null, 50), sh(9, [40, 30, 120], [30, 34, 112], [0, 150, -10], null, 56, { tr: "barrido" })],
   [I.shadow]: [sh(0, [-60, 80, 140], [-50, 82, 130], [0, 0, 0], null, 52)],
   // ---- la Larga Noche se prepara (atardecer): la plaza tapándose los oídos, la boda, los bebés, la escuela, la fuente
@@ -47,13 +47,13 @@ const SHOTS = {
   [I.sallow]: [sh(0, [4.5, 1.2, -8.5], [4, 1.3, -9.2], SRH([0, -1.6, 0]), null, 62), sh(5, SRC(2.4, .5, -.3), SRC(2.1, .4, -.3), SRH([0, -.2, 0]), null, 48, { tr: "barrido" })],
   [I.never]: [sh(0, SRC(1.1, -.6, 0), SRC(1, -.55, 0), SRH(), null, 42)],
   [I.price]: [sh(0, [3.6, 2.2, -10], [3.3, 2.3, -10.4], () => { const p = VECINOS[12].g.position; return [p.x - .2, p.y + 2.4, p.z - .8] }, null, 54),
-    sh(6, () => { const p = VECINOS[12].g.position; return [p.x + 4.6, p.y + 1.8, p.z + .2] }, () => { const p = VECINOS[12].g.position; return [p.x + 4.2, p.y + 1.9, p.z + .8] }, () => add(headW(VECINOS[12]).toArray(), [-.3, .6, -1]), null, 58, { tr: "barrido" })],
+    sh(6, () => { const p = VECINOS[12].g.position; return [p.x + 4.4, p.y + 2, p.z + 1.8] }, () => { const p = VECINOS[12].g.position; return [p.x + 4, p.y + 2.1, p.z + 2.3] }, () => add(headW(VECINOS[12]).toArray(), [-.3, 1, -1]), null, 58, { tr: "barrido" })],
   [I.shop]: [sh(0, [6, 2.2, -4], [5.4, 2.3, -4.6], [0, 4, -17], null, 58)],
   [I.candles]: [sh(0, [-3.5, .9, -9], [-3, 1, -9.6], SRH([0, -2, 0]), null, 56)],
   [I.name]: [sh(0, [2.9, 1.5, -8.2], [2.8, 1.55, -8.4], SRH([0, -.3, 0]), null, 54)],
   [I.smile]: [sh(0, SRC(2.4, 0, -.2), SRC(2.1, .15, -.2), SRH([0, -.3, 0]), null, 50), sh(6, SRC(2.2, .5, -.3), SRC(2, .35, -.3), SRH([0, -.2, 0]), null, 46, { tr: "barrido" })],
   // ---- la trastienda
-  [I.work]: [sh(0, [.6, 2.2, -20.4], [.4, 2.25, -20.9], () => add(TIx("olla"), [0, .9, 0]), null, 66), sh(4, () => { const h = headW(ME); return [.6 + (h.x - .6) * .35, 2.1, -20.4 + (h.z + 20.4) * .35] }, () => { const h = headW(ME); return [.6 + (h.x - .6) * .45, 2.1, -20.4 + (h.z + 20.4) * .45] }, HDc(ME), null, 52, { tr: "barrido" })],
+  [I.work]: [sh(0, [-3.4, 2.6, -20.6], [-3.2, 2.65, -20.9], () => add(TIx("olla"), [0, .9, 0]), null, 64), sh(4, () => { const h = headW(ME); return [.6 + (h.x - .6) * .35, 2.1, -20.4 + (h.z + 20.4) * .35] }, () => { const h = headW(ME); return [.6 + (h.x - .6) * .45, 2.1, -20.4 + (h.z + 20.4) * .45] }, HDc(ME), null, 52, { tr: "barrido" })],
   // ---- la casa de Nell (noche cálida)
   [I.nell]: [sh(0, () => CASA_NELL_V.ventana.map((v, i) => v + [-.6, -.35, -.8][i]), () => CASA_NELL_V.ventana.map((v, i) => v + [-.4, -.35, -.6][i]), HDc(NELL), null, 50)],
   [I.say]: [sh(0, FR(NELL, .55, .05, 0), FR(NELL, .5, .05, 0), HDc(NELL), null, 52), sh(9, FR(ME, 1.0, .35, 0), FR(ME, .92, .35, 0), HDc(ME), null, 50, { tr: "barrido" })],
@@ -64,13 +64,13 @@ const SHOTS = {
   [I.found]: [sh(0, [-3.2, 1.25, -20.4], [-3.25, 1.2, -20.6], [-3.45, .7, -21.4], null, 45)],
   [I.hole]: [sh(0, FR(ME, 1.2, .05, .25), FR(ME, 1.05, .05, .2), HDc(ME), null, 46)],
   [I.ledger]: [sh(0, TIo("libro", [.3, .55, .45]), TIo("libro", [.25, .5, .38]), TIo("libro"), null, 40)],
-  [I.workers]: [sh(0, [.6, 2.2, -20.4], [.3, 2.2, -21], [-1, 1.4, -26], null, 64), sh(14, [-3.4, 2.6, -20.6], [-3.2, 2.6, -20.8], [0, 2, -24.5], null, 70, { tr: "barrido" })],
+  [I.workers]: [sh(0, [-3.4, 2.6, -20.6], [-3.2, 2.6, -20.8], [0, 1.6, -25], null, 66), sh(14, [-3.6, 2.4, -21.6], [-3.4, 2.45, -21.9], [0, 2, -24.5], null, 70, { tr: "barrido" })],
   [I.hired]: [sh(0, [-3.4, 2.6, -20.6], [-3.2, 2.6, -20.8], HDc(ME), null, 62)],
   // ---- la cadena del este y las botas
   [I.chain]: [sh(0, CC("primerEslabon"), () => add(CAMS_CAMPANA.primerEslabon.p, [3, 1, -2]), CC("primerEslabon", "l"), null, 55), sh(4, () => add(PE, [-16, 8, 12]), () => add(PE, [-15, 8.8, 13]), () => add(PE, [0, 3, 0]), null, 55, { tr: "barrido" })],
   [I.boots]: [sh(0, () => add(sallowR.g.position.toArray(), [3.6, .4, 3.6]), () => add(sallowR.g.position.toArray(), [3.1, .45, 4]), () => add(sallowR.g.position.toArray(), [0, 2.2, 0]), null, 66)],
   // ---- esta noche: los tapones nuevos de Nell
-  [I.tonight]: [sh(0, [3.2, 1.6, 10.6], [3.4, 1.65, 10.2], HDc(NELL), null, 54)],
+  [I.tonight]: [sh(0, FR(NELL, .9, .2, -.6), FR(NELL, .82, .2, -.5), () => add(headW(NELL).toArray(), [0, -.4, 0]), null, 54)],
   [I.needle]: [sh(0, FR(ME, 1.0, .1, 0), FR(ME, .92, .1, 0), HDc(ME), null, 50)],
   [I.nobodyleft]: [sh(0, FR(NELL, .85, 0, 0), FR(NELL, .78, 0, 0), HDc(NELL), null, 50)],
   // ---- la trepada
@@ -78,11 +78,11 @@ const SHOTS = {
   [I.links]: [sh(0, enCadena(.09, [12, 9, -4]), enCadena(.095, [11, 8.5, -3]), () => add(ME.g.getWorldPosition(new THREE.Vector3()).toArray(), [0, 1.5, 0]), null, 58)],
   [I.clouds]: [sh(0, enCadena(.2, [9, 7, 10]), enCadena(.21, [8.5, 6.5, 11]), () => ME.g.getWorldPosition(new THREE.Vector3()).toArray(), null, 58), sh(5, enCadena(.22, [7, 4, 6]), enCadena(.22, [7, 4.4, 5.4]), () => ME.g.getWorldPosition(new THREE.Vector3()).toArray(), null, 62, { tr: "barrido" })],
   // ---- adentro de la campana
-  [I.inside]: [sh(0, CC("dentro"), () => add(CAMS_CAMPANA.dentro.p, [-.5, .3, .4]), CC("dentro", "l"), null, 68)],
-  [I.noclapper]: [sh(0, CC("dentroGancho"), () => add(CAMS_CAMPANA.dentroGancho.p, [0, -2, 0]), CC("dentroGancho", "l"), null, 50)],
+  [I.inside]: [sh(0, CC("dentro"), () => add(CAMS_CAMPANA.dentro.p, [-.5, .3, .4]), HDc(ME), null, 68)],
+  [I.noclapper]: [sh(0, CC("dentro"), () => add(CAMS_CAMPANA.dentro.p, [.4, .3, -.3]), () => add(headW(ME).toArray(), [0, 1.2, 0]), null, 70)],
   [I.hammer]: [sh(0, PW(-5.5, 1.2, 3.8), PW(-5, 1.3, 3.4), SRH([0, -1.8, 0]), null, 64), sh(5, () => add(sallowR.g.position.toArray(), [-3.6, 1, 3.6]), () => add(sallowR.g.position.toArray(), [-3.1, 1.1, 3.9]), () => add(sallowR.g.position.toArray(), [0, 2, 0]), null, 62, { tr: "barrido" })],
   [I.smiled]: [sh(0, SRC(2.6, 0, -.3), SRC(2.3, -.15, -.3), SRH([0, -.4, 0]), null, 52), sh(4, () => add(sallowR.g.position.toArray(), [-3.2, 1.2, 3.4]), () => add(sallowR.g.position.toArray(), [-2.6, 1.3, 3.6]), SRH([0, -1, 0]), null, 56, { tr: "barrido" })],
-  [I.pour]: [sh(0, FR(ME, 1.6, .2, .7), FR(ME, 1.45, .2, .6), HDc(ME), null, 52), sh(7, () => add(interior().vuelca, [2.2, 1.2, 2.2]), () => add(interior().vuelca, [1.9, 1, 1.9]), () => interior().vuelca, null, 52, { tr: "barrido" })],
+  [I.pour]: [sh(0, FR(ME, 1.6, .7, .7), FR(ME, 1.45, .7, .6), HDc(ME), null, 54), sh(7, () => add(interior().vuelca, [3.2, 1.6, 3.2]), () => add(interior().vuelca, [2.9, 1.4, 2.9]), () => interior().vuelca, null, 56, { tr: "barrido" })],
   [I.swing]: [sh(0, () => add(sallowR.g.position.toArray(), [-4, .6, 3.4]), () => add(sallowR.g.position.toArray(), [-3.5, .5, 3.9]), () => add(sallowR.g.position.toArray(), [0, 2.4, 0]), null, 66)],
   [I.thud]: [sh(0, CC("dentroPlataforma"), () => add(CAMS_CAMPANA.dentroPlataforma.p, [0, -1, 0]), CC("dentroPlataforma", "l"), null, 56, { shake: .08 })],
   [I.first]: [sh(0, CC("dentroLabio"), () => add(CAMS_CAMPANA.dentroLabio.p, [0, .4, 0]), CC("dentroLabio", "l"), null, 70)],
@@ -92,8 +92,8 @@ const SHOTS = {
   [I.faces]: [sh(0, [.6, 2.2, -20.4], [.3, 2.2, -21], [-1, 1.4, -26], null, 64), sh(9, [-3.4, 2.6, -20.6], [-3.2, 2.6, -20.8], [0, 2, -24.5], null, 70, { tr: "barrido" })],
   [I.stay]: [sh(0, FR(ME, 1.6, .2, .5), FR(ME, 1.45, .2, .4), HDc(ME), null, 54)],
   // ---- el final: Nell en el primer eslabón
-  [I.nightly]: [sh(0, () => add(RC, [-4, 2, -3]), () => add(RC, [-3.4, 2.3, -3.6]), () => add(RC, [-1.2, 2.4, 1.2]), null, 58)],
-  [I.end]: [sh(0, FR(NELL, 1.4, .5, 1.1), FR(NELL, 1.3, .45, 1), HDc(NELL), null, 52), sh(5, FR(NELL, 1.2, -.7, .9), FR(NELL, 1.05, -.75, .8), () => add(headW(NELL).toArray(), [0, 1, 0]), null, 64, { tr: "barrido" })],
+  [I.nightly]: [sh(0, () => add(RC, [-2, 1.8, -2]), () => add(RC, [-1.6, 2, -2.4]), HDc(NELL), null, 58)],
+  [I.end]: [sh(0, FR(NELL, 1.4, .5, 1.1), FR(NELL, 1.3, .45, 1), HDc(NELL), null, 52), sh(5, FR(NELL, 1.5, -.3, .9), FR(NELL, 1.4, -.35, .8), () => add(headW(NELL).toArray(), [0, .7, 0]), null, 68, { tr: "barrido" })],
 };
 Object.values(SHOTS).forEach(L => L.forEach(x => { x.tr = x.tr || "barrido"; x.lat = x.lat ?? .35 }));
 
@@ -112,7 +112,7 @@ function setScene(t) {
   const env = lug === "dentro" ? "dentro" : (lug === "tienda" || lug === "trastienda") ? "sallow" : lug === "casa" ? "noche"
     : (L >= I.rule && L <= I.shadow) ? "mediodia" : (L >= I.plug && L <= I.sign) || L === I.chain ? "atardecer" : "noche";
   setEnv(QS.get("env") || env); ambiente(t);
-  R.toneMappingExposure *= (lug === "dentro" || lug === "cadena") ? 1.5 : 1.3;   // revisor: luminancia 0,27 contra 0,34–0,41 y 18 % de negros
+  R.toneMappingExposure *= lug === "dentro" ? 1.85 : (lug === "cadena" || env === "noche") ? 1.6 : 1.3;   // revisor: luminancia 0,27 contra 0,34–0,41 y 18 % de negros
   if (scene.fog && scene.fog.density !== undefined && (L === I.rule || L === I.hangs || L === I.shadow || L === I.below || L === I.nobody)) scene.fog.density = Math.min(scene.fog.density, .0004);
   if (QS.has("caras")) { const L6 = ["happy", "sad", "worried", "angry", "scared", "terrified"], k6 = L6[Math.floor(t) % 6]; ponerP(ME, 7, 6, ryA(7, 6, 7.5, 9.5)); quieto(ME, t); setFace(ME, k6); ME.g.updateMatrixWorld(true);
     const h = headW(ME), d = new THREE.Vector3(Math.sin(ME.g.rotation.y), 0, Math.cos(ME.g.rotation.y)); lejos(t); cam.position.set(h.x + d.x * 1.5, h.y + .05, h.z + d.z * 1.5); cam.lookAt(h.x, h.y - .05, h.z); cam.fov = 40; cam.updateProjectionMatrix(); lights([]); POST.tapa = null; return }
@@ -186,5 +186,8 @@ function setScene(t) {
   }
   lejos(t);
   if (VISTA) { cam.position.set(VISTA[0], VISTA[1], VISTA[2]); cam.lookAt(VISTA[3], VISTA[4], VISTA[5]); cam.fov = VISTA[6] || 50; cam.updateProjectionMatrix(); lights([]); POST.tapa = null; return }
-  lights(typeof lucesCerca === "function" ? lucesCerca(cam.position.toArray(), 4) : []); camara(t);
+  camara(t); const LX = typeof lucesCerca === "function" ? lucesCerca(cam.position.toArray(), 4) : [];
+  if (lug === "dentro") { LX.length = Math.min(LX.length, 2); LX.push([add(interior().gancho, [0, 1.5, 2]), 6, "#ffd6a0", 18], [add(cam.position.toArray(), [0, 2, 0]), L === I.noclapper ? .6 : 2.5, "#a8b8e0", 14]) }
+  if (L === I.nightly || L === I.end) LX.push([add(headW(NELL).toArray(), [1.2, 1.5, 1.5]), 3, "#ffc480", 8]);
+  lights(LX);
 }
