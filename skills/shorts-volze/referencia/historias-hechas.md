@@ -96,6 +96,7 @@ trabajan los olvidados, sin cara. Nell (8) lo olvidó el año pasado: los tapone
 Nell también; el narrador trepa la cadena este con la olla de cera hirviendo, adentro no hay badajo: Sallow toca con un
 martillo. Llena el labio de cera, el golpe hace «thud», Sallow cae en la oscuridad y a los trabajadores les vuelve la cara.
 Giro: él se queda a mantener el labio lleno; «Say my name, she yells. And I do.» 51 frases, 107 s.
+Subido público a RobloxStories: https://youtube.com/shorts/69WoGTFHz9E (copia de 93 MB a 7 Mbps para subir en 11 pedazos, en vez del MP4 de 660 MB).
 Primer video con **caras v2** (media luna, ojeras, cejas) y **pelo con textura** (trenzas reales), y con un villano
 realista en vez de bloques. Construido con cuatro agentes (ciudad, campana, elenco, villano). Lecciones:
 - Una función de encuadre que modifica su parámetro (`d *= 1.3`) dentro del cierre se acumula en cada cuadro y deja
