@@ -1,4 +1,4 @@
-  // ★ HISTORIA "Nobody Hears The Bell". Solo efectos: la música de fondo se mezcla después.
+  // ★ HISTORIA "Nobody Answers The Knock". Solo efectos: la música de fondo se mezcla después.
   const VOLM = 1.5, M = oc.createGain(); M.gain.value = VOLM; const LP = filt("lowpass", 10000, .4, M); M.connect(mus);
   if (window.SOLO === "voz") { M.gain.value = 0; fx.gain.value = 0 }
   if (window.SOLO === "sinmusica") M.gain.value = 0;
@@ -33,25 +33,28 @@
   const chasquido = (t, a = .12) => { noise(t, .05, filt("highpass", 2000, 0, envG(t, a, .001, .04, fx))); clink(t + .01, a * .6); thud(t, a * .5, 200, .08) };
   const aleteo = (t0, dur, a = .03) => { for (let t = t0; t < t0 + dur; t += .07 + r() * .03) noise(t, .04, filt("bandpass", 900 + r() * 500, 2, envG(t, a * (.5 + r() * .5), .002, .03, fx))) };
   const pajaros = (t0, t1, a = .025) => { for (let t = t0 + .4; t < t1; t += 1.1 + r() * 1.6) { const f = 2800 + r() * 1400; for (let k = 0; k < 2 + Math.floor(r() * 3); k++) { const tt = t + k * .11, o = osc("sine", f, tt, tt + .09, envG(tt, a, .005, .07, fx)); o.frequency.linearRampToValueAtTime(f * 1.25, tt + .07) } } };
-  // la campana: zumbido grave de bronce (siempre, más fuerte cerca), cera que burbujea, cadenas que crujen, viento en la altura,
-  // el «thud» final, la ciudad que murmura; cerca de Sallow: silencio frío y un tono agudo casi inaudible
-  const zumbido = (t0, dur, a = .03, f = 55) => { if (dur <= .1) return; const g = oc.createGain(); g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(a, t0 + Math.min(1.5, dur * .3)); g.gain.setValueAtTime(a, Math.max(t0 + .2, t0 + dur - 1)); g.gain.linearRampToValueAtTime(0, t0 + dur); g.connect(fx);
-    [1, 2.01, 2.76, 4.07].forEach((m, k) => { const o = osc("sine", f * m, t0, t0 + dur, g); o.detune.value = Math.sin(k) * 6 }) };
-  const burbuja = (t0, dur, a = .03) => { for (let t = t0; t < t0 + dur; t += .12 + r() * .2) { const o = osc("sine", 300 + r() * 500, t, t + .06, envG(t, a * (.4 + r() * .6), .004, .05, fx)); o.frequency.exponentialRampToValueAtTime(900 + r() * 600, t + .05) } };
-  const cadenaC = (t, dur = 1.4, a = .06) => { creak(t, dur, a); for (let k = 0; k < 5; k++) clink(t + k * dur / 5 + r() * .1, a * .5) };
-  const agudo = (t0, dur, a = .006) => { if (dur <= .1) return; osc("sine", 3150, t0, t0 + dur, envG(t0, a, 1, dur - 1, fx)) };
-  // la campana de fondo todo el video, más fuerte adentro
-  zumbido(0, sl(I.climb), .018); zumbido(sl(I.climb), sl(I.inside) - sl(I.climb), .03); zumbido(sl(I.inside), sl(I.thud) - sl(I.inside), .07, 52);
-  // la ciudad
-  rumble(sl(I.plug), 2, .03, 80); bell(sl(I.rule) + .2, .05); burbuja(sl(I.work), 3, .03); burbuja(sl(I.climb), 2, .03);
-  // Sallow: frío, agudo casi inaudible, velas
-  agudo(sl(I.sallow), sl(I.work) - sl(I.sallow), .007); whoosh(sl(I.candles) + .2, 1.2, .04, 150, 500); agudo(sl(I.hammer), sl(I.thud) - sl(I.hammer), .006);
-  // descubrimientos
-  clink(wt(I.hole, 4), .06); thud(sl(I.ledger) + .2, .06, 120, .2);
-  // la trepada: cadenas, viento en la altura
-  cadenaC(sl(I.climb) + 1, 1.6, .06); cadenaC(sl(I.links), 1.4, .06); viento(sl(I.clouds), sl(I.inside) - sl(I.clouds), .05, 500, 1200);
-  // adentro: el martillo, la cera, el thud
-  splash(sl(I.pour) + .3, .1); burbuja(sl(I.pour), 2.5, .05); whoosh(sl(I.swing), .8, .08, 120, 600); thud(sl(I.thud) + .15, .25, 45, 1.2);
-  whoosh(sl(I.fell) + .8, 1.6, .04, 800, 150);
-  // abajo: la ciudad que se enciende, pájaros al final
-  for (let k = 0; k < 6; k++) clink(sl(I.below) + .3 + k * .35, .03); pajaros(sl(I.nightly), DUR, .015);
+  // Hollowmere: viento frío de noche, golpes en la puerta, tela que arrastra, la campana de la iglesia, tijeras, el grito
+  const golpe = (t, a = .22) => { thud(t, a, 75, .22); noise(t, .05, filt("bandpass", 1400, 2, envG(t, a * .35, .001, .05, fx))); creak(t + .02, .25, a * .15) };
+  const tresGolpes = (t, sep = .55, a = .22) => [0, 1, 2].forEach(k => golpe(t + k * sep, a));
+  const tela = (t0, dur, a = .035) => { for (let t = t0; t < t0 + dur; t += 1.15) { whoosh(t, .9, a, 180, 600); thud(t + .3, a * 1.4, 50, .35) } };
+  const tijera = (t, a = .07) => { noise(t, .04, filt("highpass", 3500, 0, envG(t, a, .001, .03, fx))); clink(t + .005, a * .4) };
+  const grito = (t, dur = 2.2, a = .07) => { for (let k = 0; k < 9; k++) { const f = 180 + k * 47 + r() * 30, g = envG(t + k * .03, a / 3, .15, dur, fx), o = osc("sawtooth", f, t + k * .03, t + dur + .3, filt("bandpass", f * 2.2, 4, g)); o.frequency.linearRampToValueAtTime(f * 1.5, t + dur) } noise(t, dur, filt("bandpass", 900, 1, envG(t, a * .5, .1, dur, fx))) };
+  const N_ = n => ORDEN.indexOf(n), sn = n => sl(N_(n)), wn = (n, k) => wt(N_(n), k);
+  viento(0, DUR, .028, 400, 800);
+  tresGolpes(sn("open") + .35); tela(sn("open"), 2, .03);
+  tresGolpes(sn("voices") + .5, .5, .16);
+  creak(sn("wardrobe") + .3, 1.6, .06);
+  bell(sn("crane") + .5, .07); bell(sn("crane") + 2.2, .06);
+  tela(sn("smell"), sl(N_("smell") + 1) - sn("smell"), .035);
+  bell(sn("bell") + .1, .08); bell(sn("bell") + 1.6, .07);
+  tela(sn("notcrane"), sl(N_("notcrane") + 1) - sn("notcrane"), .04);
+  tresGolpes(sn("three") + .05, .62, .28);
+  creak(sn("window") + .2, 1.2, .05);
+  tela(sn("ladder"), 2.5, .03);
+  for (let k = 0; k < 6; k++) tijera(sn("cut") + .25 + k * .38, .08);
+  grito(sn("scream") + .05, 2.4, .08);
+  whoosh(sn("fell") + .1, 1.4, .05, 900, 200); thud(wn("fell", 6), .05, 120, .15);
+  tela(sn("walked"), 2.2, .035);
+  creak(sn("noknock") + .3, 1.8, .08);
+  tresGolpes(sn("readnames") + .4, .6, .12);
+  pajaros(sn("morning"), sn("readnames"), .012);

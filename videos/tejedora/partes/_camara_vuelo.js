@@ -30,11 +30,11 @@ let TEMBLOR = 0;   // lo pone la escena en los 1–2 golpes grandes (en unidades
 // con una deriva chica hacia la próxima). Entre puntos: curva Catmull-Rom con frenado suave en cada punto (la velocidad
 // baja al 40 % al llegar, sube en el medio), así se acerca a lo nombrado y sigue de largo sin cortar. Entre rutas: corte.
 let RUTAS_T = null;
-const rutasPrep = () => RUTAS_T ||= (typeof RUTAS === "undefined" ? [] : RUTAS).map(R => R.flatMap((q, i) => { const t = q.t(), h = q.h ?? .4; return [{ t: t - h * .5, q, i, k: 0 }, { t: t + h * .5, q, i, k: 1 }] }).sort((a, b) => a.t - b.t)).filter(R => R.length).sort((a, b) => a[0].t - b[0].t);
+const rutasPrep = () => RUTAS_T ||= (typeof RUTAS === "undefined" ? [] : RUTAS).map(R => R.flatMap((q, i) => { const t = q.t(), h = q.h ?? .3; return [{ t: t - h * .5, q, i, k: 0 }, { t: t + h * .5, q, i, k: 1 }] }).sort((a, b) => a.t - b.t)).filter(R => R.length).sort((a, b) => a[0].t - b[0].t);
 const CATR = (a, b, c, d, u) => { const u2 = u * u, u3 = u2 * u; return b.clone().multiplyScalar(2).add(c.clone().sub(a).multiplyScalar(u)).add(a.clone().multiplyScalar(2).sub(b.clone().multiplyScalar(5)).add(c.clone().multiplyScalar(4)).sub(d).multiplyScalar(u2)).add(a.clone().negate().add(b.clone().multiplyScalar(3)).sub(c.clone().multiplyScalar(3)).add(d).multiplyScalar(u3)).multiplyScalar(.5) };
 function rutaCam(t) { const RS = rutasPrep(); if (!RS.length) return null; let r = 0; RS.forEach((R, i) => { if (t >= R[0].t) r = i }); const R = RS[r];
   const pt = j => { const P = R[Math.max(0, Math.min(R.length - 1, j))], q = P.q, sig = R.find(x => x.i > q.i); let p = V_(...val(q.p, t)), l = V_(...val(q.l, t));
-    if (P.k === 1 && sig) { const pn = V_(...val(sig.q.p, t)); p.lerp(pn, q.deriva ?? .08) } return { p, l, f: q.f ?? 55 } };
+    if (P.k === 1 && sig) { const pn = V_(...val(sig.q.p, t)); p.lerp(pn, q.deriva ?? .16) } return { p, l, f: q.f ?? 55 } };
   let i = 0; for (let j = 0; j < R.length - 1; j++) if (t >= R[j].t) i = j;
   if (t <= R[0].t) { const a = pt(0); return { ...a, corte: r > 0 && t - R[0].t < .02 } }
   if (t >= R[R.length - 1].t) { const a = pt(R.length - 1), b = pt(R.length - 2), d = a.p.clone().sub(b.p), dt = Math.max(.2, R[R.length - 1].t - R[R.length - 2].t); return { p: a.p.clone().addScaledVector(d, Math.min(1.5, (t - R[R.length - 1].t) / dt) * .25), l: a.l, f: a.f } }
