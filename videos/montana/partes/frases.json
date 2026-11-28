@@ -1,0 +1,102 @@
+[
+ {
+  "n": "open",
+  "t": "The mountain opened its mouth today. It wants my brother's last tooth.",
+  "gap": 0.1
+ },
+ {
+  "n": "rule",
+  "t": "In Gumridge, every kid pays the mountain. One baby tooth, every Sunday.",
+  "gap": 0.1
+ },
+ {
+  "n": "cost",
+  "t": "Forget, and it leans down and bites your house.",
+  "gap": 0.1
+ },
+ {
+  "n": "smile",
+  "t": "So we wear our teeth on strings. And nobody smiles near the mountain.",
+  "gap": 0.1
+ },
+ {
+  "n": "pell",
+  "t": "Doctor Pell collects the teeth. He's the only one who smiles.",
+  "gap": 0.1
+ },
+ {
+  "n": "ollie",
+  "t": "My brother Ollie has one tooth left. It isn't even loose.",
+  "gap": 0.1
+ },
+ {
+  "n": "pliers",
+  "t": "Today, Pell came for it anyway. With pliers.",
+  "gap": 0.1
+ },
+ {
+  "n": "bag",
+  "t": "I grabbed his bag. It was heavy. Full of teeth.",
+  "gap": 0.1
+ },
+ {
+  "n": "never",
+  "t": "Hundreds of them. He never fed the mountain at all.",
+  "gap": 0.1
+ },
+ {
+  "n": "gold",
+  "t": "For every tooth, the mountain spits out gold. Pell keeps the gold.",
+  "gap": 0.1
+ },
+ {
+  "n": "hungry",
+  "t": "And the mountain stays hungry.",
+  "gap": 0.1
+ },
+ {
+  "n": "rumble",
+  "t": "The ground shook. The mountain was leaning down. Over our street.",
+  "gap": 0.1
+ },
+ {
+  "n": "run",
+  "t": "Everyone ran. Pell ran faster.",
+  "gap": 0.1
+ },
+ {
+  "n": "climb",
+  "t": "I climbed onto its lip, with the bag.",
+  "gap": 0.1
+ },
+ {
+  "n": "pour",
+  "t": "And I poured every tooth into its mouth.",
+  "gap": 0.1
+ },
+ {
+  "n": "chew",
+  "t": "It chewed for a long time.",
+  "gap": 0.2
+ },
+ {
+  "n": "sleep",
+  "t": "Then it closed its eyes, and went back up.",
+  "gap": 0.1
+ },
+ {
+  "n": "smiled",
+  "t": "Ollie smiled at the mountain. First kid in Gumridge to do it.",
+  "gap": 0.1
+ },
+ {
+  "n": "back",
+  "t": "The mountain smiled back.",
+  "gap": 0.2
+ },
+ {
+  "n": "end",
+  "t": "And that's why, today, the mountain opened its mouth.",
+  "gap": 0.02
+ }
+]

@@ -37,6 +37,18 @@ anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.c
   6. **Ritmo**: un giro o escalada cada 5–8 s, sin tramos de explicación de más de 2 frases seguidas; el final cierra en
      loop con la primera frase.
   7. **Publicar uno por día, a la misma hora**, sin borrar los anteriores. Dejar «No creado para niños».
+  9. **Personajes que se lean en el celular** (comparación lado a lado, 28-nov-2026): caras ≈ 40 % más grandes con ojos
+     ovalados negros grandes y boca grande y gruesa; cabeza clara con brillo de plástico (roughness ≈ .3); ropa de UN color
+     fuerte y saturado con un solo detalle (nada de estampados chicos: estrellitas, flores, cuadros se ven como ruido);
+     pelo con textura pero en colores fuertes (castaño chocolate, negro, amarillo) y silueta grande; proporciones del
+     avatar clásico (sin cuellos largos). Protagonista fijo del canal: **Toby** (buzo naranja fuerte, jean azul, pelo
+     castaño en punta).
+  10. **Voz del canal: «Lukas - Excited youthful young man»** de ElevenLabs (voice_id `wSqOdjeNqDrHcoK0zorF`, elegida
+     de oído por el dueño el 28-nov-2026; reemplaza a Skylar). Es la que usa por defecto un kit público de Shorts de
+     Roblox (estabilidad .45, similitud .8, estilo .25, velocidad 1,2). Velocidad final ≈ 260 palabras por minuto como
+     Volze: generar, medir y cortar con `cortar_completo.py --tempo` al factor que lleve a 260. Nunca clonar la voz de
+     Volze (es de otra persona; ElevenLabs exige su permiso). Los números de `perfil_voz.py` no reemplazan al oído: siempre
+     mandarle las muestras al dueño.
   8. **Medir cada video a las 48 h** (Studio → Estadísticas del video): «se quedaron viendo» ≥ 75 % y promedio visto
      ≥ 70 %. Anotarlo en `referencia/historias-hechas.md`. Si no se llega con estos cambios, el problema es el guion.
 - **Versión para celular (28-nov-2026)**: el dueño dijo primero que no la hiciera y después la pidió igual. Hacer el
