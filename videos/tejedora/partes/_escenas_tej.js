@@ -48,7 +48,7 @@ const RUTAS = [
   [PA("choir", 0, [-10.5, 1.7, 16.5], () => add(headW(TIB).toArray(), [0, -.3, 0]), 52), PA("choir", 8, FRC2("TIB", 1.6, .5, .2), HD2("TIB"), 46, { h: .5 }),
    PA("goodnight", 0, [-9.6, 2.1, 14.2], HD2("TIB"), 54), PA("goodnight", 7, [-9.2, 1.9, 14.2], HD2("TIB"), 52, { h: .5 })],
   // 9 · el taller: cose; los agujeros
-  [PA("tailor", 0, [14.6, 1.9, -2.6], [10, 1.1, 1.6], 58), PA("tailor", 3, FRC2("ME", 2.8, .9, .4), HD2("ME"), 52, { h: .4 }), PA("sew", 0, () => add(TALL_MESA(), [.9, .7, -1]), TALL_MESA, 42, { h: .6 }), PA("sew", 7, () => add(headW(ME).toArray(), [.9, 1.0, 1.1]), TALL_MESA, 50)],
+  [PA("tailor", 0, [14.6, 1.9, -2.6], [10, 1.1, 1.6], 58), PA("tailor", 3, FRC2("ME", 2.8, .9, .4), HD2("ME"), 52, { h: .4 }), PA("sew", 0, () => add(TALL_MESA(), [.9, .7, -1]), TALL_MESA, 42, { h: .6 }), PA("sew", 7, () => add(headW(ME).toArray(), [.8, .3, 1.2]), TALL_MESA, 52)],
   // 10 · la colina: se lleva el abrigo
   [PA("anyway", 0, [94, 21.2, -21], TCAB([0, -8, 0]), 60), PA("anyway", 4, [92, 21.4, -24], () => add(POSTE, [0, 2.7, 0]), 50, { h: .5 })],
   // 11 · Marga en su puerta
@@ -202,10 +202,13 @@ function setScene(t) {
     case "end": den(TIB, -12.7, 16.3, -11.6, 12.4, lt > dW(4) ? "happy" : "ternura"); den(MAMA, -11.7, 15.6, -11.6, 12.4, lt > dW(4) ? "habla" : "ternura"); abrigoRojo(MAMA, true); break;
   }
   const hayTeje = ["open", "rule", "cost", "mystery", "tall", "arms", "voices", "anyway", "smell", "notcrane", "window", "ladder", "chest", "cut", "scream", "fell", "walked", "noknock", "readnames"].includes(N);
-  if (hayTeje) TEJEDORA.aura(true, 1);
   lejos(t);
   if (VISTA) { cam.position.set(VISTA[0], VISTA[1], VISTA[2]); cam.lookAt(VISTA[3], VISTA[4], VISTA[5]); cam.fov = VISTA[6] || 50; cam.updateProjectionMatrix(); lights(lucesCerca(cam.position.toArray(), 6)); POST.tapa = null; return }
-  camara(t); let LX = lucesCerca(cam.position.toArray(), 6);
+  camara(t);
+  // el aura de la Tejedora (luz fría, niebla de los pies, pelusa) quemaba todo a blanco con la cámara cerca: baja con la distancia
+  if (hayTeje) { const pc = TEJEDORA.pechoW(), pie = TEJEDORA.pieW ? TEJEDORA.pieW(1) : pc, d = Math.min(cam.position.distanceTo(new THREE.Vector3(...pc)), cam.position.distanceTo(new THREE.Vector3(...pie)));
+    TEJEDORA.aura(true, Math.max(.12, Math.min(.7, (d - 3) / 30))) }
+  let LX = lucesCerca(cam.position.toArray(), 6);
   if (cam.position.x > 6 && cam.position.x < 16 && cam.position.z > -4 && cam.position.z < 6) LX = LX.map(l => [l[0], l[1] * .3, l[2], l[3]]);   // el taller: la lámpara quemaba las caras
     const MIEDO_CASA = ["carried", "three", "love", "beside", "tibup"].includes(N);
   if (lug === "casa" && cam.position.x < -6) { LX = LX.slice(0, 4); const fl = 1 + .12 * Math.sin(t * 9.3) + .08 * Math.sin(t * 23.1);

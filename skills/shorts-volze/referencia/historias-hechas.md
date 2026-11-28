@@ -122,6 +122,8 @@ Lecciones:
   tomas y correr gente, no solo la cámara. La lámpara del taller quemaba las caras: bajar las luces puntuales cerca.
 - La calle mide |x| < 6,5: cámaras en x ≥ 7 quedan adentro de las casas.
 - Los efectos de sonido del video anterior rompen el audio si nombran frases que no existen: reescribirlos siempre.
+- El aura de la criatura (luz fría 22, luz de los pies 10) quemaba todo a blanco con la cámara cerca: el aura baja con
+  la distancia de la cámara (`TEJEDORA.aura(true, k)` después de `camara(t)`).
 - Lo «persistente» del elenco (abrigo puesto, muñeco, lista, abrigo en mano) queda pegado a otros cuadros porque el render
   va desordenado: limpiarlo al principio de cada `setScene`.
 - Para ubicar gente y cámaras en un interior, sacar primero una vista general (`?vista=` desde una esquina, y ≈ 2,6:
