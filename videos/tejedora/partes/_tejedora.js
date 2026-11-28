@@ -3866,9 +3866,9 @@ const RUTAS = [
   // 30 · camina hasta la única puerta con picaporte
   [PA("walked", 0, [3, 1.3, 30], TCAB([0, -8, 0]), 60), PA("walked", 6, [2.5, 1.6, 22], TCAB([0, -6, 0]), 62, { h: .4 })],
   // 31 · no necesitó golpear
-  [PA("noknock", 0, [8, 4, -56], [16.8, 3, -73], 52), PA("noknock", 3, [10, 3, -60], [16.8, 1.6, -74], 48, { h: .6 }), PA("noknock", 5, [10.5, 3.4, -59], [14, 60, -100], 60, { h: .2 })],
+  [PA("noknock", 0, [8, 4, -56], [16.8, 3, -73], 52), PA("noknock", 3, [10, 3, -60], [16.8, 1.6, -74], 48, { h: .6 }), PA("noknock", 5, [10.5, 3.4, -59], [2, 60, -70], 60, { h: .2 })],
   // 32 · a la mañana, la puerta de Crane abierta
-  [PA("morning", 0, [10.5, 3.4, -59], [14, 60, -100], 60), PA("morning", 2, [10, 2.4, -60], [16.8, 1.4, -75], 52), PA("morning", 7, [16.8, 2.2, -62], [16.8, 1.3, -75.5], 50, { h: .5 })],
+  [PA("morning", 0, [10.5, 3.4, -59], [2, 60, -70], 60, { h: .55 }), PA("morning", 7, [16.8, 2.2, -62], [16.8, 1.3, -75.5], 50, { h: .5 })],
   // 33 · ahora golpea con la voz de Crane, leyendo nombres
   [PA("readnames", 0, [14, 22, 30], TCAB([0, -14, 0]), 50), PA("readnames", 7, [3, 1.6, 6], TCAB([0, -8, 0]), 62, { h: .4 })],
   // 34 · esta noche: buenas noches cinco veces, y alguien contesta
@@ -3911,7 +3911,7 @@ function setScene(t) {
   if (!ENV.interiorLuz) ENV.interiorLuz = { ...ENV.interior, hemi: .55, hemiG: "#4a3220", exp: 2.45 };
   const MIEDO_IN = ["carried", "three", "love", "beside", "tibup"].includes(N);
   let envN = QS.get("env") || ({ calle: "tejedora", calleSin: "noche", niebla: "nocheNiebla", casa: MIEDO_IN ? "interior" : "interiorLuz", recuerdo: "noche", dia: "amanecer" })[lug];
-  if (N === "morning" && lt < 1.6) { const u = eIO(P(lt, .2, 1.5)), A = ENV.noche, B = ENV.amanecer, M = {}; for (const kk in B) { const a = A[kk], b = B[kk]; M[kk] = typeof b === "number" && typeof a === "number" ? lerp(a, b, u) : typeof b === "string" && typeof a === "string" && b[0] === "#" ? "#" + new THREE.Color(a).lerp(new THREE.Color(b), u).getHexString() : Array.isArray(b) && Array.isArray(a) && typeof b[0] === "number" ? b.map((v, i) => lerp(a[i], v, u)) : u < .5 ? a ?? b : b } ENV._mezcla = M; envN = "_mezcla" }
+  if (N === "morning" && lt < 1.6) { const u = eIO(P(lt, 0, .55)), A = ENV.noche, B = ENV.amanecer, M = {}; for (const kk in B) { const a = A[kk], b = B[kk]; M[kk] = typeof b === "number" && typeof a === "number" ? lerp(a, b, u) : typeof b === "string" && typeof a === "string" && b[0] === "#" ? "#" + new THREE.Color(a).lerp(new THREE.Color(b), u).getHexString() : Array.isArray(b) && Array.isArray(a) && typeof b[0] === "number" ? b.map((v, i) => lerp(a[i], v, u)) : u < .5 ? a ?? b : b } ENV._mezcla = M; envN = "_mezcla" }
   setEnv(envN); ambiente(t);
   if (lug === "recuerdo") POST.sepia = .55;
   const V = VECINOS, mira = (c, x, z, tx, tz, cara) => { ponerP(c, x, z, ryA(x, z, tx, tz)); if (cara) setFace(c, cara) };
