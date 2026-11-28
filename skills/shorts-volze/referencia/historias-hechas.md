@@ -114,6 +114,7 @@ habla con las manos; Father Crane elige el abrigo que se deja en la colina y la 
 (cobra deudas así). El abrigo rojo de la madre (muda) está cosido en el pecho de la Tejedora; el narrador trepa y corta los
 puntos, la voz vuelve, la Tejedora abre la única puerta con picaporte (la de Crane). Giro: Tib dice buenas noches cinco
 veces «and for the first time, somebody answered». 50 frases, 491 palabras, 110 s. Primer video con **rutas de cámara**.
+Subido público a RobloxStories: https://youtube.com/shorts/HU47yK3diko
 Lecciones:
 - **Rutas**: una parada que apunta a un personaje que recién se ubica en la frase SIGUIENTE manda la curva a cualquier
   lado (el personaje está en otra parte). Ubicarlo también en la frase anterior (escondido si no tiene que verse).
