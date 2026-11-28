@@ -105,3 +105,24 @@ realista en vez de bloques. Construido con cuatro agentes (ciudad, campana, elen
 - Un primer plano contra una pared oscura dio 1,2 s de negro: correr `blackdetect` en todo render y girar a los
   personajes hacia la cámara en los planos de cara.
 - Se llenó el disco en el render (MP4 de ≈ 1 GB por video): borrar los pesados de videos ya subidos (con permiso).
+
+## «Nobody Answers The Knock» (pueblo de noche con niebla, terror, 28-nov-2026), en `videos/tejedora/`
+Hollowmere: nadie contesta un golpe después del anochecer, porque la Tejedora (22 m, abrigos cosidos, brazos de percha,
+cara de botón) se lleva tu voz y golpea con ella. La regla se ve sin cartel: picaportes arrancados, roperos contra la
+puerta, bodas donde se asiente. El narrador es el sastre; Tib dice «goodnight» cinco veces; Marga contestó hace 40 años y
+habla con las manos; Father Crane elige el abrigo que se deja en la colina y la criatura sigue el abrigo hasta la casa
+(cobra deudas así). El abrigo rojo de la madre (muda) está cosido en el pecho de la Tejedora; el narrador trepa y corta los
+puntos, la voz vuelve, la Tejedora abre la única puerta con picaporte (la de Crane). Giro: Tib dice buenas noches cinco
+veces «and for the first time, somebody answered». 50 frases, 491 palabras, 110 s. Primer video con **rutas de cámara**.
+Lecciones:
+- **Rutas**: una parada que apunta a un personaje que recién se ubica en la frase SIGUIENTE manda la curva a cualquier
+  lado (el personaje está en otra parte). Ubicarlo también en la frase anterior (escondido si no tiene que verse).
+- Los cortes entre rutas con desenfoque de sub-cuadros mezclan dos lugares: `SUBF` = 1 en el cuadro del corte.
+- Interiores chicos: las cámaras de cara (`FRC`) chocan con otros personajes, vigas y lámparas; mirar la hoja de
+  tomas y correr gente, no solo la cámara. La lámpara del taller quemaba las caras: bajar las luces puntuales cerca.
+- La calle mide |x| < 6,5: cámaras en x ≥ 7 quedan adentro de las casas.
+- Los efectos de sonido del video anterior rompen el audio si nombran frases que no existen: reescribirlos siempre.
+- Lo «persistente» del elenco (abrigo puesto, muñeco, lista, abrigo en mano) queda pegado a otros cuadros porque el render
+  va desordenado: limpiarlo al principio de cada `setScene`.
+- Para ubicar gente y cámaras en un interior, sacar primero una vista general (`?vista=` desde una esquina, y ≈ 2,6:
+  el techo está a ≈ 3 m) y recién ahí escribir las paradas.

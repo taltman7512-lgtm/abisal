@@ -3809,7 +3809,7 @@ const RUTAS = [
   // 5 · los picaportes arrancados
   [PA("handles", 0, [-2.6, 1.4, 16.2], [-6.45, 1.1, 12.85], 46), PA("handles", 5, [-4.5, 1.2, 13.9], [-6.45, 1.05, 12.85], 38, { h: .6 })],
   // 6 · el ropero contra la puerta
-  [PA("wardrobe", 0, [-11.6, 2.2, 15.8], [-7.6, 1.8, 12.9], 60), PA("wardrobe", 6, [-10.4, 2, 14.8], [-7.6, 1.9, 12.9], 58, { h: .5 })],
+  [PA("wardrobe", 0, [-8.8, 2.2, 16.4], [-7.8, 1.5, 12.9], 60), PA("wardrobe", 6, [-8.6, 2.1, 15.8], [-7.7, 1.6, 12.9], 56, { h: .5 })],
   // 7 · la boda: asienten
   [PA("wed", 0, [4, 2.4, -47], [0, 1.6, -59], 54), PA("wed", 8, [3.2, 2.2, -52], [0, 1.5, -58.8], 52, { h: .6 })],
   // 8 · Tib y el coro; las buenas noches
@@ -3834,9 +3834,9 @@ const RUTAS = [
   // 17 · sigue el abrigo hasta la casa (la Tejedora camina por la calle)
   [PA("smell", 0, [4, 1.2, 24], TCAB([0, -6, 0]), 60), PA("smell", 7, [3.5, 1.4, 21], TCAB([0, -10, 0]), 62, { h: .5 })],
   // 18 · el abrigo rojo de la madre, hace dos años (recuerdo)
-  [PA("red", 0, [93, 21.6, -23], () => add(POSTE, [0, 2.6, 0]), 50), PA("red", 8, FRC2("MAMA", 2.2, .5, .1), HD2("MAMA"), 46, { h: .5 })],
+  [PA("red", 0, [91.5, 21.4, -32], () => add(POSTE, [0, 2.4, 0]), 52), PA("red", 8, FRC2("MAMA", 2.2, .5, .1), HD2("MAMA"), 46, { h: .5 })],
   // 19 · muda desde entonces
-  [PA("mute", 0, FRC2("MAMA", 2.4, .3, -.15), HD2("MAMA", -.45), 50), PA("mute", 5, FRC2("MAMA", 1.9, .2, -.15), HD2("MAMA", -.45), 46, { h: .5 })],
+  [PA("mute", 0, FRC2("MAMA", 2.6, .3, -.1), HD2("MAMA", -.25), 50), PA("mute", 5, FRC2("MAMA", 2.2, .2, -.1), HD2("MAMA", -.25), 48, { h: .5 })],
   // 20 · el abrigo chico de Tib
   [PA("small", 0, FRC2("ME", 2.2, -.5, -.2), () => add(headW(ME).toArray(), [0, -.9, -.3]), 48), PA("small", 6, FRC2("ME", 2.6, -.3, -.3), () => add(headW(ME).toArray(), [0, -.8, -.3]), 50, { h: .5 })],
   // 21 · la deuda: el padre y Tib que tose
@@ -3851,8 +3851,8 @@ const RUTAS = [
   [PA("notcrane", 0, [-3.6, 1.6, 18.5], TCAB([0, -6, 0]), 60), PA("notcrane", 7, [-4.2, 1.2, 16], TCAB([0, -4, 0]), 64, { h: .5 })],
   // 26 · adentro: el olor, tres golpes, «open the door», la madre, Tib
   [PA("carried", 0, [-8.5, 1.7, 13.4], HD2("ME"), 52), PA("three", 0, [-7.5, 1.9, 16.6], [-7, 1.5, 12.9], 58), PA("three", 3, [-7.4, 1.8, 15.6], FAMP.puerta, 54, { h: .6 }),
-   PA("love", 0, [-7.6, 1.6, 14.4], () => add(headW(MAMA).toArray(), [0, -.5, 0]), 54), PA("beside", 2, [-7.8, 1.55, 14.2], HD2("MAMA", -.45), 50, { h: .5 }), PA("beside", 8, [-8, 1.5, 14.3], HD2("MAMA", -.45), 48),
-   PA("tibup", 0, FRC2("TIB", 1.8, .95, .3), HD2("TIB", -.05), 60), PA("tibup", 5, FRC2("TIB", 1.7, .95, .3), HD2("TIB", -.05), 58, { h: .5 })],
+   PA("love", 0, [-7.6, 1.65, 14.4], () => add(headW(MAMA).toArray(), [0, -.35, 0]), 54), PA("beside", 2, [-7.8, 1.6, 14.2], HD2("MAMA", -.3), 50, { h: .5 }), PA("beside", 8, [-8, 1.6, 14.3], HD2("MAMA", -.3), 48)],
+  [PA("tibup", 0, [-10.0, 2.1, 12.4], HD2("TIB", -.2), 60), PA("tibup", 5, [-10.2, 2, 12.9], HD2("TIB", -.2), 56, { h: .5 })],
   // 27 · sale por la ventana de atrás
   [PA("window", 0, [-17, .9, 17], [-14.2, 1.6, 14], 58), PA("window", 6, [-17.2, .8, 16.6], [-14.6, 1.8, 14], 60, { h: .5 })],
   // 28 · trepa la Tejedora, el abrigo rojo, corta los puntos, grita
@@ -3872,7 +3872,7 @@ const RUTAS = [
   [PA("readnames", 0, [14, 22, 30], TCAB([0, -14, 0]), 50), PA("readnames", 7, [3, 1.6, 6], TCAB([0, -8, 0]), 62, { h: .4 })],
   // 34 · esta noche: buenas noches cinco veces, y alguien contesta
   [PA("tonightend", 0, [-10.6, 1.8, 16.8], HD2("TIB"), 54), PA("tonightend", 5, FRC2("TIB", 1.7, .5, .2), HD2("TIB"), 46, { h: .4 }),
-   PA("end", 0, FRC2("MAMA", 2.8, .9, -.4), HD2("MAMA", -.5), 54), PA("end", 5, FRC2("MAMA", 2.4, .7, -.4), HD2("MAMA", -.5), 52, { h: .5 })],
+   PA("end", 0, [-11.6, 2.05, 12.5], [-12.2, 2.0, 15.9], 60), PA("end", 5, [-11.7, 2.0, 13.1], [-12.1, 2.0, 15.8], 56, { h: .5 })],
 ];
 function TJ_C(d) { return () => TEJEDORA.caraCam(d, .35, -1.5) }
 function TPECHO_C(d) { return () => TEJEDORA.pechoCam(d, .45, .2) }
@@ -3905,6 +3905,7 @@ function setScene(t) {
   const L = lineAt(t), N = ORDEN[L], lt = t - s(L), len = (S[L + 1] ?? DUR) - s(L), k = P(lt, 0, len), dW = kk => wt(L, kk) - s(L);
   mundoReset(); utileriaReset(); lejosReset(); TEJEDORA.ocultar(); if (typeof sallowR !== "undefined") sallowR.ocultar(); TEMBLOR = 0;
   ALL.forEach(c => { c.g.visible = false; pose(c, t, {}); quieto(c, t); setFace(c, "neutral") });
+  abrigoRojo(MAMA, false); abrigoPuesto(CRANE, null); abrigoEnMano(ME, null); lista(ME, false); muneco(TIB, null);   // lo persistente se limpia cada cuadro (los cuadros se renderizan desordenados)
   const lug = LUG[N] || "calle";
   setEnv(QS.get("env") || ({ calle: "tejedora", calleSin: "noche", niebla: "nocheNiebla", casa: "interior", recuerdo: "noche", dia: "amanecer" })[lug]); ambiente(t);
   if (lug === "recuerdo") POST.sepia = .55;
@@ -3947,7 +3948,7 @@ function setScene(t) {
     case "carried": familia("horrified"); break;
     case "three": { familia(); const f = Math.max(...[.2, .55, .9].map(g => Math.exp(-(((k - g) / .04) ** 2)))); TEMBLOR = .015 * f; roperoMover(0); break }
     case "love": case "beside": familia(); setFace(MAMA, N === "beside" || lt > dW(3) ? "llora" : "tristeMudo"); break;
-    case "tibup": den(TIB, -10.9, 13.9, -6.6, 12.9, "miedo"); den(ME, -10.2, 12.6, -6.6, 12.9, "terror"); taparBoca(ME, TIB, P(lt, dW(5) - .3, dW(7))); den(MAMA, -11.8, 16.2, -6.6, 12.9, "llora"); break;
+    case "tibup": den(TIB, -11.6, 15.2, -10, 12.4, "miedo"); den(ME, -10.2, 12.6, -6.6, 12.9, "terror"); taparBoca(ME, TIB, P(lt, dW(5) - .3, dW(7))); den(MAMA, -11.8, 16.2, -6.6, 12.9, "llora"); break;
     case "window": { puertaAbrir("ventanaAtras", 1); adentro(ME, FAMP.ventana[0] - .3, FAMP.ventana[1], -Math.PI / 2); salirVentana(ME, P(lt, 0, dW(6))); setFace(ME, "determined"); tejeFam(); break }
     case "ladder": case "chest": case "cut": case "scream": { tejeFam(); const u = N === "ladder" ? .1 + .5 * k : N === "chest" ? .6 + .4 * k : 1; const q = TEJEDORA.trepaPunto(u);
       enAire(ME, [q.p[0] + q.n[0] * .45, q.p[1] - 1.2, q.p[2] + q.n[2] * .45], Math.atan2(-q.n[0], -q.n[2])); trepar(ME, t, {});
@@ -3959,8 +3960,8 @@ function setScene(t) {
     case "noknock": { setEnv("noche"); ambiente(t); teje(16.8, -67.4, Math.PI); const a = TEJEDORA.abrirPuerta(P(lt, .1, len), CRN.picaporte); puertaAbrir("crane", a); break }
     case "morning": puertaAbrir("crane", 1); abrigoEnGancho(false); [[13.6, -70], [15.4, -70.4], [18.4, -70], [20, -69.6]].forEach(([x, z], i) => mira(V[i], x, z, 16.8, -75, i % 2 ? "scared" : "worried")); break;
     case "readnames": teje(-.6, -10, -Math.PI / 2); TEJEDORA.golpear(t, P(lt, 0, len), [-6.45, 1.9, -10]); break;
-    case "tonightend": den(TIB, -12.4, 15.9, -9.4, 15.4, "ternura"); saludarBuenasNoches(TIB, t); den(MAMA, -11, 14.7, -12.4, 15.9, "tristeMudo"); abrigoRojo(MAMA, true); den(ME, -9.8, 15.8, -12.4, 15.9, "warm"); break;
-    case "end": den(TIB, -12.4, 15.9, -11, 14.7, lt > dW(4) ? "happy" : "ternura"); den(MAMA, -11, 14.7, -12.4, 15.9, lt > dW(4) ? "habla" : "ternura"); abrigoRojo(MAMA, true); den(ME, -9.8, 15.8, -12.4, 15.9, "relieved"); break;
+    case "tonightend": den(TIB, -12.6, 16.2, -9.4, 15.4, "ternura"); saludarBuenasNoches(TIB, t); den(MAMA, -10.2, 15.6, -12.6, 16.2, "tristeMudo"); abrigoRojo(MAMA, true); break;
+    case "end": den(TIB, -12.7, 16.3, -11.6, 12.4, lt > dW(4) ? "happy" : "ternura"); den(MAMA, -11.7, 15.6, -11.6, 12.4, lt > dW(4) ? "habla" : "ternura"); abrigoRojo(MAMA, true); break;
   }
   const hayTeje = ["open", "rule", "cost", "mystery", "tall", "arms", "voices", "anyway", "smell", "notcrane", "window", "ladder", "chest", "cut", "scream", "fell", "walked", "noknock", "readnames", "bell"].includes(N);
   if (hayTeje) TEJEDORA.aura(true, 1);
@@ -3968,7 +3969,7 @@ function setScene(t) {
   if (VISTA) { cam.position.set(VISTA[0], VISTA[1], VISTA[2]); cam.lookAt(VISTA[3], VISTA[4], VISTA[5]); cam.fov = VISTA[6] || 50; cam.updateProjectionMatrix(); lights(lucesCerca(cam.position.toArray(), 6)); POST.tapa = null; return }
   camara(t); let LX = lucesCerca(cam.position.toArray(), 6);
   if (cam.position.x > 6 && cam.position.x < 16 && cam.position.z > -4 && cam.position.z < 6) LX = LX.map(l => [l[0], l[1] * .3, l[2], l[3]]);   // el taller: la lámpara quemaba las caras
-  if (lug === "casa" && cam.position.x < -6) LX = LX.map(l => [l[0], l[1] * .55, l[2], l[3]]);
+    if (lug === "casa" && cam.position.x < -6) LX.push([[-9.2, 2.5, 14.2], 2.2, "#ffc480", 9]);
   if (N === "window") LX.push([[-15.4, 2.6, 15], 8, "#ffc480", 14], [[-13, 1.8, 14], 4, "#ffc480", 7]);
   if (lug !== "casa") R.toneMappingExposure *= 1.18;   // revisor: 10 % de negros lights(hayTeje ? TEJEDORA.luzFria(LX) : LX);
 }

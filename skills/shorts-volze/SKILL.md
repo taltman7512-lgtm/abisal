@@ -108,6 +108,9 @@ anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.c
      sueltas con `tr: "barrido"`. Las rutas no atraviesan paredes (revisar contra el mapa de ocupación).
   6. Revisión: en la hoja de tomas y en el revisor, marcar como error un barrido sin motivo y una cosa nombrada a la
      que la cámara no se acerca.
+  7. **Ya implementado** (28-nov-2026) en `videos/tejedora/partes/_camara_vuelo.js` (`rutaCam`, `RUTAS`) y usado en
+     `videos/tejedora/partes/_escenas_tej.js` (`PA(frase, palabra, pos, mira, fov, {h, deriva})`): copiarlo al empezar un
+     video. Ver las lecciones de «Nobody Answers The Knock» en `referencia/historias-hechas.md`.
 - **Guardar en GitHub (28-nov-2026)**: el dueño confirmó que siga haciendo commit y push de cada cambio (código, guion,
   skill) a la rama de trabajo; nunca los MP4, la música ni la voz.
 - **Historias como las de Volze (26-nov-2026, el dueño aprobó la comparación de 16 guiones de Volze con los nuestros)**:
