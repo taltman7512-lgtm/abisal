@@ -129,3 +129,12 @@ Lecciones:
   va desordenado: limpiarlo al principio de cada `setScene`.
 - Para ubicar gente y cámaras en un interior, sacar primero una vista general (`?vista=` desde una esquina, y ≈ 2,6:
   el techo está a ≈ 3 m) y recién ahí escribir las paradas.
+
+## «We Pay The Mountain In Teeth | Roblox Story» (pueblo de día, 28-nov-2026), en `videos/montana/`
+Primer video con «Romper el techo»: 40 s, de día y saturado, la montaña con cara y boca gigante a plena luz desde el
+segundo 0, Toby (protagonista fijo, buzo naranja) y Ollie, Doctor Pell (guardapolvo blanco); caras ≈ 35 % más grandes;
+voz Lukas a 259 palabras por minuto; «Roblox» en el título y #roblox #robloxstory #shorts. Reusa el pueblo de
+Hollowmere con el clima "dia" y la montaña nueva (`partes/_montana_tej.js`). Giro en loop: «And that's why, today, the
+mountain opened its mouth.»
+Subido público: https://youtube.com/shorts/V9Bcx_subMk — **medir a las 48 h** (se quedaron ≥ 75 %, promedio visto ≥ 70 %).
+Lección: con la montaña inclinada la boca no abre (la mandíbula se apoya en el piso): los planos del labio van sin inclinar.
