@@ -521,7 +521,7 @@ const CASA_SACRISTAN = casaP(-14.5, -81, 0, 9, 8, 6.2, 6290, { muro: "muro1", te
 // ---------- LA CASA DE LA FAMILIA (la del narrador y Tib), lado oeste de la calle: planta baja = UN cuarto de verdad (6,4 × 7,4 × 3 m):
 // la puerta al frente (sin picaporte; el ropero contra ella), la ventana del frente, la VENTANA DE ATRÁS (al callejón, se abre), la mesa,
 // las camas, el hogar. Coordenadas locales: x a lo largo de la calle (+x = norte), z hacia la calle (+z = frente). Los muebles van en el detalle.
-const CASA_FAM_B = (() => { const { x, z, ry, w, d } = CASA_FAM, H = 3.0, t = .3, mu = "muro2", fz = d / 2;
+const CASA_FAM_B = (() => { const { x, z, ry, w, d } = CASA_FAM, H = 4.2, t = .3, mu = "muro2", fz = d / 2;
   const C = casaP(x, z, ry, w, d, 6.4, 6301, { muro: mu, techo: "piz0", dos: true, pendiente: 52, sinPuerta: true, sinPiso0: true, hueco: H, farol: false, balcones: 0, puertaX: 1.15 });
   const M = C.HM, at = (...a) => M.clone().multiply(TM(...a)), L = L_CASA;
   const PUE = [.6, 1.7, .26, 2.36], VEN = [-2.7, -1.3, 1.0, 2.1], VAT = [-.65, .65, 1.0, 2.1];
@@ -547,7 +547,7 @@ const CASA_FAM_B = (() => { const { x, z, ry, w, d } = CASA_FAM, H = 3.0, t = .3
 
 // ---------- EL TALLER DEL SASTRE (lado este, frente al oeste): planta baja = el taller (8,4 × 8,4 × 3,4 m): vidriera grande a la calle, puerta,
 // ventanita atrás y una al costado. Coordenadas locales como la casa de la familia (+z = hacia la calle). Los muebles van en el detalle.
-const TALLER_B = (() => { const { x, z, ry, w, d } = TALLER_T, H = 3.4, t = .3, mu = "tabla2", fz = d / 2;
+const TALLER_B = (() => { const { x, z, ry, w, d } = TALLER_T, H = 4.4, t = .3, mu = "tabla2", fz = d / 2;
   const C = casaP(x, z, ry, w, d, 9.2, 6401, { muro: mu, techo: "piz2", dos: false, pendiente: 50, frontal: true, sinPuerta: true, sinPiso0: true, hueco: H, farol: false, balcones: .5, puertaX: 1.3 });
   const M = C.HM, at = (...a) => M.clone().multiply(TM(...a)), L = L_CASA;
   const VID = [-3.8, -.5, .7, 2.8], PUE = [.7, 1.9, .26, 2.62], VAT = [-1.4, .2, 1.3, 2.4], VCO = [-1.6, -.2, 1.2, 2.4];

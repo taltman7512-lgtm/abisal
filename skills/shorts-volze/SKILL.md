@@ -127,6 +127,13 @@ anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.c
   - **Luz natural y con fuentes**: la luz sale de cosas del lugar (hogar, velas, faroles, ventanas con luna) y tiene sus
     colores. En salas oscuras donde no se ve lo que se nombra y la idea NO es dar miedo, agregar más fuentes (lámparas,
     velas, fuego) hasta que se lea. La oscuridad queda solo para los momentos de terror.
+- **Ángulos claros, en tercera persona y sin apuro (28-nov-2026)**: nada de cámara «en primera persona» (a la altura de
+  los ojos pegada a un personaje o por encima de su hombro a menos de 1 m). Planos que muestran al personaje entero o
+  de medio cuerpo con el lugar alrededor, la cámara un poco más alta que los ojos, a ≥ 2,5 m. Los movimientos más
+  lentos: como mucho una parada por segundo y medio, recorridos cortos, que siempre se entienda qué se está mirando.
+- **Techos más altos** en los interiores (≈ 4 m o más) para que entren los planos y no se vean vigas pegadas a la lente.
+- **Luz cinematográfica**: una luz principal con dirección (luna fría por la ventana o el fuego cálido), contraluz
+  (rim) que separa al personaje del fondo, contraste cálido/frío y sombras marcadas; nada de luz pareja y plana.
 - **Guardar en GitHub (28-nov-2026)**: el dueño confirmó que siga haciendo commit y push de cada cambio (código, guion,
   skill) a la rama de trabajo; nunca los MP4, la música ni la voz.
 - **Historias como las de Volze (26-nov-2026, el dueño aprobó la comparación de 16 guiones de Volze con los nuestros)**:

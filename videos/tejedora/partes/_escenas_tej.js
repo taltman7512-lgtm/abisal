@@ -22,7 +22,7 @@ const POSTE = [86, 20, -30];
 const CAIDA = [-2.2, 15.5];
 const HD = (k, dy = -.2) => () => add(headW(k).toArray(), [0, dy, 0]);
 // frente de la cara de k: a d m, girado ang alrededor, dy arriba
-const FRC = (k, d = 2.2, ang = 0, dy = .1) => () => { const h = headW(k), a = k.g.rotation.y + ang; return [h.x + Math.sin(a) * d, h.y + dy, h.z + Math.cos(a) * d] };
+const FRC = (k, d0 = 2.2, ang = 0, dy0 = .1) => () => { const d = Math.max(d0, 2.6), dy = dy0 + .35, h = headW(k), a = k.g.rotation.y + ang; return [h.x + Math.sin(a) * d, h.y + dy, h.z + Math.cos(a) * d] };
 const TCAB = (o = [0, 0, 0]) => () => add(TEJEDORA.cabezaW(), o);
 const TPECHO = (o = [0, 0, 0]) => () => add(TEJEDORA.pechoW(), o);
 const TW = (n, w = 0) => () => w ? wt(I[n], w) - .15 : S[I[n]] + .001;
@@ -48,7 +48,7 @@ const RUTAS = [
   [PA("choir", 0, [-10.5, 1.7, 16.5], () => add(headW(TIB).toArray(), [0, -.3, 0]), 52), PA("choir", 8, FRC2("TIB", 1.6, .5, .2), HD2("TIB"), 46, { h: .5 }),
    PA("goodnight", 0, [-9.6, 2.1, 14.2], HD2("TIB"), 54), PA("goodnight", 7, [-9.2, 1.9, 14.2], HD2("TIB"), 52, { h: .5 })],
   // 9 · el taller: cose; los agujeros
-  [PA("tailor", 0, [14.6, 1.9, -2.6], [10, 1.1, 1.6], 58), PA("tailor", 3, FRC2("ME", 2.8, .9, .4), HD2("ME"), 52, { h: .4 }), PA("sew", 0, () => add(TALL_MESA(), [.9, .7, -1]), TALL_MESA, 42, { h: .6 }), PA("sew", 7, () => add(headW(ME).toArray(), [.8, .3, 1.2]), TALL_MESA, 52)],
+  [PA("tailor", 0, [14.6, 1.9, -2.6], [10, 1.1, 1.6], 58), PA("tailor", 3, FRC2("ME", 2.8, .9, .4), HD2("ME"), 52, { h: .4 }), PA("sew", 0, () => add(TALL_MESA(), [.9, .7, -1]), TALL_MESA, 42, { h: .6 }), PA("sew", 7, FRC2("ME", 2.8, 1.0, .1), HD2("ME", -.4), 52)],
   // 10 · la colina: se lleva el abrigo
   [PA("anyway", 0, [94, 21.2, -21], TCAB([0, -8, 0]), 60), PA("anyway", 4, [92, 21.4, -24], () => add(POSTE, [0, 2.7, 0]), 50, { h: .5 })],
   // 11 · Marga en su puerta
@@ -76,17 +76,17 @@ const RUTAS = [
   // 22 · los cambia
   [PA("stole", 0, FRC2("ME", 2.8, -.6, .3), HD2("ME"), 50), PA("stole", 6, FRC2("ME", 2.3, -.3, .1), HD2("ME"), 46, { h: .4 })],
   // 23 · roba el abrigo de Crane del gancho
-  [PA("hook", 0, [16.8, 1.8, -63.5], CRN.gancho, 52), PA("hook", 4, [17.4, 1.8, -71.9], CRN.gancho, 46, { h: .5 }), PA("hook", 9, [14.6, 1.8, -70.6], HD2("ME"), 50)],
+  [PA("hook", 0, [16.8, 1.8, -63.5], CRN.gancho, 52), PA("hook", 9, [17.6, 2.2, -68.8], HD2("ME", -.3), 50)],
   // 24 · la campana suena y la Tejedora camina
   [PA("bell", 0, [6, 3, -50], [0, 13, -73.6], 50), PA("bell", 3, [4, 8, -62], IGL.campana, 46, { h: .5 })],
   // 25 · no fue a lo de Crane: vino a casa
   [PA("notcrane", 0, [-9, 15, 24], [.5, 4, 2], 56), PA("notcrane", 7, [-8, 12, 20], [-1, 6, 10], 58, { h: .5 })],
   // 26 · adentro: el olor, tres golpes, «open the door», la madre, Tib
   [PA("carried", 0, [-8.5, 1.7, 13.4], HD2("ME"), 52), PA("three", 0, [-7.5, 1.9, 16.6], [-7, 1.5, 12.9], 58), PA("three", 3, [-7.4, 1.8, 15.6], FAMP.puerta, 54, { h: .6 }),
-   PA("love", 0, [-7.6, 1.65, 14.4], () => add(headW(MAMA).toArray(), [0, -.35, 0]), 54), PA("beside", 2, [-7.8, 1.6, 14.2], HD2("MAMA", -.3), 50, { h: .5 }), PA("beside", 8, [-8, 1.6, 14.3], HD2("MAMA", -.3), 48)],
+   PA("love", 0, [-7.1, 2.1, 15.2], () => add(headW(MAMA).toArray(), [0, -.45, 0]), 56), PA("beside", 2, [-7.2, 2.05, 14.9], HD2("MAMA", -.4), 54, { h: .6 }), PA("beside", 8, [-7.3, 2, 14.8], HD2("MAMA", -.4), 52)],
   [PA("tibup", 0, [-10.0, 2.1, 12.4], HD2("TIB", -.2), 60), PA("tibup", 5, [-10.2, 2, 12.9], HD2("TIB", -.2), 56, { h: .5 })],
   // 27 · sale por la ventana de atrás
-  [PA("window", 0, [-17, .9, 17], [-14.2, 1.6, 14], 58), PA("window", 6, [-17.2, .8, 16.6], [-14.6, 1.8, 14], 60, { h: .5 })],
+  [PA("window", 0, [-17.6, 2.2, 20.5], [-15, 1.7, 14.6], 56), PA("window", 6, [-17.4, 2.1, 20], [-15.6, 1.6, 16], 54, { h: .6 })],
   // 28 · trepa la Tejedora, el abrigo rojo, corta los puntos, grita
   [PA("ladder", 0, () => TREPA_CAM(.15, 0), () => ME.g.getWorldPosition(new THREE.Vector3()).toArray(), 58), PA("ladder", 6, () => TREPA_CAM(.45, 0), () => ME.g.getWorldPosition(new THREE.Vector3()).toArray(), 58),
    PA("chest", 0, () => TREPA_CAM(.85, 0), TPECHO(), 52), PA("chest", 7, TPECHO_C(3.8), TPECHO(), 50, { h: .6 }),
@@ -97,7 +97,7 @@ const RUTAS = [
   // 30 · camina hasta la única puerta con picaporte
   [PA("walked", 0, [3, 1.3, 30], TCAB([0, -8, 0]), 60), PA("walked", 6, [2.5, 1.6, 22], TCAB([0, -6, 0]), 62, { h: .4 })],
   // 31 · no necesitó golpear
-  [PA("noknock", 0, [8, 4, -56], [16.8, 3, -73], 52), PA("noknock", 3, [10, 3, -60], [16.8, 1.6, -74], 48, { h: .6 }), PA("noknock", 5, [10.5, 3.4, -59], [2, 60, -70], 60, { h: .2 })],
+  [PA("noknock", 0, [8, 4, -56], [16.8, 3, -73], 52), PA("noknock", 3, [10, 3, -60], [16.8, 1.6, -74], 48, { h: .6 }), { t: () => S[I.morning] - .45, p: [10.5, 3.4, -59], l: [2, 60, -70], f: 60, h: .6, _n: "noknock" }],
   // 32 · a la mañana, la puerta de Crane abierta
   [PA("morning", 0, [10.5, 3.4, -59], [2, 60, -70], 60, { h: .55 }), PA("morning", 7, [16.8, 2.2, -62], [16.8, 1.3, -75.5], 50, { h: .5 })],
   // 33 · ahora golpea con la voz de Crane, leyendo nombres
@@ -139,7 +139,7 @@ function setScene(t) {
   ALL.forEach(c => { c.g.visible = false; pose(c, t, {}); quieto(c, t); setFace(c, "neutral") });
   abrigoRojo(MAMA, false); abrigoPuesto(CRANE, null); abrigoEnMano(ME, null); lista(ME, false); muneco(TIB, null);   // lo persistente se limpia cada cuadro (los cuadros se renderizan desordenados)
   const lug = LUG[N] || "calle";
-  if (!ENV.interiorLuz) ENV.interiorLuz = { ...ENV.interior, hemi: .55, hemiG: "#4a3220", exp: 2.45 };
+  if (!ENV.interiorLuz) ENV.interiorLuz = { ...ENV.interior, hemi: .4, hemiG: "#4a3220", exp: 2.5 };
   const MIEDO_IN = ["carried", "three", "love", "beside", "tibup"].includes(N);
   let envN = QS.get("env") || ({ calle: "tejedora", calleSin: "noche", niebla: "nocheNiebla", casa: MIEDO_IN ? "interior" : "interiorLuz", recuerdo: "noche", dia: "amanecer" })[lug];
   if (N === "morning" && lt < 1.6) { const u = eIO(P(lt, 0, .55)), A = ENV.noche, B = ENV.amanecer, M = {}; for (const kk in B) { const a = A[kk], b = B[kk]; M[kk] = typeof b === "number" && typeof a === "number" ? lerp(a, b, u) : typeof b === "string" && typeof a === "string" && b[0] === "#" ? "#" + new THREE.Color(a).lerp(new THREE.Color(b), u).getHexString() : Array.isArray(b) && Array.isArray(a) && typeof b[0] === "number" ? b.map((v, i) => lerp(a[i], v, u)) : u < .5 ? a ?? b : b } ENV._mezcla = M; envN = "_mezcla" }
@@ -186,7 +186,7 @@ function setScene(t) {
     case "three": { familia(); const f = Math.max(...[.2, .55, .9].map(g => Math.exp(-(((k - g) / .04) ** 2)))); TEMBLOR = .015 * f; roperoMover(0); break }
     case "love": case "beside": familia(); setFace(MAMA, N === "beside" || lt > dW(3) ? "llora" : "tristeMudo"); break;
     case "tibup": den(TIB, -11.6, 15.2, -10, 12.4, "miedo"); den(ME, -10.2, 12.6, -6.6, 12.9, "terror"); taparBoca(ME, TIB, P(lt, dW(5) - .3, dW(7))); den(MAMA, -11.8, 16.2, -6.6, 12.9, "llora"); break;
-    case "window": { puertaAbrir("ventanaAtras", 1); adentro(ME, FAMP.ventana[0] - .3, FAMP.ventana[1], -Math.PI / 2); salirVentana(ME, P(lt, 0, dW(6))); setFace(ME, "determined"); tejeFam(); break }
+    case "window": { puertaAbrir("ventanaAtras", 1); const z = 14.6 + 1.6 * P(lt, .3, len); ponerP(ME, -15.9, z, 0); andar(ME, t); setFace(ME, "determined"); tejeFam(); break }
     case "ladder": case "chest": case "cut": case "scream": { tejeFam(); const PAS = .9, tirones = kk => { const n = Math.floor(kk), f = kk - n; return n + eIO(P(f, .45, 1)) };   // agarra, tira, apoya: sube a tirones
       const u = N === "ladder" ? .1 + .5 * tirones(lt / PAS) / Math.max(1, len / PAS) : N === "chest" ? .6 + .4 * tirones(lt / PAS) / Math.max(1, len / PAS) : 1; const q = TEJEDORA.trepaPunto(Math.min(1, u));
       enAire(ME, [q.p[0] + q.n[0] * .8, q.p[1] - 1.2, q.p[2] + q.n[2] * .8], Math.atan2(-q.n[0], -q.n[2])); trepar(ME, t, { vel: N === "cut" || N === "scream" ? 0 : 1 / PAS });
@@ -214,6 +214,8 @@ function setScene(t) {
   if (lug === "casa" && cam.position.x < -6) { LX = LX.slice(0, 4); const fl = 1 + .12 * Math.sin(t * 9.3) + .08 * Math.sin(t * 23.1);
     LX.push([[-9.9, .9, 12.1], (MIEDO_CASA ? 1.6 : 3.2) * fl, "#ff9a48", 9], [[-10.2, 1.55, 14.3], MIEDO_CASA ? .8 : 2, "#ffc27a", 6], [[-12.9, 1.2, 16.1], MIEDO_CASA ? .6 : 1.6, "#ffcf8a", 5]) }   // hogar, lámpara de la mesa, vela de la cama
   if (lug === "casa" && cam.position.x > 6) LX.push([[9, 2.6, 3.4], 1.8, "#ffd29a", 8], [[14.6, 2.4, -1], 1.4, "#ffc27a", 7]);   // taller: lámparas de pared
+  if (window.CAM_L) { const l = new THREE.Vector3(...window.CAM_L), dv = l.clone().sub(cam.position).setY(0).normalize(), rim = l.clone().addScaledVector(dv, 1.8).add(new THREE.Vector3(0, 1.1, 0));
+    LX = [[rim.toArray(), lug === "casa" ? 2.6 : 3.4, lug === "casa" || lug === "dia" ? "#a9c4ff" : "#b8ccff", 7], ...LX] }   // contraluz frío (luz cinematográfica, pedido del dueño)
   if (N === "window") LX.push([[-15.4, 2.6, 15], 8, "#ffc480", 14], [[-13, 1.8, 14], 4, "#ffc480", 7]);
   if (lug !== "casa") R.toneMappingExposure *= 1.18;   // revisor: 10 % de negros lights(hayTeje ? TEJEDORA.luzFria(LX) : LX);
 }
