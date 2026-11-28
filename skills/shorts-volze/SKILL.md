@@ -111,6 +111,22 @@ anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.c
   7. **Ya implementado** (28-nov-2026) en `videos/tejedora/partes/_camara_vuelo.js` (`rutaCam`, `RUTAS`) y usado en
      `videos/tejedora/partes/_escenas_tej.js` (`PA(frase, palabra, pos, mira, fov, {h, deriva})`): copiarlo al empezar un
      video. Ver las lecciones de «Nobody Answers The Knock» en `referencia/historias-hechas.md`.
+- **Revisión del dueño a «Nobody Answers The Knock» (28-nov-2026)**:
+  - **Manos con color de piel**: las manos de bloque llevan el color de la piel en la punta del brazo (no la manga hasta
+    el final). Siempre que se vea una mano.
+  - **Nadie aparece de la nada**: un personaje que entra al plano llega caminando, sale de una puerta abriéndola, se
+    levanta, etc. Si la frase anterior no lo tenía, la escena muestra cómo entra.
+  - **No repetir el mismo plano** en frases seguidas (mismo lugar, mismo ángulo, misma distancia): cada frase cambia de
+    ángulo o de tamaño de plano.
+  - **Ni cámara ni personajes atraviesan objetos** (mesas, paredes, a la criatura). Revisar la hoja de tomas y también los
+    tramos entre paradas.
+  - **Trepar con movimiento real por articulaciones**: brazos y piernas alternados (agarra, tira, apoya el pie), el cuerpo
+    separado de la superficie para que se vea entero y nada atraviese; sube a tirones, no deslizándose.
+  - **Cambios de hora (noche → día)**: la cámara sube mirando al cielo, el cielo pasa de noche a día y la cámara baja al
+    plano nuevo. Nada de corte seco de noche a día.
+  - **Luz natural y con fuentes**: la luz sale de cosas del lugar (hogar, velas, faroles, ventanas con luna) y tiene sus
+    colores. En salas oscuras donde no se ve lo que se nombra y la idea NO es dar miedo, agregar más fuentes (lámparas,
+    velas, fuego) hasta que se lea. La oscuridad queda solo para los momentos de terror.
 - **Guardar en GitHub (28-nov-2026)**: el dueño confirmó que siga haciendo commit y push de cada cambio (código, guion,
   skill) a la rama de trabajo; nunca los MP4, la música ni la voz.
 - **Historias como las de Volze (26-nov-2026, el dueño aprobó la comparación de 16 guiones de Volze con los nuestros)**:

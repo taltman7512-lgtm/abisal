@@ -236,7 +236,8 @@ const torsoLadoC = o => ROPAC["l" + JSON.stringify(o)] ||= tex(64, 64, (g, w, h)
   if (o.delantal) { g.fillStyle = o.delantal[0]; g.fillRect(0, 28, w, 3) } if (o.faja) { g.fillStyle = o.faja[0]; g.fillRect(0, h - 13, w, 7) } if (o.panuelo) { g.fillStyle = o.panuelo; g.fillRect(0, 0, w, 5) } sombra2D(g, w, h, .12) });
 // brazo: manga hasta `manga` (0 sin manga … 1 larga) con estampado (kind/alt/alt2), puño (punoH = alto: arremangado grueso), rayas, guante (y guanteDesde),
 // manchas, cera, quemaduras (n, en la piel), remiendo; el resto es la mano color piel
-const brazoC = o => ROPAC["b" + JSON.stringify(o)] ||= tex(128, 256, (g, w, h) => { const y = h * (o.manga ?? .82); g.fillStyle = o.skin; g.fillRect(0, 0, w, h); g.fillStyle = o.col; g.fillRect(0, 0, w, y);
+// manos con color de piel (pedido del dueño, 28-nov-2026): la manga nunca llega a la punta; queda un 24 % de mano
+const brazoC = o => ROPAC["b" + JSON.stringify(o)] ||= tex(128, 256, (g, w, h) => { const y = h * Math.min(o.manga ?? .82, .76); g.fillStyle = o.skin; g.fillRect(0, 0, w, h); g.fillStyle = o.col; g.fillRect(0, 0, w, y);
   if (o.kind) patronC(g, w, y, o, o.col);
   if (o.rayas) { g.fillStyle = o.rayas; for (let yy = 34; yy < y - 34; yy += 54) g.fillRect(0, yy, w, 16) }
   if (o.puno) { const ph = o.punoH || 20; g.fillStyle = o.puno; g.fillRect(0, y - ph - 6, w, ph); if (o.punoH) { g.fillStyle = "rgba(0,0,0,.18)"; g.fillRect(0, y - ph / 2 - 6, w, 3) } }
@@ -391,7 +392,7 @@ function vestirC(k, o) { const skin = (typeof pielPastel === "function" && !o.si
   k.hcad = pl; k._p0 = { armY: yS, armX: tw / 2 + bw / 2, armL: bl }; k._forma = F; delete k.abrigos;
   const plast = map => new THREE.MeshStandardMaterial({ map, roughness: .5 }), t = o.torso;
   part(RB(tw, th, td, .05), boxMats(plast(torsoLadoC(t)), plast(torsoC(t)), plast(torsoC(t, true))), 0, pl + th / 2, 0, k.body, 0);
-  [k.armL, k.armR].forEach((a, i) => { part(RB(bw, bl, bd, .05), plast(brazoC({ skin, ...o.brazo, seed: (o.brazo.seed || 3) + i })), 0, .08 - bl / 2, 0, a, 0); a.position.set((i ? 1 : -1) * k._p0.armX, yS, 0);
+  [k.armL, k.armR].forEach((a, i) => { part(RB(bw, bl, bd, .05), plast(brazoC({ skin, ...o.brazo, seed: (o.brazo.seed || 3) + i })), 0, .08 - bl / 2, 0, a, 0); part(RB(bw * 1.03, bl * .2, bd * 1.03, .05), new THREE.MeshStandardMaterial({ color: skin, roughness: .5 }), 0, .08 - bl * .9, 0, a, 0);   // la mano, color piel (también la punta) a.position.set((i ? 1 : -1) * k._p0.armX, yS, 0);
     const hd = i ? k.handR : k.handL; a.add(hd); hd.position.set(0, .18 - bl, 0); hd.rotation.set(0, 0, 0); hd.material = MANO_INVIS; hd.castShadow = hd.receiveShadow = false });   // la mano: ancla invisible para la utilería
   [k.legL, k.legR].forEach((l, i) => { const po = { skin, ...o.pierna, seed: (o.pierna.seed || 5) + i }, lado = plast(piernaC(po)); part(RB(pw, pl, pd, .05), boxMats(lado, plast(piernaC({ ...po, frente: 1 })), lado), 0, .01 - pl / 2, 0, l, 0); l.position.set((i ? 1 : -1) * F.sepPierna, pl, 0) });
   const mCab = o.cabezaMat || new THREE.MeshStandardMaterial({ color: skin, roughness: .6, emissive: skin, emissiveIntensity: .28 });
