@@ -14,6 +14,31 @@ Lo único que se aprueba es la historia (paso 1) si la persona quiere verla; si 
 El dueño dio permiso (24-nov-2026) para modificar esta skill cuando haga falta. **Cada vez que pida un cambio de
 gusto** (pelo, aspecto de los personajes, nivel de detalle, voz, música, ritmo, tipo de historia, lo que sea),
 anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.claude/skills/shorts-volze/`.
+- **ROMPER EL TECHO DE ≈ 1,2 K (28-nov-2026, aprobado por el dueño; MANDA sobre lo que se contradiga abajo)**.
+  Diagnóstico con datos reales de RobloxStories (6 videos): todos se clavan en 1,1–1,4 K vistas (el lote de prueba de
+  Shorts que no escala); se queda el 66–68 % (meta ≥ 75 %); promedio visto ≈ 33–50 % en videos de 106–133 s (meta ≥ 70 %);
+  97 % del tráfico es el feed de Shorts; la audiencia que le llega son hombres 35–44 de Canadá/India (no el público
+  Roblox de Volze). Mirado lado a lado: Volze se entiende en medio segundo en el celular (saturado, cálido, mucha luz,
+  criatura a plena luz, avatares que se reconocen como Roblox); los nuestros de noche gris-azul con niebla se leen mal.
+  Reglas nuevas para los próximos videos:
+  1. **Duración 45–70 s** (≈ 200–300 palabras). Reemplaza «sin límite de duración» hasta que el promedio visto pase el
+     70 % en 3 videos seguidos; ahí se puede volver a alargar de a poco.
+  2. **Segundo 0**: la criatura (o lo raro y gigante) A PLENA LUZ junto al protagonista, con la amenaza ya ocurriendo.
+     Nunca abrir con una calle, un paisaje o algo oscuro.
+  3. **Luz y paleta**: de día o atardecer dorado, colores saturados, sin niebla espesa; la criatura contrasta con el
+     fondo; cada plano tiene que leerse con el celular a brillo bajo. Terror nocturno como mucho 1 de cada 4 videos, y
+     aun así con faroles cálidos y la criatura recortada con luz.
+  4. **Personajes más cerca del avatar clásico de Roblox** (cabeza cubo clara, cara simple, torso y brazos de colores
+     planos), con **un protagonista propio fijo** que se repite en todos los videos para que el público lo reconozca. No
+     copiar al protagonista de Volze (rubio en punta, cabeza y brazos blancos, torso azul) ni usar assets ni logos.
+  5. **Título y metadatos con señal de nicho** durante los primeros 15–20 videos: título corto + «Roblox» (ej.
+     «Nobody Answers The Knock | Roblox Story» o «Roblox: Nobody Answers…»), y en la descripción #roblox #robloxstory
+     #shorts. Reemplaza «sin hashtags ni Roblox en el título» (Volze puede omitirlo por su historial; un canal nuevo no).
+  6. **Ritmo**: un giro o escalada cada 5–8 s, sin tramos de explicación de más de 2 frases seguidas; el final cierra en
+     loop con la primera frase.
+  7. **Publicar uno por día, a la misma hora**, sin borrar los anteriores. Dejar «No creado para niños».
+  8. **Medir cada video a las 48 h** (Studio → Estadísticas del video): «se quedaron viendo» ≥ 75 % y promedio visto
+     ≥ 70 %. Anotarlo en `referencia/historias-hechas.md`. Si no se llega con estos cambios, el problema es el guion.
 - **Versión para celular (28-nov-2026)**: el dueño dijo primero que no la hiciera y después la pidió igual. Hacer el
   `-cel.mp4` (720×960, crf 30) y mandar ESE con `SendUserFile`: el `-fondo.mp4` pesa ≈ 660 MB y no llega al celular
   (límite de 500 MB).
@@ -146,7 +171,7 @@ anotarlo acá con la fecha, en la misma conversación, y copiar la skill a `~/.c
   - **Escala grande**: mejor «the whole world / every city» que un pueblito.
   - **Estructura distinta en cada video** (cuenta regresiva, dilema, investigación, final abierto) y una segunda revelación
     a mitad. Cierre «My whole life… Today…» prohibido como fórmula fija.
-  - **Sin límite de duración (26-nov-2026, el dueño)**: el video dura lo que haga falta para que la historia se explique bien.
+  - (Suspendido el 28-nov-2026 por «Romper el techo»: ahora 45–70 s.) **Sin límite de duración (26-nov-2026, el dueño)**: el video dura lo que haga falta para que la historia se explique bien.
     Como referencia, el top de Volze va de 125 a 158 s; nosotros veníamos cortos (104–108 s), así que no recortar escenas para achicar.
   - **Probar la comedia «I…»** (hazaña absurda que escala, sin monstruo, remate que se muerde la cola; el más visto de
     Volze, 37,5 M): música juguetona ≈ 16 dB bajo la voz y un golpe de efecto por barrido.
@@ -333,13 +358,14 @@ Partir de acá para videos nuevos, no de la polilla:
 ## Las 10 reglas (medidas, ordenadas por impacto)
 
 1. **Premisa en una oración con una regla imposible**; título de **≤ 5 palabras**, fórmula «We… / Nobody… / Don't… / It…»
-   (comedia: «I…»). Sin hashtags ni «Roblox» en el título (son los peores del canal: 43 k–360 k).
+   (comedia: «I…»). En el canal de Volze los títulos con «Roblox» rinden peor, pero **para nuestro canal nuevo va «Roblox» en el
+   título y #roblox #robloxstory en la descripción** (ver «Romper el techo»).
 2. **Hook de dos oraciones desde el segundo 0,0**: la regla (≈ 0–2 s) y el costo (empieza antes de 3,5 s), sobre una
    imagen que ya se mueve. Sin silencio, logo ni plano de ambientación. **En el cuadro 0 está la amenaza en
    primerísimo plano** (70–90 % del ancho) y el narrador entra en cuadro antes de 1,0 s.
 3. **Un gimmick visual que se entiende en un frame** (algo gigante, altísimo o multitudinario que ilustra la regla).
 4. **Un solo narrador en primera persona, rápido**: 245–287 palabras por minuto (mediana 260), diálogos citados por la
-   misma voz. **Sin límite de duración** (pedido del dueño): lo que haga falta para explicar bien la historia (Volze: 105–178 s).
+   misma voz. **45–70 s** por ahora (ver «Romper el techo»; Volze: 105–178 s, pero con retención alta).
 5. **Giro en los últimos ≈ 5 s que retoma la regla del arranque y la da vuelta.** El video termina 0,2–2 s después de
    la última palabra: sin cierre, sin pantalla final (bucle).
 6. **Contraste de tres niveles**: personajes de bloques propios / mundo con texturas reales / criatura u objeto
@@ -608,7 +634,8 @@ node render-gpu.mjs video salida/<nombre>.mp4 --conc=3 --sinmusica
 ```
 
 ## Checklist antes de exportar
-- [ ] Título ≤ 5 palabras, sin hashtags ni «Roblox».
+- [ ] Título corto + «Roblox»; descripción con #roblox #robloxstory #shorts (ver «Romper el techo»).
+- [ ] 45–70 s; segundo 0 con la criatura a plena luz y el protagonista; luz de día/atardecer saturada.
 - [ ] Primera palabra en 0,0 s; la segunda oración (el costo) empieza antes de 3,5 s.
 - [ ] La historia se entiende entera (sin límite de duración) y 245–287 palabras por minuto (`render-gpu.mjs info` da la duración).
 - [ ] La última frase da vuelta la regla del arranque; el video termina 0,2–2 s después de la última palabra.
